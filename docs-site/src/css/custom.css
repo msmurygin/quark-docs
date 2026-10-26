@@ -1,20 +1,17 @@
-/**
- * Quark WMS documentation theme.
- * Brand teal comes from the web UI's own ramp (--wms-color-brand--*:
- * 70 #004d4d, 60 #147878, 50 #37a3a3, 40 #63bdbd). The light-mode accent is a
- * touch darker than 60 so links pass 4.5:1 on white; dark mode uses the
- * lighter end of the ramp for the same reason on a dark surface.
+/** Quark documentation uses the public website's palette, fonts and pixel branding.
+ * Keep one token block per theme. Dark tokens use higher specificity so CSS
+ * optimization cannot reorder them behind light-mode defaults.
  */
 :root {
-  --ifm-color-primary: #0f6b6b;
-  --ifm-color-primary-dark: #0e6060;
-  --ifm-color-primary-darker: #0d5a5a;
-  --ifm-color-primary-darkest: #0a4a4a;
-  --ifm-color-primary-light: #127777;
-  --ifm-color-primary-lighter: #137c7c;
-  --ifm-color-primary-lightest: #179b9b;
-  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ifm-color-primary: #00705d;
+  --ifm-color-primary-dark: #006552;
+  --ifm-color-primary-darker: #005e4d;
+  --ifm-color-primary-darkest: #004d40;
+  --ifm-color-primary-light: #00806a;
+  --ifm-color-primary-lighter: #008c74;
+  --ifm-color-primary-lightest: #009b81;
+  --ifm-font-family-base: 'Inter',system-ui,sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono',ui-monospace,monospace;
   --ifm-font-size-base: 100%;
   --ifm-line-height-base: 1.65;
   --ifm-heading-font-weight: 650;
@@ -23,8 +20,8 @@
   --ifm-h2-font-size: 1.55rem;
   --ifm-h3-font-size: 1.2rem;
   --ifm-code-font-size: 88%;
-  --ifm-global-radius: 8px;
-  --ifm-navbar-height: 3.75rem;
+  --ifm-global-radius: 0;
+  --ifm-navbar-height: 4.5rem;
   --ifm-navbar-shadow: none;
   --ifm-navbar-link-hover-color: var(--ifm-color-primary);
   --ifm-toc-border-color: var(--ifm-color-emphasis-200);
@@ -34,31 +31,36 @@
   --ifm-pre-padding: 1rem 1.1rem;
   --ifm-footer-background-color: var(--ifm-background-surface-color);
   --docusaurus-highlighted-code-line-bg: rgba(15, 107, 107, 0.12);
-  --quark-surface: #f6f8fa;
-  --quark-border: #dfe4e9;
+  --quark-surface: #f7f7f5;
+  --quark-border: #d4d3dd;
   --quark-warn-bg: #fff6e0;
   --quark-warn-border: #e2b53c;
   --quark-warn-text: #5c4300;
+  --ifm-background-color: #fafaf7;
+  --ifm-background-surface-color: #fff;
+  --ifm-font-color-base: #0b0b12;
+  --ifm-card-border-radius: 0;
+  --ifm-button-border-radius: 0;
 }
 
-[data-theme='dark'] {
-  --ifm-color-primary: #4fb8b8;
-  --ifm-color-primary-dark: #3dadad;
-  --ifm-color-primary-darker: #38a3a3;
-  --ifm-color-primary-darkest: #2e8686;
-  --ifm-color-primary-light: #66c3c3;
-  --ifm-color-primary-lighter: #72c8c8;
-  --ifm-color-primary-lightest: #94d6d6;
-  --ifm-background-color: #14181c;
-  --ifm-background-surface-color: #1b2026;
+html[data-theme='dark'] {
+  --ifm-color-primary: #00cbaa;
+  --ifm-color-primary-dark: #00b799;
+  --ifm-color-primary-darker: #00a98d;
+  --ifm-color-primary-darkest: #00846e;
+  --ifm-color-primary-light: #24d4b8;
+  --ifm-color-primary-lighter: #48ddc6;
+  --ifm-color-primary-lightest: #74e7d5;
+  --ifm-background-color: #14141c;
+  --ifm-background-surface-color: #1b1b26;
   --ifm-navbar-background-color: #14181c;
-  --ifm-font-color-base: #e6eaee;
+  --ifm-font-color-base: #f6f6fa;
   --ifm-color-emphasis-100: #1e242b;
   --ifm-color-emphasis-200: #2d353d;
   --ifm-color-emphasis-300: #3a444d;
   --docusaurus-highlighted-code-line-bg: rgba(79, 184, 184, 0.16);
-  --quark-surface: #1b2026;
-  --quark-border: #2d353d;
+  --quark-surface: #1b1b26;
+  --quark-border: #48485c;
   --quark-warn-bg: #2d2610;
   --quark-warn-border: #8a6d1a;
   --quark-warn-text: #f0d98a;
@@ -147,13 +149,18 @@ pre code { border: 0; }
 @media print { .navbar, .footer, .theme-doc-sidebar-container, .pagination-nav { display: none !important; } }
 
 /* white on the light dark-mode teal is only ~2.3:1; use the page's dark colour instead */
-[data-theme='dark'] .button--primary { --ifm-button-color: #08201f; }
+[data-theme='dark'] .button--primary { --ifm-button-color: #fff; }
+
 
 /* Public website identity, shared with quark.build. Existing guide formatting remains intact. */
-:root{--ifm-color-primary:#00705d;--ifm-color-primary-dark:#006552;--ifm-color-primary-darker:#005e4d;--ifm-color-primary-darkest:#004d40;--ifm-color-primary-light:#00806a;--ifm-color-primary-lighter:#008c74;--ifm-color-primary-lightest:#009b81;--ifm-background-color:#fafaf7;--ifm-background-surface-color:#fff;--ifm-font-color-base:#0b0b12;--ifm-font-family-base:'Inter',system-ui,sans-serif;--ifm-font-family-monospace:'JetBrains Mono',ui-monospace,monospace;--ifm-global-radius:0;--ifm-card-border-radius:0;--ifm-button-border-radius:0;--ifm-navbar-height:4.5rem;--quark-border:#d4d3dd;--quark-surface:#f7f7f5}
-[data-theme='dark']{--ifm-color-primary:#00cbaa;--ifm-color-primary-dark:#00b799;--ifm-color-primary-darker:#00a98d;--ifm-color-primary-darkest:#00846e;--ifm-color-primary-light:#24d4b8;--ifm-color-primary-lighter:#48ddc6;--ifm-color-primary-lightest:#74e7d5;--ifm-background-color:#14141c;--ifm-background-surface-color:#1b1b26;--ifm-font-color-base:#f6f6fa;--quark-border:#48485c;--quark-surface:#1b1b26}
 .navbar{background:#0b0b12;color:#fff;border-color:#30303e}.navbar__link,.navbar__brand,.navbar__toggle{color:#fff}.navbar__link--active,.navbar__link:hover{color:#00cbaa}.navbar__logo{height:32px;width:112px}.navbar__logo img{width:112px;height:32px}.navbar button{color:#fff}.navbar-sidebar{background:var(--ifm-background-color);color:var(--ifm-font-color-base)}.navbar-sidebar .navbar__brand{color:#fff}.navbar-sidebar .menu__link{color:var(--ifm-font-color-base)}
 .button{font:500 .75rem/1.4 var(--ifm-font-family-monospace);padding:.85rem 1.15rem;border-radius:0}.button--primary{background:#3d3d7a;border-color:#3d3d7a;color:#fff}.button--primary:hover{background:#303064;border-color:#303064;color:#fff}
 .footer{background:#0b0b12;color:#b3b3c3;border-top:1px solid #30303e}.footer__title{color:#fff;font:500 .75rem var(--ifm-font-family-monospace);text-transform:uppercase;letter-spacing:.05em}.footer__link-item{color:#b3b3c3}.footer__link-item:hover{color:#00cbaa}.footer__copyright{font:.7rem var(--ifm-font-family-monospace)}
 .markdown h1{font-weight:700;letter-spacing:-.035em}.markdown h2,.markdown h3{font-weight:600}.theme-doc-sidebar-container{border-color:var(--quark-border)}:focus-visible{outline:2px solid var(--ifm-color-primary);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Keep wide reference tables inside the reading column on narrow screens. */
+.theme-doc-markdown, .markdown, article { min-width: 0; }
+.markdown table code { overflow-wrap: anywhere; }
+.navbar-sidebar__brand { background: #0b0b12; }
+.navbar-sidebar .navbar-sidebar__back { color: var(--ifm-font-color-base); }

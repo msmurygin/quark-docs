@@ -211,8 +211,9 @@ docs-site/
 ## Licence and third-party code
 
 Docusaurus, React, the search plugin and the zoom plugin are MIT-licensed. The
-portal contains no third-party code. Fonts are the system fonts of the reader's
-device (no font download, so no tracking and a faster first paint).
+portal contains no third-party code. The site loads Inter and JetBrains Mono from
+Google Fonts to match quark.build, with system-font fallbacks. No analytics or
+tracking events have been added.
 
 ## Publication automation
 
