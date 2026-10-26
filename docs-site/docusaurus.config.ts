@@ -89,6 +89,9 @@ const config: Config = {
       '@easyops-cn/docusaurus-search-local',
       {
         hashed: true,
+        // Local search must work on noindex review builds too. This does not
+        // change crawler metadata or robots.txt.
+        forceIgnoreNoIndex: true,
         language: ['en'],
         indexDocs: true,
         indexBlog: false,

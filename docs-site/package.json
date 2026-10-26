@@ -16,7 +16,8 @@
     "postbuild": "node scripts/finalize-build.mjs",
     "test:docs": "node --test scripts/api-portal.test.mjs scripts/publication.test.mjs",
     "prebuild": "node scripts/check-publication.mjs",
-    "pretest:docs": "npm run gen:api"
+    "pretest:docs": "npm run gen:api",
+    "pretypecheck": "npm run gen:api && npm run gen:cards"
   },
   "dependencies": {
     "@docusaurus/core": "3.10.2",
