@@ -1,16 +1,15 @@
 # Quark WMS documentation site
 
 A static website made from the customer guides in
-`docs-obsidian/user-guide/`, plus an API portal for the 756-method JSON-RPC
-API.
+`docs-obsidian/user-guide/`, plus an API portal generated from the WMS OpenRPC catalog.
 
 - Guides: Docusaurus 3 (classic preset), served at `/docs/`.
 - API portal: a small dependency-free static app, served at `/api/`.
 - Landing page: `/` (`src/pages/index.tsx`).
 - Search: offline, built at build time (`@easyops-cn/docusaurus-search-local`). No service needed.
 
-Nothing here is deployed by anything in this repository. `npm run build`
-writes a folder (`build/`) that you can put on any static host.
+Vercel builds and publishes `main` at https://docs.quark.build. `npm run build`
+also writes a local static `build/` folder for validation.
 
 ## The rule: sources stay where they are
 
@@ -115,7 +114,7 @@ framework and no build step. Edit them directly; `npm start` serves them as is.
 They never put catalog text into HTML (everything is set as text), so a method
 description cannot inject markup.
 
-Features: nav grouped by context and module, search across 756 methods (press
+Features: nav grouped by context and module, search across the generated method catalog (press
 `/`; arrows and Enter), a page per method with deep links (`/api/#receipt_close`,
 `/api/#ctx-inbound` for a context), copy-able curl and JSON body (the server
 address is editable and remembered), a schema browser, notes, errors, and the
@@ -127,10 +126,9 @@ key and no numeric code (`docs-obsidian/user-guide/api/05-errors.md`). The
 portal says so on the overview and on every method, and `npm run test:api`
 checks that the OpenAPI file says so. Keep that when you change the portal.
 
-When a method is added to the server, the flow is the one in
-`docs-obsidian/user-guide/api/00-README.md`: run
-`scripts/docs-api/regenerate.sh` (refreshes `openrpc.json` and `reference/`),
-then rebuild this site.
+When server methods change, a maintainer refreshes the catalog from the separate WMS code checkout. The Rust generator and `scripts/docs-api/regenerate.sh` belong to `wms-axum`, not this repository. They produce local intermediate `openrpc.json` and method reference files. Review those outputs, then copy the catalog and generated `api/reference/` into the matching paths here. Never overwrite hand-written API chapters with generated material.
+
+In this repository, run `npm run gen:api`, `npm run test:docs` and `npm run build` in `docs-site`. Check changed method examples against the reviewed catalog. No running warehouse or database is needed to build this documentation website.
 
 ## Task cards
 
@@ -170,21 +168,18 @@ English is the default. `ru` and `kk` are prepared but off: both are declared in
 
 | What | Where | Why |
 |---|---|---|
-| Public address | `DOCS_SITE_URL` (or `url` in the config), default `https://docs.example.com` | Canonical URLs, sitemap, social cards |
+| Public address | `DOCS_SITE_URL` (or `url` in the config), default `https://docs.quark.build` | Canonical URLs, sitemap, social cards |
 | Path prefix | `DOCS_BASE_URL`, default `/` | Only if the site is not served at the root (for example `/wms-docs/`). The API portal uses relative links and keeps working. |
 | Server address in curl examples | Defaults to `$BASE_URL`; each reader can type their own in the portal | Nothing to do |
-| Footer | `themeConfig.footer` | Add a legal name, support contact, privacy link. It is deliberately neutral now. |
-| Editing links | `docs.editUrl` is unset | Do not set it for customer docs: the sources live in a private repository |
+| Footer | `themeConfig.footer` | Links back to the product, contact and privacy pages. |
+| Editing links | `docs.editUrl` is unset | Optional; the customer guide source is public in quark-docs. |
 | Analytics / cookie banner | not included | Add through your host or a Docusaurus plugin if you need it |
-| `robots.txt` | not included | Add `static/robots.txt` (`Disallow: /` for a private site) |
+| `robots.txt` | `scripts/finalize-build.mjs` | Production allows crawling; previews disallow it and carry noindex metadata. |
 | Access control | the host | See below |
-| Content status | `README.md` source, landing page "Status: draft" | Update the text in `src/pages/index.tsx` when the guides leave draft |
+| Content status | Guide sources | Existing guides are published; remaining gaps are tracked for the documentation writer. |
 | Not-confirmed notes | guide sources | The guides contain `Not confirmed by code:` notes written for the team; decide whether customers should see them |
 
-Hosting notes (static hosts, access control, custom domain, versioned docs) are
-in the hand-off report; short version: the output is plain files, any static
-host works, and the pages are not safe to publish publicly until the points
-above are done.
+The output is static files. The approved production origin is docs.quark.build. Keep review deployments non-indexable and do not publish credentials, customer data or internal findings.
 
 ## Layout
 

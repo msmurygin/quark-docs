@@ -2,14 +2,14 @@
 
 This guide explains the WMS JSON-RPC API. Use it to read data from the warehouse system and to run actions such as receiving goods, moving stock and picking orders.
 
-Every fact in this guide comes from the source code in this repository. When a fact could not be checked in the code, it is marked with `> Not confirmed by code:`.
+Every fact in this guide comes from the source code in the separate Quark WMS repository. When a fact could not be checked in the code, it is marked with `> Not confirmed by code:`.
 
 ## What the API is
 
 - The API is **JSON-RPC 2.0 over HTTP**. All business calls go to one URL: `POST /api/rpc`.
 - A call names a **method** (for example `receipt_close`) and sends **params** (a JSON object).
 - The server is `app-server`. It is a Rust program built on Axum.
-- The API has **756 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
+- The API has **932 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
 
 ## Base URL
 
@@ -62,15 +62,15 @@ There is **no version number in the URL**. The path is always `/api/rpc`. A chan
 
 | Context | Methods | What it covers |
 |---|---|---|
-| `enterprise` | 71 | Users, roles, permissions, API keys, user warehouses, audit log, settings, override grants |
-| `master_data` | 126 | Owners, SKUs, locations, packs, policies, barcode formats |
-| `inbound` | 112 | ASNs, receipts, receipt lines, damage, receipt policies |
-| `inventory` | 123 | Moves, putaway, holds, serials, adjustments, counts, transaction log |
-| `outbound` | 144 | Shipment orders, allocation, waves, picking, packing, cartonization |
-| `tasks` | 50 | Work areas, operators, equipment profiles, task claim and finish |
+| `enterprise` | 78 | Users, roles, permissions, API keys, user warehouses, audit log, settings, override grants |
+| `master_data` | 127 | Owners, SKUs, locations, packs, policies, barcode formats |
+| `inbound` | 119 | ASNs, receipts, receipt lines, damage, receipt policies |
+| `inventory` | 161 | Moves, putaway, holds, serials, adjustments, counts, transaction log |
+| `outbound` | 263 | Shipment orders, allocation, waves, picking, packing, cartonization |
+| `tasks` | 48 | Work areas, operators, equipment profiles, task claim and finish |
 | `reporting` | 51 | Reports, labels, templates, printers |
 | `rf` | 11 | Handheld (RF) screen definitions |
-| `integration` | 68 | Stock reads, marking, entity attributes, event registry, events, subscribers, deliveries |
+| `integration` | 74 | Stock reads, marking, entity attributes, event registry, events, subscribers, deliveries |
 
 A context is only a way to group methods. The URL and the call format are the same for all of them.
 
@@ -81,25 +81,10 @@ A context is only a way to group methods. The URL and the call format are the sa
 - Placeholders such as `<sku_code>` stand for values you must replace.
 - Example responses show the shape. The values are made up.
 
-## How this guide is built
+## How this guide is maintained
 
-The method reference is generated. Do not edit the files in `reference/` by hand.
+The method catalog and the files in `reference/` are generated from Quark WMS code. The server source and its Rust generator live in the separate WMS repository; they are not part of this documentation website. Maintainers generate and review the catalog there, then update `openrpc.json` and `reference/` here.
 
-```bash
-bash scripts/docs-api/regenerate.sh
-```
+The website builds the API portal from that reviewed catalog with `npm run gen:api` in `docs-site`. Its tests compare the generated portal with the catalog. They do not certify a customer's running installation.
 
-The script runs a Rust example, `crates/services/app-server/examples/dump_openrpc.rs`. It prints the same OpenRPC document that the server publishes. It needs no database. Then `scripts/docs-api/generate_reference.py` turns the document into Markdown.
-
-The descriptions in the reference come from doc comments in the Rust code. Some are short or technical. The numbers, names and types are exact.
-
-Files behind the generator:
-
-| File | Role |
-|---|---|
-| `crates/services/app-server/examples/dump_openrpc.rs` | Prints the production OpenRPC document. |
-| `scripts/docs-api/generate_reference.py` | Writes `reference/*.md`. It also reads the handler return types, the filter structs and the permission-bypass lists from the Rust source. |
-| `scripts/docs-api/translations_ru_en.json` | English text for the few code comments that are written in Russian. A comment that is not in this file shows as "not in English". |
-| `scripts/docs-api/regenerate.sh` | Runs both steps. |
-
-The files `00` to `08` are written by hand. When the code changes, check them against the facts in the generated reference.
+The numbered API chapters are written by hand. When a method changes, check the relevant examples and instructions against the current catalog and implementation.

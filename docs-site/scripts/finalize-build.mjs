@@ -11,5 +11,7 @@ html=html.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/g,'').replace(/<meta\
 html=html.replace('</head>',`<link rel="canonical" href="${url.origin}/api/"><meta name="robots" content="${publicBuild?'index,follow':'noindex,nofollow'}"></head>`);
 writeFileSync(api,html);
 // Public provenance contains only the source revision, never local paths or credentials.
-writeFileSync(resolve(out,'build-info.json'),JSON.stringify({sourceRevision:process.env.DOCS_SOURCE_SHA||process.env.VERCEL_GIT_COMMIT_SHA||null,publicationRevision:process.env.VERCEL_GIT_COMMIT_SHA||null})+'\n');
+let reviewedSource = null;
+try { reviewedSource = JSON.parse(readFileSync(resolve('../docs-source.json'),'utf8')).sourceRevision || null; } catch (error) { if (error.code !== 'ENOENT') throw error; }
+writeFileSync(resolve(out,'build-info.json'),JSON.stringify({sourceRevision:process.env.DOCS_SOURCE_SHA||reviewedSource,publicationRevision:process.env.VERCEL_GIT_COMMIT_SHA||null})+'\n');
 console.log(`[publication] ${publicBuild?'Indexable production':'Non-indexable preview'}; canonical ${url.origin}`);
