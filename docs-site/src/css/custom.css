@@ -221,3 +221,8 @@ a{text-underline-offset:3px}
 .footer.footer--dark { --ifm-footer-background-color: var(--qd-night); --ifm-footer-color: #b0b0c0; --ifm-footer-link-color: #fff; --ifm-footer-title-color: #b0b0c0; }
 .navbar__search-input, [class*='searchBar'] input, [class*='dropdownMenu'] { border-radius: 0; }
 .navbar a[href='/api/'] svg { display: none; }
+
+/* Keep the mobile Docusaurus controls functional with the supplied link styling. */
+.navbar-sidebar { background: var(--qd-paper); --ifm-menu-color: var(--qd-mute); --ifm-menu-color-active: var(--qd-ink); --ifm-menu-color-background-active: var(--qd-paper-2); --ifm-menu-color-background-hover: var(--qd-paper-2); }
+.navbar-sidebar__back { background: var(--qd-paper-2); color: var(--qd-ink); }
+@media (max-width: 996px) { .navbar__items > .navbar__link { display: none; } }
