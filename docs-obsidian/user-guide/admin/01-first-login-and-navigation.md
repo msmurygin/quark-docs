@@ -3,7 +3,7 @@ title: "Administrator Guide - First Login and Navigation"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # First Login and Navigation
@@ -136,7 +136,7 @@ Control Center
 Packs
 Policy
   Allocation Policy
-  Replenishment Policy          (placeholder, see below)
+  Replenishment Policy
   Putaway Policy
   Cartonization Policy
   Lot Policy
@@ -152,11 +152,17 @@ SKU
 Attributes
 Outbound
   Orders
+  Transport Resources
+  Waves
+  Dispatches
+  Load Plans
+  Loads
 Inventory Balances
   Balances
   Holds
   Inventory Adjustments
   Inventory Counts
+  Replenishment
   Adjustment Reasons
   Transactions
   Pending Move-In
@@ -175,8 +181,8 @@ Task Manager
 Notes:
 
 - There are two items named `Reports`. The one with code `report_def_menu` is **inactive** (`is_active = false`). Only the item with code `reports_iframe_menu` shows.
-- The menu has **no item** for Shipping, Loading or Waves. `Replenishment` (after `Inventory Counts`) lists the replenishments of pick locations.
-- `Replenishment Policy` opens a list that keeps only a policy `Code`. Replenishment works by the pick locations' `Min`/`Max` and does not read it.
+- There is no separate item named `Shipping`. Use `Outbound > Orders > Ship order` for a complete order, or `Outbound > Loads` for whole-Load Goods Issue after loading.
+- `Replenishment` (after `Inventory Counts`) lists the replenishments of pick locations. `Replenishment Policy` opens the urgency settings read by the planner; each pick location's `Min` and `Max` still decide when and how much to replenish.
 - `Dashboard` is a form (`dashboard`, kind `Dashboard`). It has no sidebar item in the warehouse tree.
 
 The `dashboard` form is the home page. It is the default tab of the main work area (`tab_containers.default_tab_id` = tab `dashboard`), so it opens right after sign-in. The breadcrumb entry `Dashboard` brings you back to it and clears the other screens (`web-ui-server/src/services/viewport_service.rs`, `routes/breadcrumb_handler.rs`).

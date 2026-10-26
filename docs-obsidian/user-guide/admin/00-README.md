@@ -3,7 +3,7 @@ title: "Administrator Guide - Start Here"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Administrator Guide - Start Here
@@ -56,7 +56,7 @@ Do the steps in this order. Each step needs the data from the step before.
 | 3 | `03-warehouse-structure.md` | Zones, locations (including Stage, Door, Pack, Pick-to) and work areas exist. |
 | 4 | `04-owners-sku-uom-pack-hierarchy.md` | Owners, pack hierarchies and SKUs exist. Lot and serial rules are set. |
 | 5 | `05-inbound-setup.md` | Receipts can be received. Putaway policy sends stock to locations. |
-| 6 | `06-outbound-setup.md` | Orders can be allocated, picked and packed. |
+| 6 | `06-outbound-setup.md` | Orders can be allocated, picked, packed, loaded and shipped; pick locations can be replenished. |
 | 7 | `07-printing-and-labels.md` | Labels and printers work. |
 | 8 | `08-reports-and-dashboards.md` | Reports and the dashboard work. |
 | 9 | `09-integrations-and-api.md` | ERP and other systems can connect (only what exists). |
@@ -70,8 +70,8 @@ Do the steps in this order. Each step needs the data from the step before.
    Warehouses are created outside the web UI (see `10-checklist-go-live.md`).
 2. **User status `Locked` and `Disabled` block every way in.**
    Such a user cannot sign in, open sessions end on the next request, and the user's API keys are refused (`UserStatus::may_sign_in` in `wms-lib-auth/src/user_status.rs`). `Active` and `Invited` are let in.
-3. **Shipping and loading are not available.** They are marked `Not available in the current version` where they appear. Replenishment works by min/max of the pick locations (below); the replenishment *policy* is still only a code.
-4. **Wave policies have no web screen.** They exist only through the API (`06-outbound-setup.md`).
+3. **Loading and Goods Issue are separate decisions.** A `Loaded` Load has not deducted stock. Shipment is an explicit, irreversible Goods Issue. See `06-outbound-setup.md`, section 10.
+4. **Manual waves have a web screen; wave policies do not.** Use `Outbound > Waves` for manual composition and release. Rule-based wave-policy configuration remains API-only.
 5. **Packing is done on the RF terminal**, not in the web UI. The web UI only prepares the data (pack-station locations and work areas).
 
 ## Feature status used in this guide
@@ -82,10 +82,11 @@ Do the steps in this order. Each step needs the data from the step before.
 | Allocation, order release, picking, cartonization | Available | Screens and policies exist. |
 | Packing (Verify action at a pack station) | Available on RF only | `wms-outbound/src/packing/README.md` |
 | Packing "Repack" action | Available on RF only | `wms-outbound/src/packing/README.md` ("Repack"); RF screens `PACK10` to `PACK14` (`rf-screens/108_uc_pack_repack.sql`). |
-| Shipping confirmation | Not available in the current version | `wms-outbound/src/shipping/README.md`: "reserved; no compiled Rust module yet". |
-| Loading and trailers | Not available in the current version | `wms-outbound/src/loading/README.md`: same text. |
+| Shipping confirmation | Available | `Ship order` for one complete order, or whole-Load Goods Issue after loading. |
+| Dispatch, load planning and loading | Available | Web screens for `Dispatches`, `Load Plans`, `Transport Resources` and `Loads`; RF `Loading` flow. |
 | Replenishment by min/max of pick locations | Available | Every 5 minutes, and by «Replenish Now» on `Replenishment` (meta-ui 173): a pick location at or below its `Min` gets Replenish tasks up to `Max`, done on the RF terminal (`Inventory > Replenish`). Switched on per putaway zone (`Replenishment Allowed`). See `06-outbound-setup.md` section 11. |
-| Replenishment policy | Placeholder | meta-ui migration 048: the screen keeps only a policy code; replenishment does not read it. |
-| Wave planning | API only | `wms-outbound/src/waves/README.md`; no wave form in meta-ui. |
+| Replenishment policy | Available | The policy card controls urgent and important reserved-share thresholds and whether an empty pick location is urgent. |
+| Manual wave planning | Available | `Outbound > Waves` provides reviewed add/remove/station/release actions and per-order results. |
+| Wave policy | API only | Policy preview and build-now methods can create draft waves by rule. |
 
-Nothing reads the replenishment policy — replenishment works from the pick locations' `Min`/`Max` alone. The code only stores it: on the SKU (`replenishment_policy_id`, required, default `1`) and as an owner default. The table is marked "Reserved identity placeholder" (wms-app migration 024). See `04-owners-sku-uom-pack-hierarchy.md`.
+Replenishment quantity still comes from each pick location's `Min` and `Max`. The SKU's replenishment policy sets task urgency; it does not replace the min/max trigger. See `06-outbound-setup.md`, section 11.

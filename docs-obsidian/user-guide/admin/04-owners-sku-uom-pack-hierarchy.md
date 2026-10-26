@@ -3,7 +3,7 @@ title: "Administrator Guide - Owners, SKU, UOM, Pack Hierarchy, Lot and Serial R
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Owners, SKU, UOM, Pack Hierarchy, Lot and Serial Rules
@@ -155,7 +155,7 @@ Set the defaults the warehouse uses for one owner.
 | `Auto Close ASN` | Close the ASN automatically. | On or off. | off |
 | `Roll Receipt` | Combine receipts. | On or off. | off |
 | `Allocation Policy` | Default allocation policy. | An allocation policy. | `STD` |
-| `Replenishment Policy` | Default replenishment policy. | Not available in the current version. | |
+| `Replenishment Policy` | Owner default replenishment policy. | Stored only; the planner reads the policy on the SKU instead. | |
 | `Cartonization Policy` | Default cartonization policy. | A cartonization policy. | `STD` |
 | `Lot Policy` | Default lot policy. | A lot policy. | `STD` |
 | `Putaway Reservation TTL (min)` | Minutes a putaway reservation is held. Blank = warehouse default (`PUTAWAY_RESERVATION_TTL_MIN` = 15). | Whole number above 0 (`chk_owner_config_putaway_ttl`). | 15 |

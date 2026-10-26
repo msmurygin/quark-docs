@@ -3,25 +3,24 @@ title: "Administrator Guide - Outbound Setup"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Outbound Setup
 
-Outbound covers shipment orders, allocation, release, picking, cartonization and packing preparation.
-
-**Not available in the current version:** shipping confirmation, loading and trailers, and replenishment. The packing action `Repack` is available on the RF terminal (see section 8).
-See `00-README.md` for the evidence.
+Outbound covers shipment orders, allocation, release, picking, cartonization, packing, dispatch planning, loading, Goods Issue and replenishment. The packing action `Repack` is available on the RF terminal (see section 8).
 
 ## 1. Order flow in one picture
 
-```
-New  ->  Allocated (Allocate)  ->  Released (Release)  ->  Picked  ->  Closed
-  \_____ Cancel (any step, until something is picked) _____/
+```text
+New -> Allocated (Allocate) -> Released (Release) -> Picked -> Goods Issue -> Closed
+ \________ Cancel (only before anything is picked) _______/
 ```
 
-Statuses of an order: `New`, `PartiallyAllocated`, `Allocated`, `PartiallyReleased`, `Released`, `PartiallyPicked`, `Picked`, `Closed`, `Cancelled`.
-Statuses of a line: `NotAllocated`, `PartiallyAllocated`, `Allocated`, `PartiallyReleased`, `Released`, `PartiallyPicked`, `Picked`, `Closed`, `Cancelled`.
+A Load can ship only part of an order. While demand remains, the order or line can show `PartiallyShipped`; a shipped line can show `Shipped`. A complete-order Goods Issue closes the order after it ships all remaining demand.
+
+Statuses of an order: `New`, `PartiallyAllocated`, `Allocated`, `PartiallyReleased`, `Released`, `PartiallyPicked`, `Picked`, `PartiallyShipped`, `Shipped`, `Closed`, `Cancelled`.
+Statuses of a line: `NotAllocated`, `PartiallyAllocated`, `Allocated`, `PartiallyReleased`, `Released`, `PartiallyPicked`, `Picked`, `PartiallyShipped`, `Shipped`, `Closed`, `Cancelled`.
 The order status is calculated from the lines. You do not set it by hand.
 
 ## 2. Shipment orders
@@ -32,8 +31,9 @@ Create an order, allocate stock, and release it to the floor.
 
 ### Before you start
 
-- Role to create and edit: `ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR`.
+- Role to create and edit: `ADMIN` or `MANAGER`.
 - Role to release, cancel and cancel quantity: `ADMIN`, `MANAGER`, `SUPERVISOR` (the release band).
+- Role for `Allocate` and `Ship order`: `ADMIN`, `MANAGER`, `SUPERVISOR` or `OPERATOR`.
 - The owner, the ship-to partner and the SKUs exist, and stock is on hand.
 - The order type `SO` ("Standard Outbound") is seeded. **No screen or API creates order types.**
 - An allocation policy is published (section 3).
@@ -51,6 +51,7 @@ Create an order, allocate stock, and release it to the floor.
 9. Click `Release`. Tasks are created for the floor.
 10. To undo a reservation before picking: `Unallocate`.
 11. To stop the order: `Cancel`.
+12. After picking and any required packing, use one Goods Issue path: `Ship order` for one fully picked order, or a Load for a planned multi-order departure (section 10).
 
 ![Orders list with two released shipment orders](../assets/screens/shipment-orders.png)
 
@@ -91,6 +92,7 @@ Order-type table: seeded `SO` = `Standard Outbound`.
 
 - After `Allocate`: line status `Allocated` or `PartiallyAllocated`, a plan of cartons, and picks.
 - After `Release`: tasks in `Task Manager > Task Board`, status `Released` (or `PartiallyReleased` if some stock is short).
+- After Goods Issue: the `Shipments — base quantities` tab records immutable shipped quantities. A fully shipped order is closed; an order split across Loads can show `PartiallyShipped` until its remaining demand ships.
 
 ### If something goes wrong
 
@@ -108,14 +110,17 @@ Order-type table: seeded `SO` = `Standard Outbound`.
 | `allocation still has {qty} units deferred by inventory lock contention` | Stock was busy. | Allocate again. |
 | `version conflict on {entity} {entity_id}` | Someone saved before you. | Refresh and repeat. |
 | `Forbidden("...")` | Your role lacks the right. | Ask for the right in the matrix. |
+| `only an open released order may ship` | The order is not in a shippable lifecycle state. | Refresh it and finish release, picking and packing first. |
+| `this order belongs to an active Load; confirm its shipment through that Load` | The order is already committed to a Load. | Do not use `Ship order`; finish the Load in section 10. |
 
 ### What this affects later
 
 - Allocation reserves stock and creates picks.
 - Release creates tasks and, with cartonization, a carton plan.
+- Goods Issue deducts picked stock, updates serials and counters, records shipment history, and publishes the departure as one command.
 - The statuses drive the task board and the reports.
 
-The shipment order list has no `Close` button. Nothing in the web metadata or the RF client calls `shipment_order_close`. Closing is allowed only after release and only when every line is finished (`aggregate.rs` `close`). It runs through the API method `shipment_order_close` (roles Admin, Manager). The code comment says that today the only way a line becomes finished is cancellation, so in practice an order closes only when all its lines were cancelled.
+The shipment order list has no `Close` button. A complete-order Goods Issue closes the order automatically when no demand remains. The separate API method `shipment_order_close` remains an administrative lifecycle command for `ADMIN` and `MANAGER` after every line is terminal.
 
 ## 3. Allocation policy
 
@@ -208,27 +213,35 @@ Also: `step names qty_fit_rule={...} but no sort_1..sort_4 names LpnQuantity`.
 - Every order line freezes the policy at allocation. Old orders keep their policy.
 - Wrong steps cause unreserved stock (backorder).
 
-## 4. Wave policy (API only)
+## 4. Waves and wave policy
 
 ### What you will do
 
-Know what exists for waves.
+Group unreleased orders, review the complete composition and release the group through the ordinary order-release pipeline.
 
 ### Before you start
 
-- Role: `ADMIN`, `MANAGER` (write) or `SUPERVISOR` (part).
-- **There is no web screen for waves or wave policies.** They work through the API (`wave_*` methods, see `09-integrations-and-api.md`).
+- Role: `ADMIN`, `MANAGER` or `SUPERVISOR`.
+- Orders are not released, cancelled or claimed by another wave.
+- To assign a station, configure a `Sort` location with station positions first.
 
 ### Steps
 
-1. Call `wave_policy_create` or `wave_policy_build` to make a policy.
-2. Call `wave_policy_preview` to see which orders it would group.
-3. Call `wave_policy_build` (build now) to create Draft waves.
-4. Call `wave_create`, then add or remove orders by hand when needed.
+1. Open `Sidebar > Outbound > Waves`.
+2. Click `New Wave`, enter `Wave code`, and click `Create`.
+3. Open the wave and click `Composition and progress`.
+4. Click `Add Order`, choose `Unreleased Order`, optionally enter `Membership sequence` and `Member priority`, then click `Review` and `Confirm Draft edit`.
+5. Repeat for the orders in this wave. Use `Remove Order` to correct the draft.
+6. Optional: click `Station`, select the `Sort` station, then review and confirm the draft edit.
+7. Review the complete member list, then click `Release` and `Confirm Wave action`.
+8. If some members were blocked or failed, correct their order data and click `Retry blocked`.
+9. Use `Cancel Wave` only while the wave is still unstarted (`Draft` or `Planned`).
 
 ### Field reference
 
-Columns of `wave_policy`:
+The wave card shows `Status`, `Release generation`, station, member counts and the release result of every order. Wave statuses are `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`.
+
+Wave policy has no web editor. The API methods `wave_policy_create`, `wave_policy_preview` and `wave_policy_build` create waves by rule. Its fields include:
 
 | Field | Meaning | Allowed values |
 |---|---|---|
@@ -244,11 +257,11 @@ Columns of `wave_policy`:
 | `schedule_interval_minutes`, `schedule_starts_at` | Recurring run. | Number, time. |
 | `auto_release` | Release waves automatically. | Default false (keeps Draft waves). |
 
-Wave statuses: `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`.
-
 ### What you should see
 
-- Draft waves with the policy and run recorded.
+- A draft wave lists its complete intended order composition.
+- Release records a per-order outcome. It creates ordinary picking work; it does not confirm picking, move stock, load transport or ship goods.
+- A policy-built wave records the policy and run that created it.
 
 ### If something goes wrong
 
@@ -257,10 +270,11 @@ Wave statuses: `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cance
 | `a wave policy with this code already exists` | Duplicate code. | Use another code. |
 | `version conflict on wave policy {policy_id}` | Someone saved first. | Re-read and repeat. |
 | `wave membership changed while the command was acquiring locks; retry with the current version` | A race. | Retry. |
+| A wave action says the observed state changed | Another user changed the wave. | Cancel the dialog, click `Refresh`, review the new composition and decide again. |
 
 ### What this affects later
 
-- Release of a wave releases one order per transaction.
+- Release of a wave releases one order per transaction and preserves each order's result.
 
 No wave policy exists at the start. No migration or dev seed inserts into `wave_policy`.
 
@@ -530,7 +544,7 @@ See `03-warehouse-structure.md`, section 6.
 ### What this affects later
 
 - Closing a carton prints the shipping label and sets weights and a verdict.
-- Shipping confirmation: **Not available in the current version**.
+- Goods Issue is separate from carton close; use `Ship order` or the Load workflow in section 10.
 - The action `Repack` works on the RF terminal. The action is chosen once, when the packer opens the work, from what the unit is: a box off a cart is **verified**, a discrete pick pallet is **repacked** into output cartons (`resolve_packing_action`, `wms-outbound/src/packing/README.md`). There is nothing to set for it. Voiding an empty output carton and reopening a closed one have commands but no RF screen yet.
 
 There is no packing queue in the web UI. Migration 110 only adds one message word (`STATION_UNKNOWN`). The queue is the query `packing_queue_list`. The RF screen `PACK00` (`rf-screens/103_uc_pack_verify.sql`) reads it after the packer scans the station.
@@ -555,14 +569,89 @@ There is no packing queue in the web UI. Migration 110 only adds one message wor
 
 *Caption: the pick assignment board. Focus: The list is empty when nobody works a pick-by-area assignment.*
 
-## 10. Not available in the current version
+## 10. Dispatch, loading and Goods Issue
 
-| Feature | Status |
+### What you will do
+
+Confirm warehouse departure either for one fully picked order or for a reviewed Load. Loading and shipment are separate decisions: `Loaded` does not deduct stock; Goods Issue is the irreversible step that does.
+
+```mermaid
+sequenceDiagram
+    participant Planner
+    participant WMS
+    participant Loader
+    Planner->>WMS: Plan Dispatch and freeze Load Plan
+    Planner->>WMS: Open Load with registered transport
+    Loader->>WMS: Confirm transport and each physical unit
+    Loader->>WMS: Complete loading
+    Note over WMS: Load is Loaded; stock is still in the warehouse
+    Loader->>WMS: Confirm shipment / Goods Issue
+    Note over WMS: Stock, serials, orders, Load and Dispatch commit together
+```
+
+### Before you start
+
+- `ADMIN`, `MANAGER` or `SUPERVISOR` plans dispatches, load plans and transport. `OPERATOR` can run loading and confirm shipment after the Load exists.
+- The order is released and picked. Finish its packing job when packing is required.
+- For the Load path, ready units are at their required `Stage` location and are not held.
+- Use one path only. An order in an active Load must ship through that Load.
+
+### Ship one complete order
+
+1. Open `Sidebar > Outbound > Orders` and open the fully picked order.
+2. Click `Ship order`.
+3. In `Confirm shipment — stock will be deducted`, verify `Order`, `Reviewed status` and `Reviewed Order version`.
+4. Click `Confirm — ship and deduct stock`.
+5. Open the `Fulfilment — base quantities` and `Shipments — base quantities` tabs to check the shipped base quantities and Goods Issue receipt.
+
+This path requires every remaining line to be fully picked and its physical content to belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, or an order in an active Load must use the Load path.
+
+### Plan a Load
+
+1. Open `Sidebar > Outbound > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
+2. Open `Sidebar > Outbound > Dispatches`. Click `New Dispatch`, enter the dispatch reference, optionally choose a carrier and `Door`, then click `Create`.
+3. Open the dispatch. Enter `New stop sequence` and `New stop destination`, then click `Add Stop`. Choose `Order to add`, its now-persisted `Delivery stop`, and optional `Preferred stage`, then click `Add Order`.
+4. Review `Stops` and `Orders`, then click `Plan Dispatch`.
+5. Open `Sidebar > Outbound > Load Plans`. Click `New Load Plan`, choose the planned dispatch and `Loading order`, then click `Create`.
+6. Open the plan and click `Generate stop order`. Click `Review composition`; check all stops, selected units, invalid units and unplanned units.
+7. Click `Freeze reviewed composition`. Freeze is a planning commitment, not loading or shipment.
+8. Back on the plan, click `Open Load`, choose an unused active transport, click `Review selected transport`, then `Confirm — open Load`.
+
+Loading-order choices are `Last delivery stop first`, `First delivery stop first`, `Any stop group`, `Manual unit order`, and `Any eligible unit (no stop priority)`. Use the review screen to resolve invalid or unplanned units before Freeze.
+
+### Load and ship in the web UI
+
+1. Open `Sidebar > Outbound > Loads`, open the Load, and click `Composition and progress`.
+2. On an `Open` Load, click `Confirm transport / start`. Enter the bound transport reference, click `Review entered scan`, review the saved decision, then click `Confirm loading action`.
+3. For each unit, click `Review root LPN`, enter the physical root LPN, and review its location, quantity and next sequence. Physically load it, then click `Confirm loading action`.
+4. When `Remaining units` is 0, click `Complete loading (not ship)` and confirm. The status becomes `Loaded`; stock has not left yet.
+5. Click `Ship whole Load / deduct stock`. Verify the reviewed Load, transport and complete counts, then click `Confirm shipment / deduct stock`.
+
+### Load and ship on the RF terminal
+
+1. Open `Main Menu > Loading > Load Units`.
+2. On `Scan Load`, scan the Load code.
+3. On `Confirm Transport`, scan the bound transport and press `F4 Start`.
+4. On `Scan Unit`, scan a root LPN. The scan is a read-only review.
+5. On `Confirm Unit Loading`, physically load the unit and press `F4 Confirm`.
+6. After the last unit, press `F5 Complete` on `Scan Unit`. Review `Complete Loading`, then press `F4 Complete`.
+7. On `Load Status`, press `F5 Ship`. On `Confirm Shipment`, review the irreversible warning and complete counts, then press `F4 Ship all`.
+
+### What you should see
+
+- Load states progress through `Open`, `Loading`, `Loaded` and `Shipped`.
+- `Composition and progress` keeps planned and actual loading facts separate.
+- Goods Issue records shipment history, deducts picked stock, updates serials and order counters, and marks the Load and Dispatch shipped in one transaction.
+
+### If something goes wrong
+
+| Situation | Fix |
 |---|---|
-| Shipping confirmation | Not available in the current version |
-| Loading and trailers | Not available in the current version |
-| Web screens for waves | Not available in the current version (API only) |
-| Dispatch planning (a transport plan: stops and orders, `dispatch_create` to `dispatch_plan`) | API only. No screen and no RF screen. A planned dispatch is a frozen plan; it does not load or ship anything (`crates/services/app-server/src/web/rpcs/dispatch_rpc.rs`). |
+| The observed version changed | Cancel the decision, refresh or rescan, and review the current state. Do not retry with only a new version number. |
+| A unit is foreign, not staged, held or out of sequence | Leave it unloaded. Correct staging, holds or the plan, then review it again. |
+| A unit was confirmed loaded by mistake | Before shipment, use `Acknowledge physical unload` in the Load view, or `Loading > Unload / Cancel (Supervisor)` on RF. Scan the removed root and enter a reason. This preserves history and does not move stock. |
+| The Load must be cancelled | Physically unload and acknowledge every unit first, then use `Cancel empty Load`. |
+| Shipment is already committed | Do not repeat or reverse it from a generic status control. Use the immutable `Shipments` record as the receipt and follow the site's controlled correction process. |
 
 ## 11. Replenishment of pick locations (min/max)
 
@@ -589,7 +678,7 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ### The screen `Replenishment`
 
-`Sidebar > Replenishment` (after `Inventory Counts`). The list shows every replenishment: urgency, status (`Open`, `Done`, `Shorted`, `Cancelled`), pick location, SKU, lot, from where, quantity and unit, the short reason, when it was planned.
+`Sidebar > Inventory Balances > Replenishment` (after `Inventory Counts`). The list shows every replenishment: urgency, status (`Open`, `Done`, `Shorted`, `Cancelled`), pick location, SKU, lot, from where, quantity and unit, the short reason, when it was planned.
 
 | Button | What it does |
 |---|---|
@@ -599,7 +688,7 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ### How urgent: the replenishment policy
 
-Every SKU has a replenishment policy (`STD` unless the SKU card names another). `Sidebar > Replenishment Policy` lists them; open a row to set its rule, **New** makes one by its code with the default rule.
+Every SKU has a replenishment policy (`STD` unless the SKU card names another). `Sidebar > Policy > Replenishment Policy` lists them; open a row to set its rule, **New** makes one by its code with the default rule.
 
 | Setting | Default | Meaning |
 |---|---|---|

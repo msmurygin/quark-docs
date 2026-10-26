@@ -3,7 +3,7 @@ title: "Administrator Guide - Warehouse Structure"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Warehouse Structure
@@ -348,7 +348,7 @@ Tab `Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Defau
 
 Lot mixing rules per zone: list `Lot Commingle Rules` with `Attribute`, `Allow Mix`, `Putawayzone Code`.
 
-The replenishment fields (`Replenishment Threshold`, `Replenishment Allowed`) do nothing today. Replenishment is not available, and no code reads them. The form only disables the threshold while `Replenishment Allowed` is off.
+`Replenishment Allowed` controls whether pick locations in this zone are eligible for min/max replenishment. `Replenishment Threshold` is stored and shown but is not read by the min/max planner; the planner uses each SKU pick location's `Min` and `Max`. The form disables the threshold while `Replenishment Allowed` is off.
 
 The zone lot mixing rules (`Lot Commingle Rules`) are enforced. When stock lands in a location (receipt, putaway or move), the server looks for a rule on the location first. If the location has none for that attribute, it uses the rule of the location's zone. If neither exists, mixing is allowed. When the rule has `Allow Mix` off, the lot's value of that attribute must match the lot already on the landing LPN, or the move is refused (`wms-inventory/src/inventory_service.rs`, `check_location_attribute_overrides`). The older note in `docs-obsidian/putaway_policy/README.md` that these rules have no reader is out of date.
 

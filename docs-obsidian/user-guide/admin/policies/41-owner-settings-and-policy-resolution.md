@@ -3,7 +3,7 @@ title: "Policy Reference - Owner Settings and Policy Resolution"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Owner Settings and Policy Resolution
@@ -34,7 +34,7 @@ The order is left to right. The first level that has a value wins.
 | **Allocation policy** (looked up when an order line is **created or changed**, then frozen on the line) | `sku.allocation_policy_id` | `owner_config.default_allocation_policy_id` | Refuse the order line: `sku '<sku>' (owner <id>) has no allocation policy — neither the sku nor its owner's default names one; assign one before allocating` | `wms-lib-core/src/model/sku.rs:952-962`, `wms-outbound/src/allocation/policy.rs:118-126`, `:164-195` (new line), `:200-228` (frozen), `service/order/create.rs:177`, `service/order_line/upsert.rs:108` |
 | **Cartonization policy** | `sku.cartonization_policy_id` | `owner_config.default_cartonization_policy_id` | The pick is left out of the carton plan (reason `NoPolicy`); it ships without a planned carton | `wms-lib-core/src/model/sku.rs:910-920`, `wms-outbound/src/cartonization/read_from_db.rs:199`, `reservation.rs:154-160` |
 | **Lot policy** (details: [32](./32-lot-policy-and-attributes.md), SKU columns: [34](./34-sku-level-settings.md)) | `sku.lot_policy_id` | none. `owner_config.default_lot_policy_id` is **not read**. | If the SKU has no lot policy the SKU is "not lot tracked"; reading its lot rules fails with `Lot policy is not defined for sku/owner <sku>/<owner>` | `wms-inventory/src/deposit/deposit.rs:721`, `wms-inventory/src/inventory_service.rs:1714` |
-| **Replenishment policy** | `sku.replenishment_policy_id` | none. `owner_config.default_replenishment_policy_id` is **not read**. | Replenishment is a placeholder. No process reads either column. | search over `*.rs` |
+| **Replenishment policy** | `sku.replenishment_policy_id` | none. `owner_config.default_replenishment_policy_id` is **not read**. | The min/max planner reads the SKU policy's urgency thresholds. The SKU column is required and defaults to policy id 1. | `wms-inventory/src/service/replenishment/plan.rs`, `wms-app 137` |
 | **Picking policy** | `work_area_picking_policy` row for (work area, equipment profile) | `work_area.picking_policy_code` | Policy `DISCRETE`. A code with no published revision is an error: `picking policy <code> has no published revision` | `wms-lib-core/src/model/outbound/picking_policy.rs:597-650` |
 | **Wave policy** | chosen by the user when previewing or building a wave; the scheduler runs the policies that carry a schedule | none | no policy: no automatic waves | `wms-outbound/src/waves/policy.rs`, `scheduler.rs` |
 | **Count policy** | chosen when a count policy is run (or by its schedule) | none | none | `wms-inventory/src/service/inventory_count_policy/` |

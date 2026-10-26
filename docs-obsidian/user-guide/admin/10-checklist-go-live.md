@@ -3,7 +3,7 @@ title: "Administrator Guide - Go-Live Checklist"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Go-Live Checklist for a New Tenant
@@ -92,8 +92,8 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 30 | Cartonization policy. | Seeded: `STD` with `BOX-S`, `BOX-M`, `BOX-L` | `Policy > Cartonization Policy` | Match the boxes to your real boxes. |
 | 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Policy > Picking Policies` | |
 | 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Policy > Pick Short Reasons` | |
-| 33 | Replenishment policy. | Seeded `STD` placeholder | | **N/A**: Not available in the current version. The SKU form still needs one. |
-| 34 | Wave policy. | None | API only | Optional. |
+| 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
+| 34 | Manual wave. | None | `Outbound > Waves` | Optional; use for grouped release. Wave-policy rules remain API-only. |
 
 ### 4.6 Printing
 
@@ -112,12 +112,11 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 40 | Report catalogue loaded. | Install step | report service | 16 reports. |
 | 41 | Dashboard rail. | Seeded row with empty rail | `Control Center > Board Settings` | Pick six metrics. |
 
-### 4.8 Not available
+### 4.8 Outbound departure and replenishment
 
-Shipping confirmation, loading, replenishment: Not available in the current version. The packing action `Repack` is available on the RF terminal.
-Plan your process so that the goods leave after `Picked` or after packing, outside the product.
+Before go-live, verify one complete departure in the path you will operate: direct `Ship order`, or `Dispatches` -> `Load Plans` -> `Loads` / RF `Loading` -> Goods Issue. Confirm that operators understand that `Loaded` is not `Shipped` and that shipment deducts stock irreversibly. Also run `Replenish Now` for a pick location at or below `Min`, then complete its RF replenishment task. See `06-outbound-setup.md`, sections 10 and 11.
 
-## 5. Dry-run test (receive -> putaway -> pick -> pack)
+## 5. Dry-run test (receive -> putaway -> pick -> pack -> ship)
 
 ### Steps
 
@@ -130,11 +129,13 @@ Plan your process so that the goods leave after `Picked` or after packing, outsi
 7. Click `Release`. Check `Task Manager > Task Board`.
 8. Pick on the RF terminal with an operator who has task rights.
 9. Pack at the pack station on the RF terminal. Check that the shipping label prints.
+10. For this one-order dry run, open the order, click `Ship order`, review the departure, and click `Confirm — ship and deduct stock`.
+11. Check the order's `Fulfilment — base quantities` and `Shipments — base quantities` tabs and verify that the picked stock is no longer in warehouse balances.
 
 ### What you should see
 
-- Balances move from the receiving location to storage, then to a pick-to location, then into a carton.
-- The order status reaches `Picked`.
+- Balances move from the receiving location to storage, then to a pick-to location and into a carton; Goods Issue removes the shipped stock from warehouse balances.
+- The order reaches `Picked`, then closes after the complete-order Goods Issue. The `Shipments — base quantities` tab shows its immutable receipt.
 
 ### If something goes wrong
 
@@ -145,6 +146,7 @@ Plan your process so that the goods leave after `Picked` or after packing, outsi
 | Cartonization exceptions on the order. | SKU has no weight or size. | Fill weight and cube. |
 | "you have no right to take Pick tasks". | No task permission. | Item 13. |
 | No label. | No printer assignment or renderer. | Items 36 and 37. |
+| `Ship order` is refused. | Picking or packing is incomplete, the physical content changed, or the order belongs to a Load. | Finish the required work, refresh, or ship through the Load. |
 
 ## 6. Findings about missing or unverified seeds
 

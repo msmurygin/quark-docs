@@ -3,7 +3,7 @@ title: "Administrator Guide - Integrations and API"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-27
 ---
 
 # Integrations and API
@@ -200,7 +200,10 @@ IPaaS has its own login model. The WMS session is not passed to it.
 
 > Not confirmed by code: which WMS roles see the sidebar item `IPaaS`. The item is gated like other menu items by the role permission grants, and no seed file names the roles. To verify: open `Sidebar > Configuration > Users & Roles > Permission Matrix` and look for the menu item `integration_platform` for each role. Or log in as each role and look at the sidebar.
 
-## 5. Not available in the current version
+## 5. Outbound and replenishment calls
 
-- Shipping confirmation events or calls: Not available in the current version.
-- Replenishment calls: Not available in the current version.
+- Shipping is available through `shipment_order_ship` for one complete order and `confirm_shipment` for a complete reviewed Load. Both perform Goods Issue; loading alone does not deduct stock.
+- Loading uses the `load_*` methods, including separate read-only scan review and state-changing confirmation calls.
+- Replenishment uses `replenishment_plan`, `replenishment_take_next`, `replenishment_confirm` and `replenishment_cancel`. The policy urgency card saves through `replenishment_policy_save`.
+
+Use the generated API reference for current request and response schemas. Do not treat a successful loading confirmation as proof of shipment; verify the Goods Issue receipt or shipment history.
