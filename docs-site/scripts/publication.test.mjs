@@ -17,9 +17,9 @@ for(const mode of ['production','preview'])test(`${mode} output has the right ro
 test('publication sync excludes private and generated files while preserving guide assets',()=>{
  const dir=mkdtempSync(join(tmpdir(),'quark-docs-sync-'));try{
   const src=join(dir,'source'),dest=join(dir,'destination');mkdirSync(src);mkdirSync(dest);
-  for(const name of ['guide.md','screen.png','.env','private.key','node_modules/dependency.js','reference/_generated/form.md','src/generated/cards.json']){const f=join(src,name);mkdirSync(resolve(f,'..'),{recursive:true});writeFileSync(f,'fixture');}
+  for(const name of ['guide.md','screen.png','src/build/guide-markdown.ts','.env','private.key','node_modules/dependency.js','reference/_generated/form.md','src/generated/cards.json']){const f=join(src,name);mkdirSync(resolve(f,'..'),{recursive:true});writeFileSync(f,'fixture');}
   execFileSync('rsync',['-a','--exclude-from='+join(site,'publication-excludes.txt'),src+'/',dest+'/']);
-  for(const name of ['guide.md','screen.png'])assert.ok(existsSync(join(dest,name)),name);
+  for(const name of ['guide.md','screen.png','src/build/guide-markdown.ts'])assert.ok(existsSync(join(dest,name)),name);
   for(const name of ['.env','private.key','node_modules','reference/_generated','src/generated'])assert.ok(!existsSync(join(dest,name)),name);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
