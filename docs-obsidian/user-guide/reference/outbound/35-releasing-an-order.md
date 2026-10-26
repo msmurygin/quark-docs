@@ -31,7 +31,7 @@ The screen first asks the server for a dry run (`shipment_order_validate`). The 
 
 Source: `crates/libs/wms-outbound/src/service/order/validate.rs:60-160`.
 
-A requested ship date in the past gives a **warning** (`requested ship date {date} is in the past`). A warning does not stop the release. The `Release` button does not show warnings.
+A requested ship date in the past gives a **warning** (`requested ship date {date} is in the past`). A warning does not stop the release; the successful Release message includes it.
 
 ## What the screen says
 
@@ -42,6 +42,7 @@ A requested ship date in the past gives a **warning** (`requested ship date {dat
 | Released, tasks made | The same, plus `; {n} task(s) handed out` |
 | Released, but the reservation failed | `Order {number} released; allocation failed: {error}` |
 | Released, no allocation answer | `Order {number} released` |
+| Released with dry-run warnings | The normal success message, plus `; warning: {message}` (or `; warnings: ...` for several; line-level warnings start with `line {n}:`) |
 | The dry run found problems | `Cannot release: line 2: {message}; {message}` |
 | The server refused | `Release failed: {error}` |
 | The order changed under you | `Order data was updated (now {status}) — the form has been refreshed, please retry` |

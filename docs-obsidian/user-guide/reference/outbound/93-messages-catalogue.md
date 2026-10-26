@@ -70,6 +70,7 @@ Messages made by the server (domain refusals) are shown as the server wrote them
 - `Order {number} released; allocated {a}, short {s}; {n} task(s) handed out`
 - `Order {number} released; allocation failed: {error}`
 - `Order {number} released`
+- A successful release with dry-run warnings appends `; warning: {message}` or `; warnings: {message}; ...`; line-level warnings use `line {n}: {message}`.
 - `Cannot release: {problems}` (each problem is `line {n}: {text}` or `{text}`, joined with `; `)
 - `Release failed: {error}`
 - `Order data was updated (now {status}) — the form has been refreshed, please retry`

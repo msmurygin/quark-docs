@@ -22,7 +22,7 @@ const config: Config = {
   title: 'Quark WMS',
   tagline: 'Documentation for warehouse operators, administrators and integrators',
   favicon: 'img/favicon.svg',
-  stylesheets: [{href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap', type: 'text/css'}],
+  stylesheets: [{href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap', type: 'text/css'}],
   url: siteUrl,
   baseUrl,
   trailingSlash: true,
@@ -109,8 +109,9 @@ const config: Config = {
   themeConfig: {
     colorMode: {defaultMode: 'light', respectPrefersColorScheme: true},
     navbar: {
-      title: '',
-      logo: {alt: 'Quark WMS', src: 'img/quark-pixel.svg', width: 112, height: 32},
+      title: 'Docs',
+      style: 'dark',
+      logo: {alt: 'Quark WMS', src: 'img/quark-docs-logo.svg', height: 32},
       items: [
         {href: 'https://quark.build/product', label: 'Product', position: 'left'},
         {to: '/docs/studio/', label: 'Studio', position: 'left'},
@@ -125,7 +126,7 @@ const config: Config = {
     mermaid: {theme: {light: 'neutral', dark: 'dark'}},
     docs: {sidebar: {hideable: true, autoCollapseCategories: false}},
     footer: {
-      style: 'light',
+      style: 'dark',
       links: [
         {title: 'Quark WMS', items: [{label: 'Product Overview', href: 'https://quark.build/product'}, {label: 'WMS Cost Calculator', href: 'https://quark.build/wms-cost'}, {label: 'Contact', href: 'https://quark.build/#contact'}, {label: 'Privacy', href: 'https://quark.build/legal/privacy.html'}]},
         {

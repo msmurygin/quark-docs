@@ -55,7 +55,7 @@ Source: form `shipment_order_header_form` in `001_baseline.sql`; table `shipment
 ### Requested Ship
 
 - Used as a tie-break when the RF terminal ranks the next pick (see above), and as a group key of the wave policy (`crates/libs/wms-outbound/src/waves/policy.rs:437`).
-- `Release` shows a warning, not an error, when the date is in the past: `requested ship date {date} is in the past` (`validate.rs:145-153`). The release screen action does not show the warnings (`release_action.rs`).
+- `Release` shows a warning, not an error, when the date is in the past: `requested ship date {date} is in the past` (`validate.rs:145-153`). The warning is appended to the successful release message (`release_action.rs`).
 - Editable until the order is `Closed` or `Cancelled`.
 
 ### Notes
