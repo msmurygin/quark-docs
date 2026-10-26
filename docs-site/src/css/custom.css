@@ -9,7 +9,7 @@ html:root{--qd-paper:#fafaf7;--qd-paper-2:#f2f2ee;--qd-raise:#fff;--qd-ink:#0b0b
 --ifm-toc-border-color:var(--qd-line-2);--ifm-table-border-color:var(--qd-line-2);--ifm-table-stripe-background:transparent;--ifm-table-head-background:transparent;--ifm-hr-border-color:var(--qd-line-2);--ifm-code-background:var(--qd-paper-2);--ifm-code-font-size:84%;--ifm-code-padding-horizontal:6px;--ifm-code-padding-vertical:1px;
 --ifm-menu-color:var(--qd-mute);--ifm-menu-color-active:var(--qd-ink);--ifm-menu-color-background-active:var(--qd-paper-2);--ifm-menu-color-background-hover:var(--qd-paper-2);--ifm-menu-link-padding-vertical:7px;--ifm-menu-link-padding-horizontal:12px;
 --ifm-color-emphasis-300:var(--qd-line-2);--docusaurus-highlighted-code-line-bg:rgba(61,61,122,.12)}
-html[data-theme="dark"]{--qd-paper:#14141c;--qd-paper-2:#1b1b26;--qd-raise:#20202c;--qd-ink:#f6f6fa;--qd-mute:#b2b2c2;--qd-line:#30303d;--qd-line-2:#48485c;--qd-teal:#00cbaa;--qd-violet:#00cbaa;--ifm-color-primary:#00cbaa;--ifm-color-primary-dark:#00b799;--ifm-color-primary-darker:#00ad91;--ifm-color-primary-darkest:#008e77;--ifm-color-primary-light:#00dfbb;--ifm-color-primary-lighter:#00e9c4;--ifm-color-primary-lightest:#1fffdb;--docusaurus-highlighted-code-line-bg:rgba(0,203,170,.14)}
+html:root[data-theme="dark"]{--qd-paper:#14141c;--qd-paper-2:#1b1b26;--qd-raise:#20202c;--qd-ink:#f6f6fa;--qd-mute:#b2b2c2;--qd-line:#30303d;--qd-line-2:#48485c;--qd-teal:#00cbaa;--qd-violet:#00cbaa;--ifm-color-primary:#00cbaa;--ifm-color-primary-dark:#00b799;--ifm-color-primary-darker:#00ad91;--ifm-color-primary-darkest:#008e77;--ifm-color-primary-light:#00dfbb;--ifm-color-primary-lighter:#00e9c4;--ifm-color-primary-lightest:#1fffdb;--docusaurus-highlighted-code-line-bg:rgba(0,203,170,.14)}
 body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
 ::selection{background:var(--qd-mint);color:var(--qd-night)}
 a{text-underline-offset:3px}
@@ -226,3 +226,10 @@ a{text-underline-offset:3px}
 .navbar-sidebar { background: var(--qd-paper); --ifm-menu-color: var(--qd-mute); --ifm-menu-color-active: var(--qd-ink); --ifm-menu-color-background-active: var(--qd-paper-2); --ifm-menu-color-background-hover: var(--qd-paper-2); }
 .navbar-sidebar__back { background: var(--qd-paper-2); color: var(--qd-ink); }
 @media (max-width: 996px) { .navbar__items > .navbar__link { display: none; } }
+
+/* These tokens must outrank light :root defaults after production CSS optimization. */
+html:root { --ifm-menu-link-sublist-icon-filter: none; }
+html:root[data-theme='dark'] { --ifm-menu-link-sublist-icon-filter: brightness(0) invert(1); }
+.menu__caret::before, .menu__link--sublist-caret::after { opacity: 1; }
+/* Mermaid journey uses section-type classes for both boxes and text. */
+.docusaurus-mermaid-container svg[aria-roledescription='journey'] text.journey-section { fill: var(--qd-ink) !important; }
