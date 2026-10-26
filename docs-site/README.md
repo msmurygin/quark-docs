@@ -215,24 +215,14 @@ portal contains no third-party code. The site loads Inter and JetBrains Mono fro
 Google Fonts to match quark.build, with system-font fallbacks. No analytics or
 tracking events have been added.
 
-## Publication automation
+## Publication
 
-The authoring source remains here. `.github/workflows/publish-docs.yml` runs only for changes to this site, `docs-obsidian/user-guide`, or that workflow on `main` (or a manual dispatch). It checks the publication boundary, installs the documentation dependencies, runs documentation tests and type checking, and builds the static site. It does not build or test Quark WMS.
+This repository is the authoring source and is connected directly to Vercel. Root Directory is `docs-site`; include source files outside the root for the Markdown guide. `DOCS_SITE_URL=https://docs.quark.build` sets the public canonical origin. Push a verified documentation commit to `main` to deploy it. GitHub Actions and a cross-repository deploy key are not required.
 
-After checks pass it copies only the two documentation directories into `msmurygin/quark-docs`. That public repository is connected to a separate Vercel project. Its root directory is `docs-site`; enable source files outside the root so the guide is available. `DOCS_SITE_URL=https://docs.quark.build` is the canonical origin.
+The documentation agent reads current WMS code in `msmurygin/wms-axum` and edits guides here. It checks the relevant implementation, obtains a separate documentation review, runs type checking, nine focused documentation/API tests and a strict Docusaurus build, then checks affected pages in the browser. No WMS runtime changes or WMS certification are part of publication.
 
-### One-time synchronization credential
-
-The repository owner chose to configure this credential personally. Create an SSH key used only for this publisher. Add its public half as a deploy key on `quark-docs`, with write access. Store its private half as the encrypted Actions secret `DOCS_PUBLISH_KEY` on the private source repository. Do not put either a personal GitHub token or a private key in Git, a Markdown page or Vercel settings.
-
-The workflow checks GitHub's published SSH host keys over HTTPS, restricts the SSH identity to this key, and removes temporary key files when the step ends. The destination is fixed to the documentation repository. No deployment credential is passed to the documentation build.
-
-### Public input boundary
-
-`publication-excludes.txt` excludes environment files, key files, generated implementation references, build caches and dependencies. `check-publication.mjs` blocks high-confidence credentials and unexpected symlinks before publication. It is a guard against accidental disclosure, not a claim that every document is correct or safe without editorial review.
-
-Preview builds have `noindex` metadata and disallow crawling. Production builds enable indexing and emit a sitemap using the public canonical origin. `build-info.json` contains revision identifiers only. No analytics has been enabled.
+`check-publication.mjs` checks for high-confidence credentials and unexpected symlinks. Preview builds emit noindex and disallow crawling; production emits canonical URLs and the sitemap for docs.quark.build. No analytics is enabled. The optional printable card exports may be absent.
 
 ### Rollback
 
-Use Vercel's previous successful production deployment for an immediate rollback. Then revert the documentation commit in the authoring repository and push the revert to `main`; the publisher sends the corrected inputs. Do not repair the publication mirror as a second editable source. If the publisher fails, the last successful production deployment remains available.
+Select the previous successful production deployment in Vercel for immediate recovery. Then revert the corresponding commit in this repository and push the revert. A failed build keeps the last successful deployment available.

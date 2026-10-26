@@ -89,7 +89,7 @@ export default function Home(): ReactNode {
     <Layout title="Documentation" description="Guides for warehouse operators and administrators, and the API reference for integrators of Quark WMS.">
       <header className={styles.hero}>
         <div className={styles.heroInner}>
-          <img className={styles.mark} src={useBaseUrl('/img/logo.svg')} alt="" width="56" height="71" />
+          <img className={styles.mark} src={useBaseUrl('/img/favicon.svg')} alt="" width="56" height="56" />
           <p className={styles.eyebrow}>Documentation</p>
           <h1 className={styles.title}>Quark WMS</h1>
           <p className={styles.tagline}>Practical guides for warehouse work, system configuration and integrations. Choose the part that matches your role.</p>
