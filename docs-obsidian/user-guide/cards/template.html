@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Quark WMS task cards</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  One template for every card and every language.
+  build.mjs calls window.renderAll({ui, cards}) with the merged data.
+  Nothing in this file is language-specific: every visible word comes from
+  ui.<lang>.json or cards.<lang>.json.
+  Markup inside a text: **bold** = a label as the terminal shows it, [F8] = a keycap.
+-->
+<style>
+@page{size:148mm 210mm;margin:0}
+:root{--teal:#0f766e;--ink:#14201f;--mute:#5b6b69;--line:#d6e0de;--warn:#b45309;--bg:#ffffff;--tint:#e8f4f2;--hl:#ffb703}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--ink);font:15px/1.3 Inter,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.card{--sfs:15px;--nfs:12px;--hfs:12px;width:148mm;height:209.8mm;padding:8mm 9mm 6.5mm;display:flex;flex-direction:column;gap:3mm;position:relative;overflow:hidden;background:#fff;break-after:page;page-break-after:always}
+.card:last-child{break-after:auto;page-break-after:auto}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:4mm;border-bottom:3px solid var(--teal);padding-bottom:2.5mm}
+h1{margin:0;font-size:25px;line-height:1.1;letter-spacing:-.01em}
+.tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);text-align:right;line-height:1.3;flex:none}
+.need{font-size:13px;color:var(--mute)}
+.need b{color:var(--ink)}
+.main{display:grid;grid-template-columns:1fr 44mm;gap:4mm;flex:1 1 0;min-height:0}
+.main.noshots{grid-template-columns:1fr}
+ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--gap,1.2mm);align-self:start}
+li{display:grid;min-height:8.5mm;grid-template-columns:8mm 1fr;gap:3mm;align-items:center;font-size:var(--sfs);font-weight:600;line-height:1.15}
+li .n{width:8mm;height:8mm;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+li small{display:block;font-weight:400;color:var(--mute);font-size:var(--nfs);margin-top:1mm;line-height:1.2}
+li.loop{display:block;grid-template-columns:none;min-height:0;background:var(--tint);border-radius:8px;padding:1.6mm 3mm;font-size:max(12px,calc(var(--sfs) - 2px));font-weight:700;color:var(--teal)}
+kbd{display:inline-block;vertical-align:baseline;margin:-4px 1px;font:700 13px/1.15 ui-monospace,Menlo,Consolas,"DejaVu Sans Mono",monospace;color:var(--ink);background:#fff;border:1.5px solid var(--ink);border-bottom-width:3px;border-radius:5px;padding:2px 6px;white-space:nowrap}
+.shots{display:flex;flex-direction:column;gap:3mm;align-self:start}
+.shot{position:relative}
+.shot .lbl{position:absolute;right:-2mm;top:-2.2mm;z-index:2;min-width:6.5mm;height:6.5mm;padding:0 1.2mm;box-sizing:border-box;white-space:nowrap;border-radius:3.25mm;background:var(--teal);color:#fff;font:800 12px/6.5mm Inter,sans-serif;text-align:center;box-shadow:0 0 0 2px #fff}
+.scr{width:44mm;border-radius:6px;overflow:hidden;border:1px solid #222;background:#1b1b1b;position:relative}
+.scr .band{display:block;overflow:hidden;position:relative}
+.scr .band img{display:block;max-width:none}
+.scr .sep{height:2px;background:#555}
+.hl{position:absolute;border:2.5px solid var(--hl);border-radius:4px;box-shadow:0 0 0 2px rgba(255,183,3,.35);pointer-events:none}
+.cap{font-size:11px;color:var(--mute);margin-top:.8mm;line-height:1.2}
+.help{border:2px solid var(--warn);border-radius:10px;padding:2mm 4mm;display:flex;flex-direction:column;gap:.9mm}
+.help h2{margin:0 0 .5mm;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--warn)}
+.help .r{display:grid;grid-template-columns:38% 1fr;gap:3mm;font-size:var(--hfs);line-height:1.3}
+.help .r span:first-child{font-weight:700}
+.help kbd{font-size:12px;padding:1px 5px}
+.sup{background:var(--ink);color:#fff;border-radius:8px;padding:1.6mm 4mm;font-size:13px;font-weight:700;text-align:center}
+footer{display:flex;justify-content:space-between;gap:4mm;font-size:11px;line-height:1.25;color:var(--mute)}
+footer span:first-child{white-space:nowrap;flex:none}
+footer span:last-child{text-align:right}
+/* reference layout (card Z1) */
+.ref{display:flex;flex-direction:column;gap:3.2mm;min-width:0}
+.ref h2{margin:0 0 1.2mm;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.ref .keys{display:grid;grid-template-columns:1fr 1fr;gap:1.4mm 4mm}
+.ref .k{display:grid;grid-template-columns:auto 1fr;gap:2mm;align-items:center;font-size:var(--hfs);line-height:1.2}
+.ref .k .kk{display:flex;gap:3px;flex-wrap:nowrap;min-width:17mm}
+.ref .msgs{display:flex;flex-direction:column;gap:1.4mm;border:2px solid var(--warn);border-radius:10px;padding:2.4mm 4mm}
+.ref .msgs h2{color:var(--warn)}
+.ref .m{display:grid;grid-template-columns:42% 1fr;gap:3mm;font-size:var(--hfs);line-height:1.3}
+.ref .m span:first-child{font-weight:700}
+</style></head><body><div id="root"></div>
+<script>
+(function(){
+const PX_PER_MM=96/25.4, SHOT_W=44*PX_PER_MM;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\[([^\]]+)\]/g,'<kbd>$1</kbd>');
+const el=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;};
+const loadImg=src=>new Promise(res=>{const i=new Image();i.onload=()=>res({ok:true,w:i.naturalWidth,h:i.naturalHeight});i.onerror=()=>res({ok:false,w:0,h:0});i.src=src;});
+
+function bandsOf(crop,natH){ const arr=Array.isArray(crop)?crop:[crop]; return arr.map(b=>({y0:b.y0,y1:b.y1})); }
+
+async function buildShot(s,issues){
+  const info=await loadImg(s.src);
+  const shot=el('div','shot'); shot.append(el('span','lbl',esc(s.badge)));
+  const scr=el('div','scr'); shot.append(scr);
+  if(!info.ok){ issues.push('image failed to load: '+s.image); scr.style.height='40px'; return shot; }
+  const sc=(SHOT_W-2)/info.w;
+  let top=0; const bands=bandsOf(s.crop);
+  bands.forEach((b,i)=>{
+    if(b.y1>info.h||b.y0<0||b.y1<=b.y0) issues.push('crop '+b.y0+'-'+b.y1+' is outside '+s.image+' (height '+info.h+')');
+    if(i>0){scr.append(el('div','sep')); top+=2;}
+    const band=el('div','band'); band.style.height=((b.y1-b.y0)*sc)+'px';
+    const im=document.createElement('img'); im.src=s.src; im.alt=''; im.style.width=(info.w*sc)+'px'; im.style.marginTop=(-b.y0*sc)+'px';
+    band.append(im); scr.append(band); b.top=top; top+=(b.y1-b.y0)*sc;
+  });
+  const hls=s.highlight?(Array.isArray(s.highlight)?s.highlight:[s.highlight]):[];
+  hls.forEach(h=>{
+    const b=bands.find(b=>h.y>=b.y0-1&&h.y+h.h<=b.y1+1);
+    if(!b){issues.push('highlight '+JSON.stringify(h)+' is not inside one crop band of '+s.image);return;}
+    const d=el('div','hl'); const pad=1.5;
+    let x=h.x*sc-pad,y=b.top+(h.y-b.y0)*sc-pad,w=h.w*sc+2*pad,hh=h.h*sc+2*pad;
+    if(x<0){w+=x;x=0;} if(x+w>SHOT_W-2){w=SHOT_W-2-x;} if(y<b.top){hh-=b.top-y;y=b.top;}
+    d.style.cssText='left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+hh+'px';
+    scr.append(d);
+  });
+  if(s.caption) shot.append(el('div','cap',md(s.caption)));
+  return shot;
+}
+
+function ensureWords(){ }
+
+function buildHeader(card,ui){
+  const h=el('header'); h.append(el('h1',null,md(card.title)));
+  h.append(el('div','tag',esc(ui.areas[card.area]||card.area)+'<br>'+esc(ui.device)));
+  return h;
+}
+function buildFooter(card,ui){
+  const f=el('footer'); f.append(el('span',null,esc(ui.footer)+' '+esc(card.id)));
+  f.append(el('span',null,card.codes&&card.codes.length?esc(ui.screens)+' '+card.codes.map(esc).join(' · '):''));
+  return f;
+}
+
+async function buildCard(card,ui){
+  const issues=[]; const c=el('section','card'); c.dataset.id=card.id;
+  c.append(buildHeader(card,ui));
+  if(card.needs&&card.needs.length) c.append(el('div','need','<b>'+esc(ui.need)+'</b> '+card.needs.map(md).join(' &nbsp;·&nbsp; ')));
+  const main=el('div','main');
+  if(card.layout==='reference'){
+    main.classList.add('noshots'); const ref=el('div','ref');
+    for(const sec of card.sections){
+      if(sec.kind==='keys'){
+        const w=el('div'); w.append(el('h2',null,esc(sec.title)));
+        const g=el('div','keys');
+        sec.rows.forEach(r=>{const k=el('div','k'); k.append(el('span','kk',r.keys.map(x=>'<kbd>'+esc(x)+'</kbd>').join(''))); k.append(el('span',null,md(r.text))); g.append(k);});
+        w.append(g); ref.append(w);
+      } else {
+        const w=el('div','msgs'); w.append(el('h2',null,esc(sec.title)));
+        sec.rows.forEach(r=>{const m=el('div','m'); m.append(el('span',null,md(r.msg))); m.append(el('span',null,md(r.do))); w.append(m);});
+        ref.append(w);
+      }
+    }
+    main.append(ref); c.append(main);
+  } else {
+    const ol=el('ol');
+    card.steps.forEach((s,i)=>{
+      const li=el('li'); li.append(el('span','n',String(i+1)));
+      li.append(el('span',null,md(s.text)+(s.note?'<small>'+md(s.note)+'</small>':'')));
+      ol.append(li);
+      if(card.loop&&card.loop.afterStep===i+1) ol.append(el('li','loop','↺ '+md(card.loop.text)));
+    });
+    main.append(ol);
+    const shots=el('div','shots');
+    for(const s of card.screens) shots.append(await buildShot(s,issues));
+    if(card.screens.length) main.append(shots); else main.classList.add('noshots');
+    c.append(main);
+    const help=el('div','help'); help.append(el('h2',null,esc(ui.help)));
+    card.problems.forEach(p=>{const r=el('div','r'); r.append(el('span',null,md(p.if))); r.append(el('span',null,md(p.do))); help.append(r);});
+    c.append(help);
+  }
+  c.append(el('div','sup',esc(ui.support)));
+  c.append(buildFooter(card,ui));
+  return {c,issues};
+}
+
+const TIERS=[[15,12,12],[14.5,12,12],[14,12,12],[14,11.5,11.5],[13.5,11.5,11.5],[13,11.5,11.5],[12.5,11,11.5],[12,11,11]];
+function overflowing(c){
+  const m=c.querySelector('.main');
+  return m.scrollHeight>m.clientHeight+1||c.scrollHeight>c.clientHeight+1; 
+}
+const REF_TIERS=[[15,14,14],[15,13.5,13.5],[15,13,13],[15,12.5,12.5],[15,12,12],[15,11.5,11.5]];
+function fit(c){
+  let used=null;
+  for(const t of (c.querySelector('.ref')?REF_TIERS:TIERS)){
+    c.style.setProperty('--sfs',t[0]+'px');c.style.setProperty('--nfs',t[1]+'px');c.style.setProperty('--hfs',t[2]+'px');
+    const ol=c.querySelector('ol'); if(ol) ol.style.removeProperty('--gap');
+    if(!overflowing(c)){used=t;break;}
+  }
+  if(!used) return null;
+  // spread leftover height: a little more air between the steps, never more than 3mm
+  const ol=c.querySelector('ol'), m=c.querySelector('.main');
+  if(ol){
+    const slack=m.clientHeight-Math.max(ol.offsetHeight,(c.querySelector('.shots')||{offsetHeight:0}).offsetHeight);
+    const n=ol.children.length-1;
+    if(slack>8&&n>0){ const extra=Math.min(slack/n,3*PX_PER_MM-1.2*PX_PER_MM); ol.style.setProperty('--gap',(1.2*PX_PER_MM+extra*0.8)+'px'); if(overflowing(c)) ol.style.removeProperty('--gap'); }
+  }
+  return used;
+}
+function check(c,issues,tier){
+  if(!tier) issues.push('content does not fit on the page even at the smallest sizes (steps '+TIERS[TIERS.length-1][0]+'px)');
+  const m=c.querySelector('.main'), cr=c.getBoundingClientRect();
+  if(m.scrollHeight>m.clientHeight+1) issues.push('steps/screens overflow the middle area by '+(m.scrollHeight-m.clientHeight)+'px');
+  if(c.scrollHeight>c.clientHeight+1) issues.push('page content is '+(c.scrollHeight-c.clientHeight)+'px taller than the page');
+  const foot=c.querySelector('footer').getBoundingClientRect();
+  if(foot.bottom>cr.bottom+0.5) issues.push('footer is pushed off the page');
+  const ol=c.querySelector('ol'); if(ol){const o=ol.getBoundingClientRect(); if(o.bottom>m.getBoundingClientRect().bottom+1) issues.push('step list runs past the middle area');}
+  const sh=c.querySelector('.shots'); if(sh){const o=sh.getBoundingClientRect(); if(o.bottom>m.getBoundingClientRect().bottom+1) issues.push('screenshots run past the middle area (use shorter crops)');}
+  const all=c.querySelectorAll('*');
+  const seen=new Set();
+  all.forEach(e=>{
+    const cs=getComputedStyle(e);
+    const own=[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());
+    if(own){ const fs=parseFloat(cs.fontSize); if(fs<11-0.01){ const k='fs'+e.textContent.slice(0,20); if(!seen.has(k)){seen.add(k);issues.push('text smaller than 11px ('+fs+'px): "'+e.textContent.trim().slice(0,40)+'"');} } }
+    if(cs.display!=='inline'&&own&&e.scrollWidth>e.clientWidth+1){ issues.push('text is cut off horizontally: "'+e.textContent.trim().slice(0,40)+'"'); }
+    const r=e.getBoundingClientRect();
+    if(r.width&&(r.right>cr.right+0.5||r.left<cr.left-0.5)&&!e.closest('.lbl')) { const k='x'+e.tagName+e.textContent.slice(0,10); if(!seen.has(k)){seen.add(k);issues.push('an element sticks out of the page sideways: <'+e.tagName.toLowerCase()+'> '+e.textContent.trim().slice(0,30));} }
+  });
+  const p=c.querySelector('.help'); if(p){ p.querySelectorAll('.r').forEach(r=>{ if(r.scrollWidth>r.clientWidth+1) issues.push('problem row is cut off: '+r.textContent.slice(0,40)); }); }
+}
+
+window.renderAll=async function(payload){
+  const root=document.getElementById('root'); root.innerHTML='';
+  document.documentElement.lang=payload.ui.htmlLang||payload.ui.lang||'en';
+  const built=[];
+  for(const card of payload.cards){ const b=await buildCard(card,payload.ui); root.append(b.c); built.push({card,...b}); }
+  await document.fonts.ready;
+  const out=[];
+  for(const b of built){
+    const tier=fit(b.c); check(b.c,b.issues,tier);
+    out.push({id:b.card.id,issues:b.issues,tier});
+  }
+  return out;
+};
+})();
+</script></body></html>

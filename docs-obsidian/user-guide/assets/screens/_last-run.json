@@ -1,0 +1,366 @@
+{
+ "base": "http://localhost:18083",
+ "theme": "light",
+ "results": [
+  {
+   "id": "login",
+   "ok": true,
+   "bytes": 280621
+  },
+  {
+   "id": "home-dashboard",
+   "ok": true,
+   "bytes": 155393
+  },
+  {
+   "id": "menu-navigation",
+   "ok": true,
+   "bytes": 363227
+  },
+  {
+   "id": "warehouse-selection",
+   "ok": true,
+   "bytes": 383817
+  },
+  {
+   "id": "receipts-list",
+   "ok": true,
+   "bytes": 449102
+  },
+  {
+   "id": "inventory-balances",
+   "ok": true,
+   "bytes": 553649
+  },
+  {
+   "id": "locations",
+   "ok": true,
+   "bytes": 372730
+  },
+  {
+   "id": "skus",
+   "ok": true,
+   "bytes": 433047
+  },
+  {
+   "id": "policy-putaway",
+   "ok": true,
+   "bytes": 204187
+  },
+  {
+   "id": "policy-allocation",
+   "ok": true,
+   "bytes": 220702
+  },
+  {
+   "id": "policy-picking",
+   "ok": true,
+   "bytes": 226361
+  },
+  {
+   "id": "policy-cartonization",
+   "ok": true,
+   "bytes": 218000
+  },
+  {
+   "id": "policy-replenishment",
+   "ok": true,
+   "bytes": 201913
+  },
+  {
+   "id": "shipment-orders",
+   "ok": true,
+   "bytes": 355155
+  },
+  {
+   "id": "pick-assignments",
+   "ok": true,
+   "bytes": 225364
+  },
+  {
+   "id": "task-board",
+   "ok": true,
+   "bytes": 397757
+  },
+  {
+   "id": "reports",
+   "ok": true,
+   "bytes": 388587
+  },
+  {
+   "id": "rpc-documentation",
+   "ok": true,
+   "bytes": 308717
+  },
+  {
+   "id": "holds",
+   "ok": true,
+   "bytes": 286968
+  },
+  {
+   "id": "transactions",
+   "ok": true,
+   "bytes": 429179
+  },
+  {
+   "id": "code-list",
+   "ok": true,
+   "bytes": 354316
+  },
+  {
+   "id": "owners",
+   "ok": true,
+   "bytes": 411286
+  },
+  {
+   "id": "work-areas",
+   "ok": true,
+   "bytes": 230699
+  },
+  {
+   "id": "receipt-detail",
+   "ok": true,
+   "bytes": 359517
+  },
+  {
+   "id": "shipment-order-detail",
+   "ok": true,
+   "bytes": 320421
+  },
+  {
+   "id": "sku-detail",
+   "ok": true,
+   "bytes": 283570
+  },
+  {
+   "id": "location-detail",
+   "ok": true,
+   "bytes": 295574
+  },
+  {
+   "id": "policy-allocation-detail",
+   "ok": true,
+   "bytes": 425479
+  },
+  {
+   "id": "policy-cartonization-detail",
+   "ok": true,
+   "bytes": 326758
+  },
+  {
+   "id": "policy-picking-detail",
+   "ok": true,
+   "bytes": 346618
+  },
+  {
+   "id": "policy-putaway-detail",
+   "ok": true,
+   "bytes": 447414
+  },
+  {
+   "id": "rpc-documentation-method",
+   "ok": true,
+   "bytes": 392315
+  },
+  {
+   "id": "enterprise-users",
+   "ok": true,
+   "bytes": 244606
+  },
+  {
+   "id": "enterprise-roles",
+   "ok": true,
+   "bytes": 209777
+  },
+  {
+   "id": "enterprise-permission-matrix",
+   "ok": true,
+   "bytes": 383560
+  },
+  {
+   "id": "enterprise-audit-log",
+   "ok": true,
+   "bytes": 438963
+  },
+  {
+   "id": "enterprise-event-registry",
+   "ok": true,
+   "bytes": 372155
+  },
+  {
+   "id": "enterprise-user-detail",
+   "ok": true,
+   "bytes": 366114
+  },
+  {
+   "id": "enterprise-role-detail",
+   "ok": true,
+   "bytes": 246325
+  },
+  {
+   "id": "sku-policies",
+   "ok": true,
+   "bytes": 266879
+  },
+  {
+   "id": "sku-serial-tracking",
+   "ok": true,
+   "bytes": 302278
+  },
+  {
+   "id": "owner-detail",
+   "ok": true,
+   "bytes": 261325
+  },
+  {
+   "id": "hold-codes",
+   "ok": true,
+   "bytes": 324549
+  },
+  {
+   "id": "hold-new",
+   "ok": true,
+   "bytes": 189736
+  },
+  {
+   "id": "barcode-formats",
+   "ok": true,
+   "bytes": 289949
+  },
+  {
+   "id": "location-generator",
+   "ok": true,
+   "bytes": 303996
+  },
+  {
+   "id": "putaway-zones",
+   "ok": true,
+   "bytes": 231421
+  },
+  {
+   "id": "putaway-zone-detail",
+   "ok": true,
+   "bytes": 300987
+  },
+  {
+   "id": "putaway-zone-printers",
+   "ok": true,
+   "bytes": 278244
+  },
+  {
+   "id": "work-area-detail",
+   "ok": true,
+   "bytes": 337534
+  },
+  {
+   "id": "operators",
+   "ok": true,
+   "bytes": 239330
+  },
+  {
+   "id": "equipment-profiles",
+   "ok": true,
+   "bytes": 218384
+  },
+  {
+   "id": "equipment-profile-detail",
+   "ok": true,
+   "bytes": 258030
+  },
+  {
+   "id": "packs",
+   "ok": true,
+   "bytes": 245816
+  },
+  {
+   "id": "pack-wizard",
+   "ok": true,
+   "bytes": 241605
+  },
+  {
+   "id": "lot-policy",
+   "ok": true,
+   "bytes": 273492
+  },
+  {
+   "id": "receipt-policy",
+   "ok": true,
+   "bytes": 214165
+  },
+  {
+   "id": "receipt-policy-detail",
+   "ok": true,
+   "bytes": 269008
+  },
+  {
+   "id": "pick-short-reasons",
+   "ok": true,
+   "bytes": 239784
+  },
+  {
+   "id": "pick-short-reason-detail",
+   "ok": true,
+   "bytes": 269088
+  },
+  {
+   "id": "board-settings",
+   "ok": true,
+   "bytes": 233754
+  },
+  {
+   "id": "metric-thresholds",
+   "ok": true,
+   "bytes": 207636
+  },
+  {
+   "id": "enterprise-user-warehouses",
+   "ok": true,
+   "bytes": 285713
+  },
+  {
+   "id": "enterprise-user-api-keys",
+   "ok": true,
+   "bytes": 299786
+  },
+  {
+   "id": "enterprise-user-api-key-create",
+   "ok": true,
+   "bytes": 299874
+  },
+  {
+   "id": "enterprise-subscribers",
+   "ok": true,
+   "bytes": 189244
+  },
+  {
+   "id": "enterprise-subscriber-detail",
+   "ok": true,
+   "bytes": 171745
+  },
+  {
+   "id": "enterprise-event-monitor",
+   "ok": true,
+   "bytes": 383022
+  },
+  {
+   "id": "owner-wh-policies",
+   "ok": true,
+   "bytes": 258917
+  },
+  {
+   "id": "owner-config-receiving",
+   "ok": true,
+   "bytes": 242494
+  },
+  {
+   "id": "receipt-line-detail",
+   "ok": true,
+   "bytes": 373415
+  },
+  {
+   "id": "receipt-report-damage",
+   "ok": true,
+   "bytes": 407778
+  }
+ ]
+}

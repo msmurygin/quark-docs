@@ -1,0 +1,6 @@
+{
+  "areaOrder": ["start", "receiving", "inventory", "picking", "packing", "reference"],
+  "screensDir": "../assets/screens",
+  "sourceWidth": 780,
+  "limits": { "maxSteps": 9, "maxWordsPerStep": 8, "minProblems": 3, "maxProblems": 5, "minScreens": 2, "maxScreens": 4, "minFontPx": 11 }
+}

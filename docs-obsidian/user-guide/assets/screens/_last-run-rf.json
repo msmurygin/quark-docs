@@ -1,0 +1,605 @@
+{
+ "base": "http://127.0.0.1:18090",
+ "results": [
+  {
+   "id": "rf-login",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-main-menu",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-inventory-menu",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-stock-inquiry",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-stock-inquiry-result",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-picking-menu",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-station",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-stock-position",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-deliver-carrier",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCASN01SKU",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCASN01LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCASN01RSN",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-shortage",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-close-override",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCSN01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCSN_RECOVERY",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCSN01SUM",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-menu",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-scan",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-summary",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-sku",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-line",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-complete",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-receive-asn-close",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-start",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-line",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-done",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-next",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCBLIND02LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-close",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCADJ01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCADJ02",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-blind-closed",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCBLIND_SN_SUM",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE02",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE_CANCEL",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE_REPAL",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE02LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCASE_DONE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCRTN01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCRTN01LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCRTN01DONE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCRTN02SKU",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCRTN02LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCDMG_RECV01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCDMG_RECV01_LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCDMG_RECV01_DONE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCDMG_RECV02_SKU",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCDMG_RECV02_LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCASN01_DMG_SKU",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCASN01_DMG_LINE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCCLOSE01",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCSN_FORCE",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "RCSN_FORCE_CONFIRM",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-putaway-scan",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-putaway-confirm",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-putaway-takeTo",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-putaway-done",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PUTW_OVR",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-move-find",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-move-position",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-move-qty",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-move-dest",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-move-done",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "INVMOV_SN",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "INVMOV_OVR",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "INVINQ04",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-area",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-goto",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-what",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "CNTLOT1",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "CNTLOT2",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-entry",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-finish",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-count-done",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "CNTLOT3",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-start",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-work",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PICKINS",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-pallet",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-location",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-item",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-lpn",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-qty",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-confirm",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-done",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-close",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pick-closed",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PICK10",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PICK10C",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PICK11",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-start",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-equipment",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-choose",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-carrier",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-box",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-ready",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-next",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-location",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-item",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-lpn",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-qty",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-into-box",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-deliver",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-area-delivered",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-station",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-scan",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-check",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-weigh",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-pack-problem",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA25",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA26",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA50",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA51",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA27",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA09",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "PKA_OVR",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-warehouse-select",
+   "ok": true,
+   "warn": ""
+  },
+  {
+   "id": "rf-warehouse-pick",
+   "ok": true,
+   "warn": ""
+  }
+ ]
+}

@@ -1,0 +1,17 @@
+.git/
+node_modules/
+build/
+.docusaurus/
+.cache-loader/
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+AGENTS.md
+src/generated/
+static/api/data/
+static/api/openapi.json
+static/api/openrpc.json
+static/cards/files/
+reference/_generated/

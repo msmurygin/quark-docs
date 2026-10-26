@@ -1,0 +1,2810 @@
+[
+ {
+  "id": "L1",
+  "title": "Sign in and choose a warehouse",
+  "area": "start",
+  "needs": [
+   "your user name",
+   "your password"
+  ],
+  "steps": [
+   {
+    "text": "Type your **Username**, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Type your **Password**, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Letters show as *"
+   },
+   {
+    "text": "Choose a warehouse: press [F2]",
+    "keys": [
+     "F2"
+    ],
+    "note": "Only if you have more than one"
+   },
+   {
+    "text": "Pick yours with [Up] or [Down]",
+    "keys": [
+     "Up",
+     "Down"
+    ]
+   },
+   {
+    "text": "Press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "**Main Menu** opens"
+   },
+   {
+    "text": "Change warehouse later: [Esc] on **Main Menu**",
+    "keys": [
+     "Esc"
+    ]
+   }
+  ],
+  "screens": [
+   {
+    "image": "rf-login.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 306
+     }
+    ],
+    "badge": "1-2",
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 170
+    }
+   },
+   {
+    "image": "raw/rf-warehouse-select.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 222
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "rf-warehouse-pick.png",
+    "crop": [
+     {
+      "y0": 1186,
+      "y1": 1560
+     }
+    ],
+    "badge": "4-5",
+    "highlight": {
+     "x": 0,
+     "y": 1270,
+     "w": 780,
+     "h": 94
+    }
+   },
+   {
+    "image": "rf-main-menu.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 430
+     },
+     {
+      "y0": 1500,
+      "y1": 1560
+     }
+    ],
+    "badge": 6,
+    "highlight": {
+     "x": 0,
+     "y": 1504,
+     "w": 780,
+     "h": 56
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Invalid username or password",
+    "do": "Type both again. Still wrong? Call your supervisor."
+   },
+   {
+    "if": "The warehouse list is empty",
+    "do": "You have no warehouse. Ask your administrator."
+   },
+   {
+    "if": "Session expired",
+    "do": "Sign in again."
+   },
+   {
+    "if": "No permission",
+    "do": "You may not use this function. Tell your supervisor."
+   }
+  ],
+  "codes": [
+   "login",
+   "WHSEL",
+   "main_menu"
+  ]
+ },
+ {
+  "id": "R1",
+  "title": "Receive goods against an ASN",
+  "area": "receiving",
+  "needs": [
+   "the ASN number",
+   "the goods in your hands",
+   "pallet labels"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [1] (Receive Against ASN)",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Scan the ASN number",
+    "keys": [
+     "F2"
+    ],
+    "note": "Not sure? Press [F2] to find it"
+   },
+   {
+    "text": "Check the summary, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Scan the SKU barcode",
+    "keys": []
+   },
+   {
+    "text": "Type **Qty**. Check **UOM**, **To Loc**",
+    "keys": [],
+    "note": "Default location is STAGE. Fill lot fields if shown."
+   },
+   {
+    "text": "Scan the pallet label",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Field **To LPN**, then [Enter]"
+   },
+   {
+    "text": "All received? Press [Esc] to the summary",
+    "keys": [
+     "Esc"
+    ]
+   },
+   {
+    "text": "On the summary press [F8] (Close)",
+    "keys": [
+     "F8",
+     "Enter"
+    ],
+    "note": "**Receipt Closed** shows. Then [Enter]."
+   }
+  ],
+  "loop": {
+   "afterStep": 7,
+   "text": "More SKUs? Go back to step 5"
+  },
+  "screens": [
+   {
+    "image": "raw/rf-receive-asn-scan.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 170
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-receive-asn-line.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 598
+     }
+    ],
+    "badge": "6-7",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 252,
+      "w": 776,
+      "h": 256
+     },
+     {
+      "x": 2,
+      "y": 510,
+      "w": 776,
+      "h": 84
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-receive-asn-shortage.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 430
+     }
+    ],
+    "badge": 6,
+    "highlight": {
+     "x": 2,
+     "y": 338,
+     "w": 776,
+     "h": 84
+    },
+    "caption": "Short by more than the limit? **Reason** opens"
+   },
+   {
+    "image": "raw/rf-receive-asn-complete.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 166
+     },
+     {
+      "y0": 424,
+      "y1": 512
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 520,
+     "y": 1464,
+     "w": 260,
+     "h": 96
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "SKU not found",
+    "do": "Scan again. Still wrong? Call your supervisor."
+   },
+   {
+    "if": "ASN not found",
+    "do": "Check the number. Press [F2] to find the ASN."
+   },
+   {
+    "if": "Receiving less than expected",
+    "do": "Press [F2] in **Reason**. Pick the reason."
+   },
+   {
+    "if": "Serial Capture opens",
+    "do": "Scan one serial for each unit. See card R6."
+   },
+   {
+    "if": "[F8] is grey",
+    "do": "Serials are missing. Finish them first."
+   }
+  ],
+  "codes": [
+   "RCASN01",
+   "RCASN01LINE",
+   "RCASN01RSN",
+   "RCASN01SUM"
+  ]
+ },
+ {
+  "id": "R2",
+  "title": "Receive goods blind (no ASN)",
+  "area": "receiving",
+  "needs": [
+   "the owner code",
+   "the goods in your hands",
+   "pallet labels"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [3] (Receive Blind)",
+    "keys": [
+     "3"
+    ]
+   },
+   {
+    "text": "Type the **Owner** code",
+    "keys": [
+     "F2"
+    ],
+    "note": "Not sure? Press [F2] for a list"
+   },
+   {
+    "text": "Scan the **SKU** barcode",
+    "keys": [],
+    "note": "The field sends itself"
+   },
+   {
+    "text": "Type **Qty**. Check **UOM**, **To Loc**",
+    "keys": [],
+    "note": "Default location is STAGE. Fill lot fields if shown."
+   },
+   {
+    "text": "Scan the pallet label",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Field **To LPN**, then [Enter]"
+   },
+   {
+    "text": "Check the **Done** screen",
+    "keys": []
+   },
+   {
+    "text": "Next SKU? Press [Enter] on **Done**",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Finished? Press [F8] (Close)",
+    "keys": [
+     "F8"
+    ],
+    "note": "Then see card R5"
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/rf-blind-start.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-blind-line.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 686
+     }
+    ],
+    "badge": "5-6",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 338,
+      "w": 776,
+      "h": 256
+     },
+     {
+      "x": 2,
+      "y": 596,
+      "w": 776,
+      "h": 84
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-blind-done.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 512
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "7-9",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 80,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 2,
+      "y": 252,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 0,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     },
+     {
+      "x": 520,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     }
+    ]
+   }
+  ],
+  "problems": [
+   {
+    "if": "Owner not found",
+    "do": "Check the code. Press [F2] and pick from the list."
+   },
+   {
+    "if": "SKU not found",
+    "do": "Scan again. Still wrong? Call your supervisor."
+   },
+   {
+    "if": "Receipt without LPN is not allowed",
+    "do": "Scan a pallet label in **To LPN**."
+   },
+   {
+    "if": "Invalid location",
+    "do": "Check **To Loc**. Ask your supervisor for the right one."
+   },
+   {
+    "if": "Qty is not a multiple of pack",
+    "do": "Check your count and **UOM**."
+   }
+  ],
+  "codes": [
+   "RCBLIND01",
+   "RCBLIND01LINE",
+   "RCBLIND01DONE"
+  ]
+ },
+ {
+  "id": "R3",
+  "title": "Receive a customer return",
+  "area": "receiving",
+  "needs": [
+   "the owner code",
+   "the RMA number",
+   "the returned goods"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [4] (Receive Return)",
+    "keys": [
+     "4"
+    ]
+   },
+   {
+    "text": "Type the **Owner** code",
+    "keys": [
+     "F2"
+    ],
+    "note": "Not sure? Press [F2] for a list"
+   },
+   {
+    "text": "Type the **RMA #**",
+    "keys": [
+     "F2"
+    ],
+    "note": "[F2] lists the open customer returns"
+   },
+   {
+    "text": "Scan the returned **SKU**",
+    "keys": []
+   },
+   {
+    "text": "Choose **Condition**: [Left] or [Right]",
+    "keys": [
+     "Left",
+     "Right"
+    ],
+    "note": "Resaleable, Needs refurb, Damaged, Discard. Damaged? Fill the extra fields."
+   },
+   {
+    "text": "Type **Reason** and **Qty**",
+    "keys": [],
+    "note": "Reason is a code, for example defective"
+   },
+   {
+    "text": "Check **To Loc**. Scan **To LPN**, [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Default location is RETURNS"
+   },
+   {
+    "text": "Next SKU: [Enter]. Finished: [F8]",
+    "keys": [
+     "Enter",
+     "F8"
+    ],
+    "note": "On the **Return Accepted** screen"
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/RCRTN01.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     }
+    ],
+    "badge": "3-5",
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 256
+    }
+   },
+   {
+    "image": "raw/RCRTN01LINE.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 338,
+      "y1": 944
+     }
+    ],
+    "badge": "6-8",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 338,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 2,
+      "y": 424,
+      "w": 776,
+      "h": 172
+     },
+     {
+      "x": 2,
+      "y": 682,
+      "w": 776,
+      "h": 258
+     }
+    ]
+   },
+   {
+    "image": "RCRTN01DONE.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 520,
+     "y": 1464,
+     "w": 260,
+     "h": 96
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Owner not found",
+    "do": "Check the code. Press [F2] and pick from the list."
+   },
+   {
+    "if": "Invalid location",
+    "do": "Use the location your supervisor names."
+   },
+   {
+    "if": "Receipt without LPN is not allowed",
+    "do": "Scan a pallet label in **To LPN**."
+   },
+   {
+    "if": "Receipt is not a customer return",
+    "do": "Tell your supervisor."
+   },
+   {
+    "if": "SKU not found",
+    "do": "Scan again. Still wrong? Call your supervisor."
+   }
+  ],
+  "codes": [
+   "RCRTN01",
+   "RCRTN01LINE",
+   "RCRTN01DONE"
+  ]
+ },
+ {
+  "id": "R4",
+  "title": "Receive damaged goods",
+  "area": "receiving",
+  "needs": [
+   "the owner code",
+   "the damaged goods",
+   "a pallet label"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [6] (Receive Damaged)",
+    "keys": [
+     "6",
+     "F4"
+    ],
+    "note": "On an ASN summary use [F4] instead."
+   },
+   {
+    "text": "Type the **Owner** code",
+    "keys": [
+     "F2"
+    ],
+    "note": "Not sure? Press [F2] for a list"
+   },
+   {
+    "text": "Scan the damaged **SKU**",
+    "keys": []
+   },
+   {
+    "text": "Type the damaged **Qty**",
+    "keys": [],
+    "note": "The goods go to the DAMAGE area and are held."
+   },
+   {
+    "text": "Choose **Severity**: [Left] or [Right]",
+    "keys": [
+     "Left",
+     "Right"
+    ],
+    "note": "Cosmetic, Minor, Major or Total"
+   },
+   {
+    "text": "Choose the **Reason** the same way",
+    "keys": [],
+    "note": "Crushed, Water damage, Torn, Other …"
+   },
+   {
+    "text": "**Vendor fault?** Press [Y] or [N]",
+    "keys": [
+     "Y",
+     "N"
+    ],
+    "note": "Yes means the vendor is to blame"
+   },
+   {
+    "text": "Scan the pallet label, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Field **To LPN**"
+   }
+  ],
+  "loop": {
+   "afterStep": 9,
+   "text": "More damaged SKUs? [Enter] on **Done**"
+  },
+  "screens": [
+   {
+    "image": "raw/RCASN01_DMG_SKU.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     }
+    ],
+    "badge": 2,
+    "highlight": {
+     "x": 2,
+     "y": 252,
+     "w": 776,
+     "h": 84
+    },
+    "caption": "On an ASN summary, use the F4 key instead"
+   },
+   {
+    "image": "raw/RCDMG_RECV01.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": "3-4",
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 170
+    }
+   },
+   {
+    "image": "raw/RCDMG_RECV01_LINE.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 1030
+     }
+    ],
+    "badge": "5-9",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 338,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 2,
+      "y": 596,
+      "w": 776,
+      "h": 170
+     },
+     {
+      "x": 2,
+      "y": 854,
+      "w": 776,
+      "h": 170
+     }
+    ]
+   }
+  ],
+  "problems": [
+   {
+    "if": "Owner not found",
+    "do": "Check the code. Press [F2] and pick from the list."
+   },
+   {
+    "if": "SKU not found",
+    "do": "Scan again. Still wrong? Call your supervisor."
+   },
+   {
+    "if": "Receipt without LPN is not allowed",
+    "do": "Scan a pallet label in **To LPN**."
+   },
+   {
+    "if": "Close is refused: damage awaits a decision",
+    "do": "Ask your supervisor to decide on the damaged goods."
+   }
+  ],
+  "codes": [
+   "RCASN01_DMG_SKU",
+   "RCDMG_RECV01",
+   "RCDMG_RECV01_LINE"
+  ]
+ },
+ {
+  "id": "R5",
+  "title": "Close a receipt",
+  "area": "receiving",
+  "needs": [
+   "the receipt number",
+   "a supervisor, if it differs from the plan"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [5] (Close Receipt)",
+    "keys": [
+     "5"
+    ]
+   },
+   {
+    "text": "Scan the **Receipt #**, press [Enter]",
+    "keys": [
+     "Enter",
+     "F2"
+    ],
+    "note": "[F2] lists receipts"
+   },
+   {
+    "text": "Check the **Received** line",
+    "keys": []
+   },
+   {
+    "text": "Wrong quantity? Press [F6] (Adjust)",
+    "keys": [
+     "F6"
+    ],
+    "note": "Pick the line. Type **Correct qty**, **Reason**."
+   },
+   {
+    "text": "Press [F8] (Close)",
+    "keys": [
+     "F8"
+    ]
+   },
+   {
+    "text": "**Supervisor Override** opens? Hand over the terminal",
+    "keys": []
+   },
+   {
+    "text": "Supervisor types name and password, [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Press [F8] again, then [Enter]",
+    "keys": [
+     "F8",
+     "Enter"
+    ],
+    "note": "**Receipt Closed** means done"
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/RCCLOSE01.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 166
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-blind-close.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 426
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "4-6",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 338,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 390,
+      "y": 1464,
+      "w": 195,
+      "h": 96
+     },
+     {
+      "x": 585,
+      "y": 1464,
+      "w": 195,
+      "h": 96
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-close-override.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 480
+     }
+    ],
+    "badge": "7-8",
+    "highlight": {
+     "x": 2,
+     "y": 308,
+     "w": 776,
+     "h": 170
+    }
+   },
+   {
+    "image": "raw/rf-blind-closed.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 2,
+     "y": 166,
+     "w": 776,
+     "h": 84
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Serial capture is not finished",
+    "do": "Use Resume Serial Capture. See card R6."
+   },
+   {
+    "if": "Damage records await a final decision",
+    "do": "Ask your supervisor to decide on the damaged goods."
+   },
+   {
+    "if": "Supervisor override required to close",
+    "do": "Follow steps 7 to 9."
+   },
+   {
+    "if": "Closing with a difference is off",
+    "do": "Fix the quantity with [F6]. Or call your supervisor."
+   },
+   {
+    "if": "Receipt is locked, please retry",
+    "do": "Wait a moment. Send again."
+   }
+  ],
+  "codes": [
+   "RCCLOSE01",
+   "RCCLOSE",
+   "RCCLOSE_OVR",
+   "RCASN03DONE"
+  ]
+ },
+ {
+  "id": "R6",
+  "title": "Capture serial numbers",
+  "area": "receiving",
+  "needs": [
+   "the units, each with a serial label"
+  ],
+  "steps": [
+   {
+    "text": "**Serial Capture** opens after the line",
+    "keys": [],
+    "note": "Serial-tracked SKUs only"
+   },
+   {
+    "text": "Scan one serial in **Serial #**",
+    "keys": []
+   },
+   {
+    "text": "Scan the next unit. Repeat for all",
+    "keys": [],
+    "note": "**Progress** shows 1 из 5. из means of."
+   },
+   {
+    "text": "Last serial: **Serial Capture Complete**",
+    "keys": [],
+    "note": "You return to **Scan SKU** by yourself."
+   },
+   {
+    "text": "Must stop? Press [Esc], then [Y]",
+    "keys": [
+     "Esc",
+     "Y",
+     "N"
+    ],
+    "note": "To keep scanning press [N]"
+   },
+   {
+    "text": "Later: Receiving menu, press [7]",
+    "keys": [
+     "7"
+    ]
+   },
+   {
+    "text": "Choose your row, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Row: receipt / SKU / captured/expected"
+   },
+   {
+    "text": "Scan the rest of the serials",
+    "keys": []
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/RCSN01.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": "1-3",
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 170
+    }
+   },
+   {
+    "image": "RCSN01SUM.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": 4,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-receive-asn-menu.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 772
+     }
+    ],
+    "badge": 6,
+    "highlight": {
+     "x": 2,
+     "y": 596,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "RCSN_RECOVERY.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 176
+     }
+    ],
+    "badge": 7,
+    "highlight": {
+     "x": 0,
+     "y": 80,
+     "w": 780,
+     "h": 94
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Already scanned: …",
+    "do": "Scan a different unit."
+   },
+   {
+    "if": "SKU requires serial per unit",
+    "do": "Scan one serial for every unit."
+   },
+   {
+    "if": "No outstanding captures",
+    "do": "Nothing to resume. Press [Esc]."
+   },
+   {
+    "if": "Receipt cannot close: capture open",
+    "do": "Resume the capture and scan all serials."
+   },
+   {
+    "if": "A capture left by another operator",
+    "do": "Ask a supervisor to force-close it."
+   }
+  ],
+  "codes": [
+   "RCSN01",
+   "RCSN01SUM",
+   "RCM",
+   "RCSN_RECOVERY"
+  ]
+ },
+ {
+  "id": "R7",
+  "title": "Receive by case",
+  "area": "receiving",
+  "needs": [
+   "the case-level ASN number",
+   "the case labels",
+   "pallet labels"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [1]",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Press [2] (Receive Case-Level)",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Scan the **ASN** number",
+    "keys": [
+     "F2"
+    ],
+    "note": "[F2] lists the case-level ASNs"
+   },
+   {
+    "text": "Scan the **Case** label",
+    "keys": [
+     "F2"
+    ],
+    "note": "[F2] lists cases not yet received"
+   },
+   {
+    "text": "Check **UOM** and **Qty**",
+    "keys": [],
+    "note": "Defaults: CS and 1. Fill lot fields if shown."
+   },
+   {
+    "text": "Check **Loc**, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Default is STAGE"
+   },
+   {
+    "text": "**Line Complete**: next case, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "All cases in? Press [F8] (Close)",
+    "keys": [
+     "F8"
+    ],
+    "note": "Then follow card R5"
+   }
+  ],
+  "loop": {
+   "afterStep": 6,
+   "text": "More cases? Go back to step 4"
+  },
+  "screens": [
+   {
+    "image": "raw/RCCASE01.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 166
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/RCCASE02.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 4,
+    "highlight": {
+     "x": 2,
+     "y": 252,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/RCCASE02LINE.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 512
+     }
+    ],
+    "badge": "5-6",
+    "highlight": {
+     "x": 2,
+     "y": 252,
+     "w": 776,
+     "h": 256
+    }
+   },
+   {
+    "image": "RCCASE_DONE.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "7-8",
+    "highlight": {
+     "x": 520,
+     "y": 1464,
+     "w": 260,
+     "h": 96
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "ASN is Aggregate-granularity",
+    "do": "Press [Esc]. Use Receive Against ASN (card R1)."
+   },
+   {
+    "if": "Case is already received or cancelled",
+    "do": "Check the label. Tell your supervisor."
+   },
+   {
+    "if": "Case is not on this receipt",
+    "do": "Do not receive it. Tell your supervisor."
+   },
+   {
+    "if": "Case is on the wrong pallet",
+    "do": "Press [F6]. Scan old pallet, then new pallet."
+   },
+   {
+    "if": "A case will not arrive",
+    "do": "Ask your supervisor to cancel it with [F7]."
+   }
+  ],
+  "codes": [
+   "RCCASE01",
+   "RCCASE02",
+   "RCCASE02LINE",
+   "RCCASE_DONE"
+  ]
+ },
+ {
+  "id": "P1",
+  "title": "Put a pallet away",
+  "area": "inventory",
+  "needs": [
+   "the pallet with its LPN label",
+   "a way to carry it"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [2]",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Press [3] (Putaway)",
+    "keys": [
+     "3"
+    ]
+   },
+   {
+    "text": "Scan the pallet label in **LPN**",
+    "keys": []
+   },
+   {
+    "text": "Check the pallet row, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Read **TAKE TO**: the new location",
+    "keys": []
+   },
+   {
+    "text": "Walk there with the pallet",
+    "keys": []
+   },
+   {
+    "text": "Scan the location label",
+    "keys": [],
+    "note": "Field **Location**. It sends itself."
+   },
+   {
+    "text": "Check **Put Away**, then press [Enter]",
+    "keys": [
+     "Enter",
+     "Esc"
+    ],
+    "note": "Next pallet starts. To leave press [Esc]."
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/rf-putaway-scan.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 306
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 220,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "rf-putaway-confirm.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 176
+     }
+    ],
+    "badge": 4,
+    "highlight": {
+     "x": 0,
+     "y": 80,
+     "w": 780,
+     "h": 94
+    }
+   },
+   {
+    "image": "raw/rf-putaway-takeTo.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 480
+     }
+    ],
+    "badge": "5-7",
+    "highlight": {
+     "x": 2,
+     "y": 306,
+     "w": 776,
+     "h": 172
+    }
+   },
+   {
+    "image": "rf-putaway-done.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 306
+     }
+    ],
+    "badge": 8,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 170
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "No pallet with that LPN",
+    "do": "Press [Esc]. Scan the label again."
+   },
+   {
+    "if": "No location available",
+    "do": "Press [Esc], then [Y]. Tell your supervisor."
+   },
+   {
+    "if": "Supervisor Override opens",
+    "do": "Supervisor signs in. Then scan the location again."
+   },
+   {
+    "if": "Put it in another location",
+    "do": "Take the pallet to the new location. Scan it."
+   },
+   {
+    "if": "Location is full or blocked",
+    "do": "Ask your supervisor for another location."
+   }
+  ],
+  "codes": [
+   "PUTW01",
+   "PUTW02",
+   "PUTW03",
+   "PUTW_DONE"
+  ]
+ },
+ {
+  "id": "M1",
+  "title": "Move stock",
+  "area": "inventory",
+  "needs": [
+   "what to move (one search value)",
+   "the destination"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [2]",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Press [2] (Move Stock)",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Fill one field, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Lot, Location, LPN, Serial, SKU or Owner"
+   },
+   {
+    "text": "Choose the stock row, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Check **From**, **What**, **Available**",
+    "keys": []
+   },
+   {
+    "text": "Check **Qty**, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Lower **Qty** to move less"
+   },
+   {
+    "text": "Serial item, part move? Scan each unit",
+    "keys": []
+   },
+   {
+    "text": "Scan **To Loc**: the destination",
+    "keys": [],
+    "note": "The field sends itself"
+   },
+   {
+    "text": "Check **Moved**, press [Enter]",
+    "keys": [
+     "Enter",
+     "Esc"
+    ],
+    "note": "You return to the list. [Esc] leaves."
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/rf-move-find.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 394
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 258
+    }
+   },
+   {
+    "image": "raw/rf-move-qty.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 480
+     }
+    ],
+    "badge": "5-6",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 134,
+      "w": 776,
+      "h": 258
+     },
+     {
+      "x": 2,
+      "y": 392,
+      "w": 776,
+      "h": 84
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-move-dest.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 306,
+      "y1": 480
+     }
+    ],
+    "badge": 8,
+    "highlight": {
+     "x": 2,
+     "y": 392,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "rf-move-done.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 306
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 170
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Nothing found",
+    "do": "Press [Esc]. Change the fields."
+   },
+   {
+    "if": "Insufficient qty, or part is reserved",
+    "do": "Lower **Qty**. Move only what is available."
+   },
+   {
+    "if": "Destination full, blocked or not allowed",
+    "do": "Choose another location."
+   },
+   {
+    "if": "Supervisor Override opens",
+    "do": "Supervisor signs in. Then scan the destination again."
+   },
+   {
+    "if": "A hold blocks this move",
+    "do": "A supervisor cannot override it here. Call your supervisor."
+   }
+  ],
+  "codes": [
+   "INVMOV01",
+   "INVMOV03",
+   "INVMOV04",
+   "INVMOV_DONE"
+  ]
+ },
+ {
+  "id": "I1",
+  "title": "Check stock (stock inquiry)",
+  "area": "inventory",
+  "needs": [
+   "one of: lot, location, LPN, serial, SKU, owner"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [2]",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Press [1] (Stock Inquiry)",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "Fill one field, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Lot, Location, LPN, Serial, SKU or Owner"
+   },
+   {
+    "text": "Choose a row, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "HOLD = held. ATP = free to use."
+   },
+   {
+    "text": "Read **Qty**, **Alloc**, **ATP**",
+    "keys": [],
+    "note": "**ATP** is what you can use now"
+   },
+   {
+    "text": "Serial item? Press [F2] for serials",
+    "keys": [
+     "F2"
+    ]
+   },
+   {
+    "text": "Press [Esc] to go back",
+    "keys": [
+     "Esc"
+    ]
+   }
+  ],
+  "screens": [
+   {
+    "image": "rf-stock-inquiry.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 652
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 516
+    }
+   },
+   {
+    "image": "rf-stock-inquiry-result.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 176
+     }
+    ],
+    "badge": 4,
+    "highlight": {
+     "x": 0,
+     "y": 80,
+     "w": 780,
+     "h": 94
+    }
+   },
+   {
+    "image": "rf-stock-position.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 566,
+      "y1": 912
+     }
+    ],
+    "badge": 5,
+    "highlight": {
+     "x": 2,
+     "y": 566,
+     "w": 776,
+     "h": 344
+    }
+   },
+   {
+    "image": "INVINQ04.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 350
+     }
+    ],
+    "badge": 6,
+    "highlight": null
+   }
+  ],
+  "problems": [
+   {
+    "if": "Nothing found",
+    "do": "Press [Esc]. Change the fields."
+   },
+   {
+    "if": "Row says HOLD",
+    "do": "The stock is blocked. Ask your supervisor."
+   },
+   {
+    "if": "ATP is 0",
+    "do": "All is reserved or on hold. Ask your supervisor."
+   },
+   {
+    "if": "No serial numbers recorded",
+    "do": "Nothing to do. Press [Esc]."
+   }
+  ],
+  "codes": [
+   "INVINQ01",
+   "INVINQ02",
+   "INVINQ03",
+   "INVINQ04"
+  ]
+ },
+ {
+  "id": "C1",
+  "title": "Count a location",
+  "area": "inventory",
+  "needs": [
+   "your work area code (or none)",
+   "location labels"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [2]",
+    "keys": [
+     "2"
+    ]
+   },
+   {
+    "text": "Press [4] (Count Location)",
+    "keys": [
+     "4"
+    ]
+   },
+   {
+    "text": "Scan your work area, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "No area? [Enter] = whole warehouse"
+   },
+   {
+    "text": "Read **Go to**. Walk there",
+    "keys": []
+   },
+   {
+    "text": "Scan the location label",
+    "keys": []
+   },
+   {
+    "text": "Fill **SKU**, **Lot**, **Qty**, [Enter]",
+    "keys": [
+     "Enter",
+     "F2"
+    ],
+    "note": "Pallet? Fill **LPN** too. Lot? [F2] finds it."
+   },
+   {
+    "text": "All recorded? Press [Esc]",
+    "keys": [
+     "Esc"
+    ]
+   },
+   {
+    "text": "Press [1] (Done)",
+    "keys": [
+     "1",
+     "2",
+     "Esc",
+     "3"
+    ],
+    "note": "Empty: [2], then [Esc], [1]. [3] = leave."
+   },
+   {
+    "text": "Check **Counted**, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   }
+  ],
+  "loop": {
+   "afterStep": 6,
+   "text": "More items here? Repeat step 6"
+  },
+  "screens": [
+   {
+    "image": "raw/rf-count-goto.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 394
+     }
+    ],
+    "badge": "4-5",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 134,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 2,
+      "y": 306,
+      "w": 776,
+      "h": 84
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-count-what.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 652
+     }
+    ],
+    "badge": 6,
+    "highlight": {
+     "x": 2,
+     "y": 306,
+     "w": 776,
+     "h": 344
+    }
+   },
+   {
+    "image": "rf-count-finish.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "7-8",
+    "highlight": {
+     "x": 0,
+     "y": 1464,
+     "w": 195,
+     "h": 96
+    }
+   },
+   {
+    "image": "rf-count-done.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 306
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 2,
+     "y": 134,
+     "w": 776,
+     "h": 170
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Nothing to count",
+    "do": "Tell your supervisor. Try another area."
+   },
+   {
+    "if": "Location is not given to you",
+    "do": "Go to the location shown in **Go to**."
+   },
+   {
+    "if": "Nothing was counted in the location",
+    "do": "Record the stock. Or press [2] if it is empty."
+   },
+   {
+    "if": "SKU does not exist for this owner",
+    "do": "Check the SKU. Scan again."
+   },
+   {
+    "if": "Location is being counted by someone",
+    "do": "Wait. Take the next location."
+   }
+  ],
+  "codes": [
+   "CNT01",
+   "CNT02",
+   "CNT03",
+   "CNT_DONE"
+  ]
+ },
+ {
+  "id": "K1",
+  "title": "Pick an order (discrete pick)",
+  "area": "picking",
+  "needs": [
+   "empty pallet labels (start with DRP)",
+   "the right to pick in your area"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [3]",
+    "keys": [
+     "3"
+    ]
+   },
+   {
+    "text": "Press [1] (Discrete Pick)",
+    "keys": [
+     "1"
+    ]
+   },
+   {
+    "text": "On **Get Pick Work** press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Read **From**, **SKU**, **Qty**; [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "No pallet? Scan an empty DRP label",
+    "keys": []
+   },
+   {
+    "text": "Scan what each screen asks for",
+    "keys": [],
+    "note": "Location, item, pallet, lot"
+   },
+   {
+    "text": "Check **Picked qty**, press [Enter]",
+    "keys": [
+     "Enter"
+    ],
+    "note": "Serial item? Scan each serial next."
+   },
+   {
+    "text": "Press [F4] (Commit)",
+    "keys": [
+     "F4"
+    ]
+   },
+   {
+    "text": "Check **Pick Result** and **DROPID**",
+    "keys": []
+   }
+  ],
+  "loop": {
+   "afterStep": 9,
+   "text": "Next pick? Go back to step 3"
+  },
+  "screens": [
+   {
+    "image": "raw/rf-pick-work.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 426
+     }
+    ],
+    "badge": 4,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 256
+    }
+   },
+   {
+    "image": "raw/rf-pick-location.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": 6,
+    "highlight": {
+     "x": 2,
+     "y": 166,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-pick-qty.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": 7,
+    "highlight": {
+     "x": 2,
+     "y": 166,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "rf-pick-confirm.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 166
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 8,
+    "highlight": {
+     "x": 585,
+     "y": 1464,
+     "w": 195,
+     "h": 96
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Found less than required",
+    "do": "Press [F6] (Short). Type **Found qty** and a reason code."
+   },
+   {
+    "if": "Goods on hold or too old",
+    "do": "Press [F7] (Reject). Tell your supervisor."
+   },
+   {
+    "if": "Scan is not the expected one",
+    "do": "Scan what the screen shows as expected."
+   },
+   {
+    "if": "Pallet label not valid or in use",
+    "do": "Use another empty DRP label."
+   },
+   {
+    "if": "No eligible Pick work",
+    "do": "There is no work for you now. Ask your supervisor."
+   }
+  ],
+  "codes": [
+   "PICK02",
+   "PICK04",
+   "PICK08",
+   "PICK09"
+  ]
+ },
+ {
+  "id": "K2",
+  "title": "Pick by area with a carrier",
+  "area": "picking",
+  "needs": [
+   "your work area code",
+   "an empty carrier",
+   "empty boxes"
+  ],
+  "steps": [
+   {
+    "text": "Press [3] (Picking), then [2]",
+    "keys": [
+     "3",
+     "2"
+    ]
+   },
+   {
+    "text": "Type the work area, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Press [1] On foot, or [2] Equipment",
+    "keys": [
+     "1",
+     "2"
+    ]
+   },
+   {
+    "text": "Scan the empty carrier",
+    "keys": []
+   },
+   {
+    "text": "Put a box on each place. Scan it",
+    "keys": []
+   },
+   {
+    "text": "**Carrier Ready**: press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "**Next Pick**: go there, press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Scan what is asked, then the **Box**",
+    "keys": [
+     "Enter",
+     "F4"
+    ],
+    "note": "Check **Picked qty**, [Enter], [F4] (Commit)"
+   },
+   {
+    "text": "Route done: [Enter], scan delivery location",
+    "keys": [
+     "Enter"
+    ]
+   }
+  ],
+  "loop": {
+   "afterStep": 8,
+   "text": "More stops? Go back to step 7"
+  },
+  "screens": [
+   {
+    "image": "raw/rf-area-equipment.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 3,
+    "highlight": [
+     {
+      "x": 0,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     },
+     {
+      "x": 260,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-area-box.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 338,
+      "y1": 598
+     }
+    ],
+    "badge": 5,
+    "highlight": {
+     "x": 2,
+     "y": 510,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-area-next.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 598
+     }
+    ],
+    "badge": 7,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 170
+    }
+   },
+   {
+    "image": "raw/rf-area-deliver.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 340
+     }
+    ],
+    "badge": 9,
+    "highlight": {
+     "x": 2,
+     "y": 252,
+     "w": 776,
+     "h": 84
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Box is full",
+    "do": "Press [F2]. Pick a reason code, press [F4]."
+   },
+   {
+    "if": "Box is damaged",
+    "do": "Press [F3]. Scan a new box. Move the goods. [F4]."
+   },
+   {
+    "if": "You cannot pick a stop",
+    "do": "Press [F5] (Skip), then [F4]. It goes to the end."
+   },
+   {
+    "if": "Found less than required",
+    "do": "Press [F6] (Short). Type **Found qty** and reason."
+   },
+   {
+    "if": "Box or carrier refused",
+    "do": "It is not empty, not registered or in use. Use another."
+   }
+  ],
+  "codes": [
+   "PKAE",
+   "PKA02",
+   "PKA20",
+   "PKA30"
+  ]
+ },
+ {
+  "id": "K3",
+  "title": "Close a pick pallet",
+  "area": "picking",
+  "needs": [
+   "the full pallet",
+   "the cell label shown in **Put at**"
+  ],
+  "steps": [
+   {
+    "text": "Press [F2] (Close pallet)",
+    "keys": [
+     "F2"
+    ],
+    "note": "Works on most pick screens"
+   },
+   {
+    "text": "Check **Pallet**, **Order**, **Put at**",
+    "keys": []
+   },
+   {
+    "text": "No pallet shown? Type its **Pallet label**",
+    "keys": []
+   },
+   {
+    "text": "Carry the pallet to **Put at**",
+    "keys": []
+   },
+   {
+    "text": "Scan the cell label in **Scan cell**",
+    "keys": []
+   },
+   {
+    "text": "Not closed yet? Press [F4] (Close)",
+    "keys": [
+     "F4"
+    ]
+   },
+   {
+    "text": "Pallet of another operator? Supervisor signs in",
+    "keys": []
+   },
+   {
+    "text": "Press [F4] again to close",
+    "keys": [
+     "F4"
+    ]
+   }
+  ],
+  "screens": [
+   {
+    "image": "raw/rf-pick-work.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 170
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 1,
+    "highlight": {
+     "x": 312,
+     "y": 1464,
+     "w": 156,
+     "h": 96
+    }
+   },
+   {
+    "image": "raw/rf-pick-close.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 426
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "2-6",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 80,
+      "w": 776,
+      "h": 258
+     },
+     {
+      "x": 2,
+      "y": 338,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 520,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     }
+    ]
+   },
+   {
+    "image": "rf-pick-closed.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 252
+     }
+    ],
+    "badge": 8,
+    "highlight": {
+     "x": 2,
+     "y": 80,
+     "w": 776,
+     "h": 84
+    }
+   }
+  ],
+  "problems": [
+   {
+    "if": "Pallet is empty: nothing to close",
+    "do": "Do not close it."
+   },
+   {
+    "if": "Pallet goes to another cell",
+    "do": "Scan the cell shown in **Put at**."
+   },
+   {
+    "if": "Pallet of an order is still open",
+    "do": "Press [F2] and close it first."
+   },
+   {
+    "if": "Pallet belongs to another operator",
+    "do": "A supervisor must confirm. See steps 7 and 8."
+   },
+   {
+    "if": "A closed pallet cannot stand there",
+    "do": "Ask your supervisor."
+   }
+  ],
+  "codes": [
+   "PICK02",
+   "PICK13",
+   "PICK01"
+  ]
+ },
+ {
+  "id": "A1",
+  "title": "Pack and verify a box",
+  "area": "packing",
+  "needs": [
+   "your pack station code",
+   "boxes waiting at the station",
+   "a scale"
+  ],
+  "steps": [
+   {
+    "text": "Main Menu: press [4] (Packing)",
+    "keys": [
+     "4"
+    ]
+   },
+   {
+    "text": "Scan your **Station**",
+    "keys": []
+   },
+   {
+    "text": "Scan the box **Label**",
+    "keys": []
+   },
+   {
+    "text": "Open the box. Compare with **Picked**",
+    "keys": [],
+    "note": "**Check** says: matches the picks, or differs"
+   },
+   {
+    "text": "Goods match? Press [Enter]",
+    "keys": [
+     "Enter"
+    ]
+   },
+   {
+    "text": "Type the **Weight** from the scale",
+    "keys": []
+   },
+   {
+    "text": "Check **Printer**",
+    "keys": [],
+    "note": "Wrong one? Scan another in **Other printer**."
+   },
+   {
+    "text": "Press [Enter] or [F4] (Close)",
+    "keys": [
+     "Enter",
+     "F4"
+    ]
+   },
+   {
+    "text": "Goods differ? Press [F7], then [F4]",
+    "keys": [
+     "F7",
+     "F4"
+    ],
+    "note": "Choose the **Problem**. Put the box aside."
+   }
+  ],
+  "loop": {
+   "afterStep": 8,
+   "text": "Next box? Go back to step 3"
+  },
+  "screens": [
+   {
+    "image": "raw/rf-pack-scan.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 252,
+      "y1": 426
+     }
+    ],
+    "badge": 3,
+    "highlight": {
+     "x": 2,
+     "y": 338,
+     "w": 776,
+     "h": 84
+    }
+   },
+   {
+    "image": "raw/rf-pack-check.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 252,
+      "y1": 684
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "4-5",
+    "highlight": {
+     "x": 2,
+     "y": 252,
+     "w": 776,
+     "h": 256
+    }
+   },
+   {
+    "image": "raw/rf-pack-weigh.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 252,
+      "y1": 512
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": "6-8",
+    "highlight": [
+     {
+      "x": 2,
+      "y": 252,
+      "w": 776,
+      "h": 170
+     },
+     {
+      "x": 520,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     }
+    ]
+   },
+   {
+    "image": "raw/rf-pack-problem.png",
+    "crop": [
+     {
+      "y0": 0,
+      "y1": 80
+     },
+     {
+      "y0": 166,
+      "y1": 340
+     },
+     {
+      "y0": 1462,
+      "y1": 1560
+     }
+    ],
+    "badge": 9,
+    "highlight": [
+     {
+      "x": 2,
+      "y": 166,
+      "w": 776,
+      "h": 84
+     },
+     {
+      "x": 520,
+      "y": 1464,
+      "w": 260,
+      "h": 96
+     }
+    ]
+   }
+  ],
+  "problems": [
+   {
+    "if": "There is no such station",
+    "do": "Scan the station label again."
+   },
+   {
+    "if": "No unit with this box waits here",
+    "do": "Check the box and your station."
+   },
+   {
+    "if": "Box is for another station",
+    "do": "Take it to the right station."
+   },
+   {
+    "if": "A measured weight is required",
+    "do": "Type the **Weight**."
+   },
+   {
+    "if": "There is no active printer",
+    "do": "Scan another printer."
+   }
+  ],
+  "codes": [
+   "PACK01",
+   "PACK02",
+   "PACK03",
+   "PACK04"
+  ]
+ },
+ {
+  "id": "Z1",
+  "title": "RF keys and common messages",
+  "area": "reference",
+  "layout": "reference",
+  "needs": [],
+  "sections": [
+   {
+    "kind": "keys",
+    "title": "Keys",
+    "rows": [
+     {
+      "keys": [
+       "Esc"
+      ],
+      "text": "Back one screen. Some screens ask first."
+     },
+     {
+      "keys": [
+       "F1"
+      ],
+      "text": "Main Menu (if the screen does not use it)"
+     },
+     {
+      "keys": [
+       "F2-F8"
+      ],
+      "text": "The job named in the footer. Grey = not now."
+     },
+     {
+      "keys": [
+       "Enter"
+      ],
+      "text": "Next field. On the last field it sends."
+     },
+     {
+      "keys": [
+       "Down"
+      ],
+      "text": "Next field. It never sends."
+     },
+     {
+      "keys": [
+       "Up"
+      ],
+      "text": "Previous field"
+     },
+     {
+      "keys": [
+       "Left",
+       "Right"
+      ],
+      "text": "Change a choice field (UOM, Condition)"
+     },
+     {
+      "keys": [
+       "Space",
+       "Y",
+       "N"
+      ],
+      "text": "Yes or no field. Y = yes, N = no."
+     },
+     {
+      "keys": [
+       "F2"
+      ],
+      "text": "On a field with a list: opens the list"
+     },
+     {
+      "keys": [
+       "1-8"
+      ],
+      "text": "Menu: open the item with that number"
+     },
+     {
+      "keys": [
+       "9",
+       "0"
+      ],
+      "text": "Menu: next page (9), previous page (0)"
+     },
+     {
+      "keys": [
+       "Y",
+       "N"
+      ],
+      "text": "Answer a question. [Esc] cancels it."
+     },
+     {
+      "keys": [
+       "Up",
+       "Down",
+       "Enter"
+      ],
+      "text": "List: move, choose a row"
+     },
+     {
+      "keys": [
+       "Ctrl+C"
+      ],
+      "text": "Closes the RF session"
+     }
+    ]
+   },
+   {
+    "kind": "messages",
+    "title": "Common messages",
+    "rows": [
+     {
+      "msg": "No permission: …",
+      "do": "You may not do this. Tell your supervisor."
+     },
+     {
+      "msg": "Supervisor Override / Confirmation",
+      "do": "Hand over the terminal. Supervisor types name, password, [Enter]."
+     },
+     {
+      "msg": "Cancelled",
+      "do": "You said no to a question. Nothing was done."
+     },
+     {
+      "msg": "Session expired. Please sign in again.",
+      "do": "Sign in again (card L1)."
+     },
+     {
+      "msg": "… modified concurrently, please retry",
+      "do": "Someone changed it too. Press [Enter] again."
+     },
+     {
+      "msg": "… is locked, please retry",
+      "do": "Wait a moment. Send again."
+     },
+     {
+      "msg": "Red status line, no reply",
+      "do": "The server is not answering. Wait. Send again. Still red? Call your supervisor."
+     },
+     {
+      "msg": "Terminal does not react",
+      "do": "It waits for the server. Wait a few seconds."
+     }
+    ]
+   }
+  ],
+  "problems": [],
+  "steps": [],
+  "screens": [],
+  "codes": []
+ }
+]

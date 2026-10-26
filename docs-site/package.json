@@ -1,0 +1,39 @@
+{
+  "name": "quark-wms-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Quark WMS customer documentation site and API portal",
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "gen:api": "node scripts/build-api-portal.mjs",
+    "start": "npm run gen:api && npm run gen:cards && docusaurus start",
+    "build": "npm run gen:api && npm run gen:cards && docusaurus build",
+    "serve": "docusaurus serve --no-open",
+    "clear": "docusaurus clear",
+    "typecheck": "tsc",
+    "test:api": "node --test scripts/api-portal.test.mjs",
+    "gen:cards": "node scripts/copy-cards.mjs",
+    "postbuild": "node scripts/finalize-build.mjs",
+    "test:docs": "node --test scripts/api-portal.test.mjs scripts/publication.test.mjs",
+    "prebuild": "node scripts/check-publication.mjs"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "@docusaurus/theme-mermaid": "3.10.2",
+    "@easyops-cn/docusaurus-search-local": "0.55.3",
+    "@mermaid-js/layout-elk": "0.1.9",
+    "docusaurus-plugin-image-zoom": "3.0.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.10.2",
+    "@docusaurus/tsconfig": "3.10.2",
+    "@docusaurus/types": "3.10.2",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}

@@ -1,0 +1,159 @@
+/**
+ * Quark WMS documentation theme.
+ * Brand teal comes from the web UI's own ramp (--wms-color-brand--*:
+ * 70 #004d4d, 60 #147878, 50 #37a3a3, 40 #63bdbd). The light-mode accent is a
+ * touch darker than 60 so links pass 4.5:1 on white; dark mode uses the
+ * lighter end of the ramp for the same reason on a dark surface.
+ */
+:root {
+  --ifm-color-primary: #0f6b6b;
+  --ifm-color-primary-dark: #0e6060;
+  --ifm-color-primary-darker: #0d5a5a;
+  --ifm-color-primary-darkest: #0a4a4a;
+  --ifm-color-primary-light: #127777;
+  --ifm-color-primary-lighter: #137c7c;
+  --ifm-color-primary-lightest: #179b9b;
+  --ifm-font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --ifm-font-size-base: 100%;
+  --ifm-line-height-base: 1.65;
+  --ifm-heading-font-weight: 650;
+  --ifm-heading-line-height: 1.25;
+  --ifm-h1-font-size: 2.1rem;
+  --ifm-h2-font-size: 1.55rem;
+  --ifm-h3-font-size: 1.2rem;
+  --ifm-code-font-size: 88%;
+  --ifm-global-radius: 8px;
+  --ifm-navbar-height: 3.75rem;
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-link-hover-color: var(--ifm-color-primary);
+  --ifm-toc-border-color: var(--ifm-color-emphasis-200);
+  --ifm-table-border-color: var(--ifm-color-emphasis-200);
+  --ifm-table-stripe-background: transparent;
+  --ifm-table-head-background: var(--ifm-color-emphasis-100);
+  --ifm-pre-padding: 1rem 1.1rem;
+  --ifm-footer-background-color: var(--ifm-background-surface-color);
+  --docusaurus-highlighted-code-line-bg: rgba(15, 107, 107, 0.12);
+  --quark-surface: #f6f8fa;
+  --quark-border: #dfe4e9;
+  --quark-warn-bg: #fff6e0;
+  --quark-warn-border: #e2b53c;
+  --quark-warn-text: #5c4300;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4fb8b8;
+  --ifm-color-primary-dark: #3dadad;
+  --ifm-color-primary-darker: #38a3a3;
+  --ifm-color-primary-darkest: #2e8686;
+  --ifm-color-primary-light: #66c3c3;
+  --ifm-color-primary-lighter: #72c8c8;
+  --ifm-color-primary-lightest: #94d6d6;
+  --ifm-background-color: #14181c;
+  --ifm-background-surface-color: #1b2026;
+  --ifm-navbar-background-color: #14181c;
+  --ifm-font-color-base: #e6eaee;
+  --ifm-color-emphasis-100: #1e242b;
+  --ifm-color-emphasis-200: #2d353d;
+  --ifm-color-emphasis-300: #3a444d;
+  --docusaurus-highlighted-code-line-bg: rgba(79, 184, 184, 0.16);
+  --quark-surface: #1b2026;
+  --quark-border: #2d353d;
+  --quark-warn-bg: #2d2610;
+  --quark-warn-border: #8a6d1a;
+  --quark-warn-text: #f0d98a;
+}
+
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { font-feature-settings: 'cv11', 'ss01'; }
+
+/* ---- navbar ---- */
+.navbar { border-bottom: 1px solid var(--ifm-color-emphasis-200); }
+.navbar__title { font-weight: 700; letter-spacing: -0.01em; }
+.navbar__logo { height: 1.75rem; }
+.navbar__link { font-weight: 500; }
+.navbar__link--active { color: var(--ifm-color-primary); }
+
+/* the API portal is a static page outside the router; it should not look "external" */
+.navbar a[href$='/api/'] svg, .footer a[href$='/api/'] svg, .footer a[href$='/api/openapi.json'] svg { display: none; }
+
+/* ---- reading column ---- */
+.theme-doc-markdown { max-width: 46rem; }
+.markdown { --ifm-h1-vertical-rhythm-bottom: 0.75; }
+.markdown h1:first-child { letter-spacing: -0.02em; margin-bottom: 1.25rem; }
+.markdown > h2 { margin-top: 2.6rem; padding-top: 0.4rem; border-top: 1px solid var(--ifm-color-emphasis-200); }
+.markdown > h2:first-of-type { border-top: 0; }
+.markdown a:not(.hash-link) { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--ifm-link-color) 40%, transparent); text-underline-offset: 3px; }
+.markdown a:not(.hash-link):hover { text-decoration-color: currentColor; }
+.markdown li > p { margin-bottom: 0.4rem; }
+.markdown blockquote { border-left: 4px solid var(--ifm-color-primary); background: var(--quark-surface); padding: 0.6rem 1rem; border-radius: 0 8px 8px 0; color: inherit; }
+.markdown blockquote > :last-child { margin-bottom: 0; }
+
+/* ---- code ---- */
+code { border-radius: 5px; border-color: var(--quark-border); }
+.markdown :not(pre) > code { background: var(--quark-surface); }
+div[class*='codeBlockContainer'] { border-radius: 10px; border: 1px solid var(--quark-border); box-shadow: none; }
+[data-theme='dark'] div[class*='codeBlockContainer'] { --prism-background-color: #0f1317; }
+pre code { border: 0; }
+
+/* ---- tables (the API guide has many wide ones) ---- */
+.markdown table { display: block; overflow-x: auto; width: 100%; font-size: 0.93rem; border-collapse: collapse; }
+.markdown table th { text-align: left; font-weight: 600; white-space: nowrap; }
+.markdown table th, .markdown table td { padding: 0.55rem 0.8rem; vertical-align: top; }
+.markdown table tr { background: transparent !important; }
+
+/* ---- figures: screenshot + caption ---- */
+.doc-figure { margin: 1.6rem 0 2rem; padding: 0; }
+.doc-figure img {
+  display: block; max-width: 100%; height: auto; margin: 0 auto;
+  border: 1px solid var(--quark-border); border-radius: 10px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 6px 18px rgb(0 0 0 / 7%);
+  background: #fff; cursor: zoom-in;
+}
+/* the RF terminal shots are tall phone-sized screens: keep them readable, not huge */
+.doc-figure img[height][width]:not([width='2880']) { max-width: min(100%, 300px); }
+.doc-figure figcaption { margin: 0.7rem auto 0; max-width: 40rem; text-align: center; font-size: 0.88rem; line-height: 1.5; color: var(--ifm-color-emphasis-700); }
+.doc-figure figcaption strong { color: var(--ifm-color-primary); font-weight: 650; }
+.shot-missing {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  min-height: 7rem; padding: 1.2rem; border: 1.5px dashed var(--ifm-color-emphasis-400); border-radius: 10px;
+  background: repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--ifm-color-emphasis-200) 55%, transparent) 10px 11px);
+  color: var(--ifm-color-emphasis-700); font-size: 0.88rem; font-style: normal;
+}
+.medium-zoom-overlay { z-index: 1000; } .medium-zoom-image--opened { z-index: 1001; cursor: zoom-out !important; }
+
+/* ---- sidebar ---- */
+.theme-doc-sidebar-container { border-right: 1px solid var(--ifm-color-emphasis-200) !important; }
+.menu__link { border-radius: 6px; font-size: 0.93rem; }
+.menu__link--active:not(.menu__link--sublist) { background: color-mix(in srgb, var(--ifm-color-primary) 11%, transparent); font-weight: 600; }
+.menu__list-item-collapsible > .menu__link--sublist { font-weight: 650; }
+.table-of-contents__link--active { font-weight: 600; }
+
+/* ---- pagination / footer ---- */
+.pagination-nav__link { border-radius: 10px; border-color: var(--quark-border); transition: border-color .15s, box-shadow .15s; }
+.pagination-nav__link:hover { border-color: var(--ifm-color-primary); box-shadow: 0 2px 10px rgb(0 0 0 / 7%); }
+.footer { border-top: 1px solid var(--ifm-color-emphasis-200); }
+.footer__title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ifm-color-emphasis-600); }
+.footer__copyright { font-size: 0.85rem; color: var(--ifm-color-emphasis-600); }
+
+/* ---- search (easyops) uses the infima tokens; round it to match ---- */
+.navbar__search-input, [class*='searchBar'] input { border-radius: 8px; }
+
+@media (max-width: 996px) {
+  :root { --ifm-h1-font-size: 1.8rem; --ifm-h2-font-size: 1.35rem; }
+  .theme-doc-markdown { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print { .navbar, .footer, .theme-doc-sidebar-container, .pagination-nav { display: none !important; } }
+
+/* white on the light dark-mode teal is only ~2.3:1; use the page's dark colour instead */
+[data-theme='dark'] .button--primary { --ifm-button-color: #08201f; }
+
+/* Public website identity, shared with quark.build. Existing guide formatting remains intact. */
+:root{--ifm-color-primary:#00705d;--ifm-color-primary-dark:#006552;--ifm-color-primary-darker:#005e4d;--ifm-color-primary-darkest:#004d40;--ifm-color-primary-light:#00806a;--ifm-color-primary-lighter:#008c74;--ifm-color-primary-lightest:#009b81;--ifm-background-color:#fafaf7;--ifm-background-surface-color:#fff;--ifm-font-color-base:#0b0b12;--ifm-font-family-base:'Inter',system-ui,sans-serif;--ifm-font-family-monospace:'JetBrains Mono',ui-monospace,monospace;--ifm-global-radius:0;--ifm-card-border-radius:0;--ifm-button-border-radius:0;--ifm-navbar-height:4.5rem;--quark-border:#d4d3dd;--quark-surface:#f7f7f5}
+[data-theme='dark']{--ifm-color-primary:#00cbaa;--ifm-color-primary-dark:#00b799;--ifm-color-primary-darker:#00a98d;--ifm-color-primary-darkest:#00846e;--ifm-color-primary-light:#24d4b8;--ifm-color-primary-lighter:#48ddc6;--ifm-color-primary-lightest:#74e7d5;--ifm-background-color:#14141c;--ifm-background-surface-color:#1b1b26;--ifm-font-color-base:#f6f6fa;--quark-border:#48485c;--quark-surface:#1b1b26}
+.navbar{background:#0b0b12;color:#fff;border-color:#30303e}.navbar__link,.navbar__brand,.navbar__toggle{color:#fff}.navbar__link--active,.navbar__link:hover{color:#00cbaa}.navbar__logo{height:32px;width:112px}.navbar__logo img{width:112px;height:32px}.navbar button{color:#fff}.navbar-sidebar{background:var(--ifm-background-color);color:var(--ifm-font-color-base)}.navbar-sidebar .navbar__brand{color:#fff}.navbar-sidebar .menu__link{color:var(--ifm-font-color-base)}
+.button{font:500 .75rem/1.4 var(--ifm-font-family-monospace);padding:.85rem 1.15rem;border-radius:0}.button--primary{background:#3d3d7a;border-color:#3d3d7a;color:#fff}.button--primary:hover{background:#303064;border-color:#303064;color:#fff}
+.footer{background:#0b0b12;color:#b3b3c3;border-top:1px solid #30303e}.footer__title{color:#fff;font:500 .75rem var(--ifm-font-family-monospace);text-transform:uppercase;letter-spacing:.05em}.footer__link-item{color:#b3b3c3}.footer__link-item:hover{color:#00cbaa}.footer__copyright{font:.7rem var(--ifm-font-family-monospace)}
+.markdown h1{font-weight:700;letter-spacing:-.035em}.markdown h2,.markdown h3{font-weight:600}.theme-doc-sidebar-container{border-color:var(--quark-border)}:focus-visible{outline:2px solid var(--ifm-color-primary);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}

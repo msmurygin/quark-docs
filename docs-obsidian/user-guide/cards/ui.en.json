@@ -1,0 +1,18 @@
+{
+  "lang": "en",
+  "htmlLang": "en",
+  "device": "RF terminal",
+  "need": "You need:",
+  "help": "If something goes wrong",
+  "support": "Not on this list? Do not guess. Call your supervisor.",
+  "footer": "Quark WMS · Task card",
+  "screens": "Screens:",
+  "areas": {
+    "start": "Start",
+    "receiving": "Receiving",
+    "inventory": "Inventory",
+    "picking": "Picking",
+    "packing": "Packing",
+    "reference": "Reference"
+  }
+}
