@@ -115,7 +115,7 @@ const config: Config = {
       items: [
         {href: 'https://quark.build/product', label: 'Product', position: 'left'},
         {to: '/docs/studio/', label: 'Studio', position: 'left'},
-        {to: '/docs/', label: 'Guides', position: 'left', activeBasePath: '/docs'},
+        {to: '/docs/', label: 'Guides', position: 'left', activeBaseRegex: '^/docs/(?!studio(?:/|$))'},
         // Printable A5 task cards (gallery page src/pages/cards; files copied by scripts/copy-cards.mjs).
         {to: '/cards/', label: 'Task cards', position: 'left', activeBasePath: '/cards'},
         // The API portal is a static page, not a Docusaurus route.
