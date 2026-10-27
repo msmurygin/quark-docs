@@ -45,7 +45,7 @@ The four fields are read only when the status of the line is `InProgress`, `OnHo
 
 | When | Message |
 |---|---|
-| The location does not exist | A database refusal on `fk_receipt_detail_to_loc`. The exact text on screen is not confirmed. |
+| The location does not exist | The location is rejected. Choose an existing location and save again. |
 | The receipt is `Closed` or `Cancelled` | `receipt {id} is {status} — cannot edit receipt line in its current lifecycle state` |
 
 ## Related pages

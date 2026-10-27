@@ -13,7 +13,7 @@
     "typecheck": "tsc",
     "test:api": "node --test scripts/api-portal.test.mjs",
     "gen:cards": "node scripts/copy-cards.mjs",
-    "postbuild": "node scripts/finalize-build.mjs",
+    "postbuild": "node scripts/finalize-build.mjs && node scripts/check-public-output.mjs",
     "test:docs": "node --test scripts/api-portal.test.mjs scripts/publication.test.mjs",
     "prebuild": "node scripts/check-publication.mjs",
     "pretest:docs": "npm run gen:api",

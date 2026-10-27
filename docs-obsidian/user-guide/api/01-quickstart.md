@@ -6,11 +6,9 @@ You need:
 
 - a running `app-server` (local development uses `http://localhost:8081`),
 - `curl`,
-- a user name and password.
+- a user name and password issued by your Quark administrator.
 
-On a development database made by `wms-dev-db`, the seeded users are `demo1` (role ADMIN), `sup1` (SUPERVISOR) and `op1` (OPERATOR). Their password is `welcome1`. See `crates/tools/wms-dev-db/README.md`. Do not use these users anywhere else.
-
-> Not confirmed by code: the exact response bodies below. They are built from the code, not copied from a live server. Field values (ids, names) will differ on your system. To verify: run each step with `curl -i` against a development server and compare the HTTP status and the field names.
+The examples use placeholders. Do not paste production credentials into a script or commit them to source control. Field values such as ids and names will differ on your system.
 
 ## Step 1. Set your variables
 
@@ -23,7 +21,7 @@ export BASE_URL="http://localhost:8081"
 ```bash
 curl -s -i -c cookies.txt -X POST "$BASE_URL/api/login" \
   -H "Content-Type: application/json" \
-  -d '{"username": "demo1", "pwd": "welcome1"}'
+  -d '{"username": "<your-user-name>", "pwd": "<your-password>"}'
 ```
 
 The server answers:
@@ -73,7 +71,7 @@ Expected shape (values will differ):
   "result": {
     "data": {
       "id": 1000,
-      "username": "demo1",
+      "username": "your.user",
       "typ": "User",
       "locale": "en",
       "timezone": "Europe/Sofia",

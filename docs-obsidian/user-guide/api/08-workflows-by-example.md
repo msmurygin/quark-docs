@@ -170,8 +170,8 @@ rpc '{
     "meta": { "idempotency_key": "'"$(newkey)"'" },
     "data": {
       "pairs": [ { "code": 27, "subject": "receipt:42/line:105" } ],
-      "username": "sup1",
-      "password": "welcome1"
+      "username": "<supervisor-user>",
+      "password": "<supervisor-password>"
     }
   }
 }'

@@ -79,7 +79,7 @@ No cleanup job for this table was found in the code or the migrations.
 |---|---|
 | `ADMIN`, `MANAGER` | Yes |
 | `OPERATOR`, `VIEWER` | Yes (menu and form defaults). The screen has no buttons. |
-| `SUPERVISOR` | Not confirmed (see the [overview](00-task-manager-overview.md)) |
+| `SUPERVISOR` | Depends on the menu and form grants assigned by an administrator |
 
 ## What this screen affects
 

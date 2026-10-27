@@ -39,7 +39,7 @@ The server publishes a machine-readable description of every method.
 
 - Call `GET /api/rpc`, or call the method `rpc.discover` with `POST /api/rpc`. No login is needed.
 - The document follows OpenRPC 1.3.2. The API version in `info.version` is `1.0.0`.
-- A copy made from the code is in [openrpc.json](openrpc.json).
+- Download the machine-readable catalogue from the [API portal](pathname:///api/openrpc.json).
 - Each method has extra keys that start with `x-quark-`. They tell you the command type, the roles that have access by default, and which version fields the method checks.
 
 There is **no version number in the URL**. The path is always `/api/rpc`. A change to a method shows up as a different schema hash (`x-quark-request-schema-hash` and `x-quark-response-schema-hash`) in the OpenRPC document.

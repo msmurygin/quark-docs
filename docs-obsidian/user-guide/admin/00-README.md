@@ -27,7 +27,7 @@ Each procedure uses the same layout:
 6. **If something goes wrong**: message, meaning, fix.
 7. **What this affects later**
 
-Many screens have a real screenshot. Screens without one keep a placeholder line (see [MISSING-SCREENSHOTS](../assets/MISSING-SCREENSHOTS.md)) like this:
+Many screens have a real screenshot. Until a screen is captured, the page shows a clearly labelled screenshot placeholder like this:
 
 `![form_code - Title](../assets/screens/form-code.png)`
 

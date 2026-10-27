@@ -97,7 +97,7 @@ Source: the binding `generic_disable_unless_field_in` in part 5 of `crates/libs/
 |---|---|---|
 | `ADMIN` | Yes | Yes |
 | `MANAGER` | Yes | Yes |
-| `SUPERVISOR` | Not confirmed (see the [overview](00-task-manager-overview.md)). The read method is open to `SUPERVISOR`. | Yes by method and web action, if the menu is visible |
+| `SUPERVISOR` | Depends on the assigned menu grants; the read method allows this role | Yes by method and web action, if the menu is visible |
 | `OPERATOR`, `VIEWER` | The menu allows it. The read method does not. See below. | No |
 
 > Not confirmed by code: what `OPERATOR` and `VIEWER` see. `cartonization_exception_list` is for `ADMIN`, `MANAGER` and `SUPERVISOR` only. To verify: sign in as `OPERATOR` on a test warehouse and open the list.

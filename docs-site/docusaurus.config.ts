@@ -69,7 +69,15 @@ const config: Config = {
           sidebarItemsGenerator,
           // The 75k-line generated method reference is rendered by the API
           // portal (static/api), not here. Keep Docusaurus' default excludes.
-          exclude: ['**/_*.{js,jsx,ts,tsx,md,mdx}', '**/_*/**', '**/*.test.{js,jsx,ts,tsx}', '**/__tests__/**', 'api/reference/**'],
+          exclude: [
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+            'api/reference/**',
+            'assets/**/*.md',
+            'cards/README.md',
+          ],
           beforeDefaultRemarkPlugins: [[remarkGuide, {baseUrl, guideDir}]],
           breadcrumbs: true,
         },
