@@ -29,7 +29,7 @@ Use a manual trigger for the first controlled run even when the production desig
 ## Create a schedule
 
 1. Open **Schedules** and select **+ New Schedule**.
-2. Choose **Flow**.
+2. Choose a **Flow** created with **Trigger = Schedule (cron)**. A manual, webhook or event flow cannot be attached to a schedule.
 3. Enter a descriptive **Name**.
 4. Enter a five-field **Cron Expression**, for example `*/5 * * * *` for every five minutes.
 5. Enter the intended **Timezone**. The default is `UTC`.
@@ -56,7 +56,7 @@ Edit a schedule to change its name, cron expression, timezone or active state. D
 
 1. Open **Webhooks** and select **+ New Webhook**.
 2. Choose **Flow**.
-3. Enter a unique **Path** without the `/webhooks/` prefix.
+3. Enter a unique **Path** such as `orders/created`. Do not start it with `/`, add the `/webhooks/` prefix, or include a query (`?`) or fragment (`#`). Use non-empty path segments only.
 4. Choose **Auth Type**:
    - **HMAC SHA-256** when the provider signs the original request body;
    - **Bearer Token** when the provider can send an Authorization header;
@@ -122,8 +122,10 @@ sequenceDiagram
 
 | Symptom | Recovery |
 | --- | --- |
+| **Schedules can only be attached to flows with trigger_type=schedule** | Return to **Flows** and create the flow with **Trigger = Schedule (cron)**, then select it in the schedule. |
 | Schedule never runs | Confirm that both the schedule and flow are active; check cron expression and timezone. |
 | Schedule is paused with failures | Fix the underlying run failure, complete a manual test, then enable the schedule. |
+| Webhook path is rejected | Remove the leading slash, query and fragment. Enter only non-empty path segments, for example `orders/created`. |
 | Webhook returns an authentication error | Recalculate the signature from the unmodified body or check the bearer token. |
 | Webhook says the delivery ID header is missing | Send exactly one header using the configured name and a non-empty stable value. |
 | Webhook is accepted but no flow runs | Confirm that the webhook and flow are active, then check **Monitor** and the flow trigger. |

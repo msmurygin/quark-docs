@@ -27,9 +27,9 @@ Connector Health refreshes automatically. A healthy connector does not guarantee
 
 The list includes successful, failed, running and pending runs. A run can also finish as **outcome_unknown** when the platform cannot prove whether an external write completed.
 
-![Monitor run details with the flow result, duration, error and step timeline](../assets/screens/integration-platform-monitor-run.png)
+![Monitor run details with a successful result, duration and step timeline](../assets/screens/integration-platform-monitor-run.png)
 
-*Caption: Monitor run details. Focus: the first failed step and its error identify where recovery should start.*
+*Caption: Monitor run details for a controlled log-only test. Focus: the header and step timeline confirm which flow ran and whether every step completed.*
 
 ## Read run details
 
@@ -95,10 +95,6 @@ A retry is a new execution linked to the earlier failure. For write operations, 
 8. Select **Create**.
 9. Select **Test** on the saved channel.
 10. After the test passes, select **Edit**, turn **Enabled** on and select **Update**.
-
-![Notification Channels page with channel type, encrypted credential choice and event filters](../assets/screens/integration-platform-notification-channels.png)
-
-*Caption: Notification Channels. Focus: use an encrypted API key and enable Flow Failure and Schedule Pause for production operations.*
 
 Supported channel types are Telegram, Slack, Microsoft Teams, Email SMTP and WhatsApp. The form shows the fields required by the selected type.
 

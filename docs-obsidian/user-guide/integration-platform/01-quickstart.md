@@ -29,7 +29,7 @@ Do not use production credentials in a shared test tenant.
 5. Complete any setup fields shown by **Fork & Map**, such as **WMS goods owner ID** or **Marketplace ship-to ID**.
 6. Select **Fork & Map**. If the template needs no mapping or setup fields, **Use Template** forks it immediately.
 
-![Integration Platform template gallery with a template selected and its setup action visible](../assets/screens/integration-platform-template-gallery.png)
+![Integration Platform template gallery with provider templates and their Use Template actions](../assets/screens/integration-platform-template-gallery.png)
 
 *Caption: the Templates page. Focus: choose a template that matches the direction of data and the external system.*
 
