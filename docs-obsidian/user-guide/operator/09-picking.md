@@ -549,7 +549,7 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 | **pick assignment {code} has {n} stops left on its route** | The route is not done. | Finish the route, or dissolve. |
 | **the picks of position {n} wait for carton recovery: hand them over** | A position needs recovery. | Use **Recovery**. |
 | **version conflict on task {id} (current version {n})** | Someone changed the task. | Ask for work again. |
-| **No permission: {screen} ({function})** | Your user may not do this. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 When there is no work, the line above **Current loc** says **No eligible Pick work**. On **Get Area Work** it says **No eligible Pick work in the area**. A refusal from the server shows in the same place.
 

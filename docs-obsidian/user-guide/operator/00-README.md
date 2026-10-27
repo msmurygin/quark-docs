@@ -55,7 +55,7 @@ Some messages contain a value from your system, such as a number or a code.
 In this guide the value is written in braces, for example `{location}`.
 Your terminal shows the real value.
 
-Most messages are built by the server and the terminal shows them as they are. A few are worded by the terminal itself, for example **Invalid username or password**, **Session expired. Please sign in again.** and **No permission: {screen} ({function})**. In **No permission: {screen} ({function})**, `{function}` is the name of the server command that was refused, for example `receipt_close`. The wording can change after a software update.
+Most messages are built by the server and the terminal shows them as they are. A few are worded by the terminal itself, for example **Invalid username or password**, **Session expired. Please sign in again.** and **No permission: {screen}**. When the terminal knows the screen title, it shows that title; otherwise it shows **No permission**. Internal server command names are kept in the support log, not shown to the operator. The wording can change after a software update.
 
 ## The main menu
 
@@ -196,7 +196,7 @@ The code gives each role default permissions when a system is set up. An adminis
 - Move stock and putaway: a fresh database gives the Operator role these two. Systems that were set up another way may give them to managers only. See guides 05 and 06.
 - Not allowed: cancel a planned case (supervisor), force-close a serial capture (supervisor), and the supervisor-only picking and counting commands.
 
-If you see **No permission: {screen} ({function})**, ask your supervisor.
+If you see **No permission: {screen}** or **No permission**, tell your supervisor which screen you were using and what you tried to do.
 
 ## Glossary
 

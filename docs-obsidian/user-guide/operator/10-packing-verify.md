@@ -157,7 +157,7 @@ Press `Esc` on **Pack: Scan Unit** to go back to **Pack Station**. Press `Esc` o
 | **a lot in the package is expired or too short-lived to ship: {lot}, {expiration}, {must expire after}** | A lot in the box expires on or before today plus the SKU's minimum days left at shipping (or is already expired). The box does not close. | Put the box aside. Tell your supervisor, who decides what happens to the lot. Weighing again does not help. |
 | **carton {id} is not a package under verification** | The box is not in the check step. | Scan the box again. |
 | **version conflict on ...** | Someone changed the box. | The terminal tries again. If it fails, scan the box again. |
-| **No permission: {screen} ({function})** | Your user may not pack. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not pack. | Tell your supervisor which screen you were using and what you tried to do. |
 
 ## What the supervisor sees
 

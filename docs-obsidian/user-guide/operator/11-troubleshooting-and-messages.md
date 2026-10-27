@@ -53,13 +53,25 @@ If the supervisor approval does not work, you may see a message that the grant c
 
 | Message | What it means | What to do |
 |---------|---------------|------------|
-| **No permission: {screen} ({function})** | Your user may not use this function. | Tell your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not use this function. | Tell your supervisor which screen you were using and what you tried to do. |
 | **receipt was modified concurrently, please retry** | Someone changed the same record at the same time. | Send the form again. Some screens try again by themselves. |
 | **receipt is locked, please retry (timeout {ms}ms)** | Someone else is using the record. | Wait a moment. Send again. |
 | **order is locked by another operation (waited {ms}ms)** | Same, for an order. | Wait. Send again. |
 | **idempotency key conflict — generate new UUID for retry** | The terminal sent a request again with changed data. | Start the action again from the first screen. |
 | **version conflict on {thing}** | Someone changed the record you work on. | Open the record again. |
 | **Cancelled** | You said no to a question. | Nothing was done. |
+
+### When RF says No permission
+
+The terminal shows the screen title when it has one. It does not show the internal server command name; support can still find that name in the RF log.
+
+```mermaid
+flowchart LR
+    M["No permission: {screen}<br/>or No permission"] --> N["Note the screen and attempted action"]
+    N --> S["Tell your supervisor"]
+    S --> P["Administrator checks the role permission"]
+    P --> R["Retry after access is corrected"]
+```
 
 If the terminal cannot reach the server, the status line turns red. It shows the technical error text of the failed call, for example `jrpc transport: ...` followed by the network reason (such as "connection refused"). The terminal waits at most 10 seconds for an answer. You stay on the same screen. The error is also written to the terminal log. Wait a moment and send again. If it repeats, tell your supervisor.
 

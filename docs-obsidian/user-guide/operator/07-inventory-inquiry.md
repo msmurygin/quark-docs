@@ -98,7 +98,7 @@ The report never changes the stock. The location is always counted, and the repo
 | **No stock matches the filter. Esc to change it.** | Same. | Same. |
 | **No serial numbers recorded on this position** | The position has no serials on record. | Nothing to do. |
 | **location {code} does not exist** | The report names a location the warehouse does not have. | Scan the location label again. |
-| **No permission: {screen} ({function})** | Your user may not look up stock. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not look up stock. | Tell your supervisor which screen you were using and what you tried to do. |
 
 ## Related guides
 

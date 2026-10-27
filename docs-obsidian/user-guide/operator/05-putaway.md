@@ -11,7 +11,7 @@ Take a received pallet to the storage location that the system chooses. Scan the
 - You need to be able to walk to the location the system suggests.
 - If the location breaks a putaway rule, a supervisor must approve.
 
-The default roles Operator and Supervisor may run putaway. If you see **No permission: {screen} ({function})**, your administrator has changed the permission settings. Ask your supervisor.
+The default roles Operator and Supervisor may run putaway. If you see **No permission: {screen}** or **No permission**, your administrator has changed the permission settings. Tell your supervisor which screen you were using and what you tried to do.
 
 ## Steps
 
@@ -102,7 +102,7 @@ If you scan a location that breaks a putaway rule, the terminal opens **Supervis
 | **directed move: reservation {id} is not usable ({reason})** | The space held for you has expired. | Start putaway again. |
 | **hold #{id} ({code}) blocks this move (policy: not overridable)** | The stock is held. A supervisor cannot override it here. | Tell your supervisor. |
 | **move requires an acknowledged override of: code {n} ({subject})** | A supervisor must approve. | Follow the **Supervisor Override** steps. |
-| **No permission: {screen} ({function})** | Your user may not do this. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 ## What the supervisor sees
 

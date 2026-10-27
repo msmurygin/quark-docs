@@ -190,7 +190,7 @@ The system stores the reason `supervisor force-close via RF menu` with the chang
 | **receipt is locked, please retry (timeout {ms}ms)** | Someone else is using the receipt. | Wait. Try again. |
 | **override grant is not usable: {reason}** | The supervisor approval cannot be used. See the reasons below. | Ask the supervisor to approve again. |
 | **asn {number} not found** | No receipt has this number. | Check the number. |
-| **No permission: {screen} ({function})** | Your user may not do this. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 The `{reason}` in **override grant is not usable: {reason}** is one of these:
 
@@ -204,7 +204,7 @@ The `{reason}` in **override grant is not usable: {reason}** is one of these:
 - `it authorises closing the receipt (code {n}), and this command receives a line` or `it authorises a line's quantity (code {n}), and this command closes the receipt` — the approval is for the other action.
 - `this receive opens a new line, which no grant can name in advance — a supervisor must acknowledge it at this terminal` — the supervisor must approve at your terminal.
 
-Everyone sees **Force-Close Episode (supervisor)** in the menu. The server blocks it for users without the right. By default only Admin, Manager and Supervisor roles may force-close, and all three can open the list of episodes (a Supervisor could not before F-25). An operator can open the list, but `Y` on **Confirm Force-Close** is refused with **No permission: force_close_episode**.
+Everyone sees **Force-Close Episode (supervisor)** in the menu. By default only Admin, Manager and Supervisor roles may open the list and force-close an episode. When an Operator chooses the menu item, the first list request is refused before the list opens. The status line says **No permission: Force-Close Episodes**.
 
 ## What the supervisor sees
 

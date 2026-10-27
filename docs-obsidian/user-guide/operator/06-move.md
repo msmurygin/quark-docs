@@ -11,7 +11,7 @@ Move stock from one location (or pallet) to another location.
 - For a serial-tracked SKU, have the units ready to scan if you move only part of the stock.
 - Stock on hold, or a restricted location, needs a supervisor.
 
-The default roles Operator and Supervisor may run **Move Stock**. If you see **No permission: {screen} ({function})**, your administrator has changed the permission settings. Ask your supervisor.
+The default roles Operator and Supervisor may run **Move Stock**. If you see **No permission: {screen}** or **No permission**, your administrator has changed the permission settings. Tell your supervisor which screen you were using and what you tried to do.
 
 ## Steps
 
@@ -128,7 +128,7 @@ Your answer never changes the stock. It is kept on the location card, tab **Chec
 | **move requires an acknowledged override of: code {n} ({subject})** | A supervisor must approve. | Follow the **Supervisor Override** steps. |
 | **location {location} holds only open pick pallets: nothing moves {side} it** | The location is a transit area for pick pallets. | Choose another location. |
 | **the location the move takes stock {side} changed from {a} to {b} while the move was ...** | The location changed during the move. | Search and start again. |
-| **No permission: {screen} ({function})** | Your user may not do this. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 ## What the supervisor sees
 

@@ -226,7 +226,7 @@ For the next SKU, the terminal shows **Scan SKU** with **Receipt** and **RMA**.
 | **Receipt without LPN is not allowed by owner policy** | **To LPN** is empty, and the owner requires one. | Scan an LPN. |
 | **qty {qty} is not a multiple of pack {pack_qty}** | The quantity does not fit the pack. | Check the quantity and unit. |
 | **receipt id={id} is OnHold — release the hold before receiving** | The receipt is on hold. | Tell your supervisor. |
-| **No permission: {screen} ({function})** | Your user may not do this. For example, **Cancel Planned Case** may be for supervisors. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. For example, **Cancel Planned Case** may be for supervisors. | Tell your supervisor which screen you were using and what you tried to do. |
 
 Messages for a location and for case-level receiving:
 

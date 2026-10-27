@@ -128,7 +128,7 @@ If you do not know the lot code, press `F2` in **Lot**. Enter the **SKU** first.
 | **quantity {qty} is not a positive number** | **Qty** is zero or not a number. | Type a quantity above 0. |
 | **a recount of {location} is counted by somebody other than the first counter** | A recount needs a different person. | Tell your supervisor. |
 | **the count of {location} is {status}: it is not being counted** | The location is no longer open for counting. | Press `Esc`. Take the next location. |
-| **No permission: {screen} ({function})** | Your user may not count. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not count. | Tell your supervisor which screen you were using and what you tried to do. |
 
 ## What the supervisor sees
 

@@ -57,7 +57,7 @@ You can also type the warehouse id in **Warehouse**. The hint says **Type wareho
 | Message | What it means | What to do |
 |---------|---------------|------------|
 | **Invalid username or password** (red status line, the screen stays on **RF Terminal — Sign In**) | The sign-in was not accepted. The screen stays so you can type again. The same message shows if your user is not allowed to sign in on RF terminals. | Check the user name and password. Type them again. If it keeps failing, ask your administrator. |
-| **No permission: {screen} ({function})** | Your user may not use this function. | Tell your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not use this function. | Tell your supervisor which screen you were using and what you tried to do. |
 | The warehouse list is empty | Your user has no warehouse. | Ask your administrator to give you access. |
 
 If your session ends while you work, the terminal shows **Session expired. Please sign in again.**

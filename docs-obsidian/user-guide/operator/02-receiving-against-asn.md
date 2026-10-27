@@ -176,7 +176,7 @@ To report damaged goods during receiving, press `F4` (**Damage**) on **Receipt S
 | **receipt id={id} is in terminal state {status} — cannot receive** | The receipt is already closed or cancelled. | Tell your supervisor. |
 | **receipt was modified concurrently, please retry** | Someone changed the receipt at the same time. | Send the form again. |
 | **receipt is locked, please retry (timeout {ms}ms)** | Someone else is using the receipt. | Wait a moment. Send again. |
-| **No permission: {screen} ({function})** | Your user may not do this. | Ask your supervisor. |
+| **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 Any refusal that the server marks as "can be overridden" shows its message with **[Y/N]** on the status line. The screen files do not define this question. The terminal program raises it. Press `Y` to send the same entry again with your agreement. Press `N` or `Esc` to stop; the status line says **Cancelled**. For some questions (receiving more or less than expected) your user also needs a supervisor right. Without it the server refuses again after `Y`. Then ask your supervisor.
 
