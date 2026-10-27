@@ -595,14 +595,45 @@ Packing a serial-tracked SKU is refused today (`SERIAL_PACKING_NOT_SUPPORTED`, `
 
 ### What you will do
 
-Add your own fields to SKUs, receipts or locations.
+Define a reusable field, then give one SKU a value for it. This is a two-part setup:
+
+- the **attribute definition** says which records can use the field and what kind of value it accepts;
+- the **attribute value** is the answer stored on one SKU or location.
+
+For example, define the text attribute `COLOR` once, then set `COLOR = Blue` on SKU `WIDGET-1`.
+
+```mermaid
+flowchart LR
+    D["Define COLOR<br/>Entity Type = sku"] --> S["Open WIDGET-1<br/>Attributes tab"]
+    S --> V["Add COLOR = Blue"]
+    V --> P["SKU attribute condition<br/>can read Blue"]
+```
+
+### Before you start
+
+- `ADMIN` or `MANAGER` creates and changes attribute definitions.
+- `ADMIN`, `MANAGER` or `OPERATOR` adds and changes values on a SKU or location.
+- Create and save the SKU or location before adding a value.
+- Use `Entity Type = sku` for this example. The value picker only shows definitions for the record type you opened.
 
 ### Steps
 
 1. Open `Sidebar > Attributes`.
 2. Click `New`.
-3. Fill `Entity Type`, `Code`, `Label`, `Data Type`. Click `Save`.
-4. The attribute appears in the tab `Attributes` of the SKU (or the location).
+3. Set `Entity Type` to `sku`, enter `Code = COLOR`, `Label = Color`, and choose `Data Type = Text`.
+4. If the definition is intended for one owner, choose that `Owner`. Leave it blank for a system-wide definition. Click `Save`.
+5. Open `Sidebar > SKU`, open the SKU, and select the `Attributes` tab.
+6. Click `New`. In `Attribute`, choose `COLOR`.
+7. Enter `Blue` in `Text Value`. The form shows the one value field that matches the definition's data type.
+8. Click the `Save` button in the attribute card. The tab returns to the values list; `COLOR` is now a row.
+
+![Attribute Definitions list with COLOR selected](../assets/screens/attribute-definitions-list-form.png)
+
+*Capture bookmark: the Attribute Definitions list with `COLOR`, `sku`, `Text`, Required and Active visible.*
+
+![SKU attribute value card for COLOR](../assets/screens/sku-attribute-value-edit-form.png)
+
+*Capture bookmark: a saved SKU's Attributes tab with `COLOR` selected and `Text Value = Blue`.*
 
 ### Field reference
 
@@ -612,25 +643,44 @@ Add your own fields to SKUs, receipts or locations.
 | `Code` (required) | Key. Unique per entity type and owner. | Text. | `COLOR` |
 | `Label` (required) | Shown name. | Text. | `Color` |
 | `Data Type` (required) | Type of value. | `Text`, `Integer`, `Decimal`, `Boolean`, `Date`. | `Text` |
-| `Owner` | Limit to one owner. Blank = all. | An owner. | |
+| `Owner` | Stored scope for the definition. Blank means system-wide. The current SKU and location value pickers do not enforce this scope, so select the definition carefully. | An owner. | |
 | `Display Order` | Order. | Whole number. | 10 |
-| `Required` | Must have a value. | On or off. | off |
-| `Active` | In use. | On or off. | on |
-| `Default Value` | Start value. | Text. | |
+| `Required` | Stored metadata. The SKU and location value cards do not enforce it today. | On or off. | off |
+| `Active` | When off, putaway matching ignores the definition. Current SKU and location lists, pickers and cards may still show it and allow its value to be saved or edited. | On or off. | on |
+| `Default Value` | Stored metadata. The SKU and location value cards do not copy it into a new value today. | Text. | |
+
+The value card depends on `Data Type`:
+
+| Data Type | Field shown on the value card | Example |
+|---|---|---|
+| `Text` | `Text Value` | `Blue` |
+| `Integer` | `Integer Value` | `24` |
+| `Decimal` | `Decimal Value` | `12.50` |
+| `Boolean` | `Boolean Value` | on |
+| `Date` | `Date Value` | `2026-10-27` |
+
+The definition list offers `receipt`, but the current web UI has value tabs only for SKUs and locations. Receipt line lot attributes are configured through lot policies; do not use this screen as their setup path.
 
 ### What you should see
 
-- The row in the list `Attribute Definitions`.
+- The definition appears in `Attribute Definitions`.
+- The SKU's `Attributes` tab shows one row for `COLOR` and its text value.
+- Open the row to change its value. Use `Delete` on the value card to remove the value from this SKU without deleting the shared definition.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
 | Duplicate key `uq_attr_def_owner` or `uq_attr_def_system` | The code is used for that entity type and owner. | Use another code. |
+| Duplicate key `uq_attr_value` | That SKU or location already has a value for this definition. | Open the existing row instead of clicking `New`. |
+| The definition is missing from `Attribute` | Its entity type does not match this tab. | Check `Entity Type` on the definition. The picker filters SKU and location definitions separately. |
+| An inactive or other-owner definition is still listed | The value picker filters only by entity type today; it does not enforce `Active` or `Owner`. | Do not select it. Reopen the definition and check `Active` and `Owner`. |
+| All five value fields appear | No definition has been chosen yet. | Choose `Attribute`; the form then keeps only its matching value field visible. |
 
 ### What this affects later
 
-- Values are stored per record. Location attributes also feed putaway conditions (`Location attribute`, `SKU attribute`).
+- Values are stored per record. Changing `COLOR` on one SKU does not change another SKU.
+- Text values from active SKU and location definitions feed putaway conditions (`SKU attribute`, `Location attribute`). Inactive definitions and other data types are stored, but those conditions ignore them today.
 
 ## 9. Handling unit types (containers you own)
 
