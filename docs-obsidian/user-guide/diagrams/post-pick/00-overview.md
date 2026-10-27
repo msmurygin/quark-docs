@@ -1,65 +1,70 @@
 # After picking: what is built
 
-**What this shows.** The parts of the outbound flow after reservation and picking that exist in code today, and the parts that do not.
+**What this shows.** The outbound capabilities that can follow picking, and the point where planning becomes a physical and financial warehouse departure.
 
-This area covers cartonization, the pack station, dispatch planning and order closure. Everything on these pages was checked against the code. A diagram is drawn only for a part that exists.
+This area covers cartonization, packing, distribution and consolidation, staging, dispatch and load planning, physical loading, Goods Issue and order closure. A site uses only the branches its work-area and dispatch settings require.
 
 ```mermaid
 flowchart LR
     R["Release or Allocate"] --> CP["Carton plan"]
-    CP --> PK["Picking into planned boxes"]
-    PK --> HO["Hand-off: router unit"]
-    DP["Dispatch plan"] -.->|"intent copied"| HO
-    HO --> Q["Station queue"]
-    Q --> PV["Pack: verify or repack"]
-    PV --> PJ["Packing job Packed"]
-    OC["Close order"]
+    CP --> PK["Picking"]
+    PK --> HO["Hand-off: outbound unit"]
+    HO --> DS["Optional distribution station"]
+    HO --> PA["Optional pack station"]
+    DS --> PA
+    DS --> CO["Optional consolidation"]
+    PA --> CO
+    HO --> ST["Stage"]
+    PA --> ST
+    CO --> ST
+    DP["Planned Dispatch"] -.->|"route and stop intent"| HO
+    DP --> LP["Frozen Load Plan"]
+    ST --> LP
+    LP --> LD["Physical loading"]
+    LD --> GI["Goods Issue"]
+    GI --> OC["Order closed or PartiallyShipped"]
 ```
 
-The dotted line is a copy of the dispatch intent at hand-off. The last two nodes are not linked on purpose: a packed job does not change the order, and closing an order does not depend on packing.
+`Loaded` is not shipment. Physical loading records what is on the transport; Goods Issue is the separate irreversible command that deducts stock, updates serials and order quantities, and marks the Load and Dispatch shipped.
 
 ## What is built
 
-| Part | Status | Page |
+| Part | Status | Where to continue |
 |---|---|---|
-| Cartonization plan (which box each pick goes into) | Built. Runs inside Release and Allocate. | [10](10-cartonization-plan-journey.md) |
-| Cartonization settings and their effects | Built. Some policy fields are stored only. | [11](11-cartonization-influence-policy-and-pack-level.md), [12](12-cartonization-influence-policy-header.md), [13](13-cartonization-influence-cartons-and-pack-item.md), [14](14-cartonization-influence-unplaced-reasons.md) |
-| Box full at the floor, and its recovery | Built. | [15](15-cartonization-box-full-exception.md), [16](16-cartonization-exception-recovery.md) |
-| Hand-off from picking to a pack station | Built. Only for areas with a pack station. | [20](20-flow-handoff-to-pack-station.md), [21](21-flow-influence-station-routing.md) |
-| Packing: verify a box | Built. RF screens `PACK00` to `PACK04`. | [30](30-packing-verify-journey.md) |
-| Packing: repack a pallet | Built. RF screens `PACK10` to `PACK14`. | [31](31-packing-repack-journey.md) |
-| Packing: void and reopen | Built as API. No RF screen. | [32](32-packing-void-and-reopen.md) |
-| When the packing job is `Packed` | Built. | [33](33-packing-influence-when-packed.md) |
-| What packing reads (weights, printer, serial) | Built. | [34](34-packing-influence-weights-printer-station.md) |
-| Dispatch planning (trip, stops, orders) | Built as API. It plans only. | [40](40-dispatch-planning.md) |
-| Order closure | Built as API. Reachable only by cancelling every line. | [50](50-order-closure.md) |
+| Cartonization plan and exception recovery | Built. Runs from Release/Allocate; supervisors can retry or resolve execution exceptions. | [10](10-cartonization-plan-journey.md), [15](15-cartonization-box-full-exception.md), [16](16-cartonization-exception-recovery.md) |
+| Hand-off from picking | Built. The route can send a unit to a distribution station, pack station, consolidation station or Stage. | [20](20-flow-handoff-to-pack-station.md), [21](21-flow-influence-station-routing.md) |
+| Packing: verify or repack | Built on RF. Void, reopen and packing-exception recovery are available as controlled commands. | [30](30-packing-verify-journey.md), [31](31-packing-repack-journey.md), [32](32-packing-void-and-reopen.md), [33](33-packing-influence-when-packed.md), [34](34-packing-influence-weights-printer-station.md) |
+| Distribution station and consolidation | Built. Station boxes can be sorted; boxes from compatible orders can be consolidated onto one outbound pallet. | API reference: `station_*` and `consolidation_*`; administrator setup guide is still to be written. |
+| Dispatch planning | Built in the web UI and API. A Dispatch freezes stops and order intent; it does not move or ship stock. | [40](40-dispatch-planning.md), [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue) |
+| Staging | Built as API and RF flow. Assignment and physical confirmation are separate commands. | API reference: `stage_unit_*`; operator guide is still to be written. |
+| Load planning and loading | Built in web UI, API and RF. A reviewed Load Plan is frozen before a Load opens; every physical unit is reviewed before confirmation. | [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue) |
+| Goods Issue | Built. Use `shipment_order_ship` for one complete order or `confirm_shipment` for a complete Load. | [Order closure](50-order-closure.md), [API workflow](../../api/08-workflows-by-example.md#step-7-confirm-goods-issue) |
+| Order closure | Built. Complete-order Goods Issue closes automatically; a partial Load can leave an order `PartiallyShipped`. | [50](50-order-closure.md) |
 
-## Not built yet in code
+## Important boundaries
 
-- **Sorting and consolidation (put wall).** Not built yet in code. The router knows a `Consolidate` step in its type, but the code always sets `consolidation_required` to false, and there is no module, table or RPC for sorting. The designs are in `docs/superpowers/specs/2026-10-05-sort-and-pack-modules-design.md` and `docs/superpowers/specs/2026-10-06-post-pick-pack-consolidation-flow-v0.5.md`.
-- **Staging.** Not built yet in code. `Stage` is a location type and a router value. The router does not route it (`Stage` is never required). A dispatch can hold a "stage hint", which is stored only.
-- **Loading.** Not built yet in code. `crates/libs/wms-outbound/src/loading/README.md` says "reserved; no compiled Rust module yet", and `lib.rs` has no `loading` module.
-- **Ship confirm and shipping.** Not built yet in code. `crates/libs/wms-outbound/src/shipping/README.md` says the same. Nothing writes `qty_shipped`. `serial_ship` exists as a separate serial command (Picked to Shipped) that no order command calls.
-- **Recovery of a packing discrepancy.** Not built yet in code. A reported packing exception has no command that resolves it.
-- **Waves** come before picking and are not in this area.
+- A Dispatch and a frozen Load Plan are commitments of intent, not proof that goods moved.
+- A scan review is read-only. The matching confirm command records the physical act.
+- A `Loaded` Load still owns warehouse stock. Only Goods Issue records departure.
+- An order cannot use direct `Ship order` while it belongs to an active Load.
+- There is no generic shipment reversal. Use the immutable shipment history as the receipt and follow the site's controlled correction process.
+- Some implementation README files under the reserved `loading/` and `shipping/` directories still describe the original placeholder layout. The active implementation is under `service/load`, `service/load_plan`, `domain/load`, `domain/load_plan` and `domain/shipment_order/shipping.rs`.
 
 ## Where it comes from
 
 | Claim | Source |
 |---|---|
-| Modules of the crate: no loading or shipping | `crates/libs/wms-outbound/src/lib.rs:21` |
-| Consolidation is never required | `crates/libs/wms-outbound/src/flow/advance.rs:183` |
-| Stage, Ship and None are never required | `crates/libs/wms-outbound/src/flow/resolve.rs:60` |
-| Router lists what is not built | `crates/libs/wms-outbound/src/flow/README.md:94` |
-| Loading is a placeholder | `crates/libs/wms-outbound/src/loading/README.md:3` |
-| Shipping is a placeholder | `crates/libs/wms-outbound/src/shipping/README.md:3` |
-| Nothing writes `qty_shipped` | `crates/libs/wms-lib-core/src/model/outbound/shipment_order_line.rs:154` |
-| The `confirm_shipment` stub was removed from the RPC list | `crates/services/app-server/src/web/rpcs/contexts/tasks.rs:92` |
-| `serial_ship` is a standalone command | `crates/services/app-server/src/web/rpcs/serial_commands_rpc.rs:78` |
-| Packing exceptions: no command sets `Resolved` | `crates/libs/wms-lib-core/src/model/outbound/packing_exception.rs:35` |
+| Consolidation commands and queries | `crates/libs/wms-outbound/src/consolidation/` |
+| Staging assignment, confirmation and transfer | `crates/libs/wms-outbound/src/service/staging/` |
+| Dispatch lifecycle | `crates/libs/wms-outbound/src/service/dispatch/` |
+| Load Plan lifecycle | `crates/libs/wms-outbound/src/service/load_plan/`, `domain/load_plan/` |
+| Load review, confirmation, completion and shipment | `crates/libs/wms-outbound/src/service/load/` |
+| Direct order Goods Issue | `crates/libs/wms-outbound/src/domain/shipment_order/shipping.rs` |
+| RF Loading and shipment screens | `crates/libs/wms-lib-sql/sql/rf-screens/128_uc_loading.sql`, `129_uc_load_shipment.sql` |
+| Web screens | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/20261015141427_*` through `20261015141536_*` |
 
 ## Related pages
 
-- [Cartonization: how it works](../../admin/policies/30-cartonization-overview.md)
+- [Outbound Setup](../../admin/06-outbound-setup.md)
 - [Packing (operator)](../../operator/10-packing-verify.md)
 - [Order statuses and transitions](../../reference/outbound/90-order-statuses-and-transitions.md)

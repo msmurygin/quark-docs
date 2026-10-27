@@ -237,6 +237,14 @@ Group unreleased orders, review the complete composition and release the group t
 8. If some members were blocked or failed, correct their order data and click `Retry blocked`.
 9. Use `Cancel Wave` only while the wave is still unstarted (`Draft` or `Planned`).
 
+![Wave list with draft and released waves](../assets/screens/wave-list-form.png)
+
+*Wave list with status, order counts and release progress. Focus: choose the wave whose composition or release result needs review.*
+
+![Wave card composition and action toolbar](../assets/screens/wave-card-form.png)
+
+*Wave card with composition, progress and controlled actions. Focus: review every member outcome before retrying or cancelling.*
+
 ### Field reference
 
 The wave card shows `Status`, `Release generation`, station, member counts and the release result of every order. Wave statuses are `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`.
@@ -604,7 +612,11 @@ sequenceDiagram
 4. Click `Confirm — ship and deduct stock`.
 5. Open the `Fulfilment — base quantities` and `Shipments — base quantities` tabs to check the shipped base quantities and Goods Issue receipt.
 
-This path requires every remaining line to be fully picked and its physical content to belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, or an order in an active Load must use the Load path.
+![Direct shipment confirmation for one order](../assets/screens/shipment-order-ship-review-modal.png)
+
+*Irreversible direct Goods Issue review. Focus: confirm the reviewed order, status and version before stock is deducted.*
+
+This path requires no line to have a shipped quantity and every line's effective demand (ordered minus cancelled) to be fully allocated and picked. Its physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, an order in an active Load, or a follow-up after partial Goods Issue must use the Load path.
 
 ### Plan a Load
 
@@ -617,6 +629,14 @@ This path requires every remaining line to be fully picked and its physical cont
 7. Click `Freeze reviewed composition`. Freeze is a planning commitment, not loading or shipment.
 8. Back on the plan, click `Open Load`, choose an unused active transport, click `Review selected transport`, then `Confirm — open Load`.
 
+![Dispatch card with stops and assigned orders](../assets/screens/dispatch-card-form.png)
+
+*Dispatch card before planning. Focus: every order belongs to the intended stop and no route row is missing.*
+
+![Load Plan card with reviewed composition](../assets/screens/load-plan-card-form.png)
+
+*Load Plan composition review. Focus: selected, invalid and unplanned unit counts before Freeze.*
+
 Loading-order choices are `Last delivery stop first`, `First delivery stop first`, `Any stop group`, `Manual unit order`, and `Any eligible unit (no stop priority)`. Use the review screen to resolve invalid or unplanned units before Freeze.
 
 ### Load and ship in the web UI
@@ -627,6 +647,10 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 4. When `Remaining units` is 0, click `Complete loading (not ship)` and confirm. The status becomes `Loaded`; stock has not left yet.
 5. Click `Ship whole Load / deduct stock`. Verify the reviewed Load, transport and complete counts, then click `Confirm shipment / deduct stock`.
 
+![Load card composition and loading progress](../assets/screens/load-card-form.png)
+
+*Load card with planned and physically confirmed units. Focus: required, loaded and remaining counts stay separate.*
+
 ### Load and ship on the RF terminal
 
 1. Open `Main Menu > Loading > Load Units`.
@@ -636,6 +660,14 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 5. On `Confirm Unit Loading`, physically load the unit and press `F4 Confirm`.
 6. After the last unit, press `F5 Complete` on `Scan Unit`. Review `Complete Loading`, then press `F4 Complete`.
 7. On `Load Status`, press `F5 Ship`. On `Confirm Shipment`, review the irreversible warning and complete counts, then press `F4 Ship all`.
+
+![RF Complete Loading review](../assets/screens/LOD05.png)
+
+*RF `Complete Loading` review. Focus: all required units are confirmed before `F4 Complete`.*
+
+![RF whole-Load shipment confirmation](../assets/screens/LODS01.png)
+
+*RF `Confirm Shipment` screen. Focus: the irreversible warning, transport and complete unit counts before `F4 Ship all`.*
 
 ### What you should see
 
@@ -680,6 +712,10 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 `Sidebar > Inventory Balances > Replenishment` (after `Inventory Counts`). The list shows every replenishment: urgency, status (`Open`, `Done`, `Shorted`, `Cancelled`), pick location, SKU, lot, from where, quantity and unit, the short reason, when it was planned.
 
+![Replenishment list with an open urgent row](../assets/screens/replenishment-list-form.png)
+
+*Replenishment list. Focus: urgency, source, destination, quantity and current status of the open move.*
+
 | Button | What it does |
 |---|---|
 | **Replenish Now** | Runs the planner at once (`replenishment_plan`). |
@@ -689,6 +725,10 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 ### How urgent: the replenishment policy
 
 Every SKU has a replenishment policy (`STD` unless the SKU card names another). `Sidebar > Policy > Replenishment Policy` lists them; open a row to set its rule, **New** makes one by its code with the default rule.
+
+![Replenishment policy thresholds](../assets/screens/replenishment-policy-card-form.png)
+
+*Replenishment policy card. Focus: urgent and important reservation thresholds and the empty-location rule.*
 
 | Setting | Default | Meaning |
 |---|---|---|

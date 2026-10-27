@@ -329,7 +329,7 @@ Putaway does not run as a task. `Putaway` is a value of `task_type`, but no code
 
 ---
 
-## Workflow 3. Ship an order: create, release, allocate, wave, pick, pack
+## Workflow 3. Fulfil an order: create, release, wave, pick, pack, ship
 
 The whole outbound flow in one list:
 
@@ -341,8 +341,12 @@ shipment_order_release  -> release (also tries to allocate stock, in the same ca
 shipment_order_allocate -> allocate again (top-up) if release left lines short
 pick_dispatch_next ... pick_commit ... pick_drop_close   (the picker)
 packing_queue_list ... packing_carton_close              (the packer)
-shipment_order_close    -> close when every line is done
+either shipment_order_ship                                (one complete order)
+or dispatch_* ... stage_unit_* ... load_plan_* ... load_* ... confirm_shipment
+shipment_order_shipment_history -> read the Goods Issue receipt
 ```
+
+Choose one Goods Issue path. Direct shipment is for one fully picked order whose physical content belongs only to it. Use the Load path for a planned departure, shared outbound pallet or multi-order transport. Loading alone does not deduct stock.
 
 ### Step 1. Create the order
 
@@ -579,23 +583,58 @@ Other packing commands:
 | `packing_carton_reopen` | Reopen a closed package. Needs a supervisor grant (code 122) and a reason. |
 | `packing_exception_report` | Report missing or unexpected goods. It blocks the order's packing. |
 
-### Step 7. Close the order
+### Step 7. Confirm Goods Issue
 
-When every line is in a final state:
+Goods Issue is the warehouse-departure commitment. It writes shipment history, deducts picked stock, advances serials and updates order counters in one transaction.
+
+#### Path A. Ship one complete order
+
+Read the current order and its version with `get_shipment_order_full`. No line may already have a shipped quantity. For every line, the effective demand (`qty_ordered - qty_cancelled`) must be fully allocated and picked. The physical roots must belong only to this order, and the order must not belong to an active Load. After any partial Goods Issue, use the Load path for the follow-up shipment.
 
 ```bash
-rpc '{ "jsonrpc": "2.0", "id": 22, "method": "get_shipment_order_full",
-       "params": { "data": { "order_id": 900 } } }'
-# -> read the order version
-
-rpc '{ "jsonrpc": "2.0", "id": 23, "method": "shipment_order_close",
+rpc '{ "jsonrpc": "2.0", "id": 22, "method": "shipment_order_ship",
        "params": { "meta": { "idempotency_key": "'"$(newkey)"'" },
                    "data": { "order_id": 900, "expected_order_version": 4 } } }'
 ```
 
-To cancel instead, use `shipment_order_cancel` (refused once anything is picked). To cancel part of a line, use `shipment_order_line_cancel_qty`.
+Read from `result.data`: `goods_issue_id`, `shipped_quantities`, `journal_ids`, `serial_ids`, `new_version`, `already_committed` and `order_closed`. A complete shipment closes the order automatically.
 
-The API has no method for the steps after a closed pallet: staging, loading and dispatch. The event `process.shipment.dispatched` is in the database seed, but no code publishes it. Picking work is created only by releasing an order; there is no API method that creates a picking task on its own. To see the next step of a packing unit, read `unit_next` in the packing answer.
+#### Path B. Plan, load and ship a Load
+
+Plan the Dispatch before hand-off when possible, so its route and stop intent is copied to ready units. If units already exist, review and explicitly align them through `outbound_unit_assign` or `outbound_unit_reassign`.
+
+| Stage | Methods | Rule |
+|---|---|---|
+| Register transport | `transport_unit_register` | A transport resource is not a warehouse container. Keep its id, version and exact `external_ref`. |
+| Plan departure | `dispatch_create`, `dispatch_stop_add`, `dispatch_add_order`, `dispatch_plan` | Add stops before orders. Send the latest Dispatch version after every mutation. Planning moves no stock. |
+| Stage ready units | `stage_unit_assign`, `stage_unit_confirm` | Assignment is intent; confirmation moves the complete physical root to the reviewed Stage. Skip only when the Load policy does not require staging. |
+| Build the plan | `load_plan_create`, `load_plan_generate`, `load_plan_get`, `load_plan_freeze` | Freeze the exact reviewed units and their versions. A frozen plan is not loading authorization. |
+| Open the Load | `load_open` | Bind one unused active transport to the frozen plan. |
+| Start and load | `load_start`, then `load_unit_review` and `load_unit_confirm` for every root | Review is read-only. Confirm only after the physical act. |
+| Complete loading | `load_complete` | Every required unit must be loaded and its immutable content must still match. Status becomes `Loaded`; stock is still in the warehouse. |
+| Goods Issue | `confirm_shipment` | Ships the complete Load atomically and marks the Load and Dispatch `Shipped`. |
+
+Every state-changing method uses a fresh idempotency key and the current version returned by the preceding step. Do not retry a version conflict by changing only the version: read the current card and review the decision again.
+
+The final call has this compact shape:
+
+```bash
+rpc '{ "jsonrpc": "2.0", "id": 23, "method": "confirm_shipment",
+       "params": { "meta": { "idempotency_key": "'"$(newkey)"'" },
+                   "data": { "load_id": 700, "expected_load_version": 9 } } }'
+```
+
+`result.data.orders` contains one Goods Issue result per represented order. An order can remain `PartiallyShipped` when the Load carried only part of its demand.
+
+### Step 8. Verify the shipment and closure
+
+Use `shipment_order_fulfilment_list` for current base quantities and `shipment_order_shipment_history` for immutable Goods Issue deltas. Use `load_get` and `dispatch_get` to verify the physical departure objects.
+
+`shipment_order_close` is a separate administrative lifecycle command for `ADMIN` and `MANAGER`. Call it only when every line is already terminal through shipped quantity, cancelled quantity or a permitted mixture. Do not call it after a complete direct Goods Issue: `shipment_order_ship` already closes that order.
+
+To cancel instead, use `shipment_order_cancel` before anything is picked. To cancel part of a line, use `shipment_order_line_cancel_qty` for the still-open quantity.
+
+Picking work is still created through order or wave release; there is no generic API method that invents a picking task independently. To see the next required capability of a packing unit, read `unit_next` in the packing answer.
 
 ---
 
