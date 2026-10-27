@@ -634,8 +634,41 @@ Add your own fields to SKUs, receipts or locations.
 
 ## 9. Handling unit types (containers you own)
 
-Handling unit types describe reusable containers such as crates.
-The enterprise menu `Handling Unit Types` creates the types. `Policy > Handling Unit Registry` registers instances.
+### What you will do
+
+Define a kind of reusable carrier once, then register the physical totes, carts or boxes that the warehouse can scan. These are separate actions:
+
+- a **type** is shared enterprise configuration;
+- **registration** creates individually coded, empty units in one warehouse;
+- **binding** happens later in an operating flow, when an operator scans one of those units as a pick carrier or box.
+
+Registration does not reserve a unit, put goods into it or attach it to a picking assignment.
+
+```mermaid
+flowchart LR
+    T["Enterprise: create handling unit type"] --> R["Warehouse: register physical units"]
+    R --> E["Empty units at an Ok location"]
+    E --> C["Scan as pick carrier<br/>holds containers + positions"]
+    E --> B["Bind as pick box<br/>holds inventory"]
+```
+
+### Before you start
+
+- `ADMIN` or `MANAGER` creates and changes types in Enterprise mode.
+- `ADMIN`, `MANAGER` or `SUPERVISOR` registers units in an active warehouse.
+- The registration location exists in that warehouse and has status `Ok`.
+- For `Owned By = This warehouse`, the warehouse has a default owner configured.
+- If you select `Print Labels`, configure the `handling_unit_label`, renderer and printer assignment first. Registration itself does not wait for printing.
+
+No handling unit type is seeded.
+
+### Create the type
+
+1. Switch to Enterprise mode and open `Sidebar > Configuration > Handling Unit Types`.
+2. Click `New`.
+3. Enter `Code` and `Name`, then set what the unit can hold. A picking cart normally has `Holds Containers` on and a positive `Positions` value. A reusable pick box normally has `Holds Inventory` on and `Holds Containers` off.
+4. Set the physical limits, usage policy and `Code Prefix` when needed.
+5. Click `Save`.
 
 | Field (type) | Meaning | Allowed values |
 |---|---|---|
@@ -645,14 +678,64 @@ The enterprise menu `Handling Unit Types` creates the types. `Policy > Handling 
 | `Shippable`, `Returnable`, `Inspect on Return` | Flow flags. | On or off. |
 | `Default Usage Policy` | Who may use units. Empty = by the asset owner (warehouse: shared; client: own only). | Code list. |
 | `Inner Length`, `Inner Width`, `Inner Height`, `Max Gross Weight`, `Tare Weight` | Physical size. | Numbers. |
-| `Code Prefix` | Prefix of unit codes. | Text. |
-
-Registering (`Register Handling Units`): `Count` (required), `Location` (required), `Owned By` (required), `Client` (only for client-owned units), `Print Labels`. Buttons `Cancel`, `Register`.
-
-The label `handling_unit_label` prints once for each registered unit (see `07-printing-and-labels.md`).
-No type is seeded.
+| `Code Prefix` | Prefix of generated unit codes. Empty uses `HU`. | 1 to 10 uppercase letters or digits. |
 
 Allowed values:
 
-- `Default Usage Policy`: `OwnOnly` or `WarehouseShared`.
-- `Owned By`: `This warehouse` (`ThisWarehouse`) or `Client` (`Owner`). With `Client` you must also pick the `Client`. With `This warehouse` the client must stay empty.
+- `Default Usage Policy`: `OwnOnly` or `WarehouseShared`. Empty means warehouse-owned units are shared and client-owned units are for that client only.
+- A type must stay `Active` to register new units or bind its existing units during picking.
+
+### Register physical units
+
+1. Switch to the warehouse that will hold the units and open `Sidebar > Policy > Handling Unit Registry`.
+2. Tick exactly one type and click `Register`. The button opens the modal even with no selection, but confirmation then says `Tick exactly one handling unit type`.
+3. In `Register Handling Units`, enter `Count` from 1 to 500 and an existing `Location` whose status is `Ok`.
+4. Choose `Owned By`:
+   - `This warehouse`: leave `Client` empty;
+   - `Client`: choose the owning client.
+5. Turn on `Print Labels` only when the printer path is ready.
+6. Click `Register`.
+7. Open the type row. The lower `Handling Units` list shows each generated code, `Empty` status, location and asset owner.
+
+![Handling Unit Registry type list](../assets/screens/handling-unit-registry-type-list-form.png)
+
+*Handling Unit Registry before registration. Focus: tick exactly one type before opening `Register`.*
+
+![Register Handling Units modal](../assets/screens/handling-unit-register-modal.png)
+
+*Batch registration of physical units. Focus: count, usable location, asset owner and optional label printing.*
+
+Each code is the type's prefix followed by a seven-digit generated number, for example `TOTE0000042`. New units have status `Empty`, origin `Manual` and the location entered in the modal.
+
+When `Print Labels` is on, one detached post-commit run tries `handling_unit_label` for each new code in order and stops at the first printer, configuration, render or send failure. The units stay registered. Replaying the registration does not print again; check the registry, fix printing and use the site's controlled reprint process for the failed and skipped labels instead of registering the batch again.
+
+### Registration is not binding
+
+| Action | What changes | What does not change |
+|---|---|---|
+| Create a type | Enterprise configuration becomes available to warehouses. | No physical unit exists. |
+| Register units | Individually coded `Empty` units are created at the chosen location. | They are not assigned to work and hold no stock. |
+| Scan a carrier for a pick assignment | An eligible empty unit is selected as the carrier. | Registration and asset ownership do not change. |
+| Bind a box to a pick position | An eligible empty unit is attached to that position and can receive picked goods. | Its type and asset owner do not change. |
+
+
+### If something goes wrong
+
+| Message or symptom | Meaning | Fix |
+|---|---|---|
+| `Tick exactly one handling unit type` | No type, or more than one type, was selected. | Close the modal, tick one row and repeat. |
+| `the handling-unit type is out of service` | `Active` is off. | Reactivate the type after review, or choose another type. |
+| `count {n} is outside 1..=500` | The batch is empty or too large. | Register 1 to 500 units at a time. |
+| `location {code} not found or does not accept handling units (status is not Ok)` | The location is missing or unavailable. | Use an existing location with status `Ok`. |
+| `the warehouse has no default owner; specify the handling unit owner explicitly` | Warehouse-owned registration cannot determine the goods owner stored on the container. | Configure the warehouse default owner, or register client-owned units. |
+| `customer handling unit: specify the owning customer` | `Client` ownership was chosen without a client. | Choose the client. |
+| `a warehouse handling unit has no owning customer: remove the customer or choose the Customer ownership` | A client was sent with `This warehouse`. | Clear `Client` or choose client ownership. |
+| Units appear but labels do not | Registration committed; asynchronous printing could not resolve, render or reach a printer. | Do not register again. Fix the label/printer path and print under the site's controlled process. |
+
+### What this affects later
+
+- A pick carrier must be an empty, unheld registered unit whose active type has `Holds Containers` on and a positive `Positions` value.
+- A reusable pick box must be empty and unheld; its active type must have `Holds Inventory` on and `Holds Containers` off. Its effective usage policy must permit the goods owner.
+- Dissolving a pick assignment can release its empty boxes, and the shared-pick release command can return an empty shared tote. Neither action registers a new instance.
+
+See also [Picking overview](policies/20-picking-overview.md), [Picking policy settings](policies/21-picking-policy-settings.md), [Printing and Labels](07-printing-and-labels.md) and [Handling unit types reference](../reference/administration/18-handling-unit-types.md).
