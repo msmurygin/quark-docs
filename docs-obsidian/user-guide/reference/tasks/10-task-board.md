@@ -15,20 +15,20 @@ The menu item is `task_board_menu`.
 
 | Part | What it is |
 |---|---|
-| Toolbar | Three buttons: `Return to Pool`, `Reassign`, `Delete Task`. |
+| Toolbar | Paper-pick actions plus `Return to Pool`, `Reassign` and `Delete Task`. |
 | Filter bar | Filters for the columns that have a filter (all of them except `Pick Assignment`). |
 | Grid | One row per task, 50 rows per page. A check box at the start of each row ticks it. You can tick many rows. |
-| `Columns` | Shows or hides columns. 25 of 28 are shown at first. |
+| `Columns` | Shows or hides columns. 38 of 41 are shown at first. |
 | `Views` | Saves a set of filters and columns. |
 
 A click on a row does not open anything. The board has no card.
-The grid cannot be edited. All columns are read only.
+The task data is read only. The paper-pick input columns are editable and are saved only through **Save Picks**; they do not edit task accounting directly.
 
 > Not confirmed by code: in which order the rows come when you open the board. The metadata sets no sort for this list. To verify: open the board on a warehouse with several tasks and read the `Created` column.
 
 ## Columns
 
-Table: `task` (read through the view `task_board`). Every column is read only.
+Table: `task` (read through the view `task_board`). The base task columns below are read only.
 
 | Label | Column | Type | Filter | Shown at first | What it shows |
 |---|---|---|---|---|---|
@@ -65,6 +65,27 @@ The `Pick Assignment` column shows only a live assignment (`Building`, `Ready`, 
 A task of a dissolved assignment shows no code.
 Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/051_the_supervisor_sees_pick_assignments.sql:27-80`.
 
+### Paper-pick columns
+
+These columns are added to the grid for paper picking. **Status** becomes editable for the two paper outcomes. The other base task columns remain read only.
+
+| Label | Editable | What to enter or read |
+|---|---|---|
+| `Status` | Yes | `Picked / Completed` or `Short`. |
+| `Found qty` | Yes | Required for a short; `0` means nothing was found. Leave it empty for a completed pick. |
+| `Short reason` | Yes | A published short-reason code. Required for a short. |
+| `Pick pallet (DRP…, optional)` | Yes | The open pick pallet. When optional and empty, the system reuses or opens one. |
+| `Confirm source location` | Yes | The source location when the pick requires confirmation. |
+| `Confirm item barcode` | Yes | The item barcode when required. |
+| `Confirm source LPN` | Yes | The source LPN when required. |
+| `Confirm internal lot` | Yes | The internal lot when required. |
+| `Lot entered manually` | Yes | Whether the lot was typed instead of scanned. |
+| `Lot attribute scans (;)` | Yes | Scanned lot-attribute values, separated with semicolons. |
+| `Lot attributes (code=value;)` | Yes | Typed lot attributes as `code=value`, separated with semicolons. |
+| `Serial scans (;)` | Yes | Serial numbers, separated with semicolons. |
+| `Instructions acknowledged` | Yes | Whether the pick instructions were completed. |
+| `Actual destination LPN` | No | The destination LPN recorded by the completed pick. |
+
 ### Lease Expires
 
 A claim sets the lease to now plus the setting `TASK_LEASE_TTL_MIN` (15 minutes by default).
@@ -95,6 +116,9 @@ A button is grey when the ticked rows do not fit. The grey text says why when yo
 
 | Button | Needs | What it does | Task page |
 |---|---|---|---|
+| `Save Picks` | One or more changed Pick rows with `Picked / Completed` or `Short` selected | Records each changed row and puts any found stock on the operator's open pick pallet in transit. | [Paper picking](../../operator/09-picking.md#c-paper-picking-in-the-web-app) |
+| `Pick instructions` | A Pick task to review | Shows the confirmations and instructions required before that row can be saved. | [Paper picking](../../operator/09-picking.md#c-paper-picking-in-the-web-app) |
+| `Place Pallet` | No selected row | Opens a window for the `DRP` pallet and its destination location. A successful confirmation sends the pallet to the next workflow step. | [Paper picking](../../operator/09-picking.md#c3-place-the-pallet) |
 | `Return to Pool` | Exactly one ticked task with status `Assigned` or `InProgress` | Opens the window `Return Task to Pool`. | [Returning a task to the pool](60-returning-a-task-to-the-pool.md) |
 | `Reassign` | Exactly one ticked task that is `Assigned`, `InProgress`, or escalated | Opens the window `Reassign Task`. | [Reassigning a task](61-reassigning-a-task.md) |
 | `Delete Task` | One or more ticked tasks | Opens the window `Delete Selected Tasks?`. | [Deleting tasks](62-deleting-tasks.md) |
@@ -116,13 +140,13 @@ The value is `yes` for `Assigned`, `InProgress`, and for `Created` with `Escalat
 
 ## Who can use it
 
-| Role | Open the board | `Return to Pool`, `Reassign` | `Delete Task` |
-|---|---|---|---|
-| `ADMIN` | Yes | Yes | Yes |
-| `MANAGER` | Yes | Yes | Yes |
-| `SUPERVISOR` | Depends on the screen grants assigned by an administrator | No by default | No by default |
-| `OPERATOR` | Yes (read only) | No | No |
-| `VIEWER` | Yes (read only) | No | No |
+| Role | Open the board | Paper-pick actions | `Return to Pool`, `Reassign` | `Delete Task` |
+|---|---|---|---|---|
+| `ADMIN` | Yes | Yes | Yes | Yes |
+| `MANAGER` | Yes | Yes | Yes | Yes |
+| `SUPERVISOR` | Depends on the screen grants assigned by an administrator | Yes when the screen is available | No by default | No by default |
+| `OPERATOR` | Yes | Yes | No | No |
+| `VIEWER` | Yes (read only) | No | No | No |
 
 The reason for each cell is on [Who can do what](91-who-can-do-what.md).
 
@@ -130,7 +154,7 @@ The reason for each cell is on [Who can do what](91-who-can-do-what.md).
 
 - `Return to Pool` and `Reassign` change the holder, the status and the lease of a task. The terminal of the old holder loses the task.
 - `Delete Task` removes the task and puts its pick back into reserve.
-- Nothing on this screen changes stock.
+- `Save Picks` changes stock by putting found goods on a pick pallet in transit. `Place Pallet` moves that pallet to its frozen destination and sends it to the next workflow step.
 
 ## Related pages
 

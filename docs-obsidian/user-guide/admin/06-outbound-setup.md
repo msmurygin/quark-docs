@@ -616,7 +616,7 @@ sequenceDiagram
 
 *Irreversible direct Goods Issue review. Focus: confirm the reviewed order, status and version before stock is deducted.*
 
-This path requires no line to have a shipped quantity and every line's effective demand (ordered minus cancelled) to be fully allocated and picked. Its physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, an order in an active Load, or a follow-up after partial Goods Issue must use the Load path.
+This path requires no line to have a shipped quantity and every line's effective demand (ordered minus cancelled) to be fully allocated and picked. Every pick pallet must first be placed at its destination; stock on an open pallet in transit is not shipped. The physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, an order in an active Load, or a follow-up after partial Goods Issue must use the Load path.
 
 ### Plan a Load
 

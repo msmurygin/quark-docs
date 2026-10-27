@@ -6,11 +6,11 @@ A task is a unit of work for a picker. Allocation and release make the pick task
 The form is `shipment_order_tasks_form`. The data comes from the database view `task_board` (data object `order_task`).
 
 The tab shows every column that the task board shows (checked by the test `crates/services/web-ui-server/tests/shipment_order_metadata.rs`, see `wms-meta-ui` migration 086).
-The grid has check boxes. Three buttons work on the ticked rows.
+The grid has check boxes. Task-management buttons work on the ticked rows. Paper-pick buttons record the physical pick and place its pallet.
 
 ## Columns
 
-Every column is read only.
+The task columns are read only. The paper-pick input columns are editable and are saved only through **Save Picks**.
 
 | Label | Column | Type | Shown at first | What it shows |
 |---|---|---|---|---|
@@ -52,12 +52,17 @@ Source: form `shipment_order_tasks_form` in `001_baseline.sql`, and `wms-meta-ui
 
 | Button | Code | Needs | What it does |
 |---|---|---|---|
+| `Save Picks` | `pick_save` | One or more changed Pick rows with `Picked / Completed` or `Short` selected | Records each changed row and puts any found stock on the operator's open pick pallet in transit. |
+| `Pick instructions` | `pick_review` | A Pick task to review | Shows the confirmations and instructions required before the row can be saved. |
+| `Place Pallet` | `pick_place_plt` | No selected row | Opens a window for the `DRP` pallet and the destination location. A successful confirmation sends the pallet to the next workflow step. |
 | `Return to Pool` | `sot_release` | One task, status `Assigned` or `InProgress` | Takes the task from its picker and puts it back in the pool. |
 | `Reassign` | `sot_reassign` | One task that can be reassigned (`Assigned`, `InProgress`, or escalated to a supervisor) | Gives the task to another operator. |
 | `Delete Task` | `sot_delete` | One or more tasks | Deletes the tasks nobody has taken, and puts their picks back in reserve. |
 
 The buttons are grey until the rule is met. The grey text is `Select a task that is Assigned or InProgress`, `Select a task that is Assigned, InProgress, or escalated to a supervisor` and `Select at least one task`.
 See [Working with tasks from the order](41-working-with-tasks-from-the-order.md).
+
+For the paper workflow, including completed and short rows, see [Paper picking in the operator guide](../../operator/09-picking.md#c-paper-picking-in-the-web-app). Saving does not hand off the pallet. Use **Place Pallet** only after the pallet reaches the destination shown by the pick card.
 
 ## Related pages
 

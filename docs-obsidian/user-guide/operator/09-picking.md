@@ -2,10 +2,11 @@
 
 ## What you will do
 
-Pick goods for orders. There are two ways to work:
+Pick goods for orders. There are three ways to work:
 
 - **Discrete Pick**: you get one pick at a time and put the goods on a pallet.
 - **Pick by Area**: you work in a work area. You may take a carrier with boxes and walk a route.
+- **Paper picking**: you record the result in the web task grid, keep the goods on a pick pallet in transit, and place the pallet when the trip is finished.
 
 You also close pallets, deliver carriers, and report problems (short, reject, box full, box damaged).
 
@@ -17,6 +18,7 @@ You also close pallets, deliver carriers, and report problems (short, reject, bo
 - Some picks ask you to confirm the source: location, item, LPN, lot or a lot attribute. The screens ask in the order the system sets.
 - Your user must have the right to take pick work in your work area.
 - A supervisor is needed to dissolve an assignment that already has picked goods, and to close a pallet that belongs to another operator.
+- For paper picking, have a pick pallet label that starts with `DRP`, unless the **Pick pallet (DRP…, optional)** field is optional in your warehouse.
 
 Your supervisor gives each operator the right to take pick work per work area. The system checks this every time you ask for work, so a change applies at once. The zones your equipment cannot enter are left out. The terminal cannot show you the list of your areas. If a work area is not on your list, you see **you have no right to take pick tasks in work area {area} — ask a supervisor**.
 
@@ -497,11 +499,72 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 2. On **Deliver Carrier**, read the status line: **Scan the carrier to deliver**.
 3. In **Carrier**, scan the carrier. Then follow steps 2 to 5 above.
 
+## C. Paper picking in the web app
+
+Use this workflow when you pick from a printed list and record the result in **Task Manager > Task Board** or on an order's **Tasks** tab.
+
+### C1. Record a completed pick
+
+1. Find the Pick task in the grid.
+2. Complete any confirmation fields that the row asks for, such as source location, item, source LPN, lot, lot attributes, serials or instructions.
+3. In **Status**, choose **Picked / Completed**. Leave **Found qty** empty; completed means that you found the full quantity.
+4. In **Pick pallet (DRP…, optional)**, enter the open pick pallet label if you already have one.
+   - If the field is optional, you can leave it empty. The system reuses your open pallet for this order or opens a new `DRP` pallet.
+   - If your warehouse requires a pallet label, enter a `DRP` label before saving.
+5. Click **Save Picks**.
+6. Read the result message. If the system opened a pallet, write the new `DRP` number on the physical pallet.
+
+Saving puts the picked stock on the pallet in transit. It does not send the pallet to packing, sorting, loading or shipping. You can record more rows for the same order and destination and save again onto the same open pallet. An operator can have only one open pick pallet: place the current pallet before starting another order or a row with another destination.
+
+![Paper picking fields on the Task Board](../assets/screens/task-board-paper-picking.png)
+
+*Task Board with Status, Found qty, Short reason and Pick pallet fields. Focus: review the pallet label in the Save result before continuing the trip.*
+
+### C2. Record a short pick
+
+1. In **Status**, choose **Short**.
+2. In **Found qty**, enter what you physically found. Enter `0` if you found nothing.
+3. In **Short reason**, choose a published reason.
+4. If **Found qty** is above `0`, use the same pallet rule as for a completed pick. If it is `0`, leave **Pick pallet** empty.
+5. Click **Save Picks** and read the result for every changed row.
+
+### C3. Place the pallet
+
+Do this only when the picking trip is finished and the pallet is physically at the destination named by the pick card.
+
+1. Click **Place Pallet**. You do not need to select a task row.
+2. In **Pallet**, enter the `DRP` label.
+3. In **Location**, enter the destination shown by the pick card.
+4. Put the pallet in that location, then click **Place Pallet** in the window.
+5. Check for **Pallet {label} placed in {location}**.
+
+After this confirmation, the pallet goes to the next workflow step and accepts no more picks. If the location is wrong, the system refuses the action and names the pallet's destination. Move it to that destination and try again. **Ship order** does not ship stock that is still on an open pallet in transit.
+
+![Place Pallet window](../assets/screens/paper-pick-place-pallet-modal.png)
+
+*Place Pallet window with Pallet and Location. Focus: use the destination from the pick card, not a convenient nearby location.*
+
+```mermaid
+flowchart TD
+    A[Record a completed or short pick] --> B[Choose or enter the open DRP pallet]
+    B --> C[Save Picks]
+    C --> D{Did the system open a pallet?}
+    D -- Yes --> E[Write the new DRP number on the pallet]
+    D -- No --> F[Keep using the open pallet]
+    E --> G{More rows for the same order and destination?}
+    F --> G
+    G -- Yes --> A
+    G -- No --> H[Move the pallet to its destination]
+    H --> I[Place Pallet]
+    I --> J[Pallet continues to the next workflow step]
+```
+
 ## What you should see
 
 - **Pick Result** after each discrete pick, with **Picked** and **DROPID**.
 - **Delivered** after a carrier route.
 - A pallet that belongs to another operator closes only after a supervisor confirms.
+- For paper picking, a Save result that names the pick pallet, followed by **Pallet {label} placed in {location}** when the trip is finished.
 
 ## If something goes wrong
 
@@ -533,7 +596,7 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 | **a pallet label starts with DRP and has 4 to 50 letters, digits, '-' or '_'** | The label is not valid. | Use a `DRP` label. |
 | **label {code} is on a container that is not an empty pallet** | The label is in use. | Use another label. |
 | **pallet {code} belongs to another order** | The pallet is for another order. | Use your own pallet. |
-| **pallet {open_code} of order {order} is still open: close it first (F2)** | You must close your open pallet. | Press `F2` and close it. |
+| **pallet {open_code} of order {order} is still open: close it first (F2)** | You must close your open pallet before another order. | On RF, press `F2` and close it. In the web paper-pick grid, use **Place Pallet**. |
 | **pallet {code} goes to {destination}, not to {location}: scan {destination}** | You scanned the wrong cell. | Scan the cell in **Put at**. |
 | **pallet {code} is empty: there is nothing to close** | The pallet has no goods. | Do not close it. |
 | **pallet {code} belongs to another operator** | Another operator opened the pallet. | A supervisor must confirm. |

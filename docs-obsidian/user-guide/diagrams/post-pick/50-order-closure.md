@@ -33,7 +33,7 @@ sequenceDiagram
 
 ## Direct order shipment
 
-Use `Ship order` in the order card, or call `shipment_order_ship`, only when no line has already been partly shipped and every line's effective demand (ordered minus cancelled) is fully allocated and picked. The physical content must belong only to that order. The command is refused when the order belongs to an active Load, shares a physical root with another order, has incomplete work or follows an earlier partial Goods Issue; use the Load path for that follow-up shipment.
+Use `Ship order` in the order card, or call `shipment_order_ship`, only when no line has already been partly shipped and every line's effective demand (ordered minus cancelled) is fully allocated and picked. Every pick pallet must first be placed at its destination. An open pallet still in transit has not been handed off and its stock is excluded from direct shipment. The physical content must belong only to that order. The command is refused when the order belongs to an active Load, shares a physical root with another order, has incomplete work or follows an earlier partial Goods Issue; use the Load path for that follow-up shipment.
 
 The result includes `goods_issue_id`, shipped quantities, journal ids, serial ids, the new order version and whether the order closed.
 
