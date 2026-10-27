@@ -73,6 +73,15 @@ test('API publication sanitizer removes internal development narrative and prese
  assert.equal(sanitizePublicText('A useful sentence (`task.rs:12`).'),'A useful sentence.');
 });
 
+test('publication sanitizer preserves screenshot-only paragraphs',()=>{
+ const tree={type:'root',children:[
+  {type:'paragraph',children:[{type:'image',url:'../assets/screens/example.png',alt:'Example screen'}]},
+ ]};
+ sanitizePublicGuideTree(tree);
+ assert.equal(tree.children.length,1);
+ assert.equal(tree.children[0].children[0].type,'image');
+});
+
 test('publication sanitizer removes real-world evidence variants and orphan punctuation',()=>{
  const text=(value)=>({type:'text',value});
  const paragraph=(children)=>({type:'paragraph',children});

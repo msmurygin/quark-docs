@@ -266,7 +266,8 @@ function sanitizeContainer(node, stats) {
       continue;
     }
     const cleanedText = nodeText(child).trim();
-    if (['paragraph', 'heading'].includes(child.type) && (!cleanedText || isPunctuationOnly(cleanedText))) continue;
+    const hasImage = child.type === 'paragraph' && child.children?.some((node) => node.type === 'image');
+    if (['paragraph', 'heading'].includes(child.type) && (!cleanedText || isPunctuationOnly(cleanedText)) && !hasImage) continue;
     if (child.type === 'tableCell' && (!cleanedText || isPunctuationOnly(cleanedText))) {
       child.children = [{type: 'text', value: '—'}];
     }

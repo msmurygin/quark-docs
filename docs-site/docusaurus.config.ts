@@ -88,7 +88,15 @@ const config: Config = {
   ],
 
   plugins: ['docusaurus-plugin-image-zoom', function documentationCache() {
-    return {name: 'documentation-local-cache', configureWebpack: (_config, isServer) => ({cache: {type: 'filesystem', cacheDirectory: path.resolve(__dirname, '.cache-loader'), name: isServer ? 'server' : 'client'}})};
+    return {name: 'documentation-local-cache', configureWebpack: (_config, isServer) => ({cache: {
+      type: 'filesystem',
+      cacheDirectory: path.resolve(__dirname, '.cache-loader'),
+      name: isServer ? 'server' : 'client',
+      buildDependencies: {
+        guidePipeline: [path.resolve(__dirname, 'src/build/guide-markdown.ts'), path.resolve(__dirname, 'src/build/public-guide-sanitize.mjs')],
+        screenshotInventory: [path.resolve(guideDir, 'assets/MISSING-SCREENSHOTS.md')],
+      },
+    }})};
   }],
 
   themes: [
