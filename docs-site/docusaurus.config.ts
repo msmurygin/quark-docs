@@ -125,30 +125,6 @@ const config: Config = {
     },
     mermaid: {theme: {light: 'neutral', dark: 'dark'}},
     docs: {sidebar: {hideable: true, autoCollapseCategories: false}},
-    footer: {
-      style: 'dark',
-      links: [
-        {title: 'Quark WMS', items: [{label: 'Product Overview', href: 'https://quark.build/product'}, {label: 'WMS Cost Calculator', href: 'https://quark.build/wms-cost'}, {label: 'Contact', href: 'https://quark.build/#contact'}, {label: 'Privacy', href: 'https://quark.build/legal/privacy.html'}]},
-        {
-          title: 'Guides',
-          items: [
-            {label: 'Getting started', to: '/docs/'},
-            {label: 'Operator guide', to: '/docs/operator/'},
-            {label: 'Task cards (print)', to: '/cards/'},
-            {label: 'Administrator guide', to: '/docs/admin/'},
-          ],
-        },
-        {
-          title: 'API',
-          items: [
-            {label: 'API guide', to: '/docs/api/'},
-            {label: 'API reference', href: `pathname://${baseUrl}api/`},
-            {label: 'OpenAPI 3.1 file', href: `pathname://${baseUrl}api/openapi.json`},
-          ],
-        },
-      ],
-      copyright: `© ${new Date().getUTCFullYear()} Quark WMS · EU entity`,
-    },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
