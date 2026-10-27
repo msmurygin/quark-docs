@@ -1,6 +1,6 @@
 # Audit log
 
-The `Audit Log` screen shows the security events of the company: who changed users, roles, permissions and API keys, and which calls were refused because the role lacked the right.
+The `Audit Log` screen shows the security events of the company: who changed users, roles, permissions and API keys, and which API calls or web actions failed a permission check.
 It is a read-only list.
 
 ## How to open it
@@ -27,11 +27,11 @@ All columns are read only. The filter bar offers the filters named in the last c
 | `ID` | `id` | Whole number | No | | The row id. |
 | `Time` | `event_time` | Date and time | Yes | Date | When the event was written. |
 | `Event` | `event_kind` | Text | Yes | Set | The kind of event. See the next table. |
-| `Resource Type` | `resource_type` | Text | Yes | Set | `api`, for refused calls. Empty for the change events. |
-| `Resource` | `resource_code` | Text | No | Text | The API method that was refused. |
-| `Bit` | `required_bit` | Text | Yes | | Why the call was refused: `can_execute` (the role lacks the right) or `no_role` (the user has no role). |
+| `Resource Type` | `resource_type` | Text | Yes | Set | The protected resource: usually `api` or `server_action`. RBAC reseed events also use `api`. Empty for ordinary change events. |
+| `Resource` | `resource_code` | Text | No | Text | The API method, server-action handler or administrative capability. |
+| `Bit` | `required_bit` | Text | Yes | | The relevant permission bit: `can_execute` for invocations and RBAC reseed, or `no_role` when no role applies to the checked scope. |
 | `User` | `username` | Text | Yes | | The login of the actor. Empty for events with no actor. |
-| `Role` | `role_code` | Text | Yes | | The role of the actor, for refusals. |
+| `Role` | `role_code` | Text | Yes | | The role used for a permission check. Empty for `no_role` and events without a role. |
 | `Detail` | `detail` | JSON, shown as a summary | Yes | | The details of the event. See below. |
 | `Warehouse` | `warehouse_code` | Text | Yes | Set | The warehouse of the event. Empty for enterprise-wide events. |
 | `Target` | `target_label` | Text | Yes | Text | The row that was changed: a role code, a login, `login @ warehouse` for an assignment, `ROLE / type:code` for a permission, the key prefix for an API key. Empty (shown as a dash) when the target is unknown or has a composite key. |
@@ -46,16 +46,35 @@ The database accepts only these kinds (check constraint `audit_log_event_kind_ch
 
 | Event | Written when | Written by |
 |---|---|---|
-| `permission_denied` | An API call is refused because the role lacks the right, or the user has no role. | `check_api_call`, `crates/libs/wms-lib-auth/src/authorization/api_check.rs:352` |
+| `permission_denied` | An API call or web action fails a permission check. `Enforce` blocks it; `LogOnly` records the failed check but allows it to continue. | The API permission gate or the web action-chain gate |
 | `user_mutation` | A user is created, changed or deleted, or a password is changed. | `UserBmc` |
 | `role_mutation` | A role is created, changed or deleted. | `RoleBmc` |
 | `user_warehouse_mutation` | A warehouse assignment is created, changed or deleted. | `UserWarehouseBmc` |
 | `role_permission_mutation` | A permission cell is changed in the [Permission matrix](16-permission-matrix.md). | `batch_upsert_permission_matrix` |
 | `api_key_mutation` | An API key is generated or revoked. | `user_api_key_rpc.rs` |
-| `admin_rbac_reseed` | The permission catalogue is reseeded. | `app-server/src/web/admin_rbac.rs:207` |
+| `admin_rbac_reseed` | An administrator requests a permission-catalogue reseed, or the reseed fails or completes. The `Detail` phase is `requested`, `failed` or `completed`. | `app-server/src/web/admin_rbac.rs` |
 | `task_mutation` | A task is changed. | `TaskBmc` |
 | `rf_screen_mutation`, `rf_screen_revision_mutation` | An RF screen is published or reverted. | RF screen code |
 | `studio_meta_create`, `api_key_created`, `api_key_revoked` | Allowed by the constraint. No code that writes them was found. | |
+
+## What happens when a web action fails a permission check
+
+A toolbar button can start a chain of server actions. The permission gate checks the chain before it runs.
+
+```mermaid
+flowchart TD
+    A["User clicks a protected button"] --> G{"Are its server actions allowed?"}
+    G -->|"Yes"| R["Run the action chain"]
+    G -->|"No · Enforce"| B["Stop at the first denied action"]
+    B --> L["Write one permission_denied row"]
+    G -->|"No · LogOnly"| M["Write one row for each denied action"]
+    M --> C["Continue the action chain"]
+    C --> R
+    L --> V["Refresh Audit Log"]
+    M --> V
+```
+
+For these rows, `Resource Type` is `server_action`, `Resource` is the denied handler name and `Bit` is `can_execute`. For a role-less non-superuser in an active warehouse, `Bit` is `no_role` and only the first action in the chain is recorded. A role-less superuser is allowed and produces no denial row. `Detail` identifies the `warehouse` or `enterprise` scope.
 
 ### What `Detail` holds
 
@@ -69,7 +88,7 @@ For a change event, `detail` has five keys (`crates/libs/wms-lib-auth/src/author
 | `before` | The row before the change, or empty for an insert. |
 | `after` | The row after the change, or empty for a delete. |
 
-For a refusal, `detail` holds `{"scope": "enterprise"}` or `{"scope": "warehouse"}`.
+For a `permission_denied` event, `detail` holds `{"scope": "enterprise"}` or `{"scope": "warehouse"}`.
 
 Secrets are not written. The keys `key_hash`, `password_hash`, `token_salt`, `plaintext_key`, `pwd` and `pwd_salt` are replaced by `[redacted]` (`audit.rs`, constant `REDACT_KEYS`).
 For a user, only an allowed list of columns is written, so the password hash never appears (`UserBmc::mutation_audit_columns`, `user.rs:446`).
@@ -80,11 +99,11 @@ The `Detail` column shows the JSON as compact text in small grey type. A text lo
 
 ## Good to know
 
-- **Audit never blocks work.** The write is best effort. If the write fails, the change still happens and the failure goes only to the server log (`audit.rs`, function `log_event`).
-- **Refused calls are only logged for the API.** A button refused by the web action gate (`Forbidden("{action}")`) is not written to this table by the code read for this page.
+- **Most audit writes are best effort.** Permission-denial and ordinary change-event writes cannot change the permission result or undo the change. The exception is the initial `admin_rbac_reseed` `requested` event: if it cannot be written, the server returns an error and the reseed does not start. A later completion-audit failure does not roll back a completed reseed.
+- **API and web permission failures are both logged.** Use `Resource Type` to distinguish `api` from `server_action`.
 - **There is no clean-up.** No job that deletes old rows of `audit_log` was found.
 - **Rows pin their user and role.** The foreign keys `audit_log_user_id_fkey` and `audit_log_role_id_fkey` have no `ON DELETE` rule. A user or a role that appears in the log cannot be deleted (see [Deleting a user](34-deleting-a-user.md)).
-- **Checks in `log_only` mode.** When the server runs with `RBAC_ENFORCEMENT_MODE=log_only`, refused calls are written here but not blocked (`crates/libs/wms-lib-auth/src/authorization/enforcement.rs`).
+- **Checks in `log_only` mode.** Failed permission checks are written here, but the API call or web action continues. A web action chain records every denied action; a role-less non-superuser records only the first action. Role-less superusers bypass this denial path.
 
 ## Who can use it
 
