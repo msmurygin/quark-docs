@@ -35,7 +35,7 @@ The temperature of the receiving **line** is a different field. It is on the tab
 
 | When | Message |
 |---|---|
-| A text is longer than its limit | The database refuses it. The exact text on screen is not confirmed. |
+| A text is longer than its limit | The value is rejected. Shorten it and save again. |
 | The receipt is `Closed` or `Cancelled` | `receipt {id} is {status} - cannot edit receipt reference in its current lifecycle state` |
 
 > Not confirmed by code: the text shown for a value that is too long. To verify: type 19 characters into `Vehicle Plate` and press `Save`.

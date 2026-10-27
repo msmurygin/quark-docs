@@ -11,9 +11,8 @@ updated: 2026-10-27
 This guide is for the **customer administrator**.
 That is the person who sets up a new warehouse tenant and keeps it running.
 
-Every statement in this guide comes from the product metadata, the database
-migrations or the code. Where the code does not prove a statement, the guide
-says so in a block that starts with `> Not confirmed by code:`.
+This guide describes the administrator workflows and controls available in the
+current product. Follow the linked screen references for field-level details.
 
 ## How to read this guide
 
@@ -27,7 +26,7 @@ Each procedure uses the same layout:
 6. **If something goes wrong**: message, meaning, fix.
 7. **What this affects later**
 
-Many screens have a real screenshot. Screens without one keep a placeholder line (see [MISSING-SCREENSHOTS](../assets/MISSING-SCREENSHOTS.md)) like this:
+Many screens have a real screenshot. Until a screen is captured, the page shows a clearly labelled screenshot placeholder like this:
 
 `![form_code - Title](../assets/screens/form-code.png)`
 

@@ -13,13 +13,14 @@
 //
 // Runs as the first step of `npm run build` / `npm start`, so the portal
 // always matches openrpc.json. Output is deterministic (no timestamps).
-import { readFileSync, writeFileSync, mkdirSync, rmSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildMethodRecord, buildIndex } from './lib/rpc-model.mjs';
 import { toOpenApi } from './lib/openapi.mjs';
 import { parseReferenceDir } from './lib/reference-notes.mjs';
+import { sanitizePublicObject } from '../src/build/public-guide-sanitize.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const siteDir = resolve(here, '..');
@@ -29,7 +30,7 @@ const dataDir = resolve(outDir, 'data');
 
 const t0 = Date.now();
 const raw = readFileSync(src);
-const doc = JSON.parse(raw.toString('utf8'));
+const doc = sanitizePublicObject(JSON.parse(raw.toString('utf8')));
 if (!Array.isArray(doc.methods) || doc.methods.length === 0) throw new Error(`${src}: no methods`);
 
 const names = new Set();
@@ -39,7 +40,7 @@ for (const m of doc.methods) {
 }
 
 const refNotes = parseReferenceDir(resolve(dirname(src), 'reference'));
-const records = doc.methods.map((m) => buildMethodRecord(m, refNotes.get(m.name)));
+const records = doc.methods.map((m) => sanitizePublicObject(buildMethodRecord(m, refNotes.get(m.name))));
 const withNotes = records.filter((r) => r.errors.length).length;
 if (refNotes.size && withNotes < records.length * 0.95) throw new Error(`reference/*.md parsed for only ${withNotes}/${records.length} methods; the generated format may have changed`);
 const index = buildIndex(records);
@@ -54,7 +55,7 @@ for (const c of index.contexts) {
 }
 const openapi = toOpenApi(doc, records);
 writeFileSync(resolve(outDir, 'openapi.json'), JSON.stringify(openapi));
-copyFileSync(src, resolve(outDir, 'openrpc.json'));
+writeFileSync(resolve(outDir, 'openrpc.json'), JSON.stringify(doc));
 // The landing page shows these numbers, so they can never drift from the catalog.
 mkdirSync(resolve(siteDir, 'src/generated'), { recursive: true });
 writeFileSync(resolve(siteDir, 'src/generated/api-stats.json'), JSON.stringify({ total: records.length, contexts: index.contexts.length, version: doc.info?.version ?? '', openrpc: doc.openrpc ?? '' }, null, 2) + '\n');

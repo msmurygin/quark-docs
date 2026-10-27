@@ -120,7 +120,7 @@ The value is `yes` for `Assigned`, `InProgress`, and for `Created` with `Escalat
 |---|---|---|---|
 | `ADMIN` | Yes | Yes | Yes |
 | `MANAGER` | Yes | Yes | Yes |
-| `SUPERVISOR` | Not confirmed (see the [overview](00-task-manager-overview.md)) | No by default | No by default |
+| `SUPERVISOR` | Depends on the screen grants assigned by an administrator | No by default | No by default |
 | `OPERATOR` | Yes (read only) | No | No |
 | `VIEWER` | Yes (read only) | No | No |
 

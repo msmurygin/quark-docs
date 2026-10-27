@@ -37,7 +37,7 @@ Sign in to the web UI and reach the main screen.
 4. Click `Sign in`.
 5. Optional: use the `RU` / `EN` button on the sign-in page to change the language of the sign-in page. Use the moon/sun button to change the theme.
 
-![Web sign-in page with the username demo1 filled in](../assets/screens/login.png)
+![Web sign-in page](../assets/screens/login.png)
 
 *Caption: the sign-in page with the fields Username and Password. Focus: Sign in form on the right: Username, Password and the Sign in button. The teal numbers on the picture mark: 1 Username, 2 Password, 3 Sign in button.*
 
@@ -45,8 +45,8 @@ Sign in to the web UI and reach the main screen.
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
-| `Username` | Your login name. | Any text. Must match an existing user. | `demo1` |
-| `Password` | Your password. | At least 8 characters. | `welcome1` |
+| `Username` | Your login name. | Any text. Must match an existing user. | `alex.morgan` |
+| `Password` | Your password. | At least 8 characters. | Use the password issued by your administrator. |
 
 The sign-in form and user administration use the same eight-character minimum. Passwords shorter than eight characters are rejected before any user data is written.
 
@@ -62,7 +62,7 @@ The sign-in form and user administration use the same eight-character minimum. P
 | A password length message | The password field failed the form check. | Type a longer password. |
 | `Login failed.` | The server did not accept the credentials. | Check the user name and the password. |
 | Login is refused for an RF terminal only | The user has `RF device login` turned off (`rf_login = false`). The refusal looks the same as a wrong password. | Turn on `RF device login` for the user (see `02-users-roles-permissions.md`). |
-| Sign-in returns an error with no detail after a database reset | The session table was wiped. | Restart `web-ui-server` (project note in `.claude/CLAUDE.md`). |
+| Sign-in returns an error with no detail after a database reset | The session data was reset. | Ask the system administrator to restart the web service, then sign in again. |
 
 ### What this affects later
 

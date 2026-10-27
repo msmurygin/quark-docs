@@ -23,14 +23,11 @@ It does not teach you which button to press. For that, use the operator and admi
 | Box in a sequence diagram | An actor. For example the operator, a screen, an API method or a table. |
 | Box in an influence diagram | A setting, a decision or an outcome. The wording on the arrow says how they are linked. |
 
-## The rule: every arrow comes from code
+## How to use these diagrams
 
-Every arrow, step, setting name, status and method name in this part comes from the current code.
-Nothing is drawn from memory or from an old design note.
-
-Under each diagram you find a table called **Where it comes from**.
-It gives the file and the line for each step, for example `crates/...`.
-If a step is not proven by code, the page says so in plain words and does not draw it.
+Each diagram shows the current product flow, the decisions that affect it and
+the related settings. Use the links below a diagram to continue with the
+operator guide or the relevant screen reference.
 
 A setting that is stored but that no code reads is not drawn in an influence diagram.
 The page lists it as stored only.

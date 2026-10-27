@@ -1,6 +1,6 @@
 # Inbound diagrams: receiving and putaway
 
-These pages draw what the code does when goods are received and put away. Every step was read from the code. Where a step could not be proven, the page says "Not confirmed by code" and tells you how to check it.
+These pages show how goods move through receiving and putaway, and which settings change each decision.
 
 ## What this shows
 
@@ -55,9 +55,8 @@ Reading notes:
 
 ## How to read these pages
 
-- Each page has one question at the top ("What this shows"), the diagram, and a table "Where it comes from" with the file and line of every step.
+- Each page starts with the question it answers, followed by the diagram and practical reading notes.
 - "Stored only. It has no effect today." lists settings that are saved and shown but that no code reads. Do not rely on them.
-- "Not confirmed by code" lists steps that were not proven, with the way to check.
 
 ## Related pages
 

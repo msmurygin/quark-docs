@@ -2,7 +2,6 @@
 
 Putaway on the RF terminal has two calls: ask where the pallet goes, then move it there.
 Both diagrams below use the screens `PUTW01`, `PUTW02`, `PUTW03`, `PUTW_OVR` and `PUTW_DONE`.
-Where the code says nothing, this page says nothing. The sections "Not confirmed by code" list what is left out.
 
 ## Diagram 1. Ask where the pallet goes
 

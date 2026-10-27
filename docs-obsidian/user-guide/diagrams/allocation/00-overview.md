@@ -8,7 +8,7 @@ updated: 2026-10-11
 
 # Diagrams: Order, Release and Allocation
 
-These pages draw the path of an outbound order from the `Release` button to the reserved stock, and they show which setting changes which decision on that path. Every arrow comes from the code on the main branch. Each page ends with a table that names the file and line.
+These pages draw the path of an outbound order from the `Release` button to the reserved stock, and they show which setting changes which decision on that path. Use the related-page links to continue with the operational instructions and screen references.
 
 Two kinds of page.
 

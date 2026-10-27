@@ -653,7 +653,6 @@ If it is a discrepancy:
    `Cannot close receipt <number>: completion is <Partial|Over|Pending> and ALLOW_CLOSE_WITH_DISCREPANCY is off` (code 71, final).
 2. If it is on, the close needs code 71 confirmed by a person who holds
    `receipt.override_close_discrepancy`, or a grant for `receipt:<id>`.
-   Not confirmed: `Receipt <number> is <completion> — supervisor override required to close` (code 71, confirmable).
 
 The setting does not change receipts already closed.
 

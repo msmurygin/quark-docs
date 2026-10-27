@@ -15,6 +15,7 @@
 import type {MarkdownConfig} from '@docusaurus/types';
 import {existsSync, readFileSync} from 'node:fs';
 import path from 'node:path';
+import {sanitizePublicGuideTree, sanitizePublicMarkdownSource} from './public-guide-sanitize.mjs';
 
 function relToGuide(guideDir: string, filePath: string): string | null {
   const rel = path.relative(guideDir, filePath).split(path.sep).join('/');
@@ -79,6 +80,7 @@ export const createParseFrontMatter = (guideDir: string): MarkdownConfig['parseF
   const rel = relToGuide(guideDir, params.filePath);
   if (!rel) return parsed;
   let {frontMatter, content} = parsed;
+  content = sanitizePublicMarkdownSource(content);
 
   if (rel === 'README.md') {
     return {frontMatter: {...frontMatter, title: 'Getting started', sidebar_label: 'Getting started', slug: '/'}, content};
@@ -225,6 +227,10 @@ export default function remarkGuide(options: GuideRemarkOptions) {
       const h1 = tree.children?.find((c) => c.type === 'heading' && c.depth === 1);
       const first = h1?.children?.[0];
       if (first?.type === 'text') first.value = String(first.value).replace(/^\d+\s+/, '');
+    }
+    const publication = sanitizePublicGuideTree(tree);
+    if (publication.sections || publication.blocks || publication.inlineEvidence || publication.tableColumns) {
+      console.warn(`[guide] ${path.basename(file.path ?? '')}: author evidence hidden from public output (${publication.sections} sections, ${publication.blocks} blocks, ${publication.inlineEvidence} inline references, ${publication.tableColumns} table columns)`);
     }
     if (file.path) markMissing(tree, path.dirname(file.path));
     if (missing) {

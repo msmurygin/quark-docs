@@ -27,7 +27,6 @@ Reading notes:
 - The three RF screens send the receive and the damage together (`damage_info`: severity, reason, text, vendor responsibility). The server runs `ReportDamage` inside the receive transaction, after the receive is finished. The damaged quantity is the quantity of that receive.
 - `receipt_report_damage` is not used by an RF screen. It is for the web damage dialog and for the API.
 - The RF screens do not send a destination for a move. The stock stays where the operator put it (`dest_loc` is empty in the receive path).
-- On the return path the report runs before the stock is deposited. A hold on the LPN would need the LPN to exist, so this ordering may skip the hold (see "Not confirmed").
 - Only `Admin` and `Manager` may call `receipt_report_damage`, `receipt_write_off_damage`, `receipt_move_damage_to_rtv` and `receipt_set_damage_disposition`. The receives that carry `damage_info` are open to the floor roles for blind and return, and to `Admin` and `Manager` for the ASN receive.
 
 ### Where it comes from
@@ -167,12 +166,6 @@ Reading notes:
 | Repurpose and Destroyed | `crates/libs/wms-inbound/src/service/receipt/damage/set_damage_disposition.rs:30-193` |
 | Classes and versioned entity | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:283-345` |
 | Return code 77 name and number (`CannotCloseWithPendingDamage`) | `crates/libs/wms-shared/src/validation_codes.rs` |
-
-## Not confirmed by code
-
-- Whether the `Hold` action applies on the return path. `ReportDamage` runs before `deposit_return_line_and_echo`. The hold needs the LPN of the line, which exists only after the deposit. To verify: receive a return with condition `Damaged` and `damage_info`, with an LPN, and read `holds_applied`.
-- What the web damage dialog sends for `dest_loc`. Only the API method and the helper query `receipt_damage_destination` were read.
-- The effect of the damage `Hold` on a later putaway of the LPN. The generic hold gate of the move is on page 25.
 
 ## Related pages
 

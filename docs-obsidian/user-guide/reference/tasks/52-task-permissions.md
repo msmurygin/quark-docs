@@ -62,7 +62,7 @@ The equipment profile of the operator then removes the zones and tasks the machi
 | Role | Read | `New`, `Save`, `Delete` |
 |---|---|---|
 | `ADMIN`, `MANAGER` | Yes | Yes |
-| `SUPERVISOR` | Not confirmed | No by default: `create_`, `update_`, `delete_operator_task_permission` are for `ADMIN` and `MANAGER` |
+| `SUPERVISOR` | Depends on the screen grants assigned by an administrator | No by default: `create_`, `update_`, `delete_operator_task_permission` are for `ADMIN` and `MANAGER` |
 | `OPERATOR`, `VIEWER` | Yes | No: the method refuses |
 
 ## What it affects

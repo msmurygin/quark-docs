@@ -57,7 +57,7 @@ The table also holds `synced_at`, the time of the last sync that changed the row
 |---|---|---|
 | `ADMIN` | Yes | Yes |
 | `MANAGER` | Yes | Yes |
-| `SUPERVISOR` | Not confirmed (see the [overview](00-task-manager-overview.md)). The read method `list_operator` is not in the default list of `SUPERVISOR`. | No by default |
+| `SUPERVISOR` | Depends on the assigned screen and read-method grants | No by default |
 | `OPERATOR` | Yes (read) | No |
 | `VIEWER` | Yes (read) | No |
 

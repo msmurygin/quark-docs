@@ -2,7 +2,7 @@
 
 Each example below is a tiny example, not a product flow.
 The names in it are made up to show the shape of the diagram.
-Real diagrams are in the area pages and carry a **Where it comes from** table.
+Product diagrams are grouped in the area pages that follow.
 
 ## Sequence: who calls whom
 

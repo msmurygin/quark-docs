@@ -64,10 +64,8 @@ Also, the SKU screen marks `Receipt Policy`, `Allocation Policy`,
 `:7665-7666`). Only `Putaway Policy` is optional (`:7767`). The SKU update API
 can clear `putaway_policy_id` and `allocation_policy_id`
 (`services/app-server/src/web/rpcs/sku_rpc.rs`, "clear" list) but cannot clear the
-others. **To verify:** whether the form lets you save a SKU with an empty
-`Allocation Policy`. Steps: open any SKU, tab `Policies`, clear `Allocation Policy`,
-press Save. If the form refuses with a required-field message, the only way to
-use the owner default is the API.
+others. In the web UI, treat every field marked as required as mandatory; only
+`Putaway Policy` is optional on this screen.
 
 ## A.3 Other lookups with a fallback order
 

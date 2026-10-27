@@ -130,7 +130,7 @@ Create a new user and set a password.
 
 *Caption: the user list with the buttons New User and Refresh. Focus: Each row shows the login, role, warehouse and the Active badge.*
 
-![User form, General tab, for user demo1](../assets/screens/enterprise-user-detail.png)
+![User form, General tab](../assets/screens/enterprise-user-detail.png)
 
 *Caption: the General tab of the user card. Focus: Check Login, Email, Status, API access and RF device login. The tabs Warehouses & Roles and API Keys are next to General. The teal numbers mark: 1 Login, 2 API access, 3 RF device login.*
 

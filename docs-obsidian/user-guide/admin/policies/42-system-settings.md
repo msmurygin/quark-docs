@@ -94,7 +94,7 @@ fresh install runs.
 - **Affects**: `receipt_close` (`wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:196-226`).
   Description: `Per D-21. Permit close with completion=Partial|Over via supervisor override (code 71).`
   - Off: the close is refused for good. Message: `Cannot close receipt <number>: completion is <Partial|Over|Pending> and ALLOW_CLOSE_WITH_DISCREPANCY is off` (code 71, not overridable).
-  - On: the close needs code 71 confirmed by a person with the right `receipt.override_close_discrepancy`, or a supervisor grant for `receipt:<id>`. Message when not confirmed: `Receipt <number> is <completion> — supervisor override required to close`.
+  - On: the close needs code 71 confirmed by a person with the right `receipt.override_close_discrepancy`, or a supervisor grant for `receipt:<id>`. Before approval, the message is `Receipt <number> is <completion> — supervisor override required to close`.
 - **Example**: ASN expects 150, 149 received. On: a supervisor confirms, the receipt closes with `close_summary.discrepancy_override` naming the supervisor. Off: nobody can close it. Fix the quantity or cancel the missing line first.
 - **Interactions**: a blind or return receipt (expected 0) is never a discrepancy and closes without this setting. Serial episodes (code 73) and pending damage (code 77) block the close whatever this says. See [40-receipt-policy-settings.md](./40-receipt-policy-settings.md) section 7.1.
 - **When you change it**: affects the next close command only. Closed receipts stay closed.

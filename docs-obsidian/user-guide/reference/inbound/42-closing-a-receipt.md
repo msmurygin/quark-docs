@@ -68,7 +68,7 @@ Closing a receipt that is already `Closed` does nothing and gives no error (`cra
 | 71 | `Cannot close receipt {number}: completion is {completion} and ALLOW_CLOSE_WITH_DISCREPANCY is off` | The setting forbids it. | Receive the missing goods, or ask an administrator to change the setting. |
 | 73 | `Receipt {number} has {n} unresolved serial-capture episode(s): {list}. {hint}` | A serial capture is not finished. | Finish or cancel it. See [Capturing serial numbers](37-capturing-serial-numbers.md). |
 | 77 | `Receipt {number} has {n} damage record(s) awaiting final disposition` | A damage record has no disposition. | Set the disposition on the [Damage Records tab](15-damage-records-tab.md). |
-| 40 | A version conflict. The exact text is not confirmed, see the note below. | The receipt changed after you ticked it. | Refresh the list and try again. |
+| 40 | A version conflict. | The receipt changed after you ticked it. | Refresh the list and try again. |
 | 70 | `Receipt {number} is Cancelled — it cannot be closed.` | The receipt is finished. | None possible. |
 | 70 | `Receipt {number} is {status} — it cannot be closed.` | The status does not allow it. | None possible. |
 

@@ -77,7 +77,7 @@ Buttons: `Cancel` closes the window. `Dissolve` runs the command `pick_assignmen
 |---|---|---|
 | `ADMIN` | Yes | Yes |
 | `MANAGER` | Yes | Yes |
-| `SUPERVISOR` | Not confirmed (see the [overview](00-task-manager-overview.md)). The methods behind the list are open to `SUPERVISOR`. | Yes by method and by web action, if the menu is visible |
+| `SUPERVISOR` | Depends on the assigned menu grants; the read methods allow this role | Yes by method and by web action, if the menu is visible |
 | `OPERATOR` | Yes (menu and form default) but the methods behind the list are not open to `OPERATOR` | No |
 | `VIEWER` | Same as `OPERATOR` | No |
 

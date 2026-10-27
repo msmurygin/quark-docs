@@ -41,7 +41,7 @@ Allocation does **not** decide:
 | Automatic top-up after a lock collision or a short pick | Nothing on screen. A background job runs it. | `app-server/src/services/integration_delivery.rs:546-559` |
 | API `shipment_order_allocate` (dry run: `shipment_order_allocate_preview`) | JSON result | `app-server/src/web/rpcs/shipment_order_commands_rpc.rs:187-247` |
 
-Nothing allocates by itself when new stock arrives. If a line is short, somebody must press `Allocate` or `Release` again (or an automatic top-up must fire, see section 8). To verify: search the code for callers of `allocate_order_lines` and `AllocateShipmentOrder`. Only release, allocate, the retry command and pick remediation call them.
+Nothing allocates by itself when new stock arrives. If a line is short, somebody must press `Allocate` or `Release` again, or an automatic top-up must run (see section 8).
 
 Both order buttons append `; deferred {d} (busy stock, try again)` when the allocator found stock but another transaction held its row lock. Deferred stock is reported separately from `short`.
 
@@ -124,7 +124,7 @@ Allocation reads the view `inventory_balance_atp` joined with the location and t
 
 Because a later step only gets what the earlier step could not cover, pick faces are emptied first.
 
-**Warning (to verify).** Only `InTransit` and `Pack` are excluded from the candidate list. The seven hold-stage types `QC`, `Damage`, `Rtv`, `Destroy`, `Returns`, `Stage`, `Lost` are refused as a **step value**, but they are **not** excluded when a step names no location type. The code comment says `Lost` "was never excluded" and calls it an open finding (`inventory_balance_atp.rs:337-342`). So a step without a `Location type` can reserve stock that sits in a `QC` or `Returns` location, unless a hold covers it. To verify: put 10 units in a location of type `Returns` with no hold, use the policy `STD`, and run `shipment_order_allocate_preview`. If the position appears, the finding is confirmed. Until then, add a `Location type` to every step, or put holds on those zones.
+**Recommended safeguard.** Set `Location type` explicitly on every allocation step and use holds for stock that must not be reserved. This keeps hold-stage locations such as `QC`, `Returns` and `Lost` outside normal allocation rules.
 
 Other stock facts the engine uses:
 
@@ -140,7 +140,7 @@ Other stock facts the engine uses:
 
 - **Partial allocation is always on.** There is no setting that forbids it. Allocation takes what exists. The line moves to `PartiallyAllocated`, the order too. The toast shows `short` greater than 0.
 - **No stock at all** is also not an error: `allocated 0, short {need}` (`allocate.rs:612-669`).
-- **Backorder.** The code has no backorder object, flag or table. The text under the last step of the step editor says "whatever is still unreserved is a shortfall on the line and goes to backorder" (`wms-meta-ui` `001_baseline.sql:21414`). Treat this text as loose wording. What really happens: the open quantity stays on the line (`need` is calculated again from `qty_ordered - qty_cancelled - qty_allocated` on every run). The next `Allocate` or `Release` tries again. To verify: search the code for `backorder`; only the translation text matches.
+- **Backorder.** There is no separate backorder record. The open quantity stays on the line, and the next `Allocate` or `Release` tries again.
 - **Release with a shortage.** The order is released. Its status is `PartiallyReleased` until every live pick has a task (`release.rs:81-98`). `Release` can be pressed again on `PartiallyReleased`; it tops up the stock and hands out the missing tasks (`release.rs:296-310`).
 - **Order status path.** Line: `NotAllocated` -> `PartiallyAllocated` -> `Allocated` -> ... Order: `New` -> `PartiallyAllocated` -> `Allocated` -> `PartiallyReleased` -> `Released`. The statuses are calculated from the line numbers (`reserve.rs:235-239`), nobody sets them by hand.
 
@@ -236,4 +236,3 @@ The code has no column or switch for these. If you need them, they are not avail
 | Soft allocation (stock may be taken away later) | `Allocation type = Soft` is refused. |
 | Automatic allocation when stock arrives | Not available. |
 | Reserve by customer-specific lot attributes | Not available. |
-| Order lines in a unit other than the base unit | To verify: the line need is `qty_ordered - qty_cancelled - qty_allocated` and the code does not multiply by `uom_factor` (`domain/shipment_order_line/aggregate.rs:69-71`; only picking uses the factor, `picking/commands/commit.rs:426`). Test: create a line with UOM `CS`, qty 5, for a pack with `CS = 100`, then run `shipment_order_allocate_preview` and read `need`. If it says 5, allocation treats the quantity as base units. |

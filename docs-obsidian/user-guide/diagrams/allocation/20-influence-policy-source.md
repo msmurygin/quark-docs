@@ -45,7 +45,7 @@ The first five questions cannot be switched off. The last one is made of four st
 Reading notes.
 
 - A location type that is a hold-stage zone (`QC`, `Damage`, `Rtv`, `Destroy`, `Returns`, `Stage`, `Lost`), `InTransit` or `Pack` cannot be chosen in a step. The policy is refused at validation.
-- Only `InTransit` and `Pack` are excluded when a step names no location type. The code comment says that `Lost` "was never excluded" and calls it an open finding. So the query does not exclude a `QC`, `Returns` or `Lost` location when the step names no `Location type`. Not confirmed by code: whether such stock is then really reserved (no test was run). To verify: put 10 units in a `Returns` location with no hold, run `shipment_order_allocate_preview` on an order for that SKU, and look for the position in the answer. Until then, a location hold (see page 24) on those locations removes their stock from the list.
+- When a step has no `Location type`, protect stock in `QC`, `Returns`, `Lost` and other non-pick locations with a location hold. Held stock is removed from the available quantity. See [page 24](24-influence-holds.md).
 - The available quantity already takes holds out. See [page 24](24-influence-holds.md).
 
 ### Where it comes from

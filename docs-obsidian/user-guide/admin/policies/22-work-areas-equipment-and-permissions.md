@@ -202,7 +202,7 @@ On the operator card, list `Task Permissions`. Table `operator_task_permission`.
 - What it does: the rollout switch for new Pick work. A row with `Task Type` = `Pick` and this box off lets the operator see the area but hands out no new Pick tasks.
 - Affects: `wms-outbound/src/picking/infrastructure/dispatch.rs:225-247` (`pick_execution_enabled_for_location`: there must be a `Pick` row with the switch on, in an area that contains the zone of the task's source location; with a named area, that area). It gates only **new** issue. A task already held, and the reconnect and commit of it, never stop.
 - What the operator sees: the dispatch answers `No eligible Pick work` (RF `PICK01`). The reason code is `PICK_EXECUTION_ROLLOUT_DISABLED` in the answer's diagnostics. It is not shown on the RF screen.
-- Example: operator `op1` has a `Pick` right in `PICK-A` with the box off. They get no pick. Tick the box. The next press hands out a task.
+- Example: operator `picker-a` has a `Pick` right in `PICK-A` with the box off. They get no pick. Tick the box. The next press hands out a task.
 - Not used for task types other than `Pick`.
 - Interaction: both are needed. Without the right row: `you have no right to take Pick tasks in any work area — ask a supervisor`. With the row but without the box: no work, no message.
 - Open work: switching it off does not take tasks away.

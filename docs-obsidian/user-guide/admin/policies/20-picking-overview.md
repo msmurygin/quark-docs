@@ -118,7 +118,7 @@ For a cart the assignment takes **all tasks of its cartons in one step** or none
 Setup:
 
 - Zone `RACK` in area `PICK-A`. Zone field `Picking To Location` = `PICKTO`. Locations `A-01-01` (route `0100`) and `A-02-03` (route `0230`) are in `RACK`.
-- Operator `op1` has a `Pick` right in `PICK-A` with `Pick Execution` on. No equipment.
+- Operator `picker-a` has a `Pick` right in `PICK-A` with `Pick Execution` on. No equipment.
 - Policy `DISCRETE` is unchanged (defaults). Pallet list: Pick-to, Sort station, Staging, Door.
 - The Lot Policy of both SKUs shows no attribute on the pick.
 - Order `SO-1`, priority 50, owner with no delivery location set. Line 1: 12 of SKU `A` (lot `L1`, loose at `A-01-01`). Line 2: 5 of SKU `B` (on pallet `LPN007` at `A-02-03`).
@@ -126,13 +126,13 @@ Setup:
 Steps:
 
 1. `SO-1` is allocated and released. Two tasks are made: task 701 (12 of `A`, from `A-01-01`, to `PICKTO`, priority 50) and task 702 (5 of `B`, from `A-02-03`, to `PICKTO`).
-2. `op1` opens `Picking > Discrete Pick`, presses Enter. Pool order: both priority 50; route `0100` before `0230`. Task 701 is assigned (lease 15 minutes).
+2. `picker-a` opens `Picking > Discrete Pick`, presses Enter. Pool order: both priority 50; route `0100` before `0230`. Task 701 is assigned (lease 15 minutes).
 3. `PICK02` shows `A-01-01`, `A`, 12, lot `L1`.
-4. `op1` scans a new pallet label `DRP0001` at `PICK03`. The pallet stands in `INTRANSIT`.
+4. `picker-a` scans a new pallet label `DRP0001` at `PICK03`. The pallet stands in `INTRANSIT`.
 5. Proof (defaults): scan `A-01-01`; scan the item. `A` is loose in one lot: `Loose Lot Source` = `Automatic` finds one lot in the location and no checkable attribute, so the location scan is the proof (already asked). No LPN is asked (no container).
 6. `PICK09` commits 12. The first deposit freezes the destination `PICKTO` (zone chain; type `Pickto` is in the list). The pallet now goes to `PICKTO`.
 7. Task 702 is next. Same order, same destination `PICKTO`: goods go onto `DRP0001`. Proof: location `A-02-03`, item `B`, and **the LPN `LPN007`** (the source stands in a container, and both `Reserved LPN` = `Scan when present` and `Automatic` ask for it). Lot: one lot on the pallet, so `Automatic` is satisfied by the LPN.
-8. At the end the RF shows the pallet to close. `op1` presses F2, scans `DRP0001` and `PICKTO`. The pallet moves to `PICKTO`. Order status `Picked`.
+8. At the end the RF shows the pallet to close. `picker-a` presses F2, scans `DRP0001` and `PICKTO`. The pallet moves to `PICKTO`. Order status `Picked`.
 
 What changes if you change a setting:
 

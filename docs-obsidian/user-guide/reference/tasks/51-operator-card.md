@@ -51,7 +51,7 @@ The profiles themselves are set up in the work area screens, not here.
 | Role | Open the card | `Save` |
 |---|---|---|
 | `ADMIN`, `MANAGER` | Yes | Yes |
-| `SUPERVISOR` | Not confirmed | No by default: `update_operator` is for `ADMIN` and `MANAGER` |
+| `SUPERVISOR` | Depends on the screen grants assigned by an administrator | No by default: `update_operator` is for `ADMIN` and `MANAGER` |
 | `OPERATOR`, `VIEWER` | Yes (read) | No: the method refuses |
 
 The web action `generic_save` is open to more roles than the method. The method decides.

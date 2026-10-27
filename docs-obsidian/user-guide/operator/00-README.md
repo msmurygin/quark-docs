@@ -49,7 +49,7 @@ Every process guide has the same parts:
 
 In the steps, text in **bold** is exactly what the terminal shows.
 Text in `code format` is a key to press or a value to type or scan.
-A line that starts with `![...]` is a screen picture. Some screens still have no picture yet; the list is in [MISSING-SCREENSHOTS](../assets/MISSING-SCREENSHOTS.md).
+A line that starts with `![...]` is a screen picture. When a picture has not been captured yet, the page shows a clearly labelled screenshot placeholder.
 
 Some messages contain a value from your system, such as a number or a code.
 In this guide the value is written in braces, for example `{location}`.
