@@ -9,6 +9,7 @@ const PARTS: Array<{dir: string; label: string}> = [
   {dir: 'reference', label: 'Screen reference'},
   {dir: 'diagrams', label: 'Diagrams'},
   {dir: 'studio', label: 'Metadata Studio'},
+  {dir: 'integration-platform', label: 'Integration Platform'},
   {dir: 'api', label: 'API guide'},
 ];
 
@@ -25,7 +26,10 @@ export const sidebarItemsGenerator: SidebarItemsGeneratorOption = async ({defaul
 
   const rank = (it: Item): number => {
     if (it.type === 'doc') return -1; // "Getting started" first
-    const dir = it.type === 'category' ? PARTS.findIndex((p) => it.label.toLowerCase().includes(p.dir)) : -1;
+    const dir = it.type === 'category' ? PARTS.findIndex((p) =>
+      it.items.some((c) => 'id' in c && typeof c.id === 'string' && c.id.startsWith(`${p.dir}/`))
+      || (it.link && 'id' in it.link && String(it.link.id).startsWith(`${p.dir}/`))
+    ) : -1;
     return dir >= 0 ? dir : 99;
   };
 

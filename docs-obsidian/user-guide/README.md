@@ -5,6 +5,7 @@
 | [operator/](operator/00-README.md) | Warehouse staff using the RF terminal (receiving, putaway, move, count, pick, pack) | `operator/00-README.md` |
 | [admin/](admin/00-README.md) | Administrators who set up and run the web application | `admin/00-README.md` |
 | [studio/](studio/00-README.md) | Configuration and implementation teams | `studio/00-README.md` |
+| [integration-platform/](integration-platform/00-README.md) | Teams that connect WMS, ERPs, marketplaces and other services | `integration-platform/00-README.md` |
 | [api/](api/00-README.md) | Integrators who call the JSON-RPC API | `api/00-README.md` |
 | [assets/](assets/) | Screenshots (`assets/screens/*.png`) and the list of missing ones | [MISSING-SCREENSHOTS.md](assets/MISSING-SCREENSHOTS.md) |
 

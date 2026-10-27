@@ -19,20 +19,9 @@ This chapter lists only what exists today. It is short on purpose.
 | RPC documentation | Browsable list of methods. | `Sidebar > Integration > RPC Documentation`. |
 | Business events | Events such as `process.receipt.closed`. | `Enterprise > Integration`. |
 | Subscribers | Who receives events (webhook, poll, internal). | `Enterprise > Integration > Subscribers`. |
-| IPaaS | A flow tool that turns events into calls to ERPs and marketplaces. | `Sidebar > Integration > IPaaS`. |
+| Integration Platform | Builds and monitors flows between WMS, ERPs, marketplaces and other services. | `Sidebar > Integration > IPaaS`; see the [Integration Platform guide](../integration-platform/00-README.md). |
 
-Not covered here: connectors to a specific ERP or marketplace. Those are flows built in IPaaS.
-
-When IPaaS starts it seeds 16 system connector templates and 29 system flow templates (`templates/connectors.rs`, `templates/flows.rs`; the seed is idempotent). The connectors are:
-
-| Kind | Connectors |
-|---|---|
-| ERP | `one_c_http` (1C, HTTP), `sap_rfc` (SAP, through an RFC proxy) |
-| Marketplaces | `wildberries_supplies`, `wildberries_content`, `ozon_seller`, `kaspi_merchant`, `kaspi_ftp`, `olx_kz`, `yandex_market`, `megamarket`, `avito` |
-| Product marking | `chestnyznak_gis_mt`, `chestnyznak_mdlp`, `is_mpt_kz` (the last two go through a GOST proxy) |
-| Generic | `wms_app_server` (calls this WMS), `generic_http` |
-
-A connector is a template only. You still have to enter the address and the credentials of your own system.
+The platform includes connector and flow templates for supported integration patterns. A template is a starting point: you still enter the address and credentials for your own environment, test the connector and activate the resulting flow.
 
 ## 2. Call the API
 
@@ -163,7 +152,7 @@ Seeded subscribers:
 
 | Code | Delivery | Active | Purpose |
 |---|---|---|---|
-| `ipaas` | `webhook` to `http://localhost:8085/api/v1/events/emit` | **off** | Sends `process.*` events to IPaaS. Turn on after IPaaS is reachable. |
+| `ipaas` | `webhook` to the Integration Platform event endpoint | **off** | Sends matching process events to the platform. Configure and test the destination and access header before turning it on. |
 | `quark_outbound_execution` | `internal` | on | Allocation top-up after contention or a short pick. **Do not turn off.** |
 | `quark_inventory_count` | `internal` | on | Counts a location when a warehouse event asks for it. **Do not turn off.** |
 
@@ -185,20 +174,15 @@ Business event codes include, for example: `process.order.created`, `process.ord
 
 - The two internal subscribers drive allocation top-up and event-driven counts. If they are off, those functions stop.
 
-There is no web field and no API field for `event_filter` or `warehouse_filter`. The subscriber model does not carry them. They are set only in the database. A new subscriber gets the default `{"event_codes": ["*"]}` (all events). The delivery worker does read both filters (`integration_delivery.rs`): `event_codes` accepts `*`, a prefix such as `process.*`, or an exact code, and `warehouse_filter` is `{"warehouses": [...]}`. An empty warehouse list allows all warehouses.
+There is no web field or public API field for `event_filter` or `warehouse_filter`. Ask the deployment administrator to configure them when a subscriber must receive only selected events or warehouses. Event codes accept `*`, a prefix such as `process.*`, or an exact code. An empty warehouse list allows all warehouses.
 
 ## 4. IPaaS
 
-`Sidebar > Integration > IPaaS` opens the Integration Platform in a frame (`integration_platform`, an HTML page).
-Use it to build flows that react to events. Its own guide is outside this chapter.
+`Sidebar > Integration > IPaaS` opens the Integration Platform. Use it to create connectors, fork flow templates, configure schedules and webhooks, and monitor each execution.
 
-IPaaS has its own login model. The WMS session is not passed to it.
+The Integration Platform has a separate tenant access boundary. If it asks for access or shows an authorization error, request a platform access link or key from the deployment administrator. Do not use a marketplace connector credential as the platform access key.
 
-- The sidebar item `IPaaS` opens a frame that loads `/integration-ui` from the web UI and talks to the IPaaS service at `http://localhost:8085` (this address is fixed in the page code).
-- The IPaaS service checks the header `X-Api-Key` on every call. If its setting `IP_API_KEY` is empty (dev mode), it lets everyone in as tenant 1000 with scope `admin`. If `IP_API_KEY` is set, the key must equal it or match a row in `platform_api_keys` (stored as a SHA-256 hash).
-- The embedded UI sends no `X-Api-Key`, and the service does not allow that header in CORS. So with `IP_API_KEY` set, the frame cannot log in. Use dev mode, or call the IPaaS API directly with a key.
-
-> Not confirmed by code: which WMS roles see the sidebar item `IPaaS`. The item is gated like other menu items by the role permission grants, and no seed file names the roles. To verify: open `Sidebar > Configuration > Users & Roles > Permission Matrix` and look for the menu item `integration_platform` for each role. Or log in as each role and look at the sidebar.
+Start with the [Integration Platform quickstart](../integration-platform/01-quickstart.md). For production access and deployment checks, see [Configuration, access and API](../integration-platform/06-configuration-access-and-api.md).
 
 ## 5. Outbound and replenishment calls
 

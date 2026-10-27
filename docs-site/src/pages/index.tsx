@@ -7,7 +7,8 @@ const roles = [
   {n: '01', title: 'Metadata Studio', to: '/docs/studio/', who: 'Configuration and implementation teams', text: 'Explore modules and forms, edit configuration in drafts, and inspect the executable architecture and runtime API map.', links: [['Explore the graph', '/docs/studio/graph-explorer/'], ['Configure forms', '/docs/studio/form-designers/'], ['Fork and apply changes', '/docs/studio/module-lifecycle/']], go: 'Open the Studio guide'},
   {n: '02', title: 'Operator guide', to: '/docs/operator/', who: 'Warehouse staff with an RF terminal', text: 'Step-by-step screens for receiving, putaway, move, stock count, picking and packing, with the message you will see and what to do next.', links: [['Receiving against an ASN', '/docs/operator/receiving-against-asn/'], ['Picking', '/docs/operator/picking/'], ['Troubleshooting and messages', '/docs/operator/troubleshooting-and-messages/']], go: 'Open the operator guide'},
   {n: '03', title: 'Administrator guide', to: '/docs/admin/', who: 'People who set up and run the web application', text: 'Users and roles, warehouse structure, owners and SKUs, inbound and outbound policies, labels, reports and the go-live checklist.', links: [['Users, roles and permissions', '/docs/admin/users-roles-permissions/'], ['Warehouse structure', '/docs/admin/warehouse-structure/'], ['Go-live checklist', '/docs/admin/checklist-go-live/']], go: 'Open the administrator guide'},
-  {n: '04', title: 'API guide', to: '/docs/api/', who: 'Integrators who call the JSON-RPC API', text: `Authentication, request and response format, idempotency and concurrency, errors, webhooks, and a reference for all ${stats.total} methods.`, links: [['Quickstart', '/docs/api/quickstart/'], ['Errors', '/docs/api/errors/'], ['Workflows by example', '/docs/api/workflows-by-example/']], go: 'Open the API guide'},
+  {n: '04', title: 'Integration Platform', to: '/docs/integration-platform/', who: 'Teams connecting WMS, ERPs and marketplaces', text: 'Create connectors and flows, choose triggers, protect credentials, monitor runs and recover from integration failures.', links: [['Quickstart', '/docs/integration-platform/quickstart/'], ['Templates and Flow Builder', '/docs/integration-platform/templates-and-flow-builder/'], ['Monitoring and notifications', '/docs/integration-platform/monitoring-and-notifications/']], go: 'Open the Integration Platform guide'},
+  {n: '05', title: 'API guide', to: '/docs/api/', who: 'Integrators who call the JSON-RPC API', text: `Authentication, request and response format, idempotency and concurrency, errors, webhooks, and a reference for all ${stats.total} methods.`, links: [['Quickstart', '/docs/api/quickstart/'], ['Errors', '/docs/api/errors/'], ['Workflows by example', '/docs/api/workflows-by-example/']], go: 'Open the API guide'},
 ];
 
 export default function Home() {
@@ -26,7 +27,7 @@ export default function Home() {
               </div>
             </div>
             <dl className="qd-facts">
-              <div><dt>Guides</dt><dd>4 roles</dd></div>
+              <div><dt>Guides</dt><dd>5 roles</dd></div>
               <div><dt>API methods</dt><dd><a href="/api/">{stats.total}</a></dd></div>
               <div><dt>Contexts</dt><dd>{stats.contexts}</dd></div>
               <div><dt>Catalog</dt><dd>v{stats.version}</dd></div>

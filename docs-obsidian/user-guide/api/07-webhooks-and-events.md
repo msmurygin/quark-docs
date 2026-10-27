@@ -54,7 +54,7 @@ Events are written only by the WMS. The API has **no method to create, edit or d
 
 ### Event codes
 
-These codes appear in the Rust code (as literals) and are seeded in the database migrations. Each code has a payload type in `crates/libs/wms-lib-core/src/model/integration/event_payloads/` or in the domain that publishes it.
+The following event codes are available for the current WMS workflows.
 
 | Area | Codes |
 |---|---|
@@ -67,7 +67,7 @@ These codes appear in the Rust code (as literals) and are seeded in the database
 
 To see the codes your server knows, call `list_event_registry` (the catalog of events, with name, description and category).
 
-The table lists the codes that the Rust code can publish. In `list_event_registry`, `is_active` says whether the code is published: an active code is sent, an inactive one is not. These codes are in the catalog but **inactive, because no Rust code publishes them**: `process.inventory.hold_applied`, `.hold_released`, `process.lot.created`, `process.lot.expired`, `process.pick.completed`, `process.pick.created`, `process.putaway.completed`, `process.putaway.location_assigned`, `process.receipt.reversal`, `process.shipment.created`, `process.shipment.dispatched`. Do not wait for them. (`process.receipt.reversal` was active and `process.inventory.adjusted` / `.moved` inactive until enterprise 019, F-18; a test now keeps the catalog and the code in step.) Whether a listed code is published in a given flow depends on that flow. Use `list_integration_event` on your system to see what really arrives.
+In `list_event_registry`, `is_active` says whether an event can be published. These catalog entries are inactive, so integrations must not wait for them: `process.inventory.hold_applied`, `.hold_released`, `process.lot.created`, `process.lot.expired`, `process.pick.completed`, `process.pick.created`, `process.putaway.completed`, `process.putaway.location_assigned`, `process.receipt.reversal`, `process.shipment.created`, `process.shipment.dispatched`. Whether an active event occurs still depends on the warehouse workflow. Use `list_integration_event` on your system to confirm what is arriving.
 
 ### Read events
 
@@ -128,9 +128,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   }'
 ```
 
-The table has more columns that the API does **not** expose: `event_filter` (which events), `warehouse_filter` (which warehouses) and `webhook_headers` (extra headers, such as an `Authorization` header). A new subscriber gets the database default for `event_filter`, which is every event (`{"event_codes": ["*"]}`), and is active (`is_active` defaults to true). To narrow or to set headers, an administrator must change those columns in the database.
+The public API and web form do not expose `event_filter` (which events), `warehouse_filter` (which warehouses) or `webhook_headers` (additional delivery headers). A new subscriber receives all event codes and starts active. If an integration needs narrower filters or an authentication header, ask the deployment administrator to configure them before enabling delivery.
 
-No JSON-RPC method and no web UI form edits `event_filter`, `warehouse_filter` or `webhook_headers`. The create and update structs do not have these fields, and the UI metadata does not mention them. Only SQL changes them. The database seed has one subscriber, `ipaas` (inactive, `event_filter` = `{"event_codes": ["process.*"]}`, URL `http://localhost:8085/api/v1/events/emit`). Before activating that local subscriber for tenant 1000, add `1000@localhost:8085` to `DELIVERY_WEBHOOK_PRIVATE_ALLOWLIST`.
+The built-in Integration Platform subscriber starts inactive. Set its destination to your platform event endpoint, add the tenant-scoped `X-Api-Key` header, restrict its event filter as required and test the route before activation.
 
 How the filters work in the delivery worker:
 
@@ -212,9 +212,11 @@ A result is stored in the event's `internal_result`.
 
 ## The integration platform (separate service)
 
-`crates/services/integration-platform` is a different program with its own REST API (flows, connectors, schedules, API keys) and its own login by header `X-Api-Key`. It can receive webhooks at `/webhooks/{path}` and take events at `POST /api/v1/events/emit`. It is not part of the WMS JSON-RPC API and this guide does not document it.
+The Integration Platform is a separate service with its own tenant access and REST API. It can receive provider webhooks at `/webhooks/{path}` and authenticated business events at `POST /api/v1/events/emit`.
 
-The wiring is a normal `webhook` subscriber. Its `webhook_url` is `<platform>/api/v1/events/emit`. The platform needs an `X-Api-Key` header, which maps the call to a tenant. The body of the WMS webhook fits the platform's emit body, and the platform ignores `tenant_id` from the body. So the subscriber's `webhook_headers` must hold `{"X-Api-Key": "<platform key>"}`. Only SQL can set `webhook_headers` (see above). Which flow then runs is set in the platform, by `event_name`. This part is not in the WMS code.
+Connect WMS through a normal `webhook` subscriber whose destination is `<platform>/api/v1/events/emit`. The delivery must include a tenant-scoped platform key in the `X-Api-Key` header. The platform selects matching active flows by `event_name`; the platform key, not a tenant number in the body, determines the tenant.
+
+See [Triggers, schedules and webhooks](../integration-platform/04-triggers-schedules-and-webhooks.md) for the platform side and [Configuration, access and API](../integration-platform/06-configuration-access-and-api.md) for its access boundary.
 
 ## Other push mechanisms
 

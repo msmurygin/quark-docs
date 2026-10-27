@@ -94,7 +94,7 @@ export const createParseFrontMatter = (guideDir: string): MarkdownConfig['parseF
   const h1 = /^# +(.+?)\s*$/m.exec(content);
   if (h1) {
     const clean = h1[1].replace(/^\d+\s+/, '');
-    const index = /^([a-z]+)\/00-README\.md$/.exec(rel);
+    const index = /^([a-z0-9-]+)\/00-README\.md$/.exec(rel);
     frontMatter = {
       ...frontMatter,
       title: clean,
