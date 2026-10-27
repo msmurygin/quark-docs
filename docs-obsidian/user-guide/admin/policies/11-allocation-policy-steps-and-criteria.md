@@ -466,6 +466,22 @@ A refused sort gives: `step uses sort_{n}={value}, which this build cannot execu
 | `UNSUPPORTED_STEP` | `step '{rule_num}': {reason}` where the reason is `step uses allocation_type={v}, which this build cannot execute`, or `step uses sort_{n}={v}, ...`, or `step uses location_type={v}, ...`, or the `qty_fit_rule` text from 4.13 | Any value that the engine refuses |
 | `SHADOWED_STEP` | `step id {id} is unreachable because step '{rule_num}' consumes its candidate set first` | See below |
 
+One unsupported value on an active step blocks the complete policy. The
+allocator does not skip that row and continue with later steps.
+
+```mermaid
+flowchart TD
+    A[Check every active step] --> B{Can every active step run?}
+    B -- Yes --> C[The requested action continues]
+    B -- No --> D[The complete policy is refused; no allocation step runs]
+    D --> E[Validate lists the issues]
+    D --> F[Publish is refused]
+    D --> G[Allocate reserves nothing and rolls back]
+    D --> H[Release keeps the order released; its allocation pass reports failure]
+    D --> I[Open the marked step and fix every listed value]
+    I --> A
+```
+
 **Closed steps ("closed by step N").** A later step is closed when an earlier active step with the same `uom_code` takes every position the later one could take. The rule is cautious. It says "closed" only when all of these hold (`wms-lib-core/src/model/policies/allocation_step_shadow.rs:99-120`):
 
 - same policy, earlier `sequence`, earlier step is active and runnable;
@@ -479,7 +495,7 @@ Marks on the card (`narration` texts, `wms-lib-core/src/model/narration/mod.rs:2
 
 | Mark | Meaning |
 |---|---|
-| `never runs` + `The engine skips this step when it loads the policy, so it reserves nothing: ...` | The step uses a refused value. Because the whole policy is refused at run time, the order gets the error in section 4 of page 10. |
+| `never runs` + `This step cannot run, so the whole policy is refused until it is fixed: ...` | The step uses a refused value. Fix every listed value on the step; the allocator does not continue with the remaining steps. The order gets the error in section 4 of page 10. |
 | `never reserves` | The step runs but cannot match anything (a measured unit with `EqPackPallet` or `ExactFit`). |
 | `not active` | The step is switched off. |
 | `closed by step {rule}` | See above. |
@@ -487,7 +503,7 @@ Marks on the card (`narration` texts, `wms-lib-core/src/model/narration/mod.rs:2
 | `No steps yet. A policy with an empty pipeline reserves nothing.` | No steps. |
 | `unsaved changes`, `The steps are saved.` | Draft state of the editor |
 
-The step editor reads one query (`allocation_pipeline_view`) and shows the sentence for each step, so you can read what the engine will do. A step that the engine refuses gets only the "never runs" sentence.
+The step editor reads one query (`allocation_pipeline_view`) and shows the sentence for each step, so you can read what the engine will do. A step that refuses the policy gets only the "never runs" sentence and the values that must be fixed.
 
 ## 7. Settings outside the policy that the engine reads
 
