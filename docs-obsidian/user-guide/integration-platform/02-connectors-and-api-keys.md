@@ -114,7 +114,7 @@ The platform refuses a revocation that would leave an active flow without a usab
 
 | Symptom | Likely cause | Recovery |
 | --- | --- | --- |
-| Selecting **Use** on **Generic HTTP API** does not create a connector | The template does not have the service-specific Base URL needed for an HTTP connector | Select **+ New Connector**, choose **HTTP**, enter the provider's **Base URL** and authentication method, then save and test it. |
+| Selecting **Use** on **Generic HTTP API** does not create a connector or show an error | The template does not have the service-specific Base URL needed for an HTTP connector | Do not select **Use** repeatedly. Select **+ New Connector**, choose **HTTP**, enter the provider's **Base URL** and authentication method, then save and test it. |
 | Connection test cannot reach the service | Wrong URL, DNS, firewall or remote outage | Confirm the environment URL and network route; retry only after reachability is restored. |
 | Authentication is rejected | Wrong auth type, expired secret or mismatched account fields | Compare the connector fields with the provider's credential type; save and test the replacement. |
 | **Connection test failed: ... Previous credentials were kept.** | The replacement credentials could not authenticate or reach the provider | Leave the previous key active, correct the replacement values and select **Save credentials & test** again. |

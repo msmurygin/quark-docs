@@ -63,6 +63,38 @@ The web interface can accept a bootstrap link supplied by the deployment adminis
 
 The service also enforces an origin allowlist for browser access. If the UI opens but API calls are blocked by the browser, the deployment administrator must add the exact HTTPS origin rather than using a wildcard.
 
+## Recover from a UI request error
+
+When the interface reports a failed load, refresh or action, use the message to recover. A visible error does not prove that a server-side action or external write did not start.
+
+- A red load or refresh banner means the page could not confirm current server data. If earlier rows remain visible, treat them as the last successful view, not as a current snapshot.
+- Select **Retry** only after correcting the access key, browser origin, network route or service outage named by the message.
+- If a create, edit, delete, validation, import, export or template action shows a red message or toast, read it before repeating the action. Some legacy actions can still fail without a message; confirm the result in the relevant list.
+- A button that shows **Saving...** or **Retrying...** is already working; do not select it again.
+- For an execution or run retry, check **Monitor** and the destination system before repeating anything.
+
+```mermaid
+flowchart TD
+    A[The UI reports an error] --> B{What failed?}
+    B -->|Page load or refresh| C[Do not trust an empty or retained list as current]
+    C --> D[Correct access, origin, network or service issue]
+    D --> E[Select Retry]
+    B -->|Create, save or other action| F[Read the message and check the current result]
+    F --> G{Execution or run retry?}
+    G -->|Yes| H[Check Monitor and the destination system]
+    G -->|No| J{Outcome confirmed absent?}
+    E --> I[Verify the current list]
+    H --> K{Outcome confirmed absent?}
+    K -->|No or unknown| L[Reconcile and do not repeat]
+    K -->|Yes| M[Correct the cause and start one controlled run]
+    J -->|No or unknown| N[Do not repeat; verify current state]
+    J -->|Yes| O[Correct the cause and repeat once]
+    M --> P[Verify the new run in Monitor]
+    O --> I
+```
+
+Do not use **Retry** in an error banner as permission to repeat an external write whose result is unknown. Follow the `outcome_unknown` recovery in [Monitoring and notifications](05-monitoring-and-notifications.md).
+
 ## API base and endpoints
 
 Ask the deployment administrator for the platform base URL. Authenticated REST routes are under `/api/v1`.
