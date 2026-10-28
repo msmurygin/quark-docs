@@ -590,7 +590,8 @@ sequenceDiagram
     participant Loader
     Planner->>WMS: Plan Dispatch and freeze Load Plan
     Planner->>WMS: Open Load with registered transport
-    Loader->>WMS: Confirm transport and each physical unit
+    WMS-->>Planner: Assign permanent LD######## number
+    Loader->>WMS: Scan LD########, then confirm transport and each physical unit
     Loader->>WMS: Complete loading
     Note over WMS: Load is Loaded; stock is still in the warehouse
     Loader->>WMS: Confirm shipment / Goods Issue
@@ -628,6 +629,8 @@ This path requires no line to have a shipped quantity and every line's effective
 6. Open the plan and click `Generate stop order`. Click `Review composition`; check all stops, selected units, invalid units and unplanned units.
 7. Click `Freeze reviewed composition`. Freeze is a planning commitment, not loading or shipment.
 8. Back on the plan, click `Open Load`, choose an unused active transport, click `Review selected transport`, then `Confirm — open Load`.
+
+Opening the Load assigns its permanent number in the form `LD` plus eight digits, for example `LD00000042`. Use that number to find the Load in the list, identify its card and scan it on the RF terminal. Loads created before this numbering change keep their existing `LOAD-...` codes; do not relabel historical work.
 
 ![Dispatch card with stops and assigned orders](../assets/screens/dispatch-card-form.png)
 
@@ -672,6 +675,7 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 ### What you should see
 
 - Load states progress through `Open`, `Loading`, `Loaded` and `Shipped`.
+- A newly opened Load has a read-only `LD########` number in the list, card breadcrumb and composition header.
 - `Composition and progress` keeps planned and actual loading facts separate.
 - Goods Issue records shipment history, deducts picked stock, updates serials and order counters, and marks the Load and Dispatch shipped in one transaction.
 
@@ -679,11 +683,19 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 
 | Situation | Fix |
 |---|---|
+| The scanned Load does not exist (`LD_NOT_FOUND`) | Check the complete `LD########` number and scan again. An older open Load can still have its original `LOAD-...` code. |
 | The observed version changed | Cancel the decision, refresh or rescan, and review the current state. Do not retry with only a new version number. |
-| A unit is foreign, not staged, held or out of sequence | Leave it unloaded. Correct staging, holds or the plan, then review it again. |
+| The unit is not in this plan (`LD_NOT_IN_PLAN`) | Leave it unloaded. Scan a unit from the reviewed Load Plan, or ask the planner to resolve the membership before loading continues. |
+| The unit is not ready (`LD_UNIT_NOT_READY`) | Leave it unloaded. Complete its required picking or packing state, then review the unit again. |
+| The unit is not staged or is held (`LD_UNIT_NOT_STAGED`, `LD_UNIT_HELD`) | Leave it unloaded. Move it to the required Stage location or resolve the hold through the approved procedure, then review it again. |
+| The unit is out of sequence (`LD_WRONG_LOAD_SEQUENCE`) | Leave it unloaded. Load the current stop group or explicitly planned unit first; do not change the plan merely to bypass the refusal. |
+| The unit is already loaded (`LD_ALREADY_LOADED`) | Do not confirm it again. Review the current Load's composition, progress and unload history before continuing. |
+| The unit belongs to another Load (`LD_IN_ANOTHER_LOAD`) | Stop loading it. Ask a supervisor or support to identify the active Load and reconcile the physical unit before either Load continues. |
 | A unit was confirmed loaded by mistake | Before shipment, use `Acknowledge physical unload` in the Load view, or `Loading > Unload / Cancel (Supervisor)` on RF. Scan the removed root and enter a reason. This preserves history and does not move stock. |
 | The Load must be cancelled | Physically unload and acknowledge every unit first, then use `Cancel empty Load`. |
 | Shipment is already committed | Do not repeat or reverse it from a generic status control. Use the immutable `Shipments` record as the receipt and follow the site's controlled correction process. |
+
+Loading refusal text can be translated or reworded. Support tools and API clients should route on the stable `LD_...` code returned with the refusal, not on its English text.
 
 ## 11. Replenishment of pick locations (min/max)
 
