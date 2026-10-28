@@ -110,6 +110,7 @@ Order-type table: seeded `SO` = `Standard Outbound`.
 | `allocation still has {qty} units deferred by inventory lock contention` | Stock was busy. | Allocate again. |
 | `version conflict on {entity} {entity_id}` | Someone saved before you. | Refresh and repeat. |
 | `Forbidden("...")` | Your role lacks the right. | Ask for the right in the matrix. |
+| `this order is closed: nothing is left to ship` | The order is already closed, whether by shipment or by completing or cancelling all demand. | Do not press `Ship order` again. Check `Shipments — base quantities` when a shipment exists; otherwise review the order's close and cancellation history. |
 | `only an open released order may ship` | The order is not in a shippable lifecycle state. | Refresh it and finish release, picking and packing first. |
 | `this order belongs to an active Load; confirm its shipment through that Load` | The order is already committed to a Load. | Do not use `Ship order`; finish the Load in section 10. |
 
@@ -617,7 +618,20 @@ sequenceDiagram
 
 *Irreversible direct Goods Issue review. Focus: confirm the reviewed order, status and version before stock is deducted.*
 
-This path requires no line to have a shipped quantity and every line's effective demand (ordered minus cancelled) to be fully allocated and picked. Every pick pallet must first be placed at its destination; stock on an open pallet in transit is not shipped. The physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, an order in an active Load, or a follow-up after partial Goods Issue must use the Load path.
+Direct `Ship order` ships the order's currently ready picked content after handoff. For each line, remaining effective demand is ordered minus cancelled minus already shipped. If some demand is not ready, the Goods Issue can be partial and the order stays open; later ready content can ship in another direct Goods Issue or through a Load. Every root included in the direct shipment must first be placed at its destination; stock on an open pallet in transit is not ready. The physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, or an order in an active Load must use the Load path.
+
+```mermaid
+flowchart TD
+    A[Select Ship order] --> B{Is the order already Closed?}
+    B -->|Yes| C[Stop: nothing is left to ship]
+    B -->|No| D{Does an active Load own the order?}
+    D -->|Yes| E[Finish shipment through that Load]
+    D -->|No| F[Review currently ready handed-off roots]
+    F --> G[Confirm shipment and deduct stock]
+    G --> H{Is effective demand still open?}
+    H -->|Yes| I[Order stays open for a later direct or Load shipment]
+    H -->|No| J[Order closes]
+```
 
 ### Plan a Load
 
