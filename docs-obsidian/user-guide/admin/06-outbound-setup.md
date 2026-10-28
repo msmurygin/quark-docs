@@ -248,7 +248,43 @@ Group unreleased orders, review the complete composition and release the group t
 
 ### Field reference
 
-The wave card shows `Status`, `Release generation`, station, member counts and the release result of every order. Wave statuses are `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`.
+The wave card shows `Status`, `Release generation`, station, member counts and the release result of every order. Wave statuses are `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`. There is no `Releasing` wave status. After you confirm `Release`, the wave is `Planned` while its order rows move through the release queue. When no order is `Pending` or `Processing`, the wave becomes `Released`; picking can later move it to `InProgress` and `Completed`.
+
+Each order in the wave has its own status:
+
+| Order status | Meaning | Operator response |
+|---|---|---|
+| `Draft` | The saved order belongs to a draft wave. | Finish reviewing the complete composition before release. |
+| `Pending` | The ordinary order-release step is queued. | Wait; do not release the order separately. |
+| `Processing` | The order-release step is running. | Wait for its saved result. This is the current equivalent of a “running” member. |
+| `Released` | The ordinary order-release step succeeded. | Continue with picking. |
+| `Blocked` | A saved business or release-processing blocker needs attention. This includes automatic allocation failing after the order itself was released. | Read the saved detail and current order status, correct the cause, then use `Retry blocked` when a retry is still needed. |
+| `Failed` | The release attempt ended with an operational failure. | Read the saved detail, confirm the cause is resolved, then use `Retry blocked`. |
+| `Skipped` | The order was already released, so the wave did not repeat release. | Review the order's current work; no retry is required. |
+
+The current web screen enables `Retry blocked` only when the wave is `Released`; after you click it, the review proceeds only when at least one member is `Blocked` or `Failed`. The API also accepts the retry while the wave is `InProgress` or `Completed`, but the web button does not expose those two states yet. `Cancel Wave` is limited to `Draft` or `Planned` before any member reaches `Processing`, `Released` or `Skipped`; the confirmation does not ask for a reason.
+
+```mermaid
+flowchart LR
+    A[Wave: Draft] -->|Release| B[Wave: Planned]
+    B --> C[Order: Pending]
+    C --> D[Order: Processing]
+    D --> E{Saved release result}
+    E -->|Succeeded| F[Order: Released]
+    E -->|Business refusal| G[Order: Blocked]
+    E -->|Operational failure| H[Order: Failed]
+    E -->|Already released| I[Order: Skipped]
+    F --> J{Any order Pending or Processing?}
+    G --> J
+    H --> J
+    I --> J
+    J -->|Yes| B
+    J -->|No| K[Wave: Released]
+    A -->|Cancel Wave| M[Wave: Cancelled]
+    B -->|Cancel before member work starts| M
+```
+
+The diagram stops when the release generation settles. Picking status uses separate, complete work evidence: a non-station wave becomes `InProgress` when pick or task work exists, while a station wave waits until its first shared tote reaches the station. `Completed` requires all known work to be finished, no broken work links and every station position to be free. A `Blocked` member can be terminal only when it has explicitly zero work; a `Failed` member never proves completion.
 
 Wave policy has no web editor. The API methods `wave_policy_create`, `wave_policy_preview` and `wave_policy_build` create waves by rule. Its fields include:
 
