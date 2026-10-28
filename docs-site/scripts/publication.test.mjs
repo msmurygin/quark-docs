@@ -46,6 +46,14 @@ test('Mermaid sequence notes do not use statement-separating semicolons',()=>{
  }
 });
 
+test('missing screenshot placeholders keep captions on a separate line',()=>{
+ const css=readFileSync(join(site,'src/css/custom.css'),'utf8');
+ const rule=/\.shot-missing\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+ assert.match(rule,/display:\s*block/);
+ assert.match(rule,/width:\s*100%/);
+ assert.match(rule,/box-sizing:\s*border-box/);
+});
+
 test('publication sanitizer hides author evidence without damaging customer instructions',()=>{
  const text=(value)=>({type:'text',value});
  const paragraph=(children)=>({type:'paragraph',children});
