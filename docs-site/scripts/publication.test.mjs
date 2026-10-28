@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync,readdirSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -30,6 +30,20 @@ test('current Studio guide is source Markdown with explicit routes, diagrams and
  assert.match(overview,/Graph Explorer/);assert.match(overview,/Architecture Catalog/);assert.match(overview,/Runtime API Map/);assert.match(overview,/```mermaid\njourney/);
  assert.match(lifecycle,/```mermaid\nsequenceDiagram/);assert.match(lifecycle,/Apply & Publish/);assert.match(lifecycle,/Apply Module/);assert.doesNotMatch(lifecycle,/dialog suggests a version increment|Apply Draft/);
  assert.match(transfer,/does not provide a connected import button/);assert.match(transfer,/Overview → Export JSON/);
+});
+
+test('Mermaid sequence notes do not use statement-separating semicolons',()=>{
+ const docs=resolve(site,'../docs-obsidian');
+ const files=[];
+ const walk=(dir)=>{for(const entry of readdirSync(dir,{withFileTypes:true})){const path=join(dir,entry.name);if(entry.isDirectory())walk(path);else if(entry.name.endsWith('.md'))files.push(path);}};
+ walk(docs);
+ for(const file of files){
+  const source=readFileSync(file,'utf8');
+  for(const block of source.matchAll(/```mermaid\s*\n([\s\S]*?)```/g)){
+   if(!block[1].trimStart().startsWith('sequenceDiagram'))continue;
+   assert.doesNotMatch(block[1],/^\s*Note\s+(?:over|left of|right of)\s+[^:\n]+:[^\n;]*;/im,`${file} has a Mermaid sequence note containing a semicolon`);
+  }
+ }
 });
 
 test('publication sanitizer hides author evidence without damaging customer instructions',()=>{

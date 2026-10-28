@@ -594,7 +594,7 @@ sequenceDiagram
     WMS-->>Planner: Assign permanent LD######## number
     Loader->>WMS: Scan LD########, then confirm transport and each physical unit
     Loader->>WMS: Complete loading
-    Note over WMS: Load is Loaded; stock is still in the warehouse
+    Note over WMS: Load is Loaded, but stock is still in the warehouse
     Loader->>WMS: Confirm shipment / Goods Issue
     Note over WMS: Stock, serials, orders, Load and Dispatch commit together
 ```
