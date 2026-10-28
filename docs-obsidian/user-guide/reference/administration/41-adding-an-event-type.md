@@ -28,19 +28,31 @@ From then on, each time a receipt is created the system writes the event, and th
 3. Keep `Active` ticked, unless you want the entry off.
 4. Click `Save`.
 
+The saved entry is custom: `Builtin` shows `No`. A value created on this screen cannot become a protected built-in event type.
+
+```mermaid
+flowchart LR
+    A[New event type] --> B[Save]
+    B --> C[Custom type: Builtin = No]
+    C --> D[Edit name, description, category or Active]
+    C --> E[Delete when no longer needed]
+    F[Product type: Builtin = Yes] --> G[Delete is refused]
+```
+
 ## Steps: delete entries
 
-1. In the list, tick the entries.
+1. In the list, tick only custom entries where `Builtin` is `No`.
 2. Click `Delete`. The message is `{n} Event Registry record(s) deleted`.
 
-The entries are deleted one by one. If one fails, the ones before it stay deleted.
-Nothing stops you from deleting an entry that came with the product (`Builtin` on). If you delete a `bio.*` entry, that event is no longer written.
+The entries are deleted one by one. If a mixed selection reaches a built-in entry, deletion stops with `built-in event type '{code}' cannot be deleted`; custom entries processed earlier stay deleted. Select custom entries separately so the result is predictable.
+
+If you delete a custom `bio.*` entry, that event is no longer written.
 
 ## What changes
 
 | What | Change |
 |---|---|
-| Table `enterprise.event_registry` | A row is added, changed or deleted. |
+| Event registry | A custom row is added, changed or deleted. Built-in rows cannot be deleted. |
 | Event writing | For a `bio.*` code, switching `Active` on or off starts or stops the writing of that event. Other codes: nothing changes. |
 | Bindings | Deleting an entry deletes the rows of `enterprise.event_binding` that point to it. |
 
@@ -51,6 +63,7 @@ The registry is not audited: `EventRegistryBmc` has no audit event.
 | Problem | Meaning | Fix |
 |---|---|---|
 | `Duplicate entry on event_registry (constraint ...)` | The code exists. | Open the existing entry. |
+| `built-in event type '{code}' cannot be deleted` | The selected type came with the product. | Leave it in the registry. Clear **Active** only when the event semantics allow it. |
 | No event appears after you ticked `Active` | The code does not match what the system builds, or nothing has been saved in that table since. | Check the code against the list of `bio.*` rows, and save a record of that table. |
 | Switching a `process.*` entry off does not stop its events | The business code does not look at the registry. | None. This is how it works. |
 

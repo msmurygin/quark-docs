@@ -27,12 +27,11 @@ All columns are read only.
 | Button | Needs | What it does | Task page |
 |---|---|---|---|
 | `New` | Nothing | Opens an empty card in place of the list. | [Adding an event type](41-adding-an-event-type.md) |
-| `Delete` | One or more ticked rows | Deletes the ticked rows. | [Adding an event type](41-adding-an-event-type.md) |
+| `Delete` | One or more ticked rows | Deletes selected custom rows. Built-in rows are protected. | [Adding an event type](41-adding-an-event-type.md) |
 | `Refresh` | Nothing | Reads the list again. | |
 
 Click a row to open its card.
-`Delete` calls `delete_event_registry` once for each ticked row. The rows are deleted one by one, not as a group: if one fails, the earlier ones stay deleted
-(`crates/services/web-ui-server/src/extensions/generic/delete_selected_action.rs:151`). The message is `{n} Event Registry record(s) deleted`.
+Selected rows are deleted one by one, not as a group. If the selection reaches a built-in row, that row is refused; custom rows already deleted stay deleted. A successful batch reports `{n} Event Registry record(s) deleted`.
 
 ## The card
 
@@ -43,13 +42,13 @@ Click a row to open its card.
 | `Description` | `description` | Text | No | Any text, or empty. | Stored only. It has no effect today. |
 | `Category` | `category` | Drop-down, up to 30 characters | Yes | `bio_lifecycle` (BIO Lifecycle), `business` (Business, the database default), `field_change`, `form_render`, `scheduled`, `policy`, `custom`. | Stored only. It has no effect today. |
 | `Active` | `is_active` | Check box | No | On by default. | For the events `bio.<table>.<operation>` that the system writes when a record is saved, this decides whether the event is written. See below. |
-| `Builtin` | `is_builtin` | Check box | No | Read only. The database default is on. | Marks the types that came with the product. |
+| `Builtin` | `is_builtin` | Check box | No | Read only. **Yes** for a product event type; **No** for an entry created by an administrator. | Distinguishes protected product types from removable custom types. |
 
-Buttons: `Save` saves and goes back (`generic_save`). `Delete` deletes the event type and goes back (`generic_delete`).
+Buttons: `Save` saves and goes back. `Delete` deletes a custom event type and goes back. A built-in event type cannot be deleted.
 
 The columns `bio_def_id` and `payload_schema` have no field. The second one describes the payload of the event as a JSON schema.
 
-> Not confirmed by code: whether an event type made on this screen is saved with `Builtin` on. The field is read only on the card, the database default of the column is on, and the create call leaves the column to its default (`crates/libs/wms-lib-core/src/model/integration/event_registry.rs`, `EventRegistryForCreate`). To verify: add a test event type, save, and read `Builtin` in the list.
+An entry created from **New** is always saved as custom, so **Builtin** shows **No** after the first save. The create action cannot mark an entry as built-in.
 
 ## What the registry really does
 
@@ -70,10 +69,12 @@ The seeded rows come from the enterprise migrations. The list on your screen is 
 | Rule | Where it comes from |
 |---|---|
 | `Code` is unique. | Unique key `event_registry_code_key`. A duplicate gives `Duplicate entry on event_registry (constraint ...)`. |
+| An administrator-created type is custom. | **Builtin** is read only and the create action always saves **No**. |
+| A built-in type cannot be deleted. | Delete returns `built-in event type '{code}' cannot be deleted`. |
 | After the first save only `Name`, `Description`, `Category` and `Active` can change. | `update_event_registry` accepts only these four fields (`crates/services/app-server/src/web/rpcs/event_registry_rpc.rs:24`). |
 | Deleting a type deletes its bindings. | The foreign key `event_binding.event_id` is `ON DELETE CASCADE`. |
 
-Nothing stops you from deleting a type that has `Builtin` on (see the findings file).
+Before deleting a custom type, confirm that its bindings are no longer needed. Deletion removes those bindings, but existing event and delivery history remains available.
 
 ## Who can use it
 
