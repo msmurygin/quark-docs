@@ -24,7 +24,7 @@ The flow must be active before its configured trigger can execute it.
 3. Select **Run**.
 4. The platform opens the run in **Monitor**.
 
-Use a manual trigger for the first controlled run even when the production design will later use a schedule, webhook or event.
+Use the manual **Run** action for the first controlled run even when the flow's production trigger is a schedule, webhook or event.
 
 ## Create a schedule
 
@@ -33,10 +33,11 @@ Use a manual trigger for the first controlled run even when the production desig
 3. Enter a descriptive **Name**.
 4. Enter a five-field **Cron Expression**, for example `*/5 * * * *` for every five minutes.
 5. Enter the intended **Timezone**. The default is `UTC`.
-6. For a controlled setup, keep the flow in **draft** and choose a cron expression whose next occurrence leaves enough time to validate and activate the flow.
-7. Save the schedule. A new schedule is **active** immediately, but it does not execute while the flow is inactive.
-8. Leave the schedule active: schedule-triggered flow validation requires it. Validate and activate the flow before the planned occurrence.
-9. Watch the occurrence in **Monitor**. Pause the schedule after the controlled run if continuous execution is not yet approved.
+6. Save the schedule. A new schedule starts **paused** and cannot execute during setup.
+7. Validate and activate the flow.
+8. On **Flows**, select **Run**. Wait for the manual run to finish successfully and review it in **Monitor**.
+9. Return to **Schedules**, edit the schedule and enable it.
+10. Watch the first scheduled occurrence in **Monitor**.
 
 ![Schedules list with a flow, cron expression, timezone, status and failure count](../assets/screens/integration-platform-schedule-list.png)
 
@@ -44,7 +45,21 @@ Use a manual trigger for the first controlled run even when the production desig
 
 ### Expected result
 
-The schedule row shows the flow, cron expression, timezone and status. After it fires, **Last Run** and **Failures** update, and the run appears in **Monitor** with a schedule trigger.
+The schedule row shows the flow, cron expression, timezone and status. After you enable it and it fires, **Last Run** and **Failures** update, and the run appears in **Monitor** with a schedule trigger.
+
+The platform enables a schedule only when the flow is active and has completed a successful manual run after its latest change. If you edit the flow later, run it manually again before enabling a paused schedule.
+
+```mermaid
+flowchart TD
+    A[Create a schedule or receive a copy from a template or import] --> B[Schedule starts paused]
+    B --> C[Validate and activate the flow]
+    C --> D[Run the flow manually]
+    D --> E{Run successful after the latest flow change?}
+    E -->|No| F[Fix the flow and run it again]
+    F --> D
+    E -->|Yes| G[Enable the schedule]
+    G --> H[Watch the first scheduled run]
+```
 
 ### Repeated failures
 
@@ -123,6 +138,8 @@ sequenceDiagram
 | Symptom | Recovery |
 | --- | --- |
 | **Schedules can only be attached to flows with trigger_type=schedule** | Return to **Flows** and create the flow with **Trigger = Schedule (cron)**, then select it in the schedule. |
+| **Activate the flow before enabling its schedule** | Validate the flow, resolve every error and activate it. Then complete a controlled manual run before enabling the schedule. |
+| **Run this flow manually and complete it successfully before enabling the schedule** | On **Flows**, select **Run**, fix any failure and wait for a successful result in **Monitor**. If the flow changed after an earlier success, run it again. |
 | Schedule never runs | Confirm that both the schedule and flow are active; check cron expression and timezone. |
 | Schedule is paused with failures | Fix the underlying run failure, complete a manual test, then enable the schedule. |
 | Webhook path is rejected | Remove the leading slash, query and fragment. Enter only non-empty path segments, for example `orders/created`. |

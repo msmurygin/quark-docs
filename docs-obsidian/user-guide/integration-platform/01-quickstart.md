@@ -65,7 +65,7 @@ Check the base URL, environment, credential value and any provider-specific acco
 1. Open **Flows** and find the new flow.
 2. Select **Builder**.
 3. Check the trigger, connector and any owner, ship-to or other setup values.
-4. For a schedule-triggered flow, keep the flow in **draft**, create an active schedule whose next occurrence is far enough in the future to finish validation and activation, then return to **Builder**. Schedule validation requires an active schedule, but the scheduler does not run it while the flow is inactive.
+4. For a schedule-triggered flow, keep the flow in **draft** and open **Schedules**. Review the paused schedule copied from the template. Create one only if the template did not provide it, then return to **Builder**.
 5. Select **Validate flow**.
 6. Resolve every error. Review warnings before continuing.
 7. Select **Save snapshot**.
@@ -77,7 +77,7 @@ Leave a scheduled, webhook or event flow in **draft** status until its trigger i
 The trigger determines the activation sequence:
 
 - **Manual**: activate the flow, then select **Run**.
-- **Schedule**: leave the schedule active, activate the validated flow before the planned occurrence, and watch that occurrence in **Monitor**. Pause the schedule after the controlled run if you are not ready for continuous execution.
+- **Schedule**: activate the validated flow, select **Run** for one controlled manual run, and inspect it in **Monitor**. After it succeeds, enable the schedule.
 - **Webhook**: while the flow is still inactive, create and review the webhook. Disable it until the provider is ready, activate the flow, enable the webhook and send one signed or authenticated test request.
 - **Event**: connect the event route while the flow is inactive. Activate the flow only when you are ready to send or produce one matching event.
 
