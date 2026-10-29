@@ -40,7 +40,7 @@ For a new entity, prefer the Entity Wizard template `List → Detail`. It create
 
 ```mermaid
 flowchart LR
-    L["List"] -->|"GridRowClick<br/>SelfSwap"| D["Existing detail"]
+    L["List"] -->|"GridRowClick<br/>SelfSwap + Push to Stack"| D["Existing detail"]
     L -->|"New<br/>SelfSwap + Push to Stack"| N["New detail"]
     D -->|"Save / Delete: GoBack<br/>Back: Nav Config"| L
     N -->|"Save / Delete: GoBack<br/>Back: Nav Config"| L
@@ -48,7 +48,7 @@ flowchart LR
 
 | Trigger | Navigation | Target | Push to Stack | Why |
 | --- | --- | --- | --- | --- |
-| `GridRowClick` on the list | `SelfSwap` | Detail form | off | A row click already records the list as the return point. Turning this on adds an extra stack entry. |
+| `GridRowClick` on the list | `SelfSwap` | Detail form | on | Pushes the current list onto the stack so `GoBack` on the detail form returns to it. This is how seeded list-to-detail journeys and the Entity Wizard are configured. |
 | `New` on the list | `SelfSwap` | Detail form | on | A toolbar click does not record the list automatically. The stack entry gives `GoBack` somewhere to return. |
 | `Refresh` on the list | `SelfSwap` | none | off | Reloads the current form in place. |
 | `Save` on the detail | `GoBack` | none | off | Save the record, then return to the list. The button also needs its save extension, plus validation when the form has required fields. |
@@ -57,7 +57,7 @@ flowchart LR
 
 ![Studio Interaction Builder with a list-to-detail chain](../assets/screens/studio-interaction-builder-list-detail.png)
 
-*Capture bookmark: the list form's Interaction Builder with `GridRowClick → SelfSwap` selected and the inspector showing Target Form and Push to Stack.*
+*Interaction Builder inspection. Focus: `GridRowClick → SelfSwap`, the Target Form and enabled Push to Stack.*
 
 Use `TargetForm` only when the destination must be rendered into a Shell slot; it requires `Target Slot Name`. For a `SelfSwap` that opens a Shell or Tabbed container, set `BIO Target Form` to the leaf Normal form that must receive the selected row. A simple list-to-Normal-detail journey does not need that extra target.
 
