@@ -518,7 +518,7 @@ Saving puts the picked stock on the pallet in transit. It does not send the pall
 
 ![Paper picking fields on the Task Board](../assets/screens/task-board-paper-picking.png)
 
-*Task Board with Status, Found qty, Short reason and Pick pallet fields. Focus: review the pallet label in the Save result before continuing the trip.*
+*Task Board with Status, Found qty, Short reason and Pick pallet fields. Focus: review every changed field before you click Save Picks.*
 
 ### C2. Record a short pick
 
