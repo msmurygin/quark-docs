@@ -36,10 +36,6 @@ The web UI signs a short token (5 minutes) that carries the user, the language, 
 5. Click run. The browser downloads the file (PDF, XLSX).
 6. Click the star to mark a favorite.
 
-![Reports page with report cards grouped by audit, finance, inbound and so on](../assets/screens/reports.png)
-
-*Caption: the report catalogue inside the frame. Focus: The groups on the left and the report cards on the right. The seed report names and descriptions are not in English.*
-
 ### Field reference
 
 Seeded report catalogue (16 reports). Names are the English labels.
