@@ -44,12 +44,12 @@ You can also type the warehouse id in **Warehouse**. The hint says **Type wareho
 1. On **Main Menu**, press `Esc`. The terminal opens **Select Warehouse**.
 2. Choose the warehouse as above.
 
-![RF main menu with four options: Receiving, Inventory, Picking and Packing](../assets/screens/rf-main-menu.png)
-*Screen main_menu: Receiving, Inventory, Picking, Packing. Focus: Each option has a number; press that number to open it.*
+![RF main menu with Order Control after Consolidation](../assets/screens/rf-main-menu-order-control.png)
+*Screen main_menu. Focus: Order Control appears after Consolidation; press the number shown beside the function.*
 
 ## What you should see
 
-- After a correct choice, **Main Menu** appears with **Receiving**, **Inventory**, **Picking** and **Packing**.
+- After a correct choice, **Main Menu** appears. It includes **Receiving**, **Inventory**, **Picking**, **Packing**, **Consolidation** and **Order Control** on the first page.
 - You cannot go back to the sign-in screen with `Esc`. To sign in as another user, close the RF session and start it again.
 
 ## If something goes wrong
@@ -70,4 +70,4 @@ If the terminal cannot load your list of warehouses after sign-in, it does not s
 
 - [00 README](00-README.md) for the RF keys.
 - [02 Receiving against an ASN](02-receiving-against-asn.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)

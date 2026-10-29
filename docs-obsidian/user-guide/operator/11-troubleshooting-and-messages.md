@@ -1,4 +1,4 @@
-# 11 Troubleshooting and messages
+# 12 Troubleshooting and messages
 
 ## What you will do
 
@@ -114,6 +114,7 @@ The tables in each guide list the messages for that process:
 | Inventory count | [08](08-inventory-count.md) |
 | Picking | [09](09-picking.md) |
 | Packing | [10](10-packing-verify.md) |
+| Order control | [11](11-order-control-after-picking.md) |
 
 ## Common situations
 
