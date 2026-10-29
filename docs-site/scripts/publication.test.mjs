@@ -93,6 +93,8 @@ test('API publication sanitizer removes internal development narrative and prese
  assert.equal(clean.nested[5],'');
  assert.equal(clean.nested[6],'An RFC 3339 time in UTC.');
  assert.equal(sanitizePublicText('A useful sentence (`task.rs:12`).'),'A useful sentence.');
+ assert.equal(sanitizePublicText('Keep this customer result. That is how they are written in the code.'),'Keep this customer result.');
+ assert.equal(sanitizePublicObject({description:'Label missing in English: a diagnostic note.'}).description,'');
 });
 
 test('publication sanitizer preserves screenshot-only paragraphs',()=>{
@@ -140,6 +142,29 @@ search over *.rs: only the writers`;
  const clean=sanitizePublicMarkdownSource(source);
  assert.match(clean,/Keep this customer instruction/);
  assert.doesNotMatch(clean,/app-server\/src|grep|\brg\b|search(?:ed|ing)?\s+(?:over|through)|\*\.rs/i);
+});
+
+test('publication sanitizer removes author diagnostics and findings references',()=>{
+ const source=`# Customer guide
+
+Keep this instruction for the operator.
+
+> Label missing in English: the terminal currently shows a Russian connector.
+
+The action is refused when the task is already closed (see the findings file).
+
+Some texts contain Russian words. That is how they are written in the code.
+
+## Findings
+
+Fixed in commit abc1234.
+
+## Recovery
+
+Refresh and try again.`;
+ const clean=sanitizePublicMarkdownSource(source);
+ assert.match(clean,/Keep this instruction/);assert.match(clean,/action is refused/);assert.match(clean,/## Recovery/);assert.match(clean,/Refresh and try again/);
+ assert.doesNotMatch(clean,/Label missing|findings file|Russian words|written in the code|## Findings|abc1234/i);
 });
 
 test('early Markdown sanitizer protects descriptions, tables, lists and search text',()=>{

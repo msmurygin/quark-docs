@@ -106,12 +106,10 @@ You can also type a reason code in **Reason** (up to 32 characters).
 ![RCSN01 - Serial Capture](../assets/screens/RCSN01.png)
 *Screen RCSN01: the progress line and the Serial # field. Focus: 1 Serial #. The number matches the teal badge.*
 
-16. On **Serial Capture**, read **Progress**. It looks like `1 из 5`.
+16. On **Serial Capture**, read **Progress**. It shows the serial you are capturing and the total required, for example the first of five.
 17. In **Serial #**, scan one serial. The field holds up to 64 characters and sends itself.
 18. Repeat step 17 for each unit.
 19. If you scan the same serial twice, a line shows **⚠ Already scanned: {serial}**. Scan a different unit.
-
-> Label missing in English: `из` (in the **Progress** line, `1 из 5`). It means "of". The terminal shows the Russian word.
 
 When the last serial is accepted, the terminal shows **Serial Capture Complete** with **✓ Captured {n} serials** and the **SKU**.
 

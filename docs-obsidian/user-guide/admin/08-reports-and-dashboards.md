@@ -63,8 +63,6 @@ Seeded report catalogue (16 reports). Names are the English labels.
 | `ru_ttn_1t` | Consignment and Waybill (1-T) | outbound |
 | `ru_upd_503` | Universal Transfer Document (UPD) | outbound |
 
-> Label missing in English: the `description` text of the 16 report definitions is in Russian. The report names come from the English label and are correct. Example: `ru_inv_3` has the Russian name `Инвентаризационная опись ИНВ-3` in the Russian label only.
-
 Inventory count reports (category `inventory`). Each asks for a period, `date_from` and `date_to`:
 
 | Code | English name | What it shows |
@@ -76,7 +74,7 @@ Inventory count reports (category `inventory`). Each asks for a period, `date_fr
 
 - Value is the difference × the SKU's `cost` attribute. A SKU without a cost adds no value.
 - `Count Variance Causes` counts what the board panel `Variance causes` counts: tasks accepted with an adjustment, by the time of the decision. Run it for today and it agrees with the panel on `Today`.
-- `Count Variance Causes` names a seeded cause by the description of the cause list, which is English (`Mix-up with another item`). The board names it in the reader's language. Your own causes appear as you named them. A difference accepted before causes existed shows as `— не записана`.
+- `Count Variance Causes` names a seeded cause by the description of the cause list, which is English (`Mix-up with another item`). The board names it in the reader's language. Your own causes appear as you named them. A difference accepted before causes existed appears as not recorded.
 - `Inventory Accuracy` and the board's `Inventory accuracy` use one definition: a location's **first** count matched when every line matched.
 
 Access rule today:

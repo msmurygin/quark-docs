@@ -3,8 +3,7 @@
 This page lists the messages that the Task Manager screens show, grouped by the page that explains them.
 A part in `{braces}` is replaced by a value. The page linked in the heading says when the message appears and what to do.
 
-Messages made by the server (domain refusals) are shown as the server wrote them. Some begin with a lower-case letter. That is how they are written in the code.
-Some texts contain Russian words. They are listed as written.
+Messages are reproduced exactly as they appear in the application. A message may begin with a lower-case letter.
 
 ## [Task Board](10-task-board.md) buttons (grey text)
 

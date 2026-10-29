@@ -30,19 +30,14 @@ Label design has a web screen. Open `Sidebar > Overview > Reports`. If you pass 
 
 Table `label_definitions` (all active, DPI 203):
 
-| Code | Name in the database | Category | Size (mm) | Used by |
+| Code | Purpose | Category | Size (mm) | Used by |
 |---|---|---|---|---|
-| `pallet_label` | `Паллетная этикетка` | `pallet` | 100 x 150 | API `print_label`. |
-| `sku_label` | `Этикетка товара` | `sku` | 50 x 30 | API `print_label`. |
-| `location_label` | `Этикетка ячейки` | `location` | 70 x 40 | API `print_label`. |
-| `lpn_id_label` | `LPN ID этикетка` | `lpn` | 100 x 50 | Auto-print after a receive (`Auto-Print LPN`), and LPN print on the move path. |
+| `pallet_label` | Pallet label | `pallet` | 100 x 150 | API `print_label`. |
+| `sku_label` | Item label | `sku` | 50 x 30 | API `print_label`. |
+| `location_label` | Location label | `location` | 70 x 40 | API `print_label`. |
+| `lpn_id_label` | LPN identification label | `lpn` | 100 x 50 | Auto-print after a receive (`Auto-Print LPN`), and LPN print on the move path. |
 | `handling_unit_label` | `Handling unit label` | `custom` | 100 x 50 | Printed once for each registered handling unit. |
 | `shipping_label` | `Shipping label` | `shipping` | 100 x 150 | Printed when a pack carton is closed. |
-
-> Label missing in English: `Паллетная этикетка` (`pallet_label`).
-> Label missing in English: `Этикетка товара` (`sku_label`).
-> Label missing in English: `Этикетка ячейки` (`location_label`).
-> Label missing in English: `LPN ID этикетка` (`lpn_id_label`).
 
 The code looks up a label by its **exact, case-sensitive code**. Do not rename the codes `lpn_id_label`, `handling_unit_label`, `shipping_label`. If the lookup fails, best-effort callers log it and print nothing.
 

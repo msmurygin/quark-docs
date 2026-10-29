@@ -54,8 +54,6 @@ The reason of each refused task is the text of its refusal. These are the ones y
 | `pick_detail {id} is {status}, not Released — нечего возвращать в резерв` | The pick is not in the state `Released`. |
 | `{entity} id={id} not found` | Somebody deleted it first. The `{entity}` is the name of the missing row (`task`, `pick_detail`). |
 
-Some of these texts contain Russian words. That is how they are written in the code (see findings file `docs-obsidian/plans/reference-findings-tasks.md`).
-
 If the whole call fails, the toast reads `Tasks could not be deleted: {message}`.
 With no row ticked the toast reads `Select at least one task`.
 If a ticked key is not a number the toast reads `The task board has moved on — reselect the tasks and try again`.

@@ -10,10 +10,10 @@
 
 const INTERNAL_PATH = /(?:^|[\s`('"/])(?:crates|clients|apps|services|ui\/src|app-server\/src|web-ui-server\/src|docs-obsidian|docs\/superpowers|\.claude|dev_only)\/|\bwms-[a-z0-9_-]+\/(?:src|migrations?|sql)\/|\b[A-Za-z0-9_.…*~-]+\.(?:rs|sql|go|tsx?|toml)(?::(?:~?\d+)(?:-\d+)?)?\b|(?:^|[\s`=('"/])\*\.(?:rs|sql|go|tsx?|toml)\b|\bBASELINE(?::\d+(?:-\d+)?)?\b|\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b|\bmigrations?\s+\d{1,4}\b|\bwms-app\s+\d{1,4}\b|\b(?:baseline|seed)\s+migration\b|\bdev(?:elopment)?\s+seed\b|\bcode comment\b|\b(?:grep|rg)\b[^\n]*|\b(?:I\s+)?search(?:ed|ing)?\s+(?:all\s+)?(?:the\s+)?(?:Rust\s+)?(?:code|crates|engine)\b|\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b|\bchecked by searching\b|#\[[A-Za-z_][^\]\n]*\]/i;
 const INTERNAL_PROCESS = /\bADR[-_ ]?\d+\b|\b(?:[A-Za-z][A-Za-z -]+\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?|\bowner decision\s+20\d{2}-\d{2}-\d{2}\b|\bspec\s*§|\bruling\s+[A-Z]\d+\b|\bDecisions Log\b|\bSlice\s*#\d+\b/i;
-const PRIVATE_HEADING = /^(?:\d+\.\s*)?(?:where it comes from|not confirmed(?: by code)?|bugs, inconsistencies and items to verify|what to verify|the rule:\s*every arrow comes from code)$/i;
-const PRIVATE_QUOTE = /^(?:not confirmed(?: by code)?|to verify)\s*:/i;
+const PRIVATE_HEADING = /^(?:\d+\.\s*)?(?:where it comes from|not confirmed(?: by code)?|findings|bugs, inconsistencies and items to verify|what to verify|the rule:\s*every arrow comes from code)$/i;
+const PRIVATE_QUOTE = /^(?:not confirmed(?: by code)?|to verify|label missing in English)\s*:/i;
 const SOURCE_LABEL = /\b(?:source|sources|code proof|implementation evidence)\s*:/i;
-const AUTHOR_PROCESS = /\bnot confirmed(?: by code)?\b|\bto verify\s*:|\bwhere it comes from\b|every (?:arrow|step).*(?:comes|was read) from (?:the )?code|where the code (?:says nothing|does not prove)|checked by searching (?:the )?code|code on the main branch|table that names the file and line|file and line (?:is|are|was|were|given)/i;
+const AUTHOR_PROCESS = /\bnot confirmed(?: by code)?\b|\bto verify\s*:|\blabel missing in English\b|\bwhere it comes from\b|\bsee the findings file\b|\bhow [^.!?\n]* was checked\b|\ball statements come from (?:the )?code\b|\bthat is how (?:it|they) (?:is|are) written in the code\b|\bsome (?:of these )?texts contain Russian words\b|every (?:arrow|step).*(?:comes|was read) from (?:the )?code|where the code (?:says nothing|does not prove)|checked by searching (?:the )?code|code on the main branch|table that names the file and line|file and line (?:is|are|was|were|given)/i;
 
 function isPunctuationOnly(value) {
   return /^[\s.,;:!?()[\]{}'"`~*_\-–—/\\|]+$/.test(String(value ?? ''));
@@ -109,7 +109,7 @@ function stripEvidenceParentheticals(children, stats) {
   if (!Array.isArray(children) || children.length === 0) return;
   for (;;) {
     const joined = children.map((child) => nodeText(child)).join('');
-    const match = joined.match(INTERNAL_PATH) ?? joined.match(INTERNAL_PROCESS);
+    const match = joined.match(INTERNAL_PATH) ?? joined.match(INTERNAL_PROCESS) ?? joined.match(AUTHOR_PROCESS);
     if (!match || match.index == null) break;
     const span = findParenthetical(joined, match.index);
     if (!span) break;
@@ -375,7 +375,7 @@ export function sanitizePublicMarkdownSource(value) {
 function stripParentheticalStrings(value) {
   let text = String(value ?? '');
   for (;;) {
-    const match = text.match(INTERNAL_PATH) ?? text.match(INTERNAL_PROCESS);
+    const match = text.match(INTERNAL_PATH) ?? text.match(INTERNAL_PROCESS) ?? text.match(AUTHOR_PROCESS);
     if (!match || match.index == null) break;
     const span = findParenthetical(text, match.index);
     if (!span) break;
@@ -404,7 +404,7 @@ function stripEvidenceSentences(value) {
 
 /** Sanitize prose stored in OpenRPC/reference JSON. */
 export function sanitizePublicText(value) {
-  let text = stripParentheticalStrings(value);
+  let text = stripEvidenceSentences(value);
   text = text
     .split(/\n{2,}/)
     .filter((paragraph) => {
@@ -453,6 +453,12 @@ export const PUBLIC_FORBIDDEN_PATTERNS = [
   /\b(?:grep|rg)\b[^\n]*/i,
   /\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b/i,
   /\bchecked by searching\b/i,
+  /\bLabel missing in English\b/i,
+  /\bsee the findings file\b/i,
+  /\bHow [^<>.!?\n]* was checked\b/i,
+  /\bAll statements come from (?:the )?code\b/i,
+  /\bSome (?:of these )?texts contain Russian words\b/i,
+  /\bThat is how (?:it|they) (?:is|are) written in the code\b/i,
   /#\[[A-Za-z_][^\]\n]*\]/i,
   /<(?:p|li)[^>]*>\s*(?:Source|Sources):\s/i,
 ];
