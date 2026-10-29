@@ -688,7 +688,7 @@ Opening the Load assigns its permanent number in the form `LD` plus eight digits
 
 ![Load Plan card with reviewed composition](../assets/screens/load-plan-card-form.png)
 
-*Load Plan composition review. Focus: selected, invalid and unplanned unit counts before Freeze.*
+*Load Plan composition review. Focus: selected and outside-plan unit counts, stop order and the Freeze action.*
 
 Loading-order choices are `Last delivery stop first`, `First delivery stop first`, `Any stop group`, `Manual unit order`, and `Any eligible unit (no stop priority)`. Use the review screen to resolve invalid or unplanned units before Freeze.
 
