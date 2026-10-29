@@ -29,6 +29,10 @@ Do not use production credentials in a shared test tenant.
 5. In that dialog, complete the required WMS and provider setup fields, such as **WMS goods owner ID** or **Marketplace ship-to ID**.
 6. Select **Create draft integration**. While the request is running, the button changes to **Creating draft...**. If the dialog does not open, **Use Template** creates the draft immediately.
 
+![Integration Platform template gallery with provider templates and their Use Template actions](../assets/screens/integration-platform-template-gallery.png)
+
+*Caption: the Templates page. Focus: choose a template that matches the direction of data and the external system.*
+
 ### Expected result
 
 The platform creates a tenant-owned flow in **draft** status. It copies the template name and generates a unique code. It also creates the recommended tenant connector when you chose that option. The draft is safe to review before activation.
