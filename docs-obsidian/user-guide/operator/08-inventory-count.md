@@ -25,7 +25,7 @@ Count the stock in a location that the system gives you. Record what you find. F
 4. In **Area**, scan the work area code (up to 30 characters). Or leave it empty. Press `Enter`.
 
 ![CNT00 - Count — Next Location](../assets/screens/CNT00.png)
-*Screen CNT00: the terminal asks for the next location.*
+*Screen CNT00 after a safe no-work response: Area and Nothing to count. Press Enter to ask again.*
 
 5. On **Count — Next Location**, the terminal asks for your next location. The line **Area** shows the area, or **whole warehouse**. The status line says **Getting a location - Enter asks again**.
 6. If you see an error, press `Enter` to ask again.
