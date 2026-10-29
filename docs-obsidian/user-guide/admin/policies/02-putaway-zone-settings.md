@@ -19,7 +19,7 @@ Related files: policy and steps in `01-putaway-policy-steps-and-criteria.md`; lo
 
 ## How to read this file
 
-- Screen: `Sidebar > Topology > Putaway Zones`. List form `putawayzone_list_form`.
+- Screen: `Sidebar > Warehouse Configuration > Topology > Putaway Zones`. List form `putawayzone_list_form`.
   Open a row. The card has three tabs: `General`, `Capacity`, `Printer Settings`.
   Below the tabs there is a list of lot mixing rules (see section 3).
 - Roles: `Admin` and `Manager` create, change and delete zones and zone rules.
@@ -194,7 +194,7 @@ The error is a database foreign-key error that names the constraint, for example
 | Type and values | Text, up to 7 characters. NOT NULL. Use a hex color such as `#D97B4A`. |
 | Default | `#888888`. Seeds: `DOCK` `#4A90D9`, `RACK` `#D97B4A`. |
 | What it does | The color of the zone on the 3D warehouse page and in its legend. |
-| Affects | `Sidebar > Topology > 3D Warehouse`. The page reads the zone list (`crates/services/web-ui-server/src/routes/warehouse_3d_handler.rs:215-230`) and draws each location in its zone color (`warehouse-3d.js:121-125, 431`). Also the list column `Color`. |
+| Affects | `Sidebar > Warehouse Configuration > Topology > 3D Warehouse`, where each location is drawn in its zone color, and the `Color` column of the zone list. |
 | Example | `#2E8B57`. |
 | Interacts with | The form does not check the format. A text that is not a color is passed to the 3D library and does not draw as expected. |
 | When empty | Not possible. NOT NULL. A blank in the update is not accepted as a clear. |

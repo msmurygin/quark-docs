@@ -11,7 +11,7 @@ If nothing was fixed, the retry gives the same answer.
 
 ## Steps
 
-1. Open `Task Manager > Pick Target Exceptions`.
+1. Open `Management & Control > Exceptions > Pick Target Exceptions`.
 2. Tick **one** exception. `Retry` turns on only for a `PlannedCarton` row in `RecoveryRequired`.
 3. Click `Retry`. There is no window. The command runs at once.
 

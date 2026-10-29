@@ -1,7 +1,6 @@
-# Task Manager
+# Task control screens
 
-`Task Manager` is the group in the left sidebar where a supervisor watches the work that operators do on the floor and fixes it when it gets stuck.
-It has five screens. Every screen is a list.
+The task-control screens are split between three groups. `Management & Control > Execution Control` holds the task board and pick assignments. `Management & Control > Exceptions` holds operational exceptions and skip history. `Warehouse Configuration > Operator Permissions` holds the operator list.
 
 A **task** is one unit of work handed to one operator: pick this, put this away, move this, count this location.
 The system makes tasks. People do not type them in.
@@ -10,20 +9,16 @@ The operators take tasks on the RF terminal. This group is where a supervisor lo
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Task Manager`.
-3. Click one of the five items.
+2. Open the sidebar path shown in the table below.
+3. Click the required screen.
 
-The group is the menu item `task_manager_group`. The items and their forms are:
-
-| Sidebar item | Menu item | Opens | Page |
-|---|---|---|---|
-| `Task Board` | `task_board_menu` | `task_board_list_form` | [Task Board](10-task-board.md) |
-| `Pick Assignments` | `pick_assignment_board_menu` | `pick_assignment_board_list_form` | [Pick Assignments](20-pick-assignments-list.md) |
-| `Pick Target Exceptions` | `pick_target_exception_menu` | `pick_target_exception_list_form` | [Pick Target Exceptions](30-pick-target-exceptions.md) |
-| `Skip History` | `task_skip_board_menu` | `task_skip_board_list_form` | [Skip History](40-skip-history.md) |
-| `Operators` | `operator_menu` | `operator_list_form` | [Operators](50-operators-list.md) |
-
-Source: `docs-obsidian/user-guide/reference/_generated/menu-tree.md` and the menu rows in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql` (menu items 9110 to 9114).
+| Sidebar path | Page |
+|---|---|
+| `Management & Control > Execution Control > Task Board` | [Task Board](10-task-board.md) |
+| `Management & Control > Execution Control > Pick Assignments` | [Pick Assignments](20-pick-assignments-list.md) |
+| `Management & Control > Exceptions > Pick Target Exceptions` | [Pick Target Exceptions](30-pick-target-exceptions.md) |
+| `Management & Control > Exceptions > Skip History` | [Skip History](40-skip-history.md) |
+| `Warehouse Configuration > Operator Permissions > Operators` | [Operators](50-operators-list.md) |
 
 ## What each screen is for
 
@@ -51,11 +46,7 @@ Statuses and the exact numbers (15 minutes, 10 minutes, 3 refusals) are on [Task
 
 ## Who can use it
 
-The menu items are visible to the roles that hold the `menu_item` right.
-A new database gives this right to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`. Source: `crates/libs/wms-lib-auth/src/authorization/reconciler.rs:115-117`.
-The buttons need more rights. The full table is on [Who can do what](91-who-can-do-what.md).
-
-> Not confirmed by code: whether `SUPERVISOR` can open this group on a new database. The default menu grant in the code is only for `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`. No other default was found in the code or in the migrations. To verify: sign in as a `SUPERVISOR` user on a test warehouse and look at the sidebar. If the group is missing, grant the menu items in `Users & Roles > Permission Matrix`.
+The menu items and their buttons follow the permissions assigned to your role. If a screen is missing, ask an administrator to check your menu and action permissions. The full table is on [Who can do what](91-who-can-do-what.md).
 
 ## What this group affects
 

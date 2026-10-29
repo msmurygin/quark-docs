@@ -105,7 +105,7 @@ unless noted.
 
 ### Putaway zone: Replenishment Allowed
 
-- **Screen**: Topology > Putaway Zones > open a zone > **Replenishment Allowed**
+- **Screen**: Warehouse Configuration > Topology > Putaway Zones > open a zone > **Replenishment Allowed**
   (checkbox, form `putawayzone_edit_form`).
 - **Column**: `putawayzone.replenishment_allowed`, boolean, not null, default
   `false` (`001_baseline.sql:4182`).
@@ -203,7 +203,7 @@ unless noted.
 
 | Field | Where | Screen label |
 |---|---|---|
-| `replenishment_policy.code` | the policy | Code (Policy > Replenishment Policy) |
+| `replenishment_policy.code` | the policy | Code (Warehouse Configuration > Policies > Replenishment Policy) |
 | `replenishment_policy_detail.*` | retired | none |
 | `sku.replenishment_policy_id` | SKU | Replenishment Policy (SKU > Policies) |
 | `owner_config.default_replenishment_policy_id` | owner config | Replenishment Policy |

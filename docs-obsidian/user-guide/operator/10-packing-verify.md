@@ -167,4 +167,4 @@ A closed box has the weight you typed. A reported box carries the problem you ch
 
 - [09 Picking](09-picking.md)
 - [11 Order control after picking](11-order-control-after-picking.md)
-- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

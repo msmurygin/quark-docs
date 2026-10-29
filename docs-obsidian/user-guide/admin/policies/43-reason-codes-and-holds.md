@@ -20,7 +20,7 @@ Paths are relative to `crates/libs/` unless they start with `crates/`.
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Code > Code List` |
+| Menu path | `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List` |
 | Tables | `code_list` (one row per list), `code_list_value` (one row per value) |
 | Value columns | `code` (up to 30), `description` (up to 200, English default), `active`, `editable`, `display_order`, `metadata` (JSON) |
 | `editable` on the list | A list with `editable = false` is a fixed vocabulary. Do not add values: the code does not know them. |
@@ -43,8 +43,8 @@ held. It names a **hold code**. The code decides what the hold forbids.
 | Item | Value |
 |---|---|
 | Table of codes | `inventory_hold_code` |
-| Menu path (codes) | `Sidebar > Code > Hold Codes` |
-| Menu path (holds) | `Sidebar > Inventory Balances > Holds` |
+| Menu path (codes) | `Sidebar > Warehouse Configuration > Reason Codes > Hold Codes` |
+| Menu path (holds) | `Sidebar > Management & Control > Inventory > Holds` |
 | Roles that edit codes | `Admin`, `Manager` (create, update, delete). Everyone reads. |
 | Scopes of a hold | one LPN, one lot, or one location |
 | Default code when none is given | `QcQuarantine` (`wms-inventory/src/service/hold.rs:355-370`) |
@@ -196,7 +196,7 @@ SKU field `lot_hold_code`: **Stored only. It has no effect today.** Nothing read
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Inventory Balances > Adjustment Reasons` (next to `Adjustments`) |
+| Menu path | `Sidebar > Warehouse Configuration > Reason Codes > Adjustment Reasons` |
 | List | code list id 1031, `editable = false` |
 | Columns on screen | `Reason`, `Active`, `Adds Stock`, `Removes Stock`, `Comment Required`, `Approval Required`, `Count After Posting` |
 | What you can change | only `Count After Posting`, with the buttons `Count After Posting` and `Do Not Count` (tick one reason first). Roles `Admin`, `Manager`. Message when nothing is ticked: `Tick one reason`. |
@@ -401,7 +401,7 @@ edited with `receipt_detail` updates). There is no code list for it: any text is
 
 | Item | Value |
 |---|---|
-| Menu path | **Enterprise mode** only: `Sidebar > Configuration > Handling Unit Types`. A warehouse sees `Handling Unit Registry` (types read-only, plus the list of registered units). |
+| Menu path | **Enterprise mode** only: `Sidebar > Shared Handling Unit Types`. A warehouse sees `Handling Unit Registry` (types read-only, plus the list of registered units). |
 | Table | `enterprise.handling_unit_type`, shared by every warehouse of the tenant |
 | Roles | create and update: `Admin`, `Manager`. Read: all roles. There is no delete. |
 | Instance | A registered unit is a `container` row. Register with the modal `Register Handling Units`: `Location` (required), `Owned By` (`This warehouse` or `Client`), `Client`, `Print Labels`. At most 500 units at once. |
@@ -465,7 +465,7 @@ These are versioned reasons with typed actions, not a code list. Full rules are 
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Policy > Pick Short Reasons` |
+| Menu path | `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons` |
 | Lifecycle | `Draft` → `Published` → `Retired`; one `Published` revision per code |
 | Fields of a reason | `code` (upper case, up to 20), `description` (up to 120), `allow_partial` (default `true`), `allow_zero` (default `true`) |
 | Actions (per reason) | `ReleaseCurrentRemainder`, `BlockSourceLocation`, `ReleaseRelatedReservations`, `RelocateResidualToMissing`, `ReallocateReleasedDemand`, `CreateInventoryCount`, `HoldInventory`, `HoldContainer`, `RequestSupervisorReview`, each with `enabled`, `scope`, `required`, `target_mode`, `fixed_location`, `trigger_after`, `order_scope`, `supervisor_review` |

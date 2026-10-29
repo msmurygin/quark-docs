@@ -1,7 +1,7 @@
 # Who can do what
 
 This page shows which default role may use each button of the order screens, and which web action and API right stand behind it.
-It describes the **defaults** that a new database gets. An administrator can change every cell in `Users & Roles > Permission Matrix`. A change made there wins over this page.
+It describes the **defaults** that a new database gets. An administrator can change every cell in `Permission Matrix`. A change made there wins over this page.
 
 Two gates apply to a button:
 
@@ -49,7 +49,6 @@ Remarks:
 - `Release` does not need a second right for the stock reservation it makes. The right to release covers it.
 - The reads for `VIEWER` come from the default roles of the read methods. The baseline seed block has no `VIEWER` rows for the order methods.
 
-> Not confirmed by code: that `VIEWER` really sees the menu item `Outbound > Orders` and can open an order. The API read rights and the read actions are open to `VIEWER` by default, but the grant of the menu item and the forms was not traced. To verify: sign in as a `VIEWER` and open `Outbound > Orders`.
 
 > Not confirmed by code: the pick lists on the header and the line (owners, customers, order types, SKUs) need their own read rights. They are not listed above. To verify: sign in as an `OPERATOR`, press `New`, and open each pick list.
 
@@ -69,6 +68,6 @@ The RBAC seeder at start-up only adds rows that are missing and never removes a 
 
 - [Order screen](01-order-screen-overview.md)
 - [Order statuses and transitions](90-order-statuses-and-transitions.md)
-- Administrator guide: roles are changed in `Users & Roles > Permission Matrix`.
+- Administrator guide: roles are changed in `Permission Matrix`.
 - API: the methods in the table. All commands need `meta.idempotency_key`. The stateful ones also need the version in `data`.
 - RF terminal: not applicable.

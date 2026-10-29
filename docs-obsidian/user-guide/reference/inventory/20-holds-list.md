@@ -6,7 +6,7 @@ The form is `inventory_hold_list`. The data object is `inventory_hold`, over the
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
+2. In the left sidebar open `Management & Control`, then `Inventory`.
 3. Click `Holds`.
 
 The sidebar item is `inventory_hold_list_menu` (tab `tab_inventory_hold_list`).

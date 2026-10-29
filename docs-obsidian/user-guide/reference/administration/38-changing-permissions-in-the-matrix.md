@@ -12,7 +12,7 @@ Use this page to give a role a right, or take one away: to open a screen, to pre
 ## Steps: change one cell
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Permission Matrix`.
+2. Open `Permission Matrix`.
 3. Pick a resource type chip (`Menu Items`, `Forms`, `API Methods`, `Server Actions`) or type a part of the resource code in `Search resource code`.
 4. Find the row and the role column.
 5. Click the switch you need: **R**, **W**, **D** or **X**.

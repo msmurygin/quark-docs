@@ -11,7 +11,7 @@ You take the task away and it goes back to the pool for anyone to pick up at onc
 
 ## Steps
 
-1. Open `Task Manager > Task Board`.
+1. Open `Management & Control > Execution Control > Task Board`.
 2. Find the task. Use the filters, for example `Assignee` or `Status`.
 3. Tick the check box of **one** task. `Return to Pool` turns on only for `Assigned` or `InProgress`.
 4. Click `Return to Pool`. The window `Return Task to Pool` opens.

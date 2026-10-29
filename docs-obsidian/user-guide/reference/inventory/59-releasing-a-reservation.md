@@ -9,7 +9,7 @@ Use this page when a pallet will not arrive at the location that putaway reserve
 
 ## Steps
 
-1. Open `Inventory Balances > Pending Move-In`.
+1. Open `Management & Control > Inventory > Pending Move-In`.
 2. Tick one or more reservations. Use the quick filters `LPN`, `Location` or `Status` to find them.
 3. Click `Release`.
 

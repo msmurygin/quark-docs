@@ -11,7 +11,7 @@ You make the header first. You add the lines after the first save.
 
 ## Steps
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Click `New`.
    The receipt screen opens with a new receipt. `Receipt Number` is already filled (10 digits, for example `0000000021`), `Status` is `Open`, `Receipt Type` is `Normal`.
    `Owner` is filled when the warehouse has a default owner.

@@ -11,7 +11,7 @@ It is also how you switch on new pick work for an operator in an area.
 
 ## Add a right
 
-1. Open `Task Manager > Operators` and click the operator.
+1. Open `Warehouse Configuration > Operator Permissions > Operators` and click the operator.
 2. In the bottom list `Task Permissions` click `New`.
 3. In `Task Type` choose the type.
 4. In `Work Area` open the picker and choose the area.

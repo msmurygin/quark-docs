@@ -1,13 +1,13 @@
 # Adjustments list
 
-An **inventory adjustment** is a document that sets the stock of chosen places to a target quantity. The `Inventory Adjustments` screen lists the documents of the active warehouse.
+An **inventory adjustment** is a document that sets the stock of chosen places to a target quantity. The `Adjustments` screen lists the documents of the active warehouse.
 The form is `inventory_adjustment_list_form`. The data object is `inventory_adjustment_doc`, over the table `inventory_adjustment`. The list is read by `inventory_adjustment_list`.
 
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
-3. Click `Inventory Adjustments`.
+2. In the left sidebar open `Management & Control`, then `Inventory`.
+3. Click `Adjustments`.
 
 The sidebar item is `inventory_adjustment_list_menu` (tab `tab_inventory_adjustment_list`).
 

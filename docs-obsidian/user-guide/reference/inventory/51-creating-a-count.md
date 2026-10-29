@@ -10,7 +10,7 @@ Use this page to start an inventory count. You make the count first, then you ad
 
 ## Steps
 
-1. Open `Inventory Balances > Inventory Counts`.
+1. Open `Management & Control > Inventory > Counts`.
 2. Click `New`. The header opens. The `Number` is filled (`CNT` and 7 digits). The status is `New`.
 3. Choose `Mode`, `Type`, `Freeze` and `Scope`. Type `Recounts per Location` (0 to 9, default 2). Type a `Comment` if you want one.
 4. **To count by item:** pick `SKUs`, `Lots` or `LPNs`. Leave the locations. To count only the item, set `Scope` to `Only the item`.

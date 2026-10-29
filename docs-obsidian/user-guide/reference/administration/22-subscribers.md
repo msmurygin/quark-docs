@@ -6,7 +6,7 @@ The delivery worker of the app server reads new events from the [Event monitor](
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Integration > Subscribers`.
+2. Open `Integrations > Subscribers`.
 
 The menu item is `ent_integration_subscriber_menu`. It opens the list `ent_integration_subscriber_list_form`. The card is `ent_integration_subscriber_normal_form`. The data object is `integration_subscriber` (table `enterprise.integration_subscriber`).
 

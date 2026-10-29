@@ -40,7 +40,7 @@ Create an order, allocate stock, and release it to the floor.
 
 ### Steps
 
-1. Open `Sidebar > Outbound > Orders`.
+1. Open `Sidebar > Management & Control > Orders & Waves > Orders`.
 2. Click `New`.
 3. Tab `Header`: fill `Type`, `Owner`, `Priority`, `Requested Ship`, `Notes`. `Order #` and `Status` are read-only.
 4. Tab `Ship To`: fill `Ship To` (required) and `Carrier`.
@@ -91,7 +91,7 @@ Order-type table: seeded `SO` = `Standard Outbound`.
 ### What you should see
 
 - After `Allocate`: line status `Allocated` or `PartiallyAllocated`, a plan of cartons, and picks.
-- After `Release`: tasks in `Task Manager > Task Board`, status `Released` (or `PartiallyReleased` if some stock is short).
+- After `Release`: tasks in `Management & Control > Execution Control > Task Board`, status `Released` (or `PartiallyReleased` if some stock is short).
 - After Goods Issue: the `Shipments — base quantities` tab records immutable shipped quantities. A fully shipped order is closed; an order split across Loads can show `PartiallyShipped` until its remaining demand ships.
 
 ### If something goes wrong
@@ -140,7 +140,7 @@ A policy has a life cycle: `Draft` -> `Published` -> `Retired`. A published poli
 
 ### Steps
 
-1. Open `Sidebar > Policy > Allocation Policy`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Allocation Policy`.
 2. To change a published policy, select it and click `Duplicate`. A new draft opens.
 3. To make a new one, click `New`. Fill `Code` and `Description`. Click `Save`.
 4. Open the policy. Click `Add step`.
@@ -228,7 +228,7 @@ Group unreleased orders, review the complete composition and release the group t
 
 ### Steps
 
-1. Open `Sidebar > Outbound > Waves`.
+1. Open `Sidebar > Management & Control > Orders & Waves > Waves`.
 2. Click `New Wave`, enter `Wave code`, and click `Create`.
 3. Open the wave and click `Composition and progress`.
 4. Click `Add Order`, choose `Unreleased Order`, optionally enter `Membership sequence` and `Member priority`, then click `Review` and `Confirm Draft edit`.
@@ -338,13 +338,13 @@ The seeded policy is `DISCRETE` (revision 1, published): "One order, one root co
 
 ### Steps
 
-1. Open `Sidebar > Policy > Picking Policies`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Picking Policies`.
 2. Click `New Draft`. Fill `Code` and `Description`. Click `Create Draft`. The server copies the latest revision of the code, or `DISCRETE` for a new code.
 3. Open the draft. Change the sections.
 4. Click `Save`.
 5. Click `Publish`.
 6. To stop a revision: `Retire`.
-7. Assign the policy to a work area (`Topology > Work Areas`, button `Assign Policy`) or per equipment kind.
+7. Assign the policy to a work area (`Warehouse Configuration > Work Areas & Equipment > Work Areas`, button `Assign Policy`) or per equipment kind.
 
 ![Picking Policies list with one policy, DISCRETE](../assets/screens/policy-picking.png)
 
@@ -419,7 +419,7 @@ Define what happens when a picker cannot find the full quantity.
 
 ### Steps
 
-1. Open `Sidebar > Policy > Pick Short Reasons`.
+1. Open `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`.
 2. Click `New Revision`. Fill `Code`, `Description`, `Allow Partial`, `Allow Zero`.
 3. Click `Add Action` for each action. Fill the form. Click `Save`.
 4. Click `Save`, then `Publish`.
@@ -500,7 +500,7 @@ Tell the system which boxes exist and how to plan an order into boxes.
 
 ### Steps
 
-1. Open `Sidebar > Policy > Cartonization Policy`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Cartonization Policy`.
 2. Click `New`. Fill `Code`, `Name`, `Description`. Keep `Active`.
 3. Section `General`: set `Pick splitting`, `Objective`.
 4. Section `Solver settings`: keep the defaults unless told otherwise.
@@ -564,8 +564,8 @@ Packing itself runs on the RF terminal. The web UI prepares the master data only
 
 ### Steps
 
-1. Create a location of type `Pack` (`Sidebar > Topology > Locations`).
-2. Open `Sidebar > Topology > Work Areas`. Open the area.
+1. Create a location of type `Pack` (`Sidebar > Warehouse Configuration > Topology > Locations`).
+2. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Open the area.
 3. In the field `Pack station`, pick the `Pack` location. Save.
 4. Make sure the picking policy of the area allows `Pack` in `Pallet Drop Cell Types` when pallets should go to the station.
 5. Make sure the label `shipping_label` exists (see `07-printing-and-labels.md`).
@@ -598,11 +598,11 @@ There is no packing queue in the web UI. Migration 110 only adds one message wor
 
 | Screen | Use |
 |---|---|
-| `Task Manager > Task Board` | See every task. Buttons: `Return to Pool` (reason required), `Reassign` (new `Operator`), `Delete Task`. |
-| `Task Manager > Pick Assignments` | See carts in use. Button `Dissolve` (reason required): returns tasks to the pool and takes empty boxes off the cart. |
-| `Task Manager > Pick Target Exceptions` | See box-full problems. Button `Retry`. |
-| `Task Manager > Skip History` | See tasks refused or handed back. |
-| `Task Manager > Operators` | Operators (see `03-warehouse-structure.md`). |
+| `Management & Control > Execution Control > Task Board` | See every task. Buttons: `Return to Pool` (reason required), `Reassign` (new `Operator`), `Delete Task`. |
+| `Management & Control > Execution Control > Pick Assignments` | See carts in use. Button `Dissolve` (reason required): returns tasks to the pool and takes empty boxes off the cart. |
+| `Management & Control > Exceptions > Pick Target Exceptions` | See box-full problems. Button `Retry`. |
+| `Management & Control > Exceptions > Skip History` | See tasks refused or handed back. |
+| `Warehouse Configuration > Operator Permissions > Operators` | Operators (see `03-warehouse-structure.md`). |
 
 `Delete Task` removes every selected task nobody has taken yet, and returns its pick to reserve. An order with nothing in work goes back to `Allocated`. Press `Release` to dispatch again.
 
@@ -644,7 +644,7 @@ sequenceDiagram
 
 ### Ship one complete order
 
-1. Open `Sidebar > Outbound > Orders` and open the fully picked order.
+1. Open `Sidebar > Management & Control > Orders & Waves > Orders` and open the fully picked order.
 2. Click `Ship order`.
 3. In `Confirm shipment — stock will be deducted`, verify `Order`, `Reviewed status` and `Reviewed Order version`.
 4. Click `Confirm — ship and deduct stock`.
@@ -671,11 +671,11 @@ flowchart TD
 
 ### Plan a Load
 
-1. Open `Sidebar > Outbound > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
-2. Open `Sidebar > Outbound > Dispatches`. Click `New Dispatch`, enter the dispatch reference, optionally choose a carrier and `Door`, then click `Create`.
+1. Open `Sidebar > Management & Control > Shipping > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
+2. Open `Sidebar > Management & Control > Shipping > Dispatches`. Click `New Dispatch`, enter the dispatch reference, optionally choose a carrier and `Door`, then click `Create`.
 3. Open the dispatch. Enter `New stop sequence` and `New stop destination`, then click `Add Stop`. Choose `Order to add`, its now-persisted `Delivery stop`, and optional `Preferred stage`, then click `Add Order`.
 4. Review `Stops` and `Orders`, then click `Plan Dispatch`.
-5. Open `Sidebar > Outbound > Load Plans`. Click `New Load Plan`, choose the planned dispatch and `Loading order`, then click `Create`.
+5. Open `Sidebar > Management & Control > Shipping > Load Plans`. Click `New Load Plan`, choose the planned dispatch and `Loading order`, then click `Create`.
 6. Open the plan and click `Generate stop order`. Click `Review composition`; check all stops, selected units, invalid units and unplanned units.
 7. Click `Freeze reviewed composition`. Freeze is a planning commitment, not loading or shipment.
 8. Back on the plan, click `Open Load`, choose an unused active transport, click `Review selected transport`, then `Confirm — open Load`.
@@ -694,7 +694,7 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 
 ### Load and ship in the web UI
 
-1. Open `Sidebar > Outbound > Loads`, open the Load, and click `Composition and progress`.
+1. Open `Sidebar > Management & Control > Shipping > Loads`, open the Load, and click `Composition and progress`.
 2. On an `Open` Load, click `Confirm transport / start`. Enter the bound transport reference, click `Review entered scan`, review the saved decision, then click `Confirm loading action`.
 3. For each unit, click `Review root LPN`, enter the physical root LPN, and review its location, quantity and next sequence. Physically load it, then click `Confirm loading action`.
 4. When `Remaining units` is 0, click `Complete loading (not ship)` and confirm. The status becomes `Loaded`; stock has not left yet.
@@ -772,7 +772,7 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ### The screen `Replenishment`
 
-`Sidebar > Inventory Balances > Replenishment` (after `Inventory Counts`). The list shows every replenishment: urgency, status (`Open`, `Done`, `Shorted`, `Cancelled`), pick location, SKU, lot, from where, quantity and unit, the short reason, when it was planned.
+`Sidebar > Management & Control > Inventory > Replenishment`. The list shows every replenishment: urgency, status (`Open`, `Done`, `Shorted`, `Cancelled`), pick location, SKU, lot, from where, quantity and unit, the short reason, when it was planned.
 
 ![Replenishment list with an open urgent row](../assets/screens/replenishment-list-form.png)
 
@@ -786,7 +786,7 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ### How urgent: the replenishment policy
 
-Every SKU has a replenishment policy (`STD` unless the SKU card names another). `Sidebar > Policy > Replenishment Policy` lists them; open a row to set its rule, **New** makes one by its code with the default rule.
+Every SKU has a replenishment policy (`STD` unless the SKU card names another). `Sidebar > Warehouse Configuration > Policies > Replenishment Policy` lists them; open a row to set its rule, **New** makes one by its code with the default rule.
 
 ![Replenishment policy thresholds](../assets/screens/replenishment-policy-card-form.png)
 
@@ -802,4 +802,4 @@ Otherwise urgency 3. A share counts only when something is reserved. The importa
 
 Example, 40 lie in the pick location, default rule: 40 reserved — 1; 10 reserved — 2; nothing reserved — 3; empty — 1.
 
-The operator's side is `operator/12-replenish.md`.
+The operator's side is `operator/13-replenish.md`.

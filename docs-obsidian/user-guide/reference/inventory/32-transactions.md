@@ -6,7 +6,7 @@ The list form is `txn_log_list_form`, the detail form is `txn_log_normal_form`. 
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
+2. In the left sidebar open `Management & Control`, then `History`.
 3. Click `Transactions`.
 
 The sidebar item is `txn_log_menu` (tab `tab_txn_log_list`).

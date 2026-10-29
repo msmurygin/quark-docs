@@ -16,15 +16,15 @@ updated: 2026-10-10
 | Label templates | The layout (JSON). | Yes, in the label designer (see below). Also by API. |
 | Printer configurations | Network printers (host and port). | No. API only. |
 | Printer assignments | Which printer a user, zone, owner or warehouse uses. | A form `printer_assignments_list_form` exists, but no menu item or tab opens it. |
-| Zone printer settings | Default printers in a putaway zone. | Yes. `Topology > Putaway Zones > Printer Settings`. |
+| Zone printer settings | Default printers in a putaway zone. | Yes. `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`. |
 | Label renderer | A separate service that turns a template into ZPL. | Setting `LABEL_RENDERER_URL`. |
-| Barcode formats | Rules to read scanned barcodes (GS1 and others). | Yes. `Sidebar > Barcode Formats`. |
+| Barcode formats | Rules to read scanned barcodes (GS1 and others). | Yes. `Sidebar > Warehouse Configuration > Product Data > Barcode Formats`. |
 
 Labels are made in ZPL for Zebra printers. The server sends the ZPL to the printer's network port (default 9100).
 
 There is no web screen for printer configurations. Use the API methods (section 7).
 
-Label design has a web screen. Open `Sidebar > Reports`. If you pass the Studio-admin check, the page shows the buttons `Report designer` and `Label designer` above the frame. `Label designer` opens the designer of the report service (`/designer?surface=labels`). It reads and writes `label_definitions` and `label_templates`, the same tables the printing code uses. Users who are not Studio admins do not see these buttons.
+Label design has a web screen. Open `Sidebar > Overview > Reports`. If you pass the Studio-admin check, the page shows the buttons `Report designer` and `Label designer` above the frame. `Label designer` opens the designer of the report service (`/designer?surface=labels`). It reads and writes `label_definitions` and `label_templates`, the same tables the printing code uses. Users who are not Studio admins do not see these buttons.
 
 ## 2. Seeded labels
 
@@ -61,7 +61,7 @@ Set default printers for a zone and turn on automatic printing.
 
 ### Steps
 
-1. Open `Sidebar > Topology > Putaway Zones`.
+1. Open `Sidebar > Warehouse Configuration > Topology > Putaway Zones`.
 2. Open the zone. Open the tab `Printer Settings`.
 3. Fill the fields. Click `Save`.
 
@@ -146,7 +146,7 @@ An administrator cannot reach this form in the UI today. No menu item, tab, navi
 ## 6. Label renderer
 
 - The setting `LABEL_RENDERER_URL` (seed `http://localhost:8086`) names the renderer service.
-- Open `Sidebar > System Settings` to change it.
+- Open `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` to change it.
 - The server posts the template and data to the renderer and gets ZPL bytes back. A failed render sends nothing to the printer.
 
 | Failure stage (log token) | Meaning | Fix |
@@ -180,7 +180,7 @@ Define how the system reads scanned barcodes such as GS1-128.
 
 ### Steps
 
-1. Open `Sidebar > Barcode Formats`.
+1. Open `Sidebar > Warehouse Configuration > Product Data > Barcode Formats`.
 2. Click `New`. Fill the tab `Configuration`. Click `Save`.
 3. Open the detail list `Format Details`. Click `New`. Fill each element in order. Click `Save`.
 4. Use `Test Barcode`: paste a barcode in `Scan or Paste Barcode` and click `Test`. Read `Parsed Result`.

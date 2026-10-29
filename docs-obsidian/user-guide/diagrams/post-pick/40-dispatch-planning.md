@@ -2,7 +2,7 @@
 
 **What this shows.** How a planner creates a Dispatch, how its order intent reaches physical units, and how the Dispatch becomes `Shipped` only through whole-Load Goods Issue.
 
-A Dispatch is available in `Sidebar > Outbound > Dispatches` and through the `dispatch_*` API methods. Planning itself moves no stock. The planned stops and orders become input to staging and a reviewed Load Plan.
+A Dispatch is available in `Sidebar > Management & Control > Shipping > Dispatches` and through the `dispatch_*` API methods. Planning itself moves no stock. The planned stops and orders become input to staging and a reviewed Load Plan.
 
 ```mermaid
 sequenceDiagram
@@ -42,12 +42,12 @@ stateDiagram-v2
 
 ## Web workflow
 
-1. Open `Sidebar > Outbound > Dispatches` and click `New Dispatch`.
+1. Open `Sidebar > Management & Control > Shipping > Dispatches` and click `New Dispatch`.
 2. Enter the Dispatch reference and optional external reference, carrier and `Door`; click `Create`.
 3. Open the Dispatch. Add each delivery stop before assigning an order to it.
 4. Add unreleased or released active orders. An order can belong to only one active Dispatch.
 5. Review the `Stops` and `Orders` lists, then click `Plan Dispatch`.
-6. Continue in `Outbound > Load Plans`: create a plan for the planned Dispatch, generate its stop order, review its complete unit set and freeze it.
+6. Continue in `Management & Control > Shipping > Load Plans`: create a plan for the planned Dispatch, generate its stop order, review its complete unit set and freeze it.
 
 The API sequence is `dispatch_create` -> `dispatch_stop_add` -> `dispatch_add_order` -> `dispatch_plan`. Every mutation after create uses the current `expected_dispatch_version`.
 

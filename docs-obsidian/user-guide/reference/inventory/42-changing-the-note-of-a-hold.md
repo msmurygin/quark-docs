@@ -9,7 +9,7 @@ Use this page to change the free text (`Comments`) or optional `Auto-release` in
 
 ## Steps
 
-1. Open `Inventory Balances > Holds`.
+1. Open `Management & Control > Inventory > Holds`.
 2. Click the hold in the list. The [hold form](21-hold-form.md) opens. `Reason code`, `Lot`, `Location` and `Container (LPN)` are grey.
 3. Change `Comments`, set `Auto-release`, or clear the date to remove the schedule.
 4. Click `Save`.

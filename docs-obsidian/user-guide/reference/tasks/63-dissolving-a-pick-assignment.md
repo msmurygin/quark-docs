@@ -10,7 +10,7 @@ A dissolve returns the tasks that are not picked yet to the pool and frees the c
 
 ## Steps
 
-1. Open `Task Manager > Pick Assignments`.
+1. Open `Management & Control > Execution Control > Pick Assignments`.
 2. Tick **one** assignment. `Dissolve` turns on only for `Building`, `Ready` or `Picking`.
 3. Click `Dissolve`. The window `Dissolve Pick Assignment` opens.
 4. Type the reason in `Reason` (required, 80 characters or fewer).

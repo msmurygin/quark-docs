@@ -7,10 +7,10 @@ There is no separate ASN screen.
 ## How to open it
 
 1. Sign in and select a warehouse. The list is not available in Enterprise mode.
-2. In the left sidebar open `Inbound`.
-3. Click `Receipts`.
+2. In the left sidebar open `Management & Control`.
+3. Open `Receiving`, then click `Receipts`.
 
-The sidebar item is `Inbound > Receipts` (menu item `receipt_list_menu`, form `receipt_list`).
+The sidebar item is `Management & Control > Receiving > Receipts` (menu item `receipt_list_menu`, form `receipt_list`).
 The page opens in the main work area. The breadcrumb reads `Dashboard > Receipts`.
 
 ![Receipts list with receipt numbers, owner, status and type](../../assets/screens/receipts-list.png)

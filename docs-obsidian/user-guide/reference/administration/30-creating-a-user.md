@@ -12,7 +12,7 @@ Use this page to add a new account. A new account can sign in, but it can do not
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`.
+2. Open `Users & Roles > Users`.
 3. Click `New User`. An empty card opens on the right.
 4. On the `General` tab fill `Login`, `Full name`, `Email` and `Password`.
 5. Leave `Type` as `User` and `Status` as `Active`, unless you need something else.

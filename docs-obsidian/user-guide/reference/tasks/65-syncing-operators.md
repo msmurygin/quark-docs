@@ -11,7 +11,7 @@ The operators list is a copy of the system users. The sync updates the copy.
 
 ## Steps
 
-1. Open `Task Manager > Operators`.
+1. Open `Warehouse Configuration > Operator Permissions > Operators`.
 2. Click `Sync`.
 3. Read the message. The list is read again.
 

@@ -3,7 +3,7 @@ title: "Administrator Guide - First Login and Navigation"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-10-29
 ---
 
 # First Login and Navigation
@@ -119,75 +119,91 @@ Labels are the English labels. The order follows `sort_order`.
 Items with the same `sort_order` appear in the order the database returns them.
 
 ```
-Code
-  Code List
-  Hold Codes
-Owners
-Topology
-  Locations
-  Putaway Zones
-  3D Warehouse
-  Work Areas
-  Distribution Stations
-  Consolidation Stations
-  Packing Exceptions
-  Order Control
-  Equipment Profiles
-System Settings
-Control Center
-  Board Settings
-  Metric Thresholds
-Packs
-Policy
-  Allocation Policy
-  Replenishment Policy
-  Putaway Policy
-  Cartonization Policy
-  Lot Policy
-  Receipt Policy
-  Pick Short Reasons
-  Picking Policies
-  Cycle Count Policies
-  Handling Unit Registry
-Barcode Formats
-Inbound
-  Receipts
-SKU
-Attributes
-Outbound
-  Orders
-  Transport Resources
-  Waves
-  Dispatches
-  Load Plans
-  Loads
-Inventory Balances
-  Balances
-  Holds
-  Inventory Adjustments
-  Inventory Counts
-  Replenishment
-  Adjustment Reasons
-  Transactions
-  Pending Move-In
-Integration
-  IPaaS
-  RPC Documentation
-Reports
-Task Manager
-  Task Board
-  Pick Assignments
-  Pick Target Exceptions
-  Skip History
-  Operators
+Overview
+  Dashboard
+  Reports
+Management & Control
+  Receiving
+    Receipts
+  Orders & Waves
+    Orders
+    Waves
+  Shipping
+    Transport Resources
+    Dispatches
+    Load Plans
+    Loads
+  Inventory
+    Balances
+    Holds
+    Adjustments
+    Counts
+    Lot Transfers
+    Replenishment
+    Pending Move-In
+  Execution Control
+    Task Board
+    Pick Assignments
+    Order Control (Manual)
+    Pick Pallets (Manual)
+  Exceptions
+    Pick Target Exceptions
+    Packing Exceptions
+    Skip History
+  Stations
+    Distribution Stations
+    Consolidation Stations
+    Station Routes
+  Handling Units
+    Handling Unit Registry
+  History
+    Transactions
+Warehouse Configuration
+  Warehouse Readiness
+  Topology
+    Locations
+    Putaway Zones
+    3D Warehouse
+  Work Areas & Equipment
+    Work Areas
+    Equipment Profiles
+  Product Data
+    Owners
+    SKUs
+    Packs
+    Barcode Formats
+    Attributes
+  Policies
+    Allocation Policy
+    Replenishment Policy
+    Putaway Policy
+    Cartonization Policy
+    Lot Policy
+    Receipt Policy
+    Picking Policies
+  Counting
+    Cycle Count Policies
+    Count Tolerances
+  Reason Codes
+    Hold Codes
+    Pick Short Reasons
+    Adjustment Reasons
+  Operator Permissions
+    Operators
+  Dashboards
+    Board Settings
+    Metric Thresholds
+  Settings & Reference Data
+    System Settings
+    Code List
 ```
 
 Notes:
 
-- There are two items named `Reports`. The one with code `report_def_menu` is **inactive** (`is_active = false`). Only the item with code `reports_iframe_menu` shows.
-- There is no separate item named `Shipping`. Use `Outbound > Orders > Ship order` for a complete order, or `Outbound > Loads` for whole-Load Goods Issue after loading.
-- `Replenishment` (after `Inventory Counts`) lists the replenishments of pick locations. `Replenishment Policy` opens the urgency settings read by the planner; each pick location's `Min` and `Max` still decide when and how much to replenish.
-- `Dashboard` is a form (`dashboard`, kind `Dashboard`). It has no sidebar item in the warehouse tree.
+- All three top-level sections start collapsed. Open one level at a time. Closing a parent also closes and hides every group below it.
+- `Shipping` collects transport resources, dispatches, load plans and loads. Shipping one complete order still starts from `Management & Control > Orders & Waves > Orders`.
+- `Management & Control > Inventory > Replenishment` lists replenishments of pick locations. `Warehouse Configuration > Policies > Replenishment Policy` opens the urgency settings read by the planner; each pick location's `Min` and `Max` still decide when and how much to replenish.
+- `Overview > Dashboard` opens the home dashboard. The dashboard also remains the first tab in the top bar.
 
 The `dashboard` form is the home page. It is the default tab of the main work area (`tab_containers.default_tab_id` = tab `dashboard`), so it opens right after sign-in. The breadcrumb entry `Dashboard` brings you back to it and clears the other screens (`web-ui-server/src/services/viewport_service.rs`, `routes/breadcrumb_handler.rs`).
 
@@ -195,96 +211,105 @@ The `dashboard` form is the home page. It is the default tab of the main work ar
 
 | Menu path | Opens (form code) | Covered in |
 |---|---|---|
-| `Code > Code List` | `code_list_list_form` | `11-faq.md`, `05-inbound-setup.md` |
-| `Code > Hold Codes` | `hold_code_list_form` | `05-inbound-setup.md` |
-| `Owners` | `owner_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Topology > Locations` | `location_list_form` | `03-warehouse-structure.md` |
-| `Topology > Putaway Zones` | `putawayzone_list_form` | `03-warehouse-structure.md` |
-| `Topology > 3D Warehouse` | `warehouse_3d` (HTML page) | `03-warehouse-structure.md` |
-| `Topology > Work Areas` | `work_area_list_form` | `03-warehouse-structure.md` |
-| `Topology > Distribution Stations` | `distribution_station_list_form` | `06-outbound-setup.md` |
-| `Topology > Consolidation Stations` | `consolidation_station_list_form` | `06-outbound-setup.md` |
-| `Topology > Packing Exceptions` | `packing_exception_list_form` | `operator/10-packing-verify.md` |
-| `Topology > Order Control` | `order_control_tabbed` | `operator/11-order-control-after-picking.md` |
-| `Topology > Equipment Profiles` | `equipment_profile_list_form` | `03-warehouse-structure.md` |
-| `System Settings` | `sys_settings_list_form` | `10-checklist-go-live.md` |
-| `Control Center > Board Settings` | `dashboard_setting_list_form` | `08-reports-and-dashboards.md` |
-| `Control Center > Metric Thresholds` | `dashboard_threshold_list_form` | `08-reports-and-dashboards.md` |
-| `Packs` | `pack_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Policy > Allocation Policy` | `allocation_policy_list_form` | `06-outbound-setup.md` |
-| `Policy > Putaway Policy` | `putaway_policy_list_form` | `05-inbound-setup.md` |
-| `Policy > Cartonization Policy` | `cartonization_policy_list_form` | `06-outbound-setup.md` |
-| `Policy > Lot Policy` | `lot_policy_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Policy > Receipt Policy` | `receipt_policy_list_form` | `05-inbound-setup.md` |
-| `Policy > Pick Short Reasons` | `pick_short_reason_list_form` | `06-outbound-setup.md` |
-| `Policy > Picking Policies` | `picking_policy_list_form` | `06-outbound-setup.md` |
-| `Policy > Cycle Count Policies` | `inventory_count_policy_list_form` | `03-warehouse-structure.md` (short note) |
-| `Policy > Handling Unit Registry` | `handling_unit_registry_type_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Barcode Formats` | `barcode_format_list_form` | `07-printing-and-labels.md` |
-| `Inbound > Receipts` | `receipt_list` | `05-inbound-setup.md` |
-| `SKU` | `sku_list` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Attributes` | `attribute_def_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Outbound > Orders` | `shipment_order_list` | `06-outbound-setup.md` |
-| `Inventory Balances > ...` | `inventory_balances` (tabs), `inventory_hold_list`, `inventory_adjustment_list_form`, `inventory_count_list_form`, `inventory_adjust_reason_list_form`, `txn_log_list_form`, `pending_move_in_list_form` | `05-inbound-setup.md` (holds), `11-faq.md` |
-| `Integration > IPaaS` | `integration_platform` (HTML page) | `09-integrations-and-api.md` |
-| `Integration > RPC Documentation` | `rpc_playground` (HTML page) | `09-integrations-and-api.md` |
-| `Reports` | `reports_iframe` (HTML page) | `08-reports-and-dashboards.md` |
-| `Task Manager > Task Board` | `task_board_list_form` | `06-outbound-setup.md` |
-| `Task Manager > Pick Assignments` | `pick_assignment_board_list_form` | `06-outbound-setup.md` |
-| `Task Manager > Pick Target Exceptions` | `pick_target_exception_list_form` | `06-outbound-setup.md` |
-| `Task Manager > Skip History` | `task_skip_board_list_form` | `06-outbound-setup.md` |
-| `Task Manager > Operators` | `operator_list_form` | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Settings & Reference Data > Code List` | `code_list_list_form` | `11-faq.md`, `05-inbound-setup.md` |
+| `Warehouse Configuration > Reason Codes > Hold Codes` | `hold_code_list_form` | `05-inbound-setup.md` |
+| `Warehouse Configuration > Product Data > Owners` | `owner_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Warehouse Configuration > Topology > Locations` | `location_list_form` | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Topology > Putaway Zones` | `putawayzone_list_form` | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Topology > 3D Warehouse` | `warehouse_3d` (HTML page) | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Work Areas & Equipment > Work Areas` | `work_area_list_form` | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | `equipment_profile_list_form` | `03-warehouse-structure.md` |
+| `Management & Control > Stations > Distribution Stations` | `distribution_station_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Stations > Consolidation Stations` | `consolidation_station_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Exceptions > Packing Exceptions` | `packing_exception_list_form` | `operator/10-packing-verify.md` |
+| `Management & Control > Execution Control > Order Control (Manual)` | `order_control_tabbed` | `operator/11-order-control-after-picking.md` |
+| `Warehouse Configuration > Settings & Reference Data > System Settings` | `sys_settings_list_form` | `10-checklist-go-live.md` |
+| `Warehouse Configuration > Dashboards > Board Settings` | `dashboard_setting_list_form` | `08-reports-and-dashboards.md` |
+| `Warehouse Configuration > Dashboards > Metric Thresholds` | `dashboard_threshold_list_form` | `08-reports-and-dashboards.md` |
+| `Warehouse Configuration > Product Data > Packs` | `pack_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Warehouse Configuration > Policies > Allocation Policy` | `allocation_policy_list_form` | `06-outbound-setup.md` |
+| `Warehouse Configuration > Policies > Putaway Policy` | `putaway_policy_list_form` | `05-inbound-setup.md` |
+| `Warehouse Configuration > Policies > Cartonization Policy` | `cartonization_policy_list_form` | `06-outbound-setup.md` |
+| `Warehouse Configuration > Policies > Lot Policy` | `lot_policy_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Warehouse Configuration > Policies > Receipt Policy` | `receipt_policy_list_form` | `05-inbound-setup.md` |
+| `Warehouse Configuration > Reason Codes > Pick Short Reasons` | `pick_short_reason_list_form` | `06-outbound-setup.md` |
+| `Warehouse Configuration > Policies > Picking Policies` | `picking_policy_list_form` | `06-outbound-setup.md` |
+| `Warehouse Configuration > Counting > Cycle Count Policies` | `inventory_count_policy_list_form` | `03-warehouse-structure.md` (short note) |
+| `Management & Control > Handling Units > Handling Unit Registry` | `handling_unit_registry_type_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Warehouse Configuration > Product Data > Barcode Formats` | `barcode_format_list_form` | `07-printing-and-labels.md` |
+| `Management & Control > Receiving > Receipts` | `receipt_list` | `05-inbound-setup.md` |
+| `Warehouse Configuration > Product Data > SKUs` | `sku_list` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Warehouse Configuration > Product Data > Attributes` | `attribute_def_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
+| `Management & Control > Orders & Waves > Orders` | `shipment_order_list` | `06-outbound-setup.md` |
+| `Management & Control > Inventory > ...` | inventory balances, holds, adjustments, counts, replenishments and pending move-in | `05-inbound-setup.md` (holds), `11-faq.md` |
+| `Overview > Reports` | reports catalogue | `08-reports-and-dashboards.md` |
+| `Management & Control > Execution Control > Task Board` | `task_board_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Execution Control > Pick Assignments` | `pick_assignment_board_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Exceptions > Pick Target Exceptions` | `pick_target_exception_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Exceptions > Skip History` | `task_skip_board_list_form` | `06-outbound-setup.md` |
+| `Warehouse Configuration > Operator Permissions > Operators` | `operator_list_form` | `03-warehouse-structure.md` |
 
 Every form code in this table is traced in the migrations: menu item, then a menu-click event (`ui_event`), then a tab (`tab_items.target_form_id`), then the form (`form_base.code`). Only `Task Board`, `Skip History`, `Users`, `Roles`, `Audit Log`, `Permission Matrix` and `Translations` also have a direct `target_form_id` on the menu row.
-The items added after the first baseline (for example `Inventory Counts`, `Pick Assignments`, `Handling Unit Registry`, `Board Settings`) are wired the same way in `wms-meta-ui` migrations 073 to 123.
-`Policy > Handling Unit Registry` opens the list of registry types (`handling_unit_registry_type_list_form`). The shell form `handling_unit_registry_shell_form` is a different form.
+Items added after the first baseline (for example `Counts`, `Pick Assignments`, `Handling Unit Registry` and `Board Settings`) use the same navigation pattern.
+`Management & Control > Handling Units > Handling Unit Registry` opens the registry list.
 
-![Warehouse sidebar with the menu highlighted in red](../assets/screens/menu-navigation.png)
+![Warehouse sidebar with all top-level sections collapsed](../assets/screens/menu-navigation-collapsed.png)
 
-*Caption: the left sidebar in a warehouse, with the group `Topology` expanded. Focus: The teal frame (1) marks the sidebar: Code, Topology, Policy and the other groups.*
+*Caption: the sidebar immediately after sign-in. `Overview`, `Management & Control` and `Warehouse Configuration` are collapsed.*
+
+![Warehouse sidebar with Management and Control and Shipping expanded](../assets/screens/menu-navigation.png)
+
+*Caption: the warehouse sidebar with `Management & Control > Shipping` expanded. Each deeper level is indented; other branches remain collapsed.*
 
 ## 4. Enterprise sidebar (menu 3, "Enterprise Sidebar")
 
 ```
-Dashboard
-Configuration
-  Warehouses                  (no screen is attached)
-  Owners                      (no screen is attached)
-  Users & Roles
-    Users
-    Roles
-    Audit Log
-    Permission Matrix
-  Translations
-  Handling Unit Types
-Integration
+Enterprise Overview
+Warehouses
+Owners
+Users & Roles
+  Users
+  Roles
+Permission Matrix
+Audit
+Shared Handling Unit Types
+Translations
+Integrations
   Event Registry
-  Event Monitor
+  Events
   Subscribers
-  Delivery Log
+  Deliveries
+  IPaaS
+Platform Tools
+  Metadata Studio
+  RF UI Designer
+  RPC Documentation
 ```
 
 Notes:
 
-- `Dashboard` opens the Enterprise landing page and `Warehouses` opens warehouse administration. Owners are warehouse-scoped, so the obsolete Enterprise `Owners` placeholder is inactive; select a warehouse to manage owners.
-- `Translations` has a seeded menu permission (`menu_item` resource id `9109`). `ADMIN` can read it. `MANAGER` and `VIEWER` are denied. No other menu item has a seeded permission row.
+- `Enterprise Overview` opens the Enterprise landing page.
+- `Users & Roles`, `Integrations` and `Platform Tools` start collapsed, just like groups in the warehouse sidebar.
+- `IPaaS` is available under `Integrations`; it is no longer shown in a warehouse sidebar.
+- `Metadata Studio`, `RF UI Designer` and `RPC Documentation` are grouped under `Platform Tools`.
 
 | Menu path | Form code |
 |---|---|
 | `Users & Roles > Users` | `enterprise_users_shell` |
 | `Users & Roles > Roles` | `enterprise_role_detail` |
-| `Users & Roles > Audit Log` | `enterprise_audit_log` |
-| `Users & Roles > Permission Matrix` | `enterprise_permission_matrix` |
+| `Audit` | `enterprise_audit_log` |
+| `Permission Matrix` | `enterprise_permission_matrix` |
 | `Translations` | `translations_tabbed` |
-| `Handling Unit Types` | `handling_unit_type_list_form` |
-| `Integration > Event Registry` | `ent_event_registry_list_form` |
-| `Integration > Event Monitor` | `ent_integration_event_list_form` |
-| `Integration > Subscribers` | `ent_integration_subscriber_list_form` |
-| `Integration > Delivery Log` | `ent_event_delivery_list_form` |
+| `Shared Handling Unit Types` | `handling_unit_type_list_form` |
+| `Integrations > Event Registry` | `ent_event_registry_list_form` |
+| `Integrations > Events` | `ent_integration_event_list_form` |
+| `Integrations > Subscribers` | `ent_integration_subscriber_list_form` |
+| `Integrations > Deliveries` | `ent_event_delivery_list_form` |
+| `Integrations > IPaaS` | Integration Platform |
+| `Platform Tools > Metadata Studio` | Metadata Studio |
+| `Platform Tools > RF UI Designer` | RF UI Designer |
+| `Platform Tools > RPC Documentation` | RPC method reference |
 
-![Enterprise mode with the Enterprise sidebar on the left](../assets/screens/enterprise-users.png)
-
-*Caption: the sidebar in Enterprise mode. Focus: The left sidebar: Configuration, Users & Roles and Integration. The page itself is the Users list. The teal number 1 marks the New User button.*
 
 ## 5. Common screen types
 

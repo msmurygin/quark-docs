@@ -1,6 +1,6 @@
 # Statuses and transitions
 
-This page lists the statuses of the documents and records of the `Inventory Balances` screens, and what moves each one to the next.
+This page lists the statuses of the documents and records of the `Inventory` screens, and what moves each one to the next.
 The rules live in `crates/libs/wms-inventory/src/domain/inventory_adjustment/aggregate.rs`, `crates/libs/wms-inventory/src/domain/inventory_count/aggregate.rs` and the services next to them.
 
 ## Adjustment document

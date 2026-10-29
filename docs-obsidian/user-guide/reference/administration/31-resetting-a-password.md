@@ -11,7 +11,7 @@ Use this page to give a user a new password. This is the only way to change a pa
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`.
+2. Open `Users & Roles > Users`.
 3. Click the user. The card opens.
 4. On the `General` tab, type the new password in `Password`. The field is empty when the card opens; the old password is never shown.
 5. Click `Save`.

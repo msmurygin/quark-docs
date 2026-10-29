@@ -8,7 +8,7 @@ The form is `inventory_adjust_reason_list_form`. The data object is `inventory_a
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
+2. In the left sidebar open `Warehouse Configuration`, then `Reason Codes`.
 3. Click `Adjustment Reasons`.
 
 The sidebar item is `inventory_adjust_reason_list_menu` (tab `tab_inventory_adjust_reason_list`).

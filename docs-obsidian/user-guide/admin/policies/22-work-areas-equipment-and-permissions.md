@@ -18,7 +18,7 @@ Nothing on this page is seeded in a production database. The dev seed (`wms-lib-
 
 ## 1. Work area
 
-Menu path: `Sidebar > Topology > Work Areas`. Table `work_area`.
+Menu path: `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Table `work_area`.
 
 A work area is a group of putaway zones. An operator's rights are a grid of task type and work area. A task reaches its area through `task.from_location -> location.putawayzone -> work_area_zone`.
 
@@ -57,7 +57,7 @@ A work area is a group of putaway zones. An operator's rights are a grid of task
 - What it does: may an operator hand a task back or refuse it in this area. It gates both ways out: "hand back" and "refuse" (the RF screen `Reject Pick`, `PICK11`, and `Skip`/`Reject` in a cart).
 - Affects: `wms-tasks/src/service/release.rs` (`skip_task_in_area`, gate after the "is it yours" and status checks), `work_area_rules.rs:80-103`.
 - Message when off: `returning a task is not allowed in work area <code> — ask a supervisor to move it`. Without an area: `returning a task is not allowed in this warehouse — ask a supervisor to move it`.
-- Example: a picker is stuck on task 812 in area `PICK-A` with the flag off. A supervisor opens `Sidebar > Task Manager > Task Board` and uses `Return to Pool` or `Reassign`.
+- Example: a picker is stuck on task 812 in area `PICK-A` with the flag off. A supervisor opens `Sidebar > Management & Control > Execution Control > Task Board` and uses `Return to Pool` or `Reassign`.
 - Interaction: `TASK_ALLOW_RELEASE_DEFAULT` rules when no area is named.
 - Open work: takes effect on the next press.
 
@@ -128,7 +128,7 @@ Card of the work area, list `Policy by Equipment Kind`, buttons `Add`, `Edit`, `
 
 ## 4. Equipment profile
 
-Menu path: `Sidebar > Topology > Equipment Profiles`. Table `equipment_profile`.
+Menu path: `Sidebar > Warehouse Configuration > Work Areas & Equipment > Equipment Profiles`. Table `equipment_profile`.
 
 ### `Code` (`code`)
 
@@ -173,7 +173,7 @@ Menu path: `Sidebar > Topology > Equipment Profiles`. Table `equipment_profile`.
 
 ## 5. Operator and its equipment
 
-Menu path: `Sidebar > Task Manager > Operators`. Table `operator`.
+Menu path: `Sidebar > Warehouse Configuration > Operator Permissions > Operators`. Table `operator`.
 
 An operator row is a copy of a user. A user becomes an active operator when `RF device login` is on, the status is `Active`, and the user is assigned to the warehouse. The sync runs every 5 minutes. The `Sync` button runs it at once. You cannot create or delete operators.
 
@@ -219,7 +219,7 @@ On the operator card, list `Task Permissions`. Table `operator_task_permission`.
 
 ## 7. Task manager system settings
 
-Menu path: `Sidebar > System Settings`. Table `system_settings`. All five are numbers. A value that is empty, zero or negative falls back to the built-in value for the first four. Seeds are in `wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:9957-9961`.
+Menu path: `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`. All five settings are numbers. A value that is empty, zero or negative falls back to the built-in value for the first four.
 
 | Key | Seed | Built-in fallback | What it does | Read at |
 |---|---|---|---|---|

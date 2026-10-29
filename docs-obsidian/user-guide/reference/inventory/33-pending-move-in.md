@@ -7,7 +7,7 @@ The form is `pending_move_in_list_form` (module `putaway_policy`). The data obje
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
+2. In the left sidebar open `Management & Control`, then `Inventory`.
 3. Click `Pending Move-In`.
 
 The sidebar item is `pending_move_in_menu` (tab `tab_pending_move_in`).

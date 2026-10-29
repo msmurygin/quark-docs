@@ -10,7 +10,7 @@ There is no window. The button acts at once on every ticked receipt.
 
 ## Steps
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Tick one or more receipts with the status `On hold`.
 3. Click `Release Hold`.
 

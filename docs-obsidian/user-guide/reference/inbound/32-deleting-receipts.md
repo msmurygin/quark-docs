@@ -10,7 +10,7 @@ Deleting is final. The receipt, its lines and its planned boxes are removed from
 
 ## Steps: from the list
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Tick one or more receipts.
 3. Click `Delete`.
 

@@ -7,7 +7,7 @@ The registry says which event types exist.
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Integration > Event Registry`.
+2. Open `Integrations > Event Registry`.
 
 The menu item is `ent_event_registry_menu`. It opens the list `ent_event_registry_list_form`. The card is `ent_event_registry_normal_form`. The data object is `event_registry` (table `enterprise.event_registry`).
 

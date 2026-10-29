@@ -13,7 +13,7 @@ Read first what the registry really does: only the `Active` switch has an effect
 ## Steps: switch a record-change event on
 
 1. Switch to **Enterprise**.
-2. Open `Integration > Event Registry`.
+2. Open `Integrations > Event Registry`.
 3. Type the code in the filter of the column `Code`, for example `bio.receipt`.
 4. Click the row of the event you want, for example `bio.receipt.after_insert`.
 5. Tick `Active`.
@@ -23,7 +23,7 @@ From then on, each time a receipt is created the system writes the event, and th
 
 ## Steps: add a new entry
 
-1. Open `Integration > Event Registry` and click `New`.
+1. Open `Integrations > Event Registry` and click `New`.
 2. Fill `Code`, `Name` and `Category`. `Description` is optional.
 3. Keep `Active` ticked, unless you want the entry off.
 4. Click `Save`.

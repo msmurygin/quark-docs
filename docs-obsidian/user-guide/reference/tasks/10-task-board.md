@@ -6,7 +6,7 @@ The form is `task_board_list_form`. The data comes from the database view `task_
 
 ## How to open it
 
-1. In the left sidebar open `Task Manager`.
+1. In the left sidebar open `Management & Control`, then `Execution Control`.
 2. Click `Task Board`.
 
 The menu item is `task_board_menu`.

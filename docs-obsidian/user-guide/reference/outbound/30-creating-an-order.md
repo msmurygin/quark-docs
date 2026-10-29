@@ -11,7 +11,7 @@ Orders can also come from other systems through the API. Those orders have the s
 
 ## Steps
 
-1. Open `Outbound > Orders`.
+1. Open `Management & Control > Orders & Waves > Orders`.
 2. Click `New`. The order screen opens. `Order #` already shows a number and `Status` is `New`.
 3. On the [Header tab](10-header-tab.md) pick the `Type` and the `Owner`. Fill `Priority`, `Requested Ship` and `Notes` if you need them.
 4. On the [Ship To tab](11-ship-to-tab.md) pick the `Ship To` customer. Pick a `Carrier` if you need one.

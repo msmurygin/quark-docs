@@ -7,7 +7,7 @@ The form is `pick_target_exception_list_form`. The data object is `pick_target_e
 
 ## How to open it
 
-1. In the left sidebar open `Task Manager`.
+1. In the left sidebar open `Management & Control`, then `Exceptions`.
 2. Click `Pick Target Exceptions`.
 
 The menu item is `pick_target_exception_menu`.

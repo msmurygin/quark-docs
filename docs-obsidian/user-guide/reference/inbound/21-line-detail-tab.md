@@ -61,7 +61,7 @@ Source of the layout: form `receipt_detail_fields_form` in `001_baseline.sql` (`
 ### SKU
 
 - The SKU must exist for the owner of the receipt. Otherwise the line is refused with `SKU {code} not found for owner {id}` (`crates/libs/wms-lib-core/src/model/receipt/receipt_detail.rs:1117-1123`).
-- The SKU gives the pack, the unit, the lot policy and the serial settings used at receiving. It also gives the receipt policy (`Policy > Receipt Policy`) that judges quantity, pack multiples, dates and pallets.
+- The SKU gives the pack, the unit, the lot policy and the serial settings used at receiving. It also gives the receipt policy (`Warehouse Configuration > Policies > Receipt Policy`) that judges quantity, pack multiples, dates and pallets.
 - After you pick a SKU the tab is redrawn and the description is read from the SKU master (`receipt_detail_enrich`, `crates/services/web-ui-server/src/extensions/customization/receipt/detail_enrich_action.rs`).
 
 ### Barcode

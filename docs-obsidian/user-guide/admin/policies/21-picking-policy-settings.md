@@ -18,7 +18,7 @@ Paths in the "Affects" lines are relative to `crates/libs/` unless they start wi
 
 A picking policy is a set of rules for one way of picking. It has revisions. Each revision has a status: `Draft`, `Published` or `Retired`. Only a `Draft` can be edited.
 
-- Menu path: `Sidebar > Policy > Picking Policies`.
+- Menu path: `Sidebar > Warehouse Configuration > Policies > Picking Policies`.
 - Who can change it: roles `Admin` and `Manager` (`app-server/src/web/rpcs/picking_policy_rpc.rs:17`).
 - Who can read it: `Admin`, `Manager`, `Supervisor`, `Operator`, `Viewer` (same file, line 23).
 - Seed: one policy, code `DISCRETE`, revision 1, `Published`, description `One order, one root container: today's picking` (`wms-lib-sql/sql/wms-app/migrations/042_picking_policy.sql`).
@@ -159,7 +159,7 @@ These are not policy fields, but a cart start fails without them (`picking/carri
 
 | Screen | Field | Needed value | If wrong |
 |---|---|---|---|
-| `Sidebar > Policy > Handling Unit Registry` (type card) | `Active` | on | `the carrier's type is switched off: <code>` |
+| `Sidebar > Management & Control > Handling Units > Handling Unit Registry` (type card) | `Active` | on | `the carrier's type is switched off: <code>` |
 | same | `Holds Containers` | on | `this is not a carrier with positions: <code>` |
 | same | `Positions` | 1 or more | `this is not a carrier with positions: <code>` |
 | the container itself | has a handling-unit type | yes | `this container is not a registered handling unit: <code>` |

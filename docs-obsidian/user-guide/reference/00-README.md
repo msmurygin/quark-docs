@@ -13,11 +13,11 @@ Use it when you have a screen open and want the exact facts about it.
 
 | Section | Screens it covers | Start page |
 |---|---|---|
-| **Inbound** | The receipts list (`Inbound > Receipts`), the receipt screen with its header tabs and its lines, the line card with its tabs, and every dialog and button on them. | [Receipts list](inbound/00-receipts-overview.md) |
-| **Outbound** | The orders list (`Outbound > Orders`), the order screen with its six tabs (header, ship to, picks, tasks, cartons, cartonization exceptions), the lines list and the line card, and every dialog and button on them (release, allocate, unallocate, delete picks, cancel quantity, cancel). | [Orders list](outbound/00-orders-overview.md) |
-| **Administration** | The Enterprise sidebar: `Configuration` (Users, Roles, Audit Log, Permission Matrix, Translations, Handling Unit Types) and `Integration` (Event Registry, Event Monitor, Subscribers, Delivery Log). Also sign-in, passwords and sessions. | [Enterprise sidebar](administration/00-administration-overview.md) |
-| **Task Manager** | `Task Manager > Task Board`, `Pick Assignments` (with its card and positions), `Pick Target Exceptions`, `Skip History` and `Operators` (with its task permissions), and every dialog and button on them. | [Task Manager](tasks/00-task-manager-overview.md) |
-| **Inventory** | The group `Inventory Balances`: `Balances` (seven tabs and the Move stock document), `Holds`, `Inventory Adjustments`, `Inventory Counts`, `Adjustment Reasons`, `Transactions` and `Pending Move-In`, with every dialog and button on them. | [Inventory Balances](inventory/00-inventory-overview.md) |
+| **Inbound** | The receipts list (`Management & Control > Receiving > Receipts`), the receipt screen with its header tabs and its lines, the line card with its tabs, and every dialog and button on them. | [Receipts list](inbound/00-receipts-overview.md) |
+| **Outbound** | The orders list (`Management & Control > Orders & Waves > Orders`), the order screen with its six tabs (header, ship to, picks, tasks, cartons, cartonization exceptions), the lines list and the line card, and every dialog and button on them (release, allocate, unallocate, delete picks, cancel quantity, cancel). | [Orders list](outbound/00-orders-overview.md) |
+| **Administration** | The Enterprise sidebar: `Users & Roles`, `Permission Matrix`, `Audit`, `Shared Handling Unit Types`, `Translations`, `Integrations` and `Platform Tools`. Also sign-in, passwords and sessions. | [Enterprise sidebar](administration/00-administration-overview.md) |
+| **Task Manager** | `Management & Control > Execution Control` for Task Board and Pick Assignments, `Management & Control > Exceptions` for Pick Target Exceptions and Skip History, and `Warehouse Configuration > Operator Permissions > Operators`, with every dialog and button on them. | [Task Manager](tasks/00-task-manager-overview.md) |
+| **Inventory** | `Management & Control > Inventory`: `Balances` (seven tabs and the Move stock document), `Holds`, `Adjustments`, `Counts`, `Lot Transfers`, `Replenishment` and `Pending Move-In`; `Management & Control > History > Transactions`; and `Warehouse Configuration > Reason Codes > Adjustment Reasons`. | [Inventory](inventory/00-inventory-overview.md) |
 
 Only things that exist in the product are described.
 A feature that has no screen is not mentioned.
@@ -78,7 +78,7 @@ It always names the API method behind a button and, where one exists, the RF ter
 - The screens are defined in the metadata database (`wms-meta-ui` migrations): menus, forms, tabs, fields, labels, toolbar buttons.
 - Column types and defaults come from the warehouse database migrations (`wms-app`).
 - Rules and messages come from the receiving code (`wms-inbound`) and from the web server's receipt actions.
-- Who can press a button comes from the default permission lists in the code. An administrator can change them in `Users & Roles > Permission Matrix`.
+- Who can press a button comes from the default permission lists in the code. An administrator can change them in `Permission Matrix`.
 
 ## Related guides
 

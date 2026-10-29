@@ -10,7 +10,7 @@ The machine decides how heavy a task the operator is offered, and which picking 
 
 ## Steps
 
-1. Open `Task Manager > Operators`.
+1. Open `Warehouse Configuration > Operator Permissions > Operators`.
 2. Click the operator. The [Operator card](51-operator-card.md) opens.
 3. In `Equipment Profile` click the picker and choose a profile.
    To make the operator walk, use `Clear value` in the picker.

@@ -12,7 +12,7 @@ Use this page when receiving is finished. Closing seals the document. It cannot 
 
 ## Steps
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Tick one receipt.
 3. Click `Close Receipt`. The window `Close Receipt` opens. It says `Closing a receipt is final. Any shortage or excess is recorded in the close summary.`
 4. Click `Close Receipt` in the window. Click `Not Now` to leave without closing.

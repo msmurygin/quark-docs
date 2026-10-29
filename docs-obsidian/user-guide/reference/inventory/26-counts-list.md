@@ -1,14 +1,14 @@
 # Counts list
 
 An **inventory count** is a document that asks counters to count chosen locations and records what they found. A count never changes stock by itself. A difference that a supervisor accepts becomes an [adjustment](22-adjustments-list.md) that is posted at once.
-The `Inventory Counts` screen lists the counts of the active warehouse.
+The `Counts` screen lists the counts of the active warehouse.
 The form is `inventory_count_list_form`. The data object is `inventory_count_doc`, over the table `inventory_count`. The list is read by `inventory_count_list`.
 
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
-3. Click `Inventory Counts`.
+2. In the left sidebar open `Management & Control`, then `Inventory`.
+3. Click `Counts`.
 
 The sidebar item is `inventory_count_list_menu` (tab `tab_inventory_count_list`).
 

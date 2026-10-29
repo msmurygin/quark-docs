@@ -23,7 +23,7 @@ The field `Type` tells which kind it is.
 
 ### Steps
 
-1. Open `Sidebar > Owners`.
+1. Open `Sidebar > Warehouse Configuration > Product Data > Owners`.
 2. Click `New`.
 3. On the tab `General`, fill `Code`, `Type`, `Company` and the other fields. Click `Save`.
 4. Open the tab `Addresses`. Click `New Address`. Fill the form. Click `Save`.
@@ -204,7 +204,7 @@ Know which units exist and where to add one.
 
 ### Steps
 
-1. The 32 seeded units are listed in the code list `UOM`: open `Sidebar > Code > Code List`, find `UOM`.
+1. The 32 seeded units are listed in the code list `UOM`: open `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List`, find `UOM`.
 2. To add a unit, add a value to the code list (section 3 of `11-faq.md` has the screen steps).
 3. The class and conversion factor of a unit live in the table `uom_class`.
    No screen edits this table.
@@ -263,7 +263,7 @@ Create an item master record.
 
 ### Steps
 
-1. Open `Sidebar > SKU`.
+1. Open `Sidebar > Warehouse Configuration > Product Data > SKUs`.
 2. Click `New`.
 3. Tab `Basic`: fill `Owner`, `SKU Code`, `Pack`, `Description`, `Active`.
 4. Tab `Weight`: fill `Gross Weight`, `Net Weight`, `Tare Weight`, `Cube`.
@@ -378,7 +378,7 @@ Example: `PL` holds 10 `CS`; `CS` holds 10 `IP`; `IP` holds 10 `EA`.
 
 ### Steps (wizard)
 
-1. Open `Sidebar > Packs`.
+1. Open `Sidebar > Warehouse Configuration > Product Data > Packs`.
 2. Click `Pack Wizard`. The wizard `New Pack Wizard` opens.
 3. Step `Pack Info`: fill `Pack Code` and `Description`.
 4. Step `Base Unit`: pick `Base UOM`. Fill weight, cube and size of the base unit.
@@ -387,7 +387,7 @@ Example: `PL` holds 10 `CS`; `CS` holds 10 `IP`; `IP` holds 10 `EA`.
 
 ### Steps (by hand)
 
-1. Open `Sidebar > Packs`. Click `New`. Fill `Code` and `Description`. Save.
+1. Open `Sidebar > Warehouse Configuration > Product Data > Packs`. Click `New`. Fill `Code` and `Description`. Save.
 2. Open the pack. Click `New Item`. Fill the tab `Basic`. Fill `Dimensions`, `Pallet`, `Catch Weight` if needed.
 3. Click `Save`.
 
@@ -469,7 +469,7 @@ Say which lot dates and attributes are shown, required and checked.
 
 ### Steps
 
-1. Open `Sidebar > Policy > Lot Policy`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Lot Policy`.
 2. Click `New`. Fill `Code` and `Description`.
 3. Section `Lot creation`: pick the mode.
 4. Section `Date attributes`: for each of the four dates set `Show`, `Required`, `Label`, `Show on pick`, `Verification`.
@@ -532,7 +532,7 @@ Turn on serial tracking for a SKU and describe the serial format.
 
 ### Steps
 
-1. Open `Sidebar > SKU`. Open the SKU.
+1. Open `Sidebar > Warehouse Configuration > Product Data > SKUs`. Open the SKU.
 2. Open the tab `Serial Tracking`.
 3. Turn on `Continuous Serial Tracking`. Without it, the SKU is **not** serial-tracked.
 4. Set `Allow ASN Pre-advised` and `Allow Receive Capture`.
@@ -618,11 +618,11 @@ flowchart LR
 
 ### Steps
 
-1. Open `Sidebar > Attributes`.
+1. Open `Sidebar > Warehouse Configuration > Product Data > Attributes`.
 2. Click `New`.
 3. Set `Entity Type` to `sku`, enter `Code = COLOR`, `Label = Color`, and choose `Data Type = Text`.
 4. If the definition is intended for one owner, choose that `Owner`. Leave it blank for a system-wide definition. Click `Save`.
-5. Open `Sidebar > SKU`, open the SKU, and select the `Attributes` tab.
+5. Open `Sidebar > Warehouse Configuration > Product Data > SKUs`, open the SKU, and select the `Attributes` tab.
 6. Click `New`. In `Attribute`, choose `COLOR`.
 7. Enter `Blue` in `Text Value`. The form shows the one value field that matches the definition's data type.
 8. Click the `Save` button in the attribute card. The tab returns to the values list; `COLOR` is now a row.
@@ -714,7 +714,7 @@ No handling unit type is seeded.
 
 ### Create the type
 
-1. Switch to Enterprise mode and open `Sidebar > Configuration > Handling Unit Types`.
+1. Switch to Enterprise mode and open `Sidebar > Shared Handling Unit Types`.
 2. Click `New`.
 3. Enter `Code` and `Name`, then set what the unit can hold. A picking cart normally has `Holds Containers` on and a positive `Positions` value. A reusable pick box normally has `Holds Inventory` on and `Holds Containers` off.
 4. Set the physical limits, usage policy and `Code Prefix` when needed.
@@ -737,7 +737,7 @@ Allowed values:
 
 ### Register physical units
 
-1. Switch to the warehouse that will hold the units and open `Sidebar > Policy > Handling Unit Registry`.
+1. Switch to the warehouse that will hold the units and open `Sidebar > Management & Control > Handling Units > Handling Unit Registry`.
 2. Tick exactly one type and click `Register`. The button opens the modal even with no selection, but confirmation then says `Tick exactly one handling unit type`.
 3. In `Register Handling Units`, enter `Count` from 1 to 500 and an existing `Location` whose status is `Ok`.
 4. Choose `Owned By`:

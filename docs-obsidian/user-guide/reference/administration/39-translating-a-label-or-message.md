@@ -12,7 +12,7 @@ Use this page to give a screen text in another language, or to correct a text.
 ## Steps: translate a label
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Translations`. The tab `Labels` is open.
+2. Open `Translations`. The tab `Labels` is open.
 3. Find the label. Type a part of the English text in the quick filter, or use the filter of the column `English`.
 4. Click the row. The label page opens.
 5. In the grid below, find the row of your language.
@@ -21,7 +21,7 @@ Use this page to give a screen text in another language, or to correct a text.
 
 ## Steps: translate a message
 
-1. Open `Configuration > Translations` and click the tab `Messages`.
+1. Open `Translations` and click the tab `Messages`.
 2. Find the message by its `Key` (for example `auth.login_failed`) or by its English text.
 3. Click the row.
 4. Type the text in the cell `Translation` of your language.

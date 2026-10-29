@@ -12,7 +12,7 @@ Use this page to take access away from a person at once: a departed employee, a 
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`, and click the user.
+2. Open `Users & Roles > Users`, and click the user.
 3. On the `General` tab, set `Status` to `Locked` or `Disabled`.
 4. Click `Save`.
 

@@ -51,6 +51,6 @@ Source: `wms-meta-ui` migration 017, `crates/services/web-ui-server/src/extensio
 - [Picks tab](12-picks-tab.md): the `Carton` cell of each pick links here.
 - [Cartonization exceptions tab](15-cartonization-exceptions-tab.md)
 - [Allocating an order](36-allocating-an-order.md): the plan is calculated when stock is reserved.
-- Administrator guide: the cartonization policy is set in the menu `Policy > Cartonization Policy`.
+- Administrator guide: the cartonization policy is set in the menu `Warehouse Configuration > Policies > Cartonization Policy`.
 - API: none for the tab. It reads the view straight from the warehouse database.
 - RF terminal: the box is used in [Operator guide: Packing and verify](../../operator/10-packing-verify.md).

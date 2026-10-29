@@ -26,7 +26,7 @@
 - Seed data looks like test data: receipt numbers such as `ca12afU2` and `9e3d50A1`, LPNs such as `L-SET-0583b929`, and **DEMO** badges on the dashboard tiles.
 - The breadcrumb shows the record id, not the number on the form: the order form shows `0000000002` but the breadcrumb says `1001`. The user, role and location forms show the same effect (`1000`, `1071`).
 - The RPC Documentation page shows the stand port in its curl example (`http://127.0.0.1:18081/api/rpc`). Real installations use their own address.
-- No annotations or call-outs yet. Only `menu-navigation.png` has a red frame. Readers must rely on the caption.
+- Navigation screenshots show the current collapsed and expanded sidebar. Other screenshots rely on their captions and focus notes.
 - The web sidebar is cropped in the middle of the menu in several shots (it scrolls on its own), so the group you are reading about may be hidden.
 - Some seed content is not in English (the report names in Reports) and the user form shows an empty Full name.
 - Pick Assignments is empty, and the Enterprise Warehouses shot (`enterprise-warehouses.png`) is a blank page.

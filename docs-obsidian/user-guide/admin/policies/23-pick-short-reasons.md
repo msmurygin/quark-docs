@@ -16,7 +16,7 @@ Paths in the "Affects" lines are relative to `crates/libs/` unless they start wi
 
 ## 1. Where and who
 
-- Menu path: `Sidebar > Policy > Pick Short Reasons`.
+- Menu path: `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`.
 - Roles that change reasons: `Admin`, `Manager` (`app-server/src/web/rpcs/pick_short_reason_rpc.rs:21`). `Supervisor` can only read. `Operator` cannot read the list, but the RF short command works for them.
 - A reason has revisions with the status `Draft`, `Published`, `Retired`. Only one revision of a code can be `Published`. Only a `Published` revision is used on the floor. A short that names a code with no published revision is refused.
 - The reason is **not** a code list value. It is its own record so that actions have typed meaning. Table `pick_short_reason` (header) and `pick_short_reason_action` (one row per action).
@@ -35,7 +35,7 @@ Example: the pick asks 100. The operator enters 40, reason `SHORT`. Pick 40 are 
 
 ## 3. Reason header fields
 
-Menu: `Sidebar > Policy > Pick Short Reasons`, list columns `Code`, `Revision`, `Status`, `Description`, `Partial`, `Zero`. Buttons `New Revision`, `Refresh`; on the card `Save`, `Publish`, `Retire`.
+Menu: `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`, list columns `Code`, `Revision`, `Status`, `Description`, `Partial`, `Zero`. Buttons `New Revision`, `Refresh`; on the card `Save`, `Publish`, `Retire`.
 
 ### `Code` (`code`)
 

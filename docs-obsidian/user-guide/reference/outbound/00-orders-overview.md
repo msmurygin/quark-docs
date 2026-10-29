@@ -7,11 +7,11 @@ The order has lines. A line says which SKU, in which unit, how many.
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Outbound`.
-3. Click `Orders`.
+2. In the left sidebar open `Management & Control`.
+3. Open `Orders & Waves`, then click `Orders`.
 
-The sidebar item is `Outbound > Orders` (menu item `shipment_order_menu`, form `shipment_order_list`).
-There is no other outbound item in the sidebar.
+The sidebar item is `Management & Control > Orders & Waves > Orders` (menu item `shipment_order_menu`, form `shipment_order_list`).
+Related outbound screens are split between `Orders & Waves`, `Shipping`, `Execution Control`, `Exceptions` and `Stations`.
 
 ## What the screen has
 

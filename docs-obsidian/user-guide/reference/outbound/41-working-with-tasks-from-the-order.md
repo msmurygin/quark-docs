@@ -1,7 +1,7 @@
 # Working with tasks from the order
 
 The [Tasks tab](13-tasks-tab.md) has three task-management buttons for a supervisor. Each opens a small window.
-The same three buttons exist on the task board (menu `Task Manager > Task Board`). The windows and the rules are the same. The grids also have separate paper-pick actions: **Save Picks**, **Pick instructions** and **Place Pallet**. See [Paper picking](../../operator/09-picking.md#c-paper-picking-in-the-web-app).
+The same three buttons exist on the task board (menu `Management & Control > Execution Control > Task Board`). The windows and the rules are the same. The grids also have separate paper-pick actions: **Save Picks**, **Pick instructions** and **Place Pallet**. See [Paper picking](../../operator/09-picking.md#c-paper-picking-in-the-web-app).
 
 ## Before you start
 

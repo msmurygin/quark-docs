@@ -13,7 +13,7 @@ A new role starts with **no rights at all**. You give it rights in the [Permissi
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Roles`.
+2. Open `Users & Roles > Roles`.
 3. Click `New Role`. An empty card opens on the right.
 4. Fill `Code` and `Name`. `Description` is optional but helps: the role search also looks in it.
 5. Leave `Active` ticked.

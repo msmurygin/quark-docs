@@ -20,10 +20,10 @@ flowchart LR
 
 ### Create and assign the station
 
-1. Open `Sidebar > Topology > Locations` and click **New**.
+1. Open `Sidebar > Warehouse Configuration > Topology > Locations` and click **New**.
 2. Give the location a code, for example `CTL-01`.
 3. In **Type**, choose **Control station** (`Control`). Fill the other required location fields and click **Save**.
-4. Open `Sidebar > Topology > Work Areas` and open the area whose picked goods must be checked.
+4. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas` and open the area whose picked goods must be checked.
 5. In **Control Station**, choose `CTL-01` and save the area.
 6. If more than one work area uses control, select the same control station in every area.
 
@@ -36,7 +36,7 @@ Leaving **Control Station** empty keeps the area's current flow unchanged.
 
 ### Choose what happens when a container is missing
 
-1. Open `Sidebar > Policy > Picking Policies`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Picking Policies`.
 2. Open the policy used by the work area and create or open its draft revision.
 3. In **Order Control**, set **Missing Container at Control**.
 4. Save and publish the revision.
@@ -47,7 +47,7 @@ Leaving **Control Station** empty keeps the area's current flow unchanged.
 | Value | What happens |
 |---|---|
 | **Write off to Lost** | The goods in the missing container are written off to a `Lost` location. Picking closes short and the order continues without that container. |
-| **Release the order without it** | The order continues without the container and may ship partially. The container remains recorded where it was last seen, and that location is sent for a count. If the container is later found, it must be scanned at the control station and ships on a later trip. |
+| **Release the order without it** | The order continues without the container and may ship partially. The container remains on record, and its last known location is sent for a count. If the container is later found, it must be scanned at the control station and ships on a later trip. |
 | **Only find it** | The order waits until the container is found. This is the default. |
 
 The rule is recorded when the operator reports the container missing. Publishing a different rule later does not change an exception that is already open.
@@ -128,7 +128,7 @@ The order remains blocked until the missing-container rule allows the supervisor
 
 ## Supervisor: resolve missing containers
 
-Open `Sidebar > Topology > Order Control`. The screen has two tabs.
+Open `Sidebar > Management & Control > Execution Control > Order Control (Manual)`. The screen has two tabs.
 
 ### Exceptions
 
@@ -138,7 +138,7 @@ Select one row. The toolbar shows the actions allowed for that row:
 |---|---|
 | **Found** | Records that the container was found. The operator still brings it to the control station and scans it. |
 | **Write Off** | Opens **Write Off Container**. Read the warning, add an optional **Note**, then confirm **Write Off**. The goods go to `Lost`, picking closes short and the order continues. |
-| **Release Order Without Container** | Opens a confirmation. The order continues without the container, the container stays recorded at control and its last location is sent for a count. |
+| **Release Order Without Container** | Opens a confirmation. The order continues without the container. The container remains on record, and its last known location is sent for a count. |
 | **Request Count** | Sends the last known location for a count. The order continues to wait for another decision. The policy never blocks this action; after a count is already requested, a duplicate request is unavailable. |
 
 ![Order Control Exceptions tab with the four supervisor actions](../assets/screens/order-control-exceptions.png)
@@ -168,6 +168,6 @@ A container scanned at the station automatically closes its missing-container ex
 
 - [09 Picking](09-picking.md)
 - [10 Packing, verify and repack](10-packing-verify.md)
-- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)
 - [Warehouse structure](../admin/03-warehouse-structure.md)
 - [Picking policy settings](../admin/policies/21-picking-policy-settings.md)

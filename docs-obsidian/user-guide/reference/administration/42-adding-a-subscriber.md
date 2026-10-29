@@ -13,7 +13,7 @@ Use this page to connect an outside system to the event stream, to change how it
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Integration > Subscribers`.
+2. Open `Integrations > Subscribers`.
 3. Click `New`. An empty card opens.
 4. Fill `Code` (it cannot be changed later) and `Name`.
 5. Pick `Delivery`: `webhook`.

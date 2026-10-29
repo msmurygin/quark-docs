@@ -501,7 +501,7 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 
 ## C. Paper picking in the web app
 
-Use this workflow when you pick from a printed list and record the result in **Task Manager > Task Board** or on an order's **Tasks** tab.
+Use this workflow when you pick from a printed list and record the result in **Management & Control > Execution Control > Task Board** or on an order's **Tasks** tab.
 
 ### C1. Record a completed pick
 
@@ -628,4 +628,4 @@ Each committed pick moves stock to the pallet (DROPID) or box. A short pick rele
 
 - [04 Damage and receipt close](04-damage-and-receipt-close.md) for **Force-Close Episode (supervisor)**
 - [10 Packing and verify](10-packing-verify.md)
-- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

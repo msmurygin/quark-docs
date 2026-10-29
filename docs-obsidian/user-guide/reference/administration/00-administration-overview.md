@@ -1,14 +1,13 @@
-# Enterprise sidebar: Configuration and Integration
+# Enterprise administration screens
 
-The **Enterprise sidebar** holds the screens that work across all warehouses: users, roles, permissions, translations, handling unit types and the event system.
-It is a different sidebar from the warehouse sidebar (`Inbound`, `Inventory`, ...).
-This section describes every screen under the two Enterprise groups, `Configuration` and `Integration`.
+The **Enterprise sidebar** holds the screens that work across all warehouses: users, roles, permissions, translations, shared handling unit types, integrations and platform tools.
+It is different from the warehouse sidebar.
 
 ## How to open it
 
 1. Sign in.
 2. Open the warehouse switcher and pick **Enterprise**. The sidebar footer then reads `Enterprise · ADMIN`.
-3. The sidebar shows the groups `Dashboard`, `Configuration` and `Integration`.
+3. The sidebar shows the current Enterprise sections. `Users & Roles`, `Integrations` and `Platform Tools` can be expanded.
 
 The switcher offers Enterprise **only** to a user who holds the role `ADMIN` on at least one warehouse.
 The switch is refused otherwise with `Enterprise access requires ADMIN role` (`crates/services/web-ui-server/src/routes/warehouse_handler.rs:67`).
@@ -19,23 +18,24 @@ A role named `MANAGER` or `SUPERVISOR` does not open Enterprise, even if an API 
 
 ## What the sidebar has
 
-| Group | Item | Menu item code | Opens | Page |
-|---|---|---|---|---|
-| `Configuration` | `Warehouses` | `ent_warehouses` | Form `warehouse_admin_list_form` | |
-| `Configuration` | `Users & Roles` | `ent_users` | A group of four items. | |
-| `Users & Roles` | `Users` | `ent_users_list` | Form `enterprise_users_shell` | [Users list](10-users-list.md) |
-| `Users & Roles` | `Roles` | `ent_roles_list` | Form `enterprise_role_detail` | [Roles](14-roles.md) |
-| `Users & Roles` | `Audit Log` | `ent_audit_log` | Form `enterprise_audit_log` | [Audit log](15-audit-log.md) |
-| `Users & Roles` | `Permission Matrix` | `ent_permission_matrix` | Form `enterprise_permission_matrix` | [Permission matrix](16-permission-matrix.md) |
-| `Configuration` | `Translations` | `ent_translations` | Form `translations_tabbed` | [Translations](17-translations.md) |
-| `Configuration` | `Handling Unit Types` | `handling_unit_type_menu` | Form `handling_unit_type_list_form` | [Handling unit types](18-handling-unit-types.md) |
-| `Integration` | `Event Registry` | `ent_event_registry_menu` | Form `ent_event_registry_list_form` | [Event registry](20-event-registry.md) |
-| `Integration` | `Event Monitor` | `ent_integration_event_menu` | Form `ent_integration_event_list_form` | [Event monitor](21-event-monitor.md) |
-| `Integration` | `Subscribers` | `ent_integration_subscriber_menu` | Form `ent_integration_subscriber_list_form` | [Subscribers](22-subscribers.md) |
-| `Integration` | `Delivery Log` | `ent_event_delivery_menu` | Form `ent_event_delivery_list_form` | [Delivery log](23-delivery-log.md) |
-
-Source: the menu `Enterprise` (menu id 3) in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql` (table `menu_items`) and the events `nav_ent_*` and `nav_handling_unit_type_list` in table `ui_event`.
-The first group in the sidebar, `Dashboard` (`ent_dashboard`), is not described here.
+| Sidebar path | Page |
+|---|---|
+| `Warehouses` | Warehouse administration |
+| `Owners` | Owner administration |
+| `Users & Roles > Users` | [Users list](10-users-list.md) |
+| `Users & Roles > Roles` | [Roles](14-roles.md) |
+| `Permission Matrix` | [Permission matrix](16-permission-matrix.md) |
+| `Audit` | [Audit log](15-audit-log.md) |
+| `Shared Handling Unit Types` | [Handling unit types](18-handling-unit-types.md) |
+| `Translations` | [Translations](17-translations.md) |
+| `Integrations > Event Registry` | [Event registry](20-event-registry.md) |
+| `Integrations > Events` | [Event monitor](21-event-monitor.md) |
+| `Integrations > Subscribers` | [Subscribers](22-subscribers.md) |
+| `Integrations > Deliveries` | [Delivery log](23-delivery-log.md) |
+| `Integrations > IPaaS` | [Integration Platform](../../integration-platform/00-README.md) |
+| `Platform Tools > Metadata Studio` | Metadata Studio |
+| `Platform Tools > RF UI Designer` | RF UI Designer |
+| `Platform Tools > RPC Documentation` | RPC method reference |
 
 ### Warehouse definitions and owners
 
@@ -44,9 +44,9 @@ creates an inactive warehouse definition; it does not provision a PostgreSQL
 schema. The list reports whether the schema is ready, and activation is refused
 until deployment preparation is complete.
 
-Owners are maintained in the **warehouse** sidebar (`owner_list`) after a
-warehouse is selected. They are stored inside that warehouse's schema, so the
-old `ent_owners` placeholder is inactive and is not rendered in Enterprise.
+Owners are available directly from the Enterprise sidebar. Product owners used
+by warehouse operations are also available under
+`Warehouse Configuration > Product Data > Owners` after a warehouse is selected.
 
 ## Which items you see
 

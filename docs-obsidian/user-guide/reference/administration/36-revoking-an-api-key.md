@@ -11,7 +11,7 @@ A revoked key cannot be restored. Generate a new one instead.
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`, and click the user who owns the key.
+2. Open `Users & Roles > Users`, and click the user who owns the key.
 3. Open the tab `API Keys`.
 4. Tick the row of the key.
 5. Click `Revoke`. The window `Revoke API Key` opens. It says that the key is revoked at once, that services using it get 401, and that it cannot be undone.

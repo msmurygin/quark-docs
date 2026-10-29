@@ -116,7 +116,7 @@ others. In the web UI, treat every field marked as required as mandatory; only
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Owners`, open an owner, tab `WH Settings` |
+| Menu path | `Sidebar > Warehouse Configuration > Product Data > Owners`, open an owner, tab `WH Settings` |
 | Outer tabs of an owner | `General`, `WH Settings`, `Addresses`, `Bank Accounts` |
 | Inner tabs of `WH Settings` | `LPN Config`, `Policies`, `Locations`, `Units of Measure`, `Receiving` |
 | Rows | at most one `owner_config` row per owner (unique on `owner_id`). It is optional. |
