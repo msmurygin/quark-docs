@@ -3,7 +3,7 @@ title: "Administrator Guide - Picking Policy Settings"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-29
 ---
 
 # Picking Policy Settings
@@ -23,7 +23,7 @@ A picking policy is a set of rules for one way of picking. It has revisions. Eac
 - Who can read it: `Admin`, `Manager`, `Supervisor`, `Operator`, `Viewer` (same file, line 23).
 - Seed: one policy, code `DISCRETE`, revision 1, `Published`, description `One order, one root container: today's picking` (`wms-lib-sql/sql/wms-app/migrations/042_picking_policy.sql`).
 - The list columns are `Code`, `Revision`, `Status`, `Description`, `Grouping`, `Deposit`.
-- The card has six bands: `Grouping`, `Carrier`, `Target Binding`, `Confirmation`, `Deposit`, `Completion`.
+- The card has seven bands: `Grouping`, `Carrier`, `Target Binding`, `Confirmation`, `Deposit`, `Completion`, `Order Control`.
 
 ### 1.1 Two shapes
 
@@ -46,6 +46,7 @@ This table is the most important thing on this page. Read it before you edit a p
 | `Pallet Drop Cell Types`, `Pallet Drop Suggestion` | The revision frozen on the pallet when it was opened (`wms-outbound/src/picking/deposit/onto_pallet.rs:181`): the policy of the work area (for the shift's equipment) when the operator came in through `Pick by Area` and the pick location is in a zone of that area; otherwise `DISCRETE`. | Not read. |
 | `Count an Emptied Location` | The revision frozen on the pallet, chosen as in the row above (`wms-outbound/src/picking/emptied_location.rs:41-50`). | The copy frozen at start (`emptied_location.rs:52-56`). |
 | `Max Targets`, `Completion`, `Quantity`, `Target`, `Deposit Mode` | Not read. | Read at start and at delivery. |
+| `Missing Container at Control` | The published policy of the work area that names the control station. The value is recorded when a missing container is reported. | The same station policy decides the rule, not a policy copy from an individual cart. |
 
 Important consequence: **the five `Confirmation` fields of a discrete pick are read from `DISCRETE` only.** A policy with `Unit` = `Order` and a code other than `DISCRETE` never changes how a discrete pick proves its source. Its **pallet** fields (`Pallet Drop Cell Types`, `Pallet Drop Suggestion`) and `Count an Emptied Location` are read, but only for a pallet that is opened through `Pick by Area` for a pick that stands in a zone of the area. For every other pallet (the old entry `Discrete Pick`, or a task outside the area) the pallet is frozen to `DISCRETE`. Since picking slice R12 was amended (commit `1e19eb87b`), an area can therefore decide where its pallets may go (`Pack` among the drop types sends them to the pack station of the area) without changing the warehouse's `DISCRETE`. See section 10, item 1.
 
@@ -249,16 +250,27 @@ These two fields apply to a cart assignment. `Quantity` is read when the assignm
 ### `Pallet Drop Cell Types` (`pallet_drop_types`)
 
 - UI label: `Pallet Drop Cell Types`. Multi-select. (The word "cell" stays in the label. The rest of the product now says "location".)
-- Column: `text[]`, not null. Allowed members: `Door`, `Pickto`, `Sort`, `Stage`, `Pack`. At least 1 and at most 5, no repeats (database check `chk_picking_policy_pallet_drop_types`).
-- Shown names: `Door`, `Pick-to`, `Sort station`, `Staging`, `Pack station`.
-- Default: `{Pickto,Sort,Stage,Door}` (schema, so the seed `DISCRETE` has it). `Pack` is added only if you choose it. The system saves the list in the order Door, Pickto, Sort, Stage, Pack.
+- Column: `text[]`, not null. Allowed members: `Door`, `Pickto`, `Sort`, `Stage`, `Pack`, `Control`. At least 1 and at most 6, no repeats (database check `chk_picking_policy_pallet_drop_types`).
+- Shown names: `Door`, `Pick-to`, `Sort station`, `Staging`, `Pack station`, `Control station`.
+- Default: `{Pickto,Sort,Stage,Door}` (schema, so the seed `DISCRETE` has it). `Pack` and `Control` are added only if you choose them. The system saves the list in the order Door, Pickto, Sort, Stage, Pack, Control.
 - What it does: the list of location types where a closed discrete pallet may stand. It is a fence, not a menu. A pallet closes only into the one location it goes to. That location is frozen at the first deposit. The first deposit is refused if the location type is not in this list.
 - Affects: `onto_pallet.rs:91-96` (the check at first deposit), `:181-199` (reads the list from the revision frozen on the pallet); `picking/commands/drop_close.rs:181` (the check at close, `F2`).
 - Example: list = `Stage`, `Door`. The owner field `Delivery location (picker carrier)` is `PICKTO` (type `Pickto`). The first pick of a pallet is refused: `a closed pallet may not stand in the location this pick goes to: PICKTO (Pickto)`. Add `Pickto` to the list, publish a new `DISCRETE` revision. Pallets opened after the publish accept it.
 - Pack stations: if the list holds `Pack` and the location's area has exactly one pack station, the first deposit sends the pallet to the station and the router freezes it (`onto_pallet.rs:97-106`). Without `Pack` in the list a pallet is never routed to a station.
+- Control stations: a closed pick pallet can go directly from picking to order control only when the list holds `Control` and the area names a control station. If it goes to packing first, the output cartons follow the area's downstream station settings; this pallet list is not checked again.
 - Messages: `A closed pallet must be allowed into at least one location type`, `A closed pallet cannot be put into a location of type {loc_type}`, `Location type {loc_type} is listed twice`. At the RF: `a closed pallet cannot stand in a location of this type: <location> (<type>)` at `F2`; `this pick has no destination location — neither its owner nor its task names one: task <id>`.
 - Interaction: shape does not fix it. Any grouping can set it. For carts it is stored but not read.
 - Open work: a pallet keeps the revision it was opened under. Publishing a new `DISCRETE` revision does not change an open pallet.
+
+### `Missing Container at Control` (`missing_container_at_control`)
+
+- UI label: `Missing Container at Control` in the `Order Control` band. Dropdown; required on a draft.
+- Default and safest value: `Only find it`. The order waits until the missing container is found and scanned at the control station.
+- `Write off to Lost`: the supervisor may write off the goods in the missing container. Picking closes short and the order continues without it.
+- `Release the order without it`: the supervisor may let the order continue without the container. The container remains recorded where it was last seen and that location is sent for a count. A container found later is scanned at control and ships on a later trip.
+- `Request Count` is available under every value. It asks for a count but does not release the order by itself.
+- The rule is recorded when the operator reports the container missing. A later policy revision does not change an exception that is already open.
+- See [Order control after picking](../../operator/11-order-control-after-picking.md) for the operator and supervisor steps.
 
 ### `On an Emptied Location` (`pick_to_zero`)
 

@@ -214,4 +214,4 @@ A closed receipt has status **Closed**. A close with a difference is stored with
 
 - [02 Receiving against an ASN](02-receiving-against-asn.md)
 - [03 Blind receiving and returns](03-blind-receiving-and-returns.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)

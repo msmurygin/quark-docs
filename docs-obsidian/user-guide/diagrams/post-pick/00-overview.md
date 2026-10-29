@@ -14,9 +14,13 @@ flowchart LR
     DS --> PA
     DS --> CO["Optional consolidation"]
     PA --> CO
+    HO --> CT["Optional order control"]
+    PA --> CT
+    CO --> CT
     HO --> ST["Stage"]
     PA --> ST
     CO --> ST
+    CT --> ST
     DP["Planned Dispatch"] -.->|"route and stop intent"| HO
     DP --> LP["Frozen Load Plan"]
     ST --> LP
@@ -32,9 +36,10 @@ flowchart LR
 | Part | Status | Where to continue |
 |---|---|---|
 | Cartonization plan and exception recovery | Built. Runs from Release/Allocate; supervisors can retry or resolve execution exceptions. | [10](10-cartonization-plan-journey.md), [15](15-cartonization-box-full-exception.md), [16](16-cartonization-exception-recovery.md) |
-| Hand-off from picking | Built. The route can send a unit to a distribution station, pack station, consolidation station or Stage. | [20](20-flow-handoff-to-pack-station.md), [21](21-flow-influence-station-routing.md) |
+| Hand-off from picking | Built. The route can send a unit to a distribution station, pack station, consolidation station, order control or Stage. | [20](20-flow-handoff-to-pack-station.md), [21](21-flow-influence-station-routing.md) |
 | Packing: verify or repack | Built on RF. Void, reopen and packing-exception recovery are available as controlled commands. | [30](30-packing-verify-journey.md), [31](31-packing-repack-journey.md), [32](32-packing-void-and-reopen.md), [33](33-packing-influence-when-packed.md), [34](34-packing-influence-weights-printer-station.md) |
 | Distribution station and consolidation | Built. Station boxes can be sorted; boxes from compatible orders can be consolidated onto one outbound pallet. | API reference: `station_*` and `consolidation_*`; administrator setup guide is still to be written. |
+| Order control after picking | Built on RF and in the web UI. The operator scans every container of an order; a supervisor resolves missing-container exceptions. | [Order control after picking](../../operator/11-order-control-after-picking.md) |
 | Dispatch planning | Built in the web UI and API. A Dispatch freezes stops and order intent; it does not move or ship stock. | [40](40-dispatch-planning.md), [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue) |
 | Staging | Built as API and RF flow. Assignment and physical confirmation are separate commands. | API reference: `stage_unit_*`; operator guide is still to be written. |
 | Load planning and loading | Built in web UI, API and RF. A reviewed Load Plan is frozen before a Load opens; every physical unit is reviewed before confirmation. | [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue) |

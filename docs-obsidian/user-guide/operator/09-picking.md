@@ -628,4 +628,4 @@ Each committed pick moves stock to the pallet (DROPID) or box. A short pick rele
 
 - [04 Damage and receipt close](04-damage-and-receipt-close.md) for **Force-Close Episode (supervisor)**
 - [10 Packing and verify](10-packing-verify.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)

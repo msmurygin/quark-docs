@@ -128,6 +128,10 @@ Topology
   Putaway Zones
   3D Warehouse
   Work Areas
+  Distribution Stations
+  Consolidation Stations
+  Packing Exceptions
+  Order Control
   Equipment Profiles
 System Settings
 Control Center
@@ -198,6 +202,10 @@ The `dashboard` form is the home page. It is the default tab of the main work ar
 | `Topology > Putaway Zones` | `putawayzone_list_form` | `03-warehouse-structure.md` |
 | `Topology > 3D Warehouse` | `warehouse_3d` (HTML page) | `03-warehouse-structure.md` |
 | `Topology > Work Areas` | `work_area_list_form` | `03-warehouse-structure.md` |
+| `Topology > Distribution Stations` | `distribution_station_list_form` | `06-outbound-setup.md` |
+| `Topology > Consolidation Stations` | `consolidation_station_list_form` | `06-outbound-setup.md` |
+| `Topology > Packing Exceptions` | `packing_exception_list_form` | `operator/10-packing-verify.md` |
+| `Topology > Order Control` | `order_control_tabbed` | `operator/11-order-control-after-picking.md` |
 | `Topology > Equipment Profiles` | `equipment_profile_list_form` | `03-warehouse-structure.md` |
 | `System Settings` | `sys_settings_list_form` | `10-checklist-go-live.md` |
 | `Control Center > Board Settings` | `dashboard_setting_list_form` | `08-reports-and-dashboards.md` |

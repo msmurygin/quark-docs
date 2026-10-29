@@ -112,4 +112,4 @@ The system holds a space at the suggested location while you walk. If you give u
 
 - [06 Move](06-move.md)
 - [07 Stock inquiry](07-inventory-inquiry.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](11-troubleshooting-and-messages.md)

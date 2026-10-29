@@ -3,7 +3,7 @@ title: "Administrator Guide - Work Areas, Equipment and Operator Permissions"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-29
 ---
 
 # Work Areas, Equipment and Operator Permissions
@@ -86,6 +86,16 @@ A work area is a group of putaway zones. An operator's rights are a grid of task
 - Example: area `PICK-A` has station `PACK-01`. The policy of the area (or `DISCRETE`, for a pallet that is not opened through the area) has `Stage`, `Door`, `Pack` in the list. A pallet whose destination `STAGE-1` stands in a zone of `PICK-A` is frozen to go to `PACK-01`, and a packing unit waits there.
 - Open work: a pallet or cart that already froze its destination keeps it.
 - The type of the location is not checked again after it became a station.
+
+### `Control Station` (`control_station_location`)
+
+- UI label: `Control Station`. Dropdown of this warehouse's locations of type `Control`. Empty is allowed.
+- What it does: sends the area's outbound containers to one place where the operator checks the whole order after picking, packing or consolidation. Empty means no order control for this area.
+- The warehouse can use only one control station. Another area may select the same location, but a different one is refused and the message names the station already in use.
+- A closed pick pallet goes directly from picking to this station only when its policy also includes `Control` in **Pallet Drop Cell Types**. Cartons produced by packing follow the area's downstream station settings instead.
+- Do not move the station while an order or container is waiting there. Work already sent to the old station keeps that destination and is not redirected by the change.
+- Example: area `PICK-A` names `CTL-01`. Another area may also name `CTL-01`; it cannot name `CTL-02` in the same warehouse.
+- See [Order control after picking](../../operator/11-order-control-after-picking.md) for setup, operator and supervisor steps.
 
 ## 2. Work area zone
 
