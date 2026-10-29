@@ -238,9 +238,9 @@ Group unreleased orders, review the complete composition and release the group t
 8. If some members were blocked or failed, correct their order data and click `Retry blocked`.
 9. Use `Cancel Wave` only while the wave is still unstarted (`Draft` or `Planned`).
 
-![Wave list with draft and released waves](../assets/screens/wave-list-form.png)
+![Wave list with draft and active waves](../assets/screens/wave-list-form.png)
 
-*Wave list with status, order counts and release progress. Focus: choose the wave whose composition or release result needs review.*
+*Wave list with current status and reviewed version. Focus: choose the wave whose composition or release result needs review; open its card for member counts and release progress.*
 
 ![Wave card composition and action toolbar](../assets/screens/wave-card-form.png)
 
