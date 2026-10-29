@@ -37,7 +37,7 @@ flowchart LR
     A4[Event] --> A
 ```
 
-- A **template** is a starting design. Forking it creates your own editable flow.
+- A **template** is a starting design. Using it creates your own editable draft flow.
 - A **connector** holds the address, transport and authentication method for one external system.
 - An **API key** holds sensitive connector or notification credentials.
 - A **flow** defines the steps, mappings, conditions and error behaviour.

@@ -109,7 +109,7 @@ Main endpoint groups:
 | Webhook definitions | `/api/v1/webhook-defs` | Manage incoming webhook routes. |
 | Runs | `/api/v1/flow-runs` | List run details and retry a failed run. |
 | Credential definitions | `/api/v1/keys` | Create, bind and revoke connector credentials. |
-| Templates | `/api/v1/templates` | List and fork templates. |
+| Templates | `/api/v1/templates` | List templates and create tenant drafts from them. |
 | Events | `/api/v1/events/emit` | Submit a named event to the tenant queue. |
 | Configuration | `/api/v1/system-config`, `/api/v1/tenant-config` | Manage flow variables. |
 | Notifications | `/api/v1/notification-channels` | Manage and test alert destinations. |

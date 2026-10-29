@@ -4,7 +4,7 @@ title: "Quickstart"
 
 # Quickstart
 
-The fastest safe route is to fork a flow template, create the recommended connector, enter credentials, activate the flow and watch its first run.
+The fastest safe route is to create a draft from a flow template, create the recommended connector, enter credentials, activate the flow and watch its first run.
 
 ## Before you start
 
@@ -23,11 +23,11 @@ Do not use production credentials in a shared test tenant.
 1. Open **Templates**. If the tenant has no flows, you can also select **Browse Templates** on **Dashboard**.
 2. Search by marketplace, ERP or task.
 3. On the matching template card, select **Use Template**.
-4. If **Fork & Map** opens, review the connector selection:
+4. If **Set up: _template name_** opens, review the connector selection:
    - choose an existing connector only if it was created from the recommended connector template for the same environment;
-   - otherwise select the option to create the recommended connector.
-5. Complete any setup fields shown by **Fork & Map**, such as **WMS goods owner ID** or **Marketplace ship-to ID**.
-6. Select **Fork & Map**. If the template needs no mapping or setup fields, **Use Template** forks it immediately.
+   - otherwise keep **Create a new connector (recommended)** selected.
+5. In that dialog, complete the required WMS and provider setup fields, such as **WMS goods owner ID** or **Marketplace ship-to ID**.
+6. Select **Create draft integration**. While the request is running, the button changes to **Creating draft...**. If the dialog does not open, **Use Template** creates the draft immediately.
 
 ![Integration Platform template gallery with provider templates and their Use Template actions](../assets/screens/integration-platform-template-gallery.png)
 
@@ -39,7 +39,7 @@ The platform creates a tenant-owned flow in **draft** status. It copies the temp
 
 ### If the connector cannot be matched
 
-Do not attach a similarly named connector just to continue. Cancel **Fork & Map**, open **Connectors**, create or clone the correct connector, test it, and then return to **Templates**.
+If dialog-based setup fails, the dialog stays open and shows **Setup failed: ...**. Correct the values or connector selection and submit again. If direct creation fails, you stay on **Templates** and see the same message. Do not attach a similarly named connector just to continue: cancel setup when the dialog is open, open **Connectors**, create or clone the correct connector, test it, and then return to **Templates**.
 
 ## 2. Configure and test the connector
 

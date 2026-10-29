@@ -6,16 +6,33 @@ title: "Templates and Flow Builder"
 
 Use a template when it matches the system and direction of data. Use **Flow Builder** to review the result or to build a custom integration.
 
-## Fork a template
+## Create a draft from a template
 
 1. Open **Templates** and find the template card.
 2. Select **Use Template** on that card.
-3. If **Fork & Map** opens, choose the connector that the flow will use and complete the setup fields shown by the template.
-4. Select **Fork & Map**. If no mapping or setup is required, **Use Template** forks the template immediately.
+3. If **Set up: _template name_** opens, choose an existing matching connector or keep **Create a new connector (recommended)** selected.
+4. In that dialog, complete the required WMS and provider setup fields.
+5. Select **Create draft integration**. If the dialog does not open, **Use Template** creates the draft immediately.
 
 The platform copies the template name, generates a unique flow code and creates the flow in **draft** status. It offers an existing connector only when that connector was created from the expected connector template. A name match alone is not enough.
 
 When a template asks for **WMS goods owner ID**, enter the owner whose stock or orders belong to this integration. For an order-import template, **Marketplace ship-to ID** identifies the WMS customer or destination used for imported orders. Verify both values in the target tenant before activation.
+
+```mermaid
+flowchart TD
+    A[Select Use Template] --> B{Setup required?}
+    B -->|No| G[Create draft integration]
+    B -->|Yes| C[Choose the expected connector or create a new one]
+    C --> D[Complete required WMS and provider fields]
+    D --> E[Select Create draft integration]
+    E --> F{Setup succeeded?}
+    F -->|No| C
+    F -->|Yes| G
+    G --> H[Configure and test the connection]
+    H --> I[Review the draft flow and any paused schedule]
+```
+
+While dialog-based setup is running, the action reads **Creating draft...** and cannot be submitted again. On success, the platform confirms that the draft integration was created and opens the new flow. Configure and test its connections, then review the draft flow and, for a schedule template, its paused schedule. If dialog-based setup fails, the dialog stays open and shows **Setup failed: ...**; correct the values or connector selection before trying again. A direct-creation failure shows the same message while you remain on **Templates**.
 
 ## Create or import a flow
 
@@ -107,7 +124,7 @@ Activation performs validation again and saves an activation snapshot as one ope
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft: Create, fork or import
+    [*] --> Draft: Create, use template or import
     Draft --> Draft: Edit and validate
     Draft --> Active: Activate valid snapshot
     Active --> Active: Run
