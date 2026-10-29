@@ -6,7 +6,7 @@ It is a read-only list.
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Users & Roles > Audit Log`.
+2. Open `Audit`.
 
 The menu item is `ent_audit_log`. It opens the form `enterprise_audit_log`. The data comes from the view `enterprise.audit_log_view` (table `enterprise.audit_log`).
 

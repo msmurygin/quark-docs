@@ -10,7 +10,7 @@ Use this page to block or mark stock: a lot that waits for a quality check, a lo
 
 ## Steps
 
-1. Open `Inventory Balances > Holds`.
+1. Open `Management & Control > Inventory > Holds`.
 2. Click `New Hold`. The [hold form](21-hold-form.md) opens.
 3. Pick the `Reason code`.
 4. Fill **exactly one** of `Lot`, `Location` and `Container (LPN)`. Use the pick list next to the field.

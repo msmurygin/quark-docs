@@ -6,7 +6,7 @@ The list of types is common to all warehouses. Individual carriers of a type (th
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Handling Unit Types`.
+2. Open `Shared Handling Unit Types`.
 
 The menu item is `handling_unit_type_menu`. It opens the list `handling_unit_type_list_form`. The card is `handling_unit_type_normal_form`. The data object is `handling_unit_type` (table `enterprise.handling_unit_type`).
 The screens come from the migration `080_handling_unit_screens.sql`.

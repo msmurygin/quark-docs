@@ -7,11 +7,11 @@ You can hold several receipts at once.
 
 - Each receipt is `Open` or `InProgress`. A receipt that is already on hold, closed or cancelled is refused.
 - You have the web action `receipt_put_on_hold` and the API right `receipt_put_on_hold`. By default only `ADMIN` and `MANAGER` have them. See [Who can do what](91-who-can-do-what.md).
-- The hold reason exists in the list `Code > Hold Codes`. The window offers only codes that are **active** and **enforce**. See [Administrator guide: Reason codes and holds](../../admin/policies/43-reason-codes-and-holds.md).
+- The hold reason exists in the list `Warehouse Configuration > Reason Codes > Hold Codes`. The window offers only codes that are **active** and **enforce**. See [Administrator guide: Reason codes and holds](../../admin/policies/43-reason-codes-and-holds.md).
 
 ## Steps
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Tick one or more receipts.
 3. Click `Put on Hold`. The window `Put Receipt on Hold` opens. It says `Holding a receipt also holds every line on it that is not already closed or cancelled.`
 4. In `Hold reason` pick a reason. Each choice reads `{code} — {description}`.

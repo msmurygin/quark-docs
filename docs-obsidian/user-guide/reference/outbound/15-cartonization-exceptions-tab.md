@@ -59,6 +59,6 @@ Source: `wms-meta-ui` migration 022, `wms-app` migration 015.
 
 - [Cartons tab](14-cartons-tab.md)
 - [Picks tab](12-picks-tab.md)
-- Administrator guide: the cartonization policy is set in the menu `Policy > Cartonization Policy`. The pack card is in the menu `Packs`.
+- Administrator guide: the cartonization policy is set in `Warehouse Configuration > Policies > Cartonization Policy`. The pack card is in `Warehouse Configuration > Product Data > Packs`.
 - API: none for the tab. It reads the view straight from the warehouse database.
 - RF terminal: none for this tab.

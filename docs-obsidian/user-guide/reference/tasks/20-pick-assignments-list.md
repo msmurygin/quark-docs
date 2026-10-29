@@ -6,7 +6,7 @@ The form is `pick_assignment_board_list_form`. The data comes from the database 
 
 ## How to open it
 
-1. In the left sidebar open `Task Manager`.
+1. In the left sidebar open `Management & Control`, then `Execution Control`.
 2. Click `Pick Assignments`.
 
 The menu item is `pick_assignment_board_menu`.

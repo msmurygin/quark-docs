@@ -65,7 +65,7 @@ The defaults for each API method are written in the code of that method (`roles 
 
 The table shows the defaults found in `app-server/src/web/rpcs/*.rs`.
 `Yes` means the role is in the default list of every create, update and delete method of that area.
-Edit the defaults in `Users & Roles > Permission Matrix`.
+Edit the defaults in `Permission Matrix`.
 
 | Area | ADMIN | MANAGER | SUPERVISOR | OPERATOR | VIEWER |
 |---|---|---|---|---|---|
@@ -102,7 +102,7 @@ Notes:
 - `SUPERVISOR` adds: `allocation_policy_duplicate`, `shipment_order_release`, `shipment_order_line_cancel_qty`, `shipment_order_unallocate`, `pick_detail_delete_selected`, `task_delete_confirm`.
 - Only `ADMIN` can open `Translations` (menu permission `9109`).
 
-> Not confirmed by code: a complete per-method list of API rights for every role. The rights come from code lists, from the seeder that runs when app-server starts, and from many migrations. They cannot be merged by reading alone. To verify: start the system, sign in as `ADMIN`, open `Users & Roles > Permission Matrix`, pick the role and filter the resource type `API`. Or run `SELECT resource_code, can_read, can_write, can_delete, can_execute FROM enterprise.role_permission rp JOIN enterprise.role r ON r.id = rp.role_id WHERE r.code = '<ROLE>' AND rp.resource_type = 'api'`.
+Use `Enterprise > Permission Matrix` to review the effective API permissions for a role. Filter the matrix to the `API` resource type; deployment-specific permission changes take precedence over the defaults described here.
 
 ## 3. Create a user
 
@@ -118,7 +118,7 @@ Create a new user and set a password.
 
 ### Steps
 
-1. Open `Sidebar > Configuration > Users & Roles > Users`.
+1. Open `Sidebar > Users & Roles > Users`.
 2. Click `New User`.
 3. On the tab `General`, fill `Login`, `Full name`, `Email`, `Type` and `Status`.
 4. Fill `Password`.
@@ -200,7 +200,7 @@ Give a user access to a warehouse with a role.
 
 ### Steps
 
-1. Open `Sidebar > Configuration > Users & Roles > Users`.
+1. Open `Sidebar > Users & Roles > Users`.
 2. Open the user.
 3. Open the tab `Warehouses & Roles`.
 4. Click `Assign`.
@@ -254,11 +254,11 @@ Create a custom role and set its permissions.
 
 ### Steps
 
-1. Open `Sidebar > Configuration > Users & Roles > Roles`.
+1. Open `Sidebar > Users & Roles > Roles`.
 2. Click `New Role`.
 3. Fill `Code`, `Name` and `Description`. Keep `Active` on.
 4. Click `Save`.
-5. Open `Sidebar > Configuration > Users & Roles > Permission Matrix`.
+5. Open `Sidebar > Permission Matrix`.
 6. Find the new role in the columns. Set read, write, delete and execute bits for each resource.
 7. Save the matrix.
 
@@ -299,7 +299,7 @@ List columns: `Code`, `Name`, `Description`, `Members`, `Resources`, `Active`, `
 ### What this affects later
 
 - A new custom role starts with **no** server-action rights, except the rights you give it.
-- Every permission change is written to `Users & Roles > Audit Log`.
+- Every permission change is written to `Audit`.
 
 The flag `is_system` only shows a "system" badge in the role list (`web-ui-server/src/components/layout/cortive_role_list.rs`). No rule in code or in the database protects a system role from deletion. Only the foreign key `user_warehouse_role_id_fkey` blocks it, and only while a user still holds the role. Do not delete `ADMIN`, `MANAGER`, `OPERATOR`, `SUPERVISOR` or `VIEWER`.
 
@@ -311,7 +311,7 @@ See who changed permissions and which calls were denied.
 
 ### Steps
 
-1. Open `Sidebar > Configuration > Users & Roles > Audit Log`.
+1. Open `Sidebar > Audit`.
 2. Use the column filters. Click `Refresh`.
 
 ![enterprise_audit_log - Audit Log](../assets/screens/enterprise-audit-log.png)

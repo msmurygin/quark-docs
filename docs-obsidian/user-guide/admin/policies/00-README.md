@@ -81,7 +81,7 @@ does not apply is left out. If a setting is stored but nothing reads it, the ent
 
 | Item | What it tells you |
 |---|---|
-| **UI label** | The exact English label on the screen and the menu path, for example `Sidebar > Policy > Receipt Policy`, tab `General`, field `Receipt Without LPN`. For settings without a screen: `API only` and the method name (for example `update_owner_config`). |
+| **UI label** | The exact English label on the screen and the menu path, for example `Sidebar > Warehouse Configuration > Policies > Receipt Policy`, tab `General`, field `Receipt Without LPN`. For settings without a screen: `API only` and the method name (for example `update_owner_config`). |
 | **Column / key** | The database table and column, or the `system_settings` key. |
 | **Type and range** | The data type, the allowed values, minimum and maximum, and whether it can be empty. |
 | **Default** | The default in the database schema, and the value in the seed data (the rows a new database is created with). |

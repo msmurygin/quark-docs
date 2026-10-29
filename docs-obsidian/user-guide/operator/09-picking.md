@@ -501,7 +501,7 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 
 ## C. Paper picking in the web app
 
-Use this workflow when you pick from a printed list and record the result in **Task Manager > Task Board** or on an order's **Tasks** tab.
+Use this workflow when you pick from a printed list and record the result in **Management & Control > Execution Control > Task Board** or on an order's **Tasks** tab.
 
 ### C1. Record a completed pick
 

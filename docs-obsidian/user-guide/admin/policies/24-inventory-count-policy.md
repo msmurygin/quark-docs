@@ -22,20 +22,20 @@ Paths in the "Affects" lines are relative to `crates/libs/` unless they start wi
 - Status of a task: `Open` (being counted), `Variance` (counted, a difference waits for a decision), `Closed` (matched, or the difference was adjusted), `Recounted` (replaced by a new attempt), `Cancelled`.
 - Status of a count: `Open`, `Closed`, `Cancelled`.
 
-The RF path: `Inventory` menu, `Count Location`. Screens: `Count — Work Area` (scan the work area, or press Enter for the whole warehouse), `Count — Next Location`, `Count — Go To Location` ("Go to the location and scan it"), `Count — Finish` (`1 = Done, 2 = Empty, 3 = Leave`), `Counted`. A supervisor decides differences on the web: `Sidebar > Inventory Balances > Inventory Counts` (buttons `Accept Variance`, `Recount`, `Cancel Count`). `Accept Variance` asks why the count differs (section 6b).
+The RF path: `Inventory` menu, `Count Location`. Screens: `Count — Work Area` (scan the work area, or press Enter for the whole warehouse), `Count — Next Location`, `Count — Go To Location` ("Go to the location and scan it"), `Count — Finish` (`1 = Done, 2 = Empty, 3 = Leave`), `Counted`. A supervisor decides differences on the web: `Sidebar > Management & Control > Inventory > Counts` (buttons `Accept Variance`, `Recount`, `Cancel Count`). `Accept Variance` asks why the count differs (section 6b).
 
 ## 2. Count triggers (what starts a count)
 
 | # | Trigger | Switch | Where you set it | Source value on the count | Count type |
 |---|---|---|---|---|---|
-| 1 | A cycle policy finds locations due | the policy | `Sidebar > Policy > Cycle Count Policies` (section 4) | `Schedule` + the policy id | `Cycle` |
-| 2 | A supervisor starts a count | none | `Sidebar > Inventory Balances > Inventory Counts > New` (section 5) | `User` | `Selective` |
-| 3 | A short pick, when the reason has the action `CreateInventoryCount` | the reason | `Sidebar > Policy > Pick Short Reasons` (`23-pick-short-reasons.md`) | `ShortPick:<reason code>` | `Event` |
-| 4 | A full pick empties its source location | `On an Emptied Location` = `Count` | `Sidebar > Policy > Picking Policies` (`21-picking-policy-settings.md`, section 6) | `PickToZero` | `Event` |
+| 1 | A cycle policy finds locations due | the policy | `Sidebar > Warehouse Configuration > Counting > Cycle Count Policies` (section 4) | `Schedule` + the policy id | `Cycle` |
+| 2 | A supervisor starts a count | none | `Sidebar > Management & Control > Inventory > Counts > New` (section 5) | `User` | `Selective` |
+| 3 | A short pick, when the reason has the action `CreateInventoryCount` | the reason | `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons` (`23-pick-short-reasons.md`) | `ShortPick:<reason code>` | `Event` |
+| 4 | A full pick empties its source location | `On an Emptied Location` = `Count` | `Sidebar > Warehouse Configuration > Policies > Picking Policies` (`21-picking-policy-settings.md`, section 6) | `PickToZero` | `Event` |
 | 4a | The picker answers "is it empty?" against the stock (said not empty where nothing is, or empty where stock is) | `On an Emptied Location` = `Confirm` | the same | `ZeroConfirmation` | `Event` |
-| 5 | A posted adjustment whose reason says "count after posting" | `Count After Posting` | `Sidebar > Inventory Balances > Adjustment Reasons` (section 6) | `Adjustment` | `Event` |
-| 6 | A directed putaway landed through an acknowledged deviation | `COUNT_ON_PUTAWAY_DEVIATION` | `Sidebar > System Settings` (section 7) | `PutawayDeviation` | `Event` |
-| 7 | An order is cancelled while one of its picks had its source confirmed (location, item, LPN or lot scanned) | `COUNT_ON_PICK_CANCELLED` | `Sidebar > System Settings` (section 7a) | `PickCancelled` | `Event` |
+| 5 | A posted adjustment whose reason says "count after posting" | `Count After Posting` | `Sidebar > Warehouse Configuration > Reason Codes > Adjustment Reasons` (section 6) | `Adjustment` | `Event` |
+| 6 | A directed putaway landed through an acknowledged deviation | `COUNT_ON_PUTAWAY_DEVIATION` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (section 7) | `PutawayDeviation` | `Event` |
+| 7 | An order is cancelled while one of its picks had its source confirmed (location, item, LPN or lot scanned) | `COUNT_ON_PICK_CANCELLED` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (section 7a) | `PickCancelled` | `Event` |
 | 8 | An operator reports stock the system does not show (RF `Report Unexpected Stock`, or `F6` on an empty Stock Inquiry) | none — always | — | `UnexpectedInventory` | `Event` |
 
 How the event triggers work (3 to 8): the transaction that causes them writes the event `process.inventory.count_requested` into the outbox. It does not start the count. A background subscriber starts the count after the first transaction has committed (`wms-inventory/src/service/inventory_count/request_location.rs`). So a rolled-back pick, adjustment or putaway asks for nothing.
@@ -65,7 +65,7 @@ These are fixed in code. There is nothing to switch.
 
 ## 4. Cycle count policy
 
-Menu path: `Sidebar > Policy > Cycle Count Policies`. Table `inventory_count_policy` (wms-app 058, 073). A policy says which locations, or which SKUs, are counted how often. A daily run turns what is due into one ordinary count. The field `Basis` decides which: `Locations` (the policy narrows by zone, type, ABC and aisle of the locations) or `Items` (it narrows by the ABC class and group of the SKUs, and counts each SKU wherever it lies).
+Menu path: `Sidebar > Warehouse Configuration > Counting > Cycle Count Policies`. Table `inventory_count_policy` (wms-app 058, 073). A policy says which locations, or which SKUs, are counted how often. A daily run turns what is due into one ordinary count. The field `Basis` decides which: `Locations` (the policy narrows by zone, type, ABC and aisle of the locations) or `Items` (it narrows by the ABC class and group of the SKUs, and counts each SKU wherever it lies).
 
 - Roles that change: `Admin`, `Manager`, `Supervisor`. Read: `Admin`, `Manager`, `Supervisor`, `Viewer`.
 - Buttons: list `New`, `Refresh`; card `Save`, `Run Now`, `Delete`, `Back`.
@@ -192,7 +192,7 @@ Menu path: `Sidebar > Policy > Cycle Count Policies`. Table `inventory_count_pol
 
 ## 5. Settings of one count (manual or from API)
 
-On `Sidebar > Inventory Balances > Inventory Counts`. Table `inventory_count`. The card shows `Number`, `Status`, `Mode`, `Freeze`, `Locations`, `Comment`, `Recounts per Location`, and read-only `Type`, `Source`, counters and dates. After the count starts, you do not edit what you typed.
+On `Sidebar > Management & Control > Inventory > Counts`. Table `inventory_count`. The card shows `Number`, `Status`, `Mode`, `Freeze`, `Locations`, `Comment`, `Recounts per Location`, and read-only `Type`, `Source`, counters and dates. After the count starts, you do not edit what you typed.
 
 | Field | Column | Values and default | What it does |
 |---|---|---|---|
@@ -228,7 +228,7 @@ Other refusals when you start or edit a count:
 
 ## 6. Adjustment reasons (what the difference becomes)
 
-Menu path: `Sidebar > Inventory Balances > Adjustment Reasons`. This is the list of reasons of inventory adjustments (code list `inv_adjust_reason`, id 1031). The list columns are `Code`, `Reason`, `Active`, `Adds Stock`, `Removes Stock`, `Comment Required`, `Approval Required`, `Count After Posting`.
+Menu path: `Sidebar > Warehouse Configuration > Reason Codes > Adjustment Reasons`. This is the list of reasons of inventory adjustments (code list `inv_adjust_reason`, id 1031). The list columns are `Code`, `Reason`, `Active`, `Adds Stock`, `Removes Stock`, `Comment Required`, `Approval Required`, `Count After Posting`.
 
 An accepted count difference uses the reason **`COUNT_VARIANCE`** (`service/inventory_count/accept.rs`). The adjustment has source `InventoryCount`. Each line: `target quantity` = what was counted, `expected quantity` = the snapshot. The adjustment is validated and posted in the same step. A count never asks the adjustment for approval.
 
@@ -265,7 +265,7 @@ Refusals of a line: `reason X is not on the adjustment reason list`, `reason X i
 
 ## 6a. Count tolerances (what is accepted on its own)
 
-Menu path: `Sidebar > Policy > Count Tolerances` (right after `Cycle Count Policies`). Table `inventory_count_tolerance` (wms-app 096). There is one row per SKU ABC class: `A`, `B`, `C`. You cannot add or delete a class. A SKU without a class counts as `B`.
+Menu path: `Sidebar > Warehouse Configuration > Counting > Count Tolerances` (right after `Cycle Count Policies`). Table `inventory_count_tolerance` (wms-app 096). There is one row per SKU ABC class: `A`, `B`, `C`. You cannot add or delete a class. A SKU without a class counts as `B`.
 
 - Roles: `Admin`, `Manager` change a tolerance (`update_inventory_count_tolerance`). `Admin`, `Manager`, `Supervisor`, `Viewer` read them.
 - The card is saved with its version. If someone else saved first, the save is refused. Refresh and repeat.
@@ -308,7 +308,7 @@ On Russian screens the causes have Russian names.
 
 Add your own cause:
 
-1. Open `Sidebar > Code > Code List`. Find `count_variance_cause`.
+1. Open `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List`. Find `count_variance_cause`.
 2. In `Code List Values`, click `New Value`.
 3. Fill `Code`, `Display Order`, `Description`, `Active`. Click `Save`. The window offers the cause from the next accept, in `Display Order`.
 
@@ -317,7 +317,7 @@ Add your own cause:
 
 Accept a difference with a cause:
 
-1. Open `Sidebar > Inventory Balances > Inventory Counts`. Open a count.
+1. Open `Sidebar > Management & Control > Inventory > Counts`. Open a count.
 2. Tick a location in `Variance`, or open its card.
 3. Click `Accept Variance`. The window `Accept Variance` opens.
 4. Pick `Cause` (required). Type `Comment` if it helps (up to 200 characters).
@@ -339,7 +339,7 @@ A recount does not record a cause. The cause belongs to the attempt that is acce
 
 ## 7. System setting `COUNT_ON_PUTAWAY_DEVIATION`
 
-- Where: `Sidebar > System Settings`. Table `system_settings`, key `COUNT_ON_PUTAWAY_DEVIATION`, editable.
+- Where: `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`. Table `system_settings`, key `COUNT_ON_PUTAWAY_DEVIATION`, editable.
 - Value: `0` or `1`. Seed `0` (and default `0`). Description: `Directed putaway with an acknowledged deviation (code 85): 0=nothing, 1=count the destination location`.
 - What it does: when `1`, a directed putaway that the operator pushed through an acknowledged deviation (capacity, location type or mixing) asks for the destination location to be counted. Source `PutawayDeviation`. Anything other than `1` reads as off.
 - Affects: `wms-inventory/src/movement/validation.rs:752-766`, `movement/service.rs:856-880`.
@@ -347,7 +347,7 @@ A recount does not record a cause. The cause belongs to the attempt that is acce
 
 ## 7a. System setting `COUNT_ON_PICK_CANCELLED`
 
-- Where: `Sidebar > System Settings`. Table `system_settings`, key `COUNT_ON_PICK_CANCELLED`, editable (wms-app 119).
+- Where: `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`. Table `system_settings`, key `COUNT_ON_PICK_CANCELLED`, editable (wms-app 119).
 - Value: `0` or `1`. Seed `0` (and default `0`). Description: `Order cancelled while its pick's source was already confirmed: 0=nothing, 1=count the source location`.
 - What it does: when `1`, cancelling an order (`shipment_order_cancel`) asks for a count of the source location of every pick it removes whose source an operator had already confirmed — the operator may have been at the shelf, units in hand. Source `PickCancelled`, the pick as the record; one count per location. A pick nobody had started, the operator's own reject (`F7`), reassignments and un-allocation never count: they leave the shelf as it was. Anything other than `1` reads as off.
 - Affects: `wms-outbound/src/picking/cancelled_pick.rs`, called from `service/order/cancel.rs`.

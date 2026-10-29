@@ -16,7 +16,7 @@ Policy and step settings are in `01-putaway-policy-steps-and-criteria.md`.
 
 ## How to read this file
 
-- Screen: `Sidebar > Topology > Locations`. List form `location_list_form` (columns `Type`, `ABC`, `Code`, `Putaway Zone`, `Level`, `Status`).
+- Screen: `Sidebar > Warehouse Configuration > Topology > Locations`. List form `location_list_form` (columns `Type`, `ABC`, `Code`, `Putaway Zone`, `Level`, `Status`).
   Open a row. The card has five tabs: `General`, `Dimensions`, `Position`, `Attributes`, `Checks` (section 4a, read only).
   A list `Lot Commingle Rules` sits below the card (section 4).
 - Buttons on the list: `New`, `Delete`, `Refresh`, `Generate` (bulk wizard `Location Generator`).
@@ -169,7 +169,7 @@ Values: `None` nothing is wrong; `CycleCountActive` a count is running (set by t
 | Example | Place a hold with code `Damaged` on `B-04-1`. The status becomes `Damage`. Release the hold: back to `Ok`. |
 | Interacts with | The rule (`wms-inventory/src/service/hold.rs:430-517`): any active hold with code `Damaged` gives `Damage`. Else any other active hold whose code **enforces** gives `Hold`. Holds whose code only informs (not enforcing) do nothing. No holds: `Ok`. |
 | When empty | Not possible. |
-| If you change it | Place or release a hold (`Sidebar > Inventory Balances > Holds`, hold codes under `Sidebar > Code > Hold Codes`). |
+| If you change it | Place or release a hold (`Sidebar > Management & Control > Inventory > Holds`, hold codes under `Sidebar > Warehouse Configuration > Reason Codes > Hold Codes`). |
 
 What a hold does to moves:
 - A hold on the destination whose code blocks inbound flow stops the landing: `destination location blocked: active hold code=LocBlocked (id=12)`.

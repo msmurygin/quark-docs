@@ -1,7 +1,7 @@
 # Who can do what
 
-This page shows which default role may use each button of the `Inventory Balances` screens, and which web action and API right stand behind it.
-It describes the **defaults** that a new database gets. An administrator can change every cell in `Users & Roles > Permission Matrix`. A change made there wins over this page.
+This page shows which default role may use each button of the `Inventory` screens, and which web action and API right stand behind it.
+It describes the **defaults** that a new database gets. An administrator can change every cell in `Permission Matrix`. A change made there wins over this page.
 
 Two gates apply to a button:
 
@@ -66,11 +66,11 @@ Source of the API cells: the `declare_rpc_module!` lists in `crates/services/app
 - `OPERATOR` and `SUPERVISOR` hold the web action `generic_save`, but `create_inventory_hold_row` is for `ADMIN` and `MANAGER` only, so `New Hold` is refused by the API.
 - `Count After Posting` is a button of a screen that `SUPERVISOR` reads, but only `ADMIN` and `MANAGER` may press it.
 
-> Not confirmed by code: the exact refusal text a role sees on each button. To verify: sign in as `OPERATOR` and press `New Hold`, then open `Inventory Adjustments`.
+Refusal text can vary with the permission that blocks the action. Test custom roles in a non-production warehouse before assigning them to operators.
 
 ## Related pages
 
-- [Inventory Balances overview](00-inventory-overview.md)
+- [Inventory overview](00-inventory-overview.md)
 - [Adjustment header](23-adjustment-header.md)
 - [Count header](27-count-header.md)
 - [Administrator guide: Users, roles and permissions](../../admin/02-users-roles-permissions.md)

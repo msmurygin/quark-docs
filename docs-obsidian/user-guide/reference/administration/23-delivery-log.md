@@ -1,13 +1,13 @@
 # Delivery log
 
-The `Delivery Log` has one row for each pair of an event and a subscriber: "event 812 to subscriber 3".
+The `Deliveries` screen has one row for each pair of an event and a subscriber: "event 812 to subscriber 3".
 It shows how many times the worker tried, what the answer was, and the last error.
 It is a read-only list.
 
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Integration > Delivery Log`.
+2. Open `Integrations > Deliveries`.
 
 The menu item is `ent_event_delivery_menu`. It opens the list `ent_event_delivery_list_form`. The card is `ent_event_delivery_normal_form`. The data object is `integration_event_delivery` (table `enterprise.integration_event_delivery`).
 

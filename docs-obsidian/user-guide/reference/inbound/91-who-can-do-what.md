@@ -1,7 +1,7 @@
 # Who can do what
 
 This page shows which default role may use each receiving button, and which API right and web action stands behind it.
-It describes the **defaults** that a new database gets. An administrator can change every cell in `Users & Roles > Permission Matrix`. A change made there wins over this page.
+It describes the **defaults** that a new database gets. An administrator can change every cell in `Permission Matrix`. A change made there wins over this page.
 
 Two gates apply to a button:
 

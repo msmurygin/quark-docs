@@ -64,13 +64,13 @@ Do the steps in this order. Each step needs the data from the step before.
 
 ## Important facts to know before you start
 
-1. **There is no screen to create a warehouse.**
-   The enterprise menu has entries named `Warehouses` and `Owners`, but they open no form.
-   Warehouses are created outside the web UI (see `10-checklist-go-live.md`).
+1. **Warehouses are provisioned outside the web UI.**
+   `Enterprise > Warehouses` lists configured warehouses, and `Enterprise > Owners` manages owners. Neither screen provisions a new warehouse schema.
+   See `10-checklist-go-live.md` for the required deployment step.
 2. **User status `Locked` and `Disabled` block every way in.**
    Such a user cannot sign in, open sessions end on the next request, and the user's API keys are refused (`UserStatus::may_sign_in` in `wms-lib-auth/src/user_status.rs`). `Active` and `Invited` are let in.
 3. **Loading and Goods Issue are separate decisions.** A `Loaded` Load has not deducted stock. Shipment is an explicit, irreversible Goods Issue. See `06-outbound-setup.md`, section 10.
-4. **Manual waves have a web screen; wave policies do not.** Use `Outbound > Waves` for manual composition and release. Rule-based wave-policy configuration remains API-only.
+4. **Manual waves have a web screen; wave policies do not.** Use `Management & Control > Orders & Waves > Waves` for manual composition and release. Rule-based wave-policy configuration remains API-only.
 5. **Packing is done on the RF terminal**, not in the web UI. The web UI only prepares the data (pack-station locations and work areas).
 
 ## Feature status used in this guide
@@ -85,7 +85,7 @@ Do the steps in this order. Each step needs the data from the step before.
 | Dispatch, load planning and loading | Available | Web screens for `Dispatches`, `Load Plans`, `Transport Resources` and `Loads`; RF `Loading` flow. |
 | Replenishment by min/max of pick locations | Available | Every 5 minutes, and by «Replenish Now» on `Replenishment` (meta-ui 173): a pick location at or below its `Min` gets Replenish tasks up to `Max`, done on the RF terminal (`Inventory > Replenish`). Switched on per putaway zone (`Replenishment Allowed`). See `06-outbound-setup.md` section 11. |
 | Replenishment policy | Available | The policy card controls urgent and important reserved-share thresholds and whether an empty pick location is urgent. |
-| Manual wave planning | Available | `Outbound > Waves` provides reviewed add/remove/station/release actions and per-order results. |
+| Manual wave planning | Available | `Management & Control > Orders & Waves > Waves` provides reviewed add/remove/station/release actions and per-order results. |
 | Wave policy | API only | Policy preview and build-now methods can create draft waves by rule. |
 
 Replenishment quantity still comes from each pick location's `Min` and `Max`. The SKU's replenishment policy sets task urgency; it does not replace the min/max trigger. See `06-outbound-setup.md`, section 11.

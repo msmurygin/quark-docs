@@ -7,7 +7,7 @@ English is the original text. Each other language has one translation slot for e
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Translations`.
+2. Open `Translations`.
 
 The menu item is `ent_translations`. It opens the form `translations_tabbed` with the tabs `Labels` (`translations_label_list`) and `Messages` (`translations_message_list`).
 

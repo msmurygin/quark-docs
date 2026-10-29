@@ -1,6 +1,6 @@
 # Messages catalogue
 
-This page lists the messages that the `Inventory Balances` screens show, grouped by the page that explains them.
+This page lists the messages that the `Inventory` screens show, grouped by the page that explains them.
 A part in `{braces}` is replaced by a value. The page linked in the heading says when the message appears and what to do.
 
 Messages made by the server (domain refusals) are shown as the server wrote them. Some begin with a lower-case letter. That is how they are written in the code.

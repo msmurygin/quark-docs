@@ -9,7 +9,7 @@ Use this page to start a document that will correct stock. You make the header f
 
 ## Steps
 
-1. Open `Inventory Balances > Inventory Adjustments`.
+1. Open `Management & Control > Inventory > Adjustments`.
 2. Click `New`. The document opens. The `Number` is already filled (`ADJ` and 7 digits). The status is `Draft`.
 3. Choose the `Reason`.
 4. If the reason asks for a comment, type it in `Comment`. Type a comment in any case if you want one.

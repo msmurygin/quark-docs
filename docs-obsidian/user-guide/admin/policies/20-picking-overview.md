@@ -174,8 +174,8 @@ What changes if you change a setting:
 
 ## 8. A short setup checklist for picking
 
-1. Zones exist, each with `Picking To Location` (`Sidebar > Topology > Putaway Zones`).
-2. A work area with its zones (`Sidebar > Topology > Work Areas`).
+1. Zones exist, each with `Picking To Location` (`Sidebar > Warehouse Configuration > Topology > Putaway Zones`).
+2. A work area with its zones (`Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`).
 3. Equipment profiles if you use carts or lift limits.
 4. Operators synced. For each: `Task Permissions` row with `Task Type` = `Pick`, the area, and **`Pick Execution` ticked**.
 5. Policy: use `DISCRETE` for pallet picking. For carts, make a policy with `Unit` = `PlannedTarget` and publish it. Assign it to the area or to the area and equipment.

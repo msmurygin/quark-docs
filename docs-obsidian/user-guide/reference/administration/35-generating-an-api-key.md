@@ -12,7 +12,7 @@ Use this page to give a program a key so that it can call the WMS API as a user.
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`, and click the user.
+2. Open `Users & Roles > Users`, and click the user.
 3. Open the tab `API Keys`.
 4. Click `Generate Key`. The window `Generate API Key` opens.
 5. Type a `Name` that tells you what the key is for, for example `nightly-erp-sync`.

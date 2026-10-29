@@ -11,7 +11,7 @@ This removes the **work**, not the reservation. To remove the reservation too, u
 
 ## Steps
 
-1. Open `Task Manager > Task Board`.
+1. Open `Management & Control > Execution Control > Task Board`.
 2. Tick the check box of every task you want to delete. You can tick many.
 3. Click `Delete Task`. The window `Delete Selected Tasks?` opens.
 4. Read the text. Click `Delete`.

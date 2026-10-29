@@ -28,7 +28,7 @@ Check that a new tenant has the minimum data to run the full path:
 | P3 | At least one warehouse exists: a schema plus a row in `enterprise.warehouse`. | A user can see the warehouse after sign-in. | `03-warehouse-structure.md`, section 1 |
 | P4 | The RBAC seeder ran. | The `Permission Matrix` shows rows for all six roles. | `wms-lib-auth/src/authorization/seeder.rs` |
 | P5 | The first administrator exists. | You can sign in. | Section 6, finding F1. |
-| P6 | `REPORTS_SERVICE_URL` and `REPORTS_JWT_SECRET` (32 bytes or more) are set for the web UI. | `Sidebar > Reports` shows the catalogue. | `08-reports-and-dashboards.md` |
+| P6 | `REPORTS_SERVICE_URL` and `REPORTS_JWT_SECRET` (32 bytes or more) are set for the web UI. | `Sidebar > Overview > Reports` shows the catalogue. | `08-reports-and-dashboards.md` |
 | P7 | `LABEL_RENDERER_URL` points to the renderer. | A test label renders. | `07-printing-and-labels.md` |
 | P8 | The public WMS address uses HTTPS and the services run in production cookie mode. | App-server has `SERVICE_ENV=production`; web-ui-server has `UI_SERVICE_ENV=production`. A successful login returns `auth-token` and `wms-session-id` with `Secure; SameSite=Lax`. | `../reference/administration/92-sign-in-passwords-and-sessions.md` |
 
@@ -50,14 +50,14 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 6 | Putaway zones. | Seeded: `DOCK`, `RACK` | `Topology > Putaway Zones` | Replace or add your own. New locations default to zone `DOCK`. |
-| 7 | Special locations. | Seeded: `STAGE`, `PICKTO`, `LOST`, `QC`, `DAMAGE`, `RTV`, `RETURN`, `INTRANSIT`, `UNKNOWN`, `DOCK` | `Topology > Locations` | Do not delete `STAGE`, `PICKTO`, `LOST`, `DAMAGE`, `INTRANSIT`: zones and code refer to them by name. |
-| 8 | Storage locations. | Seeded demo: 96 locations `A-01-0` to `D-06-3` (types `Case`, `Pick`) | `Topology > Locations` | Replace with your real map: use `Generate`. |
+| 6 | Putaway zones. | Seeded: `DOCK`, `RACK` | `Warehouse Configuration > Topology > Putaway Zones` | Replace or add your own. New locations default to zone `DOCK`. |
+| 7 | Special locations. | Seeded: `STAGE`, `PICKTO`, `LOST`, `QC`, `DAMAGE`, `RTV`, `RETURN`, `INTRANSIT`, `UNKNOWN`, `DOCK` | `Warehouse Configuration > Topology > Locations` | Do not delete `STAGE`, `PICKTO`, `LOST`, `DAMAGE`, `INTRANSIT`: zones and code refer to them by name. |
+| 8 | Storage locations. | Seeded demo: 96 locations `A-01-0` to `D-06-3` (types `Case`, `Pick`) | `Warehouse Configuration > Topology > Locations` | Replace with your real map: use `Generate`. |
 | 9 | A `Door` location (dock door). | Create | `Locations` | No `Door` location is seeded. Needed only if you choose `Door` as a drop type. |
 | 10 | A `Pack` location for each pack station. | Create | `Locations` | No `Pack` location is seeded. |
-| 11 | Work area with zones and a pack station. | Create | `Topology > Work Areas` | None is seeded. |
-| 12 | Equipment profiles (if lifts are used). | Create | `Topology > Equipment Profiles` | None is seeded. |
-| 13 | Operator task rights. | Create | `Task Manager > Operators` | One row per operator, task type and area. Without it: "you have no right to take Pick tasks ...". |
+| 11 | Work area with zones and a pack station. | Create | `Warehouse Configuration > Work Areas & Equipment > Work Areas` | None is seeded. |
+| 12 | Equipment profiles (if lifts are used). | Create | `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | None is seeded. |
+| 13 | Operator task rights. | Create | `Warehouse Configuration > Operator Permissions > Operators` | One row per operator, task type and area. Without it: "you have no right to take Pick tasks ...". |
 
 ### 4.3 Master data
 
@@ -65,11 +65,11 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 |---|---|---|---|---|
 | 14 | Owners, suppliers, carriers, customers. | Seeded demo: `OWNER001/002`, `SUPP001-003`, `CARR001/002`, `CUST001/002` | `Owners` | Replace the demo names. |
 | 15 | Owner `WH Settings`. | Seeded for the owners that have a row | owner card | Set the default putaway policy. |
-| 16 | Units of measure. | Seeded: 32 | `Code > Code List` (`UOM`) | `Not available` as a screen for classes and factors. |
+| 16 | Units of measure. | Seeded: 32 | `Warehouse Configuration > Settings & Reference Data > Code List` (`UOM`) | `Not available` as a screen for classes and factors. |
 | 17 | Pack hierarchy. | Seeded: `STD` (PL > CS > IP > EA) | `Packs` | Create your own packs. |
 | 18 | SKUs with weight, cube and pack. | Seeded demo: `NOLOT` | `SKU` | Weight and cube are needed for cartonization. |
 | 19 | SKU barcodes. | Create | SKU barcode list | RF scanning needs them. |
-| 20 | Lot policy. | Seeded: `STD`, `NOLOT` | `Policy > Lot Policy` | Set dates and attributes you need. |
+| 20 | Lot policy. | Seeded: `STD`, `NOLOT` | `Warehouse Configuration > Policies > Lot Policy` | Set dates and attributes you need. |
 | 21 | Serial config for serial SKUs. | Create | SKU tab `Serial Tracking` | Only when needed. |
 | 22 | Custom attributes. | Optional | `Attributes` | |
 
@@ -77,10 +77,10 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 23 | Receipt policy. | Seeded: `STD` (allows everything, no quantity check) | `Policy > Receipt Policy` | Make a stricter one if needed. |
-| 24 | Hold codes. | Seeded: 16 | `Code > Hold Codes` | |
+| 23 | Receipt policy. | Seeded: `STD` (allows everything, no quantity check) | `Warehouse Configuration > Policies > Receipt Policy` | Make a stricter one if needed. |
+| 24 | Hold codes. | Seeded: 16 | `Warehouse Configuration > Reason Codes > Hold Codes` | |
 | 25 | Damage actions per owner. | Seeded: Minor `None`, Major `Hold`, Total `Reject` | owner `WH Settings > Receiving` | |
-| 26 | **Putaway policy with steps.** | Seeded policy `STD` has **no steps** | `Policy > Putaway Policy` | **You must add at least one step**, then set it as the owner default. |
+| 26 | **Putaway policy with steps.** | Seeded policy `STD` has **no steps** | `Warehouse Configuration > Policies > Putaway Policy` | **You must add at least one step**, then set it as the owner default. |
 | 27 | Settings: `PUTAWAY_RESERVATION_TTL_MIN`, `ALLOW_CLOSE_WITH_DISCREPANCY`, `MOVE_HOLD_POLICY`. | Seeded | `System Settings` | |
 
 ### 4.5 Outbound
@@ -88,12 +88,12 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
 | 28 | Order type. | Seeded: `SO` | n/a | No screen or API creates more. |
-| 29 | Allocation policy. | Seeded: `STD` (published, one `Firm` step) | `Policy > Allocation Policy` | Duplicate it to change it. |
-| 30 | Cartonization policy. | Seeded: `STD` with `BOX-S`, `BOX-M`, `BOX-L` | `Policy > Cartonization Policy` | Match the boxes to your real boxes. |
-| 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Policy > Picking Policies` | |
-| 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Policy > Pick Short Reasons` | |
+| 29 | Allocation policy. | Seeded: `STD` (published, one `Firm` step) | `Warehouse Configuration > Policies > Allocation Policy` | Duplicate it to change it. |
+| 30 | Cartonization policy. | Seeded: `STD` with `BOX-S`, `BOX-M`, `BOX-L` | `Warehouse Configuration > Policies > Cartonization Policy` | Match the boxes to your real boxes. |
+| 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Warehouse Configuration > Policies > Picking Policies` | |
+| 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
 | 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
-| 34 | Manual wave. | None | `Outbound > Waves` | Optional; use for grouped release. Wave-policy rules remain API-only. |
+| 34 | Manual wave. | None | `Management & Control > Orders & Waves > Waves` | Optional; use for grouped release. Wave-policy rules remain API-only. |
 
 ### 4.6 Printing
 
@@ -107,10 +107,10 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 38 | Internal subscribers on. | Seeded on | `Enterprise > Integration > Subscribers` | Keep `quark_outbound_execution` and `quark_inventory_count` active. |
+| 38 | Internal subscribers on. | Seeded on | `Enterprise > Integrations > Subscribers` | Keep `quark_outbound_execution` and `quark_inventory_count` active. |
 | 39 | IPaaS subscriber. | Seeded **off** | Subscribers | Turn on after IPaaS runs. |
 | 40 | Report catalogue loaded. | Install step | report service | 16 reports. |
-| 41 | Dashboard rail. | Seeded row with empty rail | `Control Center > Board Settings` | Pick six metrics. |
+| 41 | Dashboard rail. | Seeded row with empty rail | `Warehouse Configuration > Dashboards > Board Settings` | Pick six metrics. |
 
 ### 4.8 Outbound departure and replenishment
 
@@ -120,13 +120,13 @@ Before go-live, verify one complete departure in the path you will operate: dire
 
 ### Steps
 
-1. Create a receipt: `Sidebar > Inbound > Receipts > New`. Add one line for a test SKU.
+1. Create a receipt: `Sidebar > Management & Control > Receiving > Receipts > New`. Add one line for a test SKU.
 2. Receive on the RF terminal (or the web `Receive` window).
-3. Check that stock appears in `Inventory Balances > Balances`.
+3. Check that stock appears in `Management & Control > Inventory > Balances`.
 4. Run putaway on the RF terminal. Check that a location is suggested. If not: `A policy with an empty pipeline suggests nothing.` Add steps.
-5. Create an order: `Sidebar > Outbound > Orders > New`. Add a line.
+5. Create an order: `Sidebar > Management & Control > Orders & Waves > Orders > New`. Add a line.
 6. Click `Allocate`. Check the tab `Picks`. Check the tab `Cartons`.
-7. Click `Release`. Check `Task Manager > Task Board`.
+7. Click `Release`. Check `Management & Control > Execution Control > Task Board`.
 8. Pick on the RF terminal with an operator who has task rights.
 9. Pack at the pack station on the RF terminal. Check that the shipping label prints.
 10. For this one-order dry run, open the order, click `Ship order`, review the departure, and click `Confirm — ship and deduct stock`.

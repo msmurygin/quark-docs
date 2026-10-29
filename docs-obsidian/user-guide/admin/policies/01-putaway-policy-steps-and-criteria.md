@@ -17,7 +17,7 @@ Location settings are in `03-location-settings.md`.
 
 ## How to read this file
 
-- Menu path to the screen: `Sidebar > Policy > Putaway Policy`. Open a policy row to get the step editor.
+- Menu path to the screen: `Sidebar > Warehouse Configuration > Policies > Putaway Policy`. Open a policy row to get the step editor.
 - Paths to code start at `crates/libs/` unless they start with `crates/services/`.
 - `BASELINE` means `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`.
 - A line like `step.rs:184` means `wms-inventory/src/putaway/step.rs`, line 184.
@@ -41,7 +41,7 @@ Location settings are in `03-location-settings.md`.
 
 ## 1. Policy header
 
-Screen: `Sidebar > Policy > Putaway Policy`. The list has the columns `Code` and `Description`.
+Screen: `Sidebar > Warehouse Configuration > Policies > Putaway Policy`. The list has the columns `Code` and `Description`.
 The header form is `putaway_policy_normal_form` (fields `ID`, `Code`, `Description`).
 The table is `putaway_policy` (`BASELINE:3990`).
 
@@ -49,7 +49,7 @@ The table is `putaway_policy` (`BASELINE:3990`).
 
 | Item | Value |
 |---|---|
-| UI label | `Code` (required). Menu: `Sidebar > Policy > Putaway Policy`. |
+| UI label | `Code` (required). Menu: `Sidebar > Warehouse Configuration > Policies > Putaway Policy`. |
 | Column | `putaway_policy.code` |
 | Type and values | Text, up to 10 characters. Must be unique in the warehouse (`putaway_policy_code_key`, `BASELINE:11351`). |
 | Default | No default. Seed: one policy, `STD` (id 1), with no steps (`BASELINE:8608`). |
@@ -718,7 +718,7 @@ Same as 3.4.7 for `location.mix_lot` (UI label `Mixed lot`, code `MixLot`, `cand
 |---|---|
 | UI label | `Location attribute` (also needs an attribute from `Choose an attribute`). |
 | Column read | `attribute_value.value_text` of the location, for attribute definitions with `entity_type = 'location'`, type Text, active. |
-| Type and values | Free text values. The attribute code comes from `Sidebar > Attributes` definitions. |
+| Type and values | Free text values. The attribute code comes from `Sidebar > Warehouse Configuration > Product Data > Attributes` definitions. |
 | Default | No condition. |
 | What it does | Keeps locations whose attribute value is (or is not) in the list. |
 | Affects | `candidates.rs:507-511`, SQL `EXISTS` (`location.rs:1860-1925`). |
@@ -847,7 +847,7 @@ How a missing value is read:
 | Item | Value |
 |---|---|
 | UI label | `SKU attribute`. Needs a code. |
-| Column read | `attribute_value.value_text` for the SKU, definitions with `entity_type = 'sku'` (Text, active). Defined under `Sidebar > Attributes`. |
+| Column read | `attribute_value.value_text` for the SKU, definitions with `entity_type = 'sku'` (Text, active). Defined under `Sidebar > Warehouse Configuration > Product Data > Attributes`. |
 | Type and values | Free text. |
 | Default | No condition. |
 | What it does | The step applies only to SKUs whose attribute has these values. |
@@ -975,7 +975,7 @@ Picker (`putaway_criterion_vocabulary`):
 
 | Setting | Where | Default | Effect |
 |---|---|---|---|
-| `PUTAWAY_RESERVATION_TTL_MIN` | `Sidebar > System Settings` (`system_settings`) | `15` (seed `BASELINE:9955`); code fallback 15 (`reserve.rs:22`) | Minutes a suggested location is held. After that a sweeper (every 5 minutes) frees it. |
+| `PUTAWAY_RESERVATION_TTL_MIN` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (`system_settings`) | `15` (seed `BASELINE:9955`); code fallback 15 (`reserve.rs:22`) | Minutes a suggested location is held. After that a sweeper (every 5 minutes) frees it. |
 | `Putaway Reservation TTL (min)` | Owner, WH Settings (`owner_config.putaway_reservation_ttl_min`) | blank = use the warehouse value | Overrides the system setting for that owner. Must be above 0. |
 | `PUTAWAY_LOCK_TIMEOUT_MS` | `system_settings` | Seeded `5000` (wms-app 091). Code default 5000 ms (`DEFAULT_LOCK_TIMEOUT_MS`) | How long one reservation waits for a busy location. A value of 0 or less is ignored (0 would mean "wait forever"). |
 | `COUNT_ON_PUTAWAY_DEVIATION` | `system_settings` (migration 071) | `0` | `1` = when an operator accepts a deviation (code 85) from the suggestion, the destination location is queued for a count. |

@@ -11,7 +11,7 @@ Use this page to give a user access to a warehouse with a role, to change the ro
 ## Steps: add an assignment
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`, and click the user.
+2. Open `Users & Roles > Users`, and click the user.
 3. Open the tab `Warehouses & Roles`.
 4. Click `Assign`. A new row appears.
 5. Pick the `Warehouse` and the `Role`.

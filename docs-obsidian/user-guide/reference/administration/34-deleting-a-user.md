@@ -12,7 +12,7 @@ Use this page to remove an account for good. In most cases it is better to set t
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Users & Roles > Users`, and click the user.
+2. Open `Users & Roles > Users`, and click the user.
 3. On the `General` tab, click `Delete`.
 4. The card closes and you go back to the list.
 

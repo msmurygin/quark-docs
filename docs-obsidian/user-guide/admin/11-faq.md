@@ -45,14 +45,14 @@ It is calculated from active holds. Place or release a hold instead. See `05-inb
 `MAX_GENERATED_LOCATIONS` is 10,000. Run the wizard in blocks. See `03-warehouse-structure.md`, section 4.
 
 **How do I add a value to a code list (a unit, a damage reason, a hold word)?**
-1. Open `Sidebar > Code > Code List`.
+1. Open `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List`.
 2. Open the list. Only lists with `Editable` on can change (16 lists in the warehouse database).
 3. In `Code List Values`, click `New Value`.
 4. Fill `Code`, `Display Order`, `Description`, `Active`. Click `Save`.
 Then check that the screens that use the list show the value.
 
 **How do I change a system setting?**
-Open `Sidebar > System Settings`. Change the `Value`. Click `Save`. Only rows with `Editable` on can change. The list edits only the value.
+Open `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`. Change the `Value`. Click `Save`. Only rows with `Editable` on can change. The list edits only the value.
 
 **How do I translate a label?**
 Enterprise mode: `Translations`. Two tabs: labels and messages. Open an item. In `Translations`, fill `Translation` for the `Language`. The English text is the base text. Only `ADMIN` can open this screen.
@@ -86,7 +86,7 @@ Yes. Use `Ship order` for one fully picked order, or plan a Dispatch and Load fo
 Yes. Configure each SKU's pick location `Min`, `Max` and `Unit`, allow replenishment on the pick zone, grant the `Replenish` task right, and review its replenishment-policy urgency. See `06-outbound-setup.md`, section 11.
 
 **Can I plan waves in the web UI?**
-Yes. Use `Outbound > Waves` for manual composition, station assignment, release and retry. Wave-policy rules remain API-only. See `06-outbound-setup.md`, section 4.
+Yes. Use `Management & Control > Orders & Waves > Waves` for manual composition, station assignment, release and retry. Wave-policy rules remain API-only. See `06-outbound-setup.md`, section 4.
 
 ## Printing and reports
 
@@ -102,10 +102,10 @@ See the table in `08-reports-and-dashboards.md`, section 1.
 `Someone changed this record after you opened it. Look at the current version and make your change again.` Refresh the record and repeat.
 
 **Where do I see who changed what?**
-`Enterprise > Users & Roles > Audit Log` for permissions. Each document has its own `Audit` tab (receipts, SKUs).
+`Enterprise > Audit` for permissions. Each document has its own `Audit` tab (receipts, SKUs).
 
 **Where are the server logs?**
 Files `logs/wms-server.log.YYYY-MM-DD` on the server (project note).
 
 **Where do I find the field meanings of a screen that this guide does not cover?**
-Use `Sidebar > Integration > RPC Documentation` for API fields. For screens, each form is defined in the meta-ui database.
+Use `Enterprise > Platform Tools > RPC Documentation` for API fields. For screens, each form is defined in the meta-ui database.

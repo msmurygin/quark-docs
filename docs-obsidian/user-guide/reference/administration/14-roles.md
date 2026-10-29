@@ -7,7 +7,7 @@ The permissions of a role are edited in the [Permission matrix](16-permission-ma
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Users & Roles > Roles`.
+2. Open `Users & Roles > Roles`.
 
 The menu item is `ent_roles_list`. It opens the form `enterprise_role_detail` (a shell). The shell has two slots:
 the list `enterprise_roles_list` on the left, and the role pane `enterprise_role_detail_pane` on the right.

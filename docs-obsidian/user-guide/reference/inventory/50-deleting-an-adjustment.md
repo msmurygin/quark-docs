@@ -11,7 +11,7 @@ Use this page to remove a document that was never posted, or to remove one line 
 
 From the list:
 
-1. Open `Inventory Balances > Inventory Adjustments`.
+1. Open `Management & Control > Inventory > Adjustments`.
 2. Tick one row.
 3. Click `Delete`.
 

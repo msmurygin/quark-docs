@@ -13,7 +13,7 @@ Use this page to add a kind of reusable carrier (a tote, a pallet, a cart) so th
 ## Steps
 
 1. Switch to **Enterprise**.
-2. Open `Configuration > Handling Unit Types`.
+2. Open `Shared Handling Unit Types`.
 3. Click `New`. An empty card opens.
 4. Fill `Code` and `Name`.
 5. Set what the carrier holds: tick `Holds Inventory`, `Holds Containers`, or both. At least one must be on.

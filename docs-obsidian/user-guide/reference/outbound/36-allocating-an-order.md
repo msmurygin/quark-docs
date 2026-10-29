@@ -64,6 +64,6 @@ Source: `crates/libs/wms-outbound/src/allocation/policy.rs:112-260`.
 - [Releasing an order](35-releasing-an-order.md)
 - [Unallocating an order](37-unallocating-an-order.md)
 - [Picks tab](12-picks-tab.md)
-- Administrator guide: the allocation policy is set in the menu `Policy > Allocation Policy`.
+- Administrator guide: the allocation policy is set in the menu `Warehouse Configuration > Policies > Allocation Policy`.
 - API: `shipment_order_allocate` (stateful command, version of the order). The dry run `shipment_order_allocate_preview` exists in the API, but no button calls it.
 - RF terminal: none.

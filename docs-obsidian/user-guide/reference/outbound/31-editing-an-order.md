@@ -11,7 +11,7 @@ Use this page to change the header of a saved order.
 
 ## Steps
 
-1. Open the order from `Outbound > Orders`.
+1. Open the order from `Management & Control > Orders & Waves > Orders`.
 2. Change the fields you need on the [Header tab](10-header-tab.md) or the [Ship To tab](11-ship-to-tab.md).
 3. Click `Save` on the order toolbar.
 

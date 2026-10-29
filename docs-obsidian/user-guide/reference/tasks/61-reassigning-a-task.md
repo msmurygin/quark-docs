@@ -12,7 +12,7 @@ It is also the only way to take a task out of the escalated state.
 
 ## Steps
 
-1. Open `Task Manager > Task Board`.
+1. Open `Management & Control > Execution Control > Task Board`.
 2. Tick the check box of **one** task.
 3. Click `Reassign`. The window `Reassign Task` opens.
 4. In `Operator` click the picker and choose the new holder.

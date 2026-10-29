@@ -28,7 +28,7 @@ There is no separate ASN screen in the menu.
 
 ### Steps
 
-1. Open `Sidebar > Inbound > Receipts`.
+1. Open `Sidebar > Management & Control > Receiving > Receipts`.
 2. Click `New`.
 3. Tab `Header`: fill `Receipt Number`, `Owner`, `Receipt Type`, `Supplier`, `Carrier`, `Expected Receipt Date` and the other fields you know.
 4. Tab `Dates` and tab `Shipping`: fill what you know.
@@ -156,7 +156,7 @@ Set how strict receiving is about missing documents, quantity, pack multiples an
 
 ### Steps
 
-1. Open `Sidebar > Policy > Receipt Policy`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Receipt Policy`.
 2. Click `New`. Open the tab `General`. Fill the fields.
 3. Open the tab `Qty validation against ASN (RF)`. Set limits.
 4. Open the tab `Qty validation against PO (RF)`. Set limits.
@@ -240,9 +240,9 @@ Set what happens to damaged goods found at receiving, and know how a damage case
 
 ### Steps
 
-1. Open the owner (`Sidebar > Owners`). Open `WH Settings > Receiving`.
+1. Open the owner (`Sidebar > Warehouse Configuration > Product Data > Owners`). Open `WH Settings > Receiving`.
 2. Set `Damage Action: Minor`, `Damage Action: Major`, `Damage Action: Total`.
-3. Set reasons: open `Sidebar > Code > Code List` and edit the lists `damage_reason`, `damage_severity` and `damage_action` if you need other words.
+3. Set reasons: open `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List` and edit the lists `damage_reason`, `damage_severity` and `damage_action` if you need other words.
 4. The operator reports damage on a line: `Report Damage`.
 5. Close each damage case with a disposition (API or RF; see below).
 
@@ -308,12 +308,12 @@ Define the hold reasons your warehouse uses and place a hold.
 
 ### Steps: edit hold reasons
 
-1. Open `Sidebar > Code > Hold Codes`.
+1. Open `Sidebar > Warehouse Configuration > Reason Codes > Hold Codes`.
 2. Click `New`. Fill the fields. Click `Save`.
 
 ### Steps: place a hold
 
-1. Open `Sidebar > Inventory Balances > Holds`.
+1. Open `Sidebar > Management & Control > Inventory > Holds`.
 2. Click `New Hold`.
 3. Pick a `Reason code`. Fill exactly one of `Lot`, `Location`, `Container (LPN)`.
 4. Fill `Comments`. Click `Save`.
@@ -383,7 +383,7 @@ The first step that finds a suitable location wins. If no step finds one, there 
 
 ### Steps
 
-1. Open `Sidebar > Policy > Putaway Policy`.
+1. Open `Sidebar > Warehouse Configuration > Policies > Putaway Policy`.
 2. Click `New`. Fill `Code` and `Description`. Click `Save`.
 3. Open the policy. The step editor opens.
 4. Click `Add step`. A new step is live at once and is tried after every rule above it.

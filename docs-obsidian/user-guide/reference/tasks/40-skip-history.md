@@ -7,7 +7,7 @@ The form is `task_skip_board_list_form`. The data comes from the view `task_skip
 
 ## How to open it
 
-1. In the left sidebar open `Task Manager`.
+1. In the left sidebar open `Management & Control`, then `Exceptions`.
 2. Click `Skip History`.
 
 The menu item is `task_skip_board_menu`.

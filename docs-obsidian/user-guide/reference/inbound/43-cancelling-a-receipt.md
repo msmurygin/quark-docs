@@ -10,7 +10,7 @@ Use this page when the goods will not come and nothing was received. Cancelling 
 
 ## Steps
 
-1. Open `Inbound > Receipts`.
+1. Open `Management & Control > Receiving > Receipts`.
 2. Tick one receipt.
 3. Click `Cancel Receipt`. The window `Cancel Receipt` opens. It says `Cancelling a receipt is final and cascades to every line that is not already closed.`
 4. Type a `Reason`. The hint says `Recorded in the cancel summary and sent to the ERP. Required.`

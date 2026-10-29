@@ -455,7 +455,7 @@ except where noted.
 
 ### Zone: attribute rule (`putawayzone_lot_commingle`)
 
-- **Screen**: Topology > Putaway Zones > zone > lot commingle list. Fields
+- **Screen**: Warehouse Configuration > Topology > Putaway Zones > zone > lot commingle list. Fields
   **Attribute Code** and **Allow Mix**.
 - **Columns**: `putawayzone_lot_commingle.putawayzone_code`, `attrib_code`,
   `allow_mix` (default `true`).

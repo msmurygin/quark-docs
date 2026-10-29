@@ -7,7 +7,7 @@ The form is `operator_list_form`. The data object is `operator` (table `operator
 
 ## How to open it
 
-1. In the left sidebar open `Task Manager`.
+1. In the left sidebar open `Warehouse Configuration`, then `Operator Permissions`.
 2. Click `Operators`.
 
 The menu item is `operator_menu`.

@@ -16,12 +16,12 @@ Paths start at `crates/libs/` unless they say otherwise. `file:line` shows where
 
 | What | Menu path or API | Roles |
 |---|---|---|
-| Policy list and header | `Sidebar > Policy > Allocation Policy`. Buttons: `New`, `Delete`, `Refresh`, `Duplicate`. | Admin, Manager, Supervisor (write). Everyone with the screen can read. |
+| Policy list and header | `Sidebar > Warehouse Configuration > Policies > Allocation Policy`. Buttons: `New`, `Delete`, `Refresh`, `Duplicate`. | Admin, Manager, Supervisor (write). Everyone with the screen can read. |
 | Step editor | Click a policy row. The step page opens (navigation `nav_allocation_policy_row_opens_step_page`). | same |
 | Lifecycle buttons | `Validate`, `Publish`, `Deactivate` on the policy form toolbar | same |
-| SKU link | `Sidebar > SKU > open the SKU > tab Policies > Allocation Policy` | SKU editors |
-| Owner default | `Sidebar > Owner > open an owner of type Own > tab WH Settings > inner tab Policies > Allocation Policy` | Owner editors |
-| Rotation facts | `Sidebar > SKU > open the SKU > tab Shelf Life`: `Rotation`, `Rotate By`, `Min Shelf Life on Pick` | SKU editors |
+| SKU link | `Sidebar > Warehouse Configuration > Product Data > SKUs > open the SKU > tab Policies > Allocation Policy` | SKU editors |
+| Owner default | `Sidebar > Warehouse Configuration > Product Data > Owners > open an owner of type Own > tab WH Settings > inner tab Policies > Allocation Policy` | Owner editors |
+| Rotation facts | `Sidebar > Warehouse Configuration > Product Data > SKUs > open the SKU > tab Shelf Life`: `Rotation`, `Rotate By`, `Min Shelf Life on Pick` | SKU editors |
 
 API methods (all in `app-server/src/web/rpcs/allocation_policy_rpc.rs`):
 

@@ -6,7 +6,7 @@ The screen has a **summary strip** on top and **seven tabs** below it. Each tab 
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Inventory Balances`.
+2. In the left sidebar open `Management & Control`, then `Inventory`.
 3. Click `Balances`.
 
 The sidebar item is `inventory_balance_list_menu`. It opens the form `inventory_balances` (kind Tabbed, style `balshell`).

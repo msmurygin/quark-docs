@@ -25,7 +25,7 @@ Understand what a warehouse is and what the web UI can and cannot do with it.
 ### Steps
 
 There is **no screen** that creates a warehouse.
-The menu entry `Sidebar > Configuration > Warehouses` (Enterprise mode) has no form behind it.
+`Enterprise > Warehouses` lists configured warehouses but does not provision a new warehouse schema.
 The API has only `list_user_warehouses` and `get_warehouse_defaults` (read-only).
 
 To add a warehouse, the installer must:
@@ -163,7 +163,7 @@ Create or edit one location.
 
 ### Steps
 
-1. Open `Sidebar > Topology > Locations`.
+1. Open `Sidebar > Warehouse Configuration > Topology > Locations`.
 2. Click `New`.
 3. On the tab `General`, fill `Code` and `Type`. Fill the other fields you need.
 4. Open the tab `Dimensions`. Fill the sizes and capacity.
@@ -241,7 +241,7 @@ Create many locations from a pattern in one run.
 
 ### Steps
 
-1. Open `Sidebar > Topology > Locations`.
+1. Open `Sidebar > Warehouse Configuration > Topology > Locations`.
 2. Click `Generate`. The wizard `Location Generator` opens.
 3. Step `Code pattern`: fill the three ranges and the optional prefixes and suffixes.
 4. Step `Classification`: choose the type, zone and flags.
@@ -309,7 +309,7 @@ Create a zone that groups locations and names its special locations.
 
 ### Steps
 
-1. Open `Sidebar > Topology > Putaway Zones`.
+1. Open `Sidebar > Warehouse Configuration > Topology > Putaway Zones`.
 2. Click `New`.
 3. On the tab `General`, fill the fields.
 4. On the tab `Capacity`, fill the limits (optional).
@@ -385,13 +385,13 @@ Group zones into work areas. Describe lift equipment. Give operators the right t
 
 ### Steps
 
-1. Open `Sidebar > Topology > Work Areas`. Click `New`. Fill `Code` and the settings. Save.
+1. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Click `New`. Fill `Code` and the settings. Save.
 2. In the area, add its zones: use the list `Work Area Zones`, button `New`, pick a `Putaway Zone`, click `Save`.
 3. To name the picking policy: select the area and click `Assign Policy`. Pick a policy. Click `Assign`.
 4. For a policy per equipment kind: in `Policy by Equipment Kind`, click `Add`. Pick an `Equipment Profile` and a `Picking Policy`.
-5. Open `Sidebar > Topology > Equipment Profiles`. Click `New`. Fill the fields. Save.
+5. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Equipment Profiles`. Click `New`. Fill the fields. Save.
 6. To exclude zones for a kind of equipment, add rows to `Excluded Zones`.
-7. Open `Sidebar > Task Manager > Operators`. Click `Sync` to copy users now.
+7. Open `Sidebar > Warehouse Configuration > Operator Permissions > Operators`. Click `Sync` to copy users now.
 8. Open an operator. Set `Equipment Profile`. Add rows to `Task Permissions`.
 
 ![Work Areas list with one work area, MAIN_AREA](../assets/screens/work-areas.png)
@@ -475,7 +475,7 @@ System defaults used when the terminal names no work area (`System Settings`):
 
 - Pick tasks are handed only to operators with a right in the area.
 - A closed pick pallet or a carton goes to the pack station of the area.
-- A supervisor works from `Task Manager > Task Board` (columns include `Assignee`, `Status`, `Lease Expires`, `Refusals`; buttons `Return to Pool`, `Reassign`, `Delete Task`).
+- A supervisor works from `Management & Control > Execution Control > Task Board` (columns include `Assignee`, `Status`, `Lease Expires`, `Refusals`; buttons `Return to Pool`, `Reassign`, `Delete Task`).
 
 The rule is in `OperatorBmc::sync_from_enterprise` (`wms-lib-core/src/model/tasks/operator.rs`). A user becomes an active operator of a warehouse when all three are true: `rf_login = true`, `status = 'Active'`, and a row in `user_warehouse` for that warehouse. The role does not matter. The sync sets an operator inactive when one of the three stops being true.
 
@@ -487,7 +487,7 @@ The rule is in `OperatorBmc::sync_from_enterprise` (`wms-lib-core/src/model/task
 
 ## 8. 3D warehouse
 
-`Sidebar > Topology > 3D Warehouse` opens an HTML page (`warehouse_3d`).
+`Sidebar > Warehouse Configuration > Topology > 3D Warehouse` opens an HTML page (`warehouse_3d`).
 It draws locations from their coordinates (`X Coord`, `Y Coord`, `Z Coord`) and the zone color.
 
 The page is titled `Warehouse Topology`. Its controls (`web-ui-server/src/components/pages/warehouse_3d.rs`):
@@ -502,7 +502,7 @@ The page is titled `Warehouse Topology`. Its controls (`web-ui-server/src/compon
 
 ## 9. Cycle count policies (short note)
 
-`Sidebar > Policy > Cycle Count Policies` (`inventory_count_policy_normal_form`).
+`Sidebar > Warehouse Configuration > Counting > Cycle Count Policies` (`inventory_count_policy_normal_form`).
 
 | Field | Meaning | Allowed values |
 |---|---|---|
@@ -519,4 +519,4 @@ The page is titled `Warehouse Topology`. Its controls (`web-ui-server/src/compon
 Buttons: `Save`, `Run Now`, `Delete`.
 Setting `COUNT_ON_PUTAWAY_DEVIATION` (0 or 1) asks for a count of the destination when putaway deviates.
 
-The full count workflow (`Inventory Balances > Inventory Counts`) is outside the scope of this guide.
+The full count workflow (`Management & Control > Inventory > Counts`) is outside the scope of this guide.

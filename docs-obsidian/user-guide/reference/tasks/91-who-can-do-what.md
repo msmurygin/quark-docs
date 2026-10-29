@@ -1,7 +1,7 @@
 # Who can do what
 
 This page shows which default role may use each Task Manager button, and which web action and API method stand behind it.
-It describes the **defaults** that a new database gets. An administrator can change every cell in `Users & Roles > Permission Matrix`. A change made there wins over this page.
+It describes the **defaults** that a new database gets. An administrator can change every cell in `Permission Matrix`. A change made there wins over this page.
 
 Three gates apply to a screen:
 
@@ -83,5 +83,5 @@ The `SUPERVISOR` column assumes an administrator has already granted that role t
 
 - [Task Manager](00-task-manager-overview.md)
 - [Return codes](92-return-codes.md)
-- Administrator guide: `Users & Roles > Permission Matrix`
+- Administrator guide: `Permission Matrix`
 - API: the right of each method is on its page in the Tasks API reference and the Outbound API reference.

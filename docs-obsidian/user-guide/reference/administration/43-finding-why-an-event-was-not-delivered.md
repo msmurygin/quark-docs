@@ -10,7 +10,7 @@ You will use the [Event monitor](21-event-monitor.md) first, then the [Delivery 
 
 ## Steps
 
-1. Switch to **Enterprise** and open `Integration > Event Monitor`.
+1. Switch to **Enterprise** and open `Integrations > Events`.
 2. Filter by `Entity` (for example `receipt`) and `Key` (the receipt number). Find the event.
 3. **No row at all?** The event was never written. Go to "The event does not exist" below.
 4. Read `Status` and follow the table.
@@ -23,7 +23,7 @@ You will use the [Event monitor](21-event-monitor.md) first, then the [Delivery 
 | `failed` | At least one delivery used up its tries. | Open the Delivery log (step 5). |
 | `sent` | All handled deliveries were sent. A `poll` subscriber is not counted. | If the receiver says it got nothing, check whether the subscriber is a `poll` one: nothing is sent to it. |
 
-5. Open `Integration > Delivery Log`. Filter `Event ID` with the id you saw. There is one row for each subscriber.
+5. Open `Integrations > Deliveries`. Filter `Event ID` with the id you saw. There is one row for each subscriber.
 6. Read the row:
 
 | `Status` | `Attempts` | `HTTP Code` | `Last Error` | Cause |

@@ -1,12 +1,12 @@
 # Event monitor
 
-The `Event Monitor` shows the **event log**: every event the system has written, with its delivery state.
+The `Events` screen shows the **event log**: every event the system has written, with its delivery state.
 It is a read-only list. You use it to check that an event was written and what became of it.
 
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Integration > Event Monitor`.
+2. Open `Integrations > Events`.
 
 The menu item is `ent_integration_event_menu`. It opens the list `ent_integration_event_list_form`. The card is `ent_integration_event_normal_form`. The data object is `integration_event` (table `enterprise.integration_event`).
 

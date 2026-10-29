@@ -6,7 +6,7 @@ You switch a cell on or off, and the change is saved at once.
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Users & Roles > Permission Matrix`.
+2. Open `Permission Matrix`.
 
 The menu item is `ent_permission_matrix`. It opens the form `enterprise_permission_matrix`, a form of the kind `PermissionMatrix`.
 The form settings (`form_permission_matrix_properties`) say: 50 resources on a page, and the save method is `batch_upsert_permission_matrix`.

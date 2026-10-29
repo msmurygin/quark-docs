@@ -68,7 +68,7 @@ The code is `wms-inventory/src/putaway/mod.rs`, function `run_steps` (line 793).
 
 After the answer:
 
-8. **The reservation** is visible under `Sidebar > Inventory Balances > Pending Move-In`. Other searches count its cube, weight and pallet position
+8. **The reservation** is visible under `Sidebar > Management & Control > Inventory > Pending Move-In`. Other searches count its cube, weight and pallet position
    as taken. It lasts `Putaway Reservation TTL (min)` of the owner, else `PUTAWAY_RESERVATION_TTL_MIN` (15). A sweeper runs every 5 minutes and frees expired ones
    (`putaway/sweeper.rs`).
 9. **The move** is run with the reservation id. It is a "directed" move. The move checks again, **always**, these rules: destination type, holds on source and destination,
@@ -136,17 +136,17 @@ To see how many locations a condition removed, run the dry run: it prints `Remov
 
 | What | Screen / menu | Column or key | Described in |
 |---|---|---|---|
-| Policy header | `Sidebar > Policy > Putaway Policy` | `putaway_policy.code`, `description` | file 01, section 1 |
+| Policy header | `Sidebar > Warehouse Configuration > Policies > Putaway Policy` | `putaway_policy.code`, `description` | file 01, section 1 |
 | Step fields | step editor (open a policy) | `putaway_policy_detail.*` | file 01, section 2 |
 | Conditions | step editor, band `Conditions` | `putaway_step_criterion.*` | file 01, section 3 |
 | Policy on a SKU | SKU, tab Policies: `Putaway Policy` | `sku.putaway_policy_id` | file 01, 1.5 |
 | Policy default of an owner | Owner, WH Settings: `Putaway Policy` | `owner_config.default_putaway_policy_id` | file 01, 1.5 |
 | Preferred zone and location of a SKU | SKU, tab Policies: `Putaway Zone`, `Putaway Location` | `sku.putawayzone`, `sku.putaway_loc` | file 01, 2.2 |
-| Zone | `Sidebar > Topology > Putaway Zones` | `putawayzone.*` | file 02 |
+| Zone | `Sidebar > Warehouse Configuration > Topology > Putaway Zones` | `putawayzone.*` | file 02 |
 | Zone lot mixing rules | zone card, list `Lot Commingle Rules` | `putawayzone_lot_commingle.*` | file 02, section 3 |
-| Location | `Sidebar > Topology > Locations` | `location.*` | file 03 |
+| Location | `Sidebar > Warehouse Configuration > Topology > Locations` | `location.*` | file 03 |
 | Location lot mixing rules | location card, list `Lot Commingle Rules` | `location_lot_commingle.*` | file 03, section 4 |
-| Timers | `Sidebar > System Settings`; owner WH Settings | `PUTAWAY_RESERVATION_TTL_MIN`, `PUTAWAY_LOCK_TIMEOUT_MS`, `COUNT_ON_PUTAWAY_DEVIATION`, `owner_config.putaway_reservation_ttl_min` | file 01, 4.5 |
+| Timers | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`; owner WH Settings | `PUTAWAY_RESERVATION_TTL_MIN`, `PUTAWAY_LOCK_TIMEOUT_MS`, `COUNT_ON_PUTAWAY_DEVIATION`, `owner_config.putaway_reservation_ttl_min` | file 01, 4.5 |
 
 Master data on the SKU that putaway reads (the SKU form, not documented here in full):
 

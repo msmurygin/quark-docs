@@ -11,7 +11,7 @@ A count that has been counted is cancelled, not deleted. See [Cancelling a count
 
 ## Steps
 
-1. Open `Inventory Balances > Inventory Counts`.
+1. Open `Management & Control > Inventory > Counts`.
 2. Tick one row.
 3. Click `Delete`.
 

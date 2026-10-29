@@ -20,7 +20,7 @@ Paths are relative to `crates/libs/` unless they start with `crates/`.
 | Item | Value |
 |---|---|
 | Table | `system_settings`, **one table per warehouse** (it lives in the warehouse schema, for example `wh1`). Each warehouse has its own values. |
-| Menu path | `Sidebar > System Settings` |
+| Menu path | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` |
 | Screen fields | `Config Key`, `Value`, `Default Value`, `Description`, `Editable` |
 | What you can change | Only `Value` (`config_value`). Key, default, description and the editable flag are read-only on the screen and in `update_system_settings`. |
 | Refusal when not editable | `system setting <KEY> is read-only` |
@@ -273,7 +273,7 @@ These are hard-coded. There is no screen and no key.
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Control Center > Board Settings` and `Sidebar > Control Center > Metric Thresholds` (the group sits right after `System Settings`) |
+| Menu path | `Sidebar > Warehouse Configuration > Dashboards > Board Settings` and `Sidebar > Warehouse Configuration > Dashboards > Metric Thresholds` |
 | Screens | `Dashboard Settings` (list and card), `Metric Thresholds` (list and card), `Dashboard Metrics` (read-only catalogue) |
 | Roles | change: `Admin`, `Manager`. Read the settings: `Admin`, `Manager`. Read the catalogue: every role. |
 | API | `dashboard_setting_get`, `dashboard_setting_list`, `update_dashboard_setting`, `dashboard_metric_threshold_*` (`create`, `update`, `delete`, `get`, `list`), `dashboard_metric_catalogue` |
@@ -361,8 +361,8 @@ One row per metric (unique on `metric_key`). Without a row the metric has no ale
 | `Auto-Print LPN` (`owner_config.auto_print_lpn_on_receive`) | owner, tab `Receiving` | print the LPN label after a receive (file 41, B.8) | yes |
 | Printer assignment | table `printer_assignments`, API only | which printer a print goes to. Fields: `scope_type` (`User`, `Zone`, `Owner`, `Warehouse`), `scope_id` (the user id, zone id or owner id; empty for the warehouse), `printer_id`, `priority` (default 100, lower wins inside a scope), `is_active` (default true). Order: **Zone → User → Owner → Warehouse** (`wms-lib-core/src/model/printer_assignments.rs:170-222`). A print with no location has no zone, so the order is User → Owner → Warehouse. | yes |
 | Printer configuration | table `printer_configurations`, API only (`printer_configuration_rpc.rs`) | `code`, `name`, `description`, `printer_host`, `printer_port` (default 9100), `printer_model`, `zone_code`, `is_default`, `label_definition_id`, `is_active` (default true) | only `code`, `printer_host`, `printer_port` are used (`wms-printing/src/label_print_service.rs:772-822`). **`is_active`, `zone_code`, `is_default`, `label_definition_id`, `printer_model` are stored only**: a printer with `is_active = false` still prints if an active assignment points to it. |
-| Label definitions and templates | tables `label_definitions`, `label_templates`; designer in `Sidebar > Reports` | the label layout. The code looks a label up by its exact code: `lpn_id_label` (receive), `handling_unit_label` (handling unit registry), `shipping_label` (carton close) | yes |
-| Zone printer fields | `Topology > Putaway Zones > Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`, `Default Report Printer` | meant to set default printers | **Stored only. They have no effect today.** The model reads and writes them; no print path reads them. Use a printer assignment with scope `Zone`. |
+| Label definitions and templates | tables `label_definitions`, `label_templates`; designer in `Sidebar > Overview > Reports` | the label layout. The code looks a label up by its exact code: `lpn_id_label` (receive), `handling_unit_label` (handling unit registry), `shipping_label` (carton close) | yes |
+| Zone printer fields | `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`, `Default Report Printer` | meant to set default printers | **Stored only. They have no effect today.** The model reads and writes them; no print path reads them. Use a printer assignment with scope `Zone`. |
 
 Print results never fail the business command. A missing printer, a missing
 template or an unreachable device is logged and the receive or the carton close still

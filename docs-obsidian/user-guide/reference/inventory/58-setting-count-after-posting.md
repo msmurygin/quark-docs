@@ -9,7 +9,7 @@ Use this page to choose whether the locations changed by an adjustment are count
 
 ## Steps
 
-1. Open `Inventory Balances > Adjustment Reasons`.
+1. Open `Warehouse Configuration > Reason Codes > Adjustment Reasons`.
 2. Tick one reason.
 3. Click `Count After Posting` to turn the count on, or `Do Not Count` to turn it off.
 4. Check the column `Count After Posting`.
@@ -36,7 +36,7 @@ Later, when an adjustment with that reason is posted, each location of a changed
 
 A document that a count made (source `InventoryCount`) asks for nothing.
 
-> Not confirmed by code: where an operator can see a refused request. To verify: turn the setting on, post an adjustment on a location that is frozen by a hard count, and look at `Integration > Delivery Log`.
+If a request is refused, review its delivery result in `Enterprise > Integrations > Deliveries`.
 
 ## Related pages
 

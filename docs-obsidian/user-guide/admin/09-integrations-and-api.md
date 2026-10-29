@@ -16,10 +16,10 @@ This chapter lists only what exists today. It is short on purpose.
 |---|---|---|
 | JSON-RPC API | Every business action as a method call. | Path `/rpc` on `app-server`. |
 | API keys | Let another system call the API as a user. | `02-users-roles-permissions.md`, section 7. |
-| RPC documentation | Browsable list of methods. | `Sidebar > Integration > RPC Documentation`. |
-| Business events | Events such as `process.receipt.closed`. | `Enterprise > Integration`. |
-| Subscribers | Who receives events (webhook, poll, internal). | `Enterprise > Integration > Subscribers`. |
-| Integration Platform | Builds and monitors flows between WMS, ERPs, marketplaces and other services. | `Sidebar > Integration > IPaaS`; see the [Integration Platform guide](../integration-platform/00-README.md). |
+| RPC documentation | Browsable list of methods. | `Enterprise > Platform Tools > RPC Documentation`. |
+| Business events | Events such as `process.receipt.closed`. | `Enterprise > Integrations > Events`. |
+| Subscribers | Who receives events (webhook, poll, internal). | `Enterprise > Integrations > Subscribers`. |
+| Integration Platform | Builds and monitors flows between WMS, ERPs, marketplaces and other services. | `Enterprise > Integrations > IPaaS`; see the [Integration Platform guide](../integration-platform/00-README.md). |
 
 The platform includes connector and flow templates for supported integration patterns. A template is a starting point: you still enter the address and credentials for your own environment, test the connector and activate the resulting flow.
 
@@ -36,7 +36,7 @@ Make a call from another system.
 
 ### Steps
 
-1. Open `Sidebar > Integration > RPC Documentation` to find the method and its parameters.
+1. Open `Enterprise > Platform Tools > RPC Documentation` to find the method and its parameters.
 2. Send an HTTP POST to the `/rpc` path with the header `Authorization: Bearer <key>`.
 3. Send a JSON-RPC 2.0 body.
 4. For a command (any write), send a unique `idempotency_key` in `params.meta`.
@@ -116,11 +116,11 @@ Choose which events leave the warehouse system and where they go.
 
 ### Steps
 
-1. Open `Enterprise > Integration > Event Registry`. Check the events. 339 are seeded: `bio_lifecycle` 267, `business` 61, `form_render` 3, `scheduled` 3, `field_change` 4, `security` 1.
-2. Open `Enterprise > Integration > Subscribers`. Click `New`.
+1. Open `Enterprise > Integrations > Event Registry`. Check the events. 339 are seeded: `bio_lifecycle` 267, `business` 61, `form_render` 3, `scheduled` 3, `field_change` 4, `security` 1.
+2. Open `Enterprise > Integrations > Subscribers`. Click `New`.
 3. Fill `Name`, `Code`, `Delivery`, `Webhook URL`, `Max Retries`, `Retry Delay (s)`. Turn on `Active`.
 4. Click `Save`.
-5. Watch `Enterprise > Integration > Event Monitor` and `Delivery Log`.
+5. Watch `Enterprise > Integrations > Events` and `Deliveries`.
 
 ![ent_integration_subscriber_normal_form - Subscriber Edit](../assets/screens/ent-integration-subscriber-normal-form.png)
 
@@ -160,8 +160,8 @@ Business event codes include, for example: `process.order.created`, `process.ord
 
 ### What you should see
 
-- A new event appears in `Event Monitor` with status and failure count.
-- A delivery row appears in `Delivery Log` with status, attempts, last error, HTTP code.
+- A new event appears in `Events` with status and failure count.
+- A delivery row appears in `Deliveries` with status, attempts, last error, HTTP code.
 
 ### If something goes wrong
 
@@ -178,7 +178,7 @@ There is no web field or public API field for `event_filter` or `warehouse_filte
 
 ## 4. IPaaS
 
-`Sidebar > Integration > IPaaS` opens the Integration Platform. Use it to create connectors, fork flow templates, configure schedules and webhooks, and monitor each execution.
+`Enterprise > Integrations > IPaaS` opens the Integration Platform. Use it to create connectors, fork flow templates, configure schedules and webhooks, and monitor each execution.
 
 The Integration Platform has a separate tenant access boundary. If it asks for access or shows an authorization error, request a platform access link or key from the deployment administrator. Do not use a marketplace connector credential as the platform access key.
 

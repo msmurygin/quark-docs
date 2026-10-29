@@ -30,7 +30,7 @@ The web UI signs a short token (5 minutes) that carries the user, the language, 
 ### Steps
 
 1. Switch to a warehouse (not Enterprise).
-2. Open `Sidebar > Reports`.
+2. Open `Sidebar > Overview > Reports`.
 3. Search or group the report list. Click a report.
 4. Fill the parameter form.
 5. Click run. The browser downloads the file (PDF, XLSX).
@@ -107,7 +107,7 @@ Access rule today:
 - Deletions in your own report tables do not travel to the service (see its install guide).
 
 - The old report definition screen is retired. Its menu item `report_def_menu` is inactive and does not reach the sidebar.
-- Report definitions are added in two ways. The command `quark-reports import-catalog` loads the catalogue. Or a Studio admin clicks `Report designer` above the frame on `Sidebar > Reports` and edits there. The same page has `Label designer`.
+- Report definitions are added in two ways. The command `quark-reports import-catalog` loads the catalogue. Or a Studio admin clicks `Report designer` above the frame on `Sidebar > Overview > Reports` and edits there. The same page has `Label designer`.
 
 ## 2. Dashboard
 
@@ -123,7 +123,7 @@ The dashboard has a left **rail** of up to six key figures (metrics), panels, an
 
 ### Steps: board settings
 
-1. Open `Sidebar > Control Center > Board Settings`.
+1. Open `Sidebar > Warehouse Configuration > Dashboards > Board Settings`.
 2. Open the single settings row.
 3. Pick a metric for each of `Rail slot 1` to `Rail slot 6`.
 4. Set `Throughput plan (units/hour)` and `Expiring within (days)`.
@@ -132,7 +132,7 @@ The dashboard has a left **rail** of up to six key figures (metrics), panels, an
 
 ### Steps: thresholds
 
-1. Open `Sidebar > Control Center > Metric Thresholds`.
+1. Open `Sidebar > Warehouse Configuration > Dashboards > Metric Thresholds`.
 2. Click `New`.
 3. Pick the `Metric`. Pick `Bad when`. Fill `Alert at` or `Critical at` (or both).
 4. Click `Save`.
@@ -222,12 +222,12 @@ Rules (`dashboard_metric_threshold` checks):
 
 | Screen | Path | Use |
 |---|---|---|
-| Balances | `Sidebar > Inventory Balances > Balances` | Tabs: `By Location`, `By Container`, `By SKU`, `By Lot`, `By Serial`, `Open Episodes`, `On Hold`. |
-| Transactions | `Sidebar > Inventory Balances > Transactions` | The ledger of stock moves, with before and after values. |
-| Pending Move-In | `Sidebar > Inventory Balances > Pending Move-In` | Reserved putaway destinations. |
-| Audit Log | `Enterprise > Users & Roles > Audit Log` | Permission changes and denials. |
-| Event Monitor | `Enterprise > Integration > Event Monitor` | Business events and their status. |
+| Balances | `Sidebar > Management & Control > Inventory > Balances` | Tabs: `By Location`, `By Container`, `By SKU`, `By Lot`, `By Serial`, `Open Episodes`, `On Hold`. |
+| Transactions | `Sidebar > Management & Control > History > Transactions` | The ledger of stock moves, with before and after values. |
+| Pending Move-In | `Sidebar > Management & Control > Inventory > Pending Move-In` | Reserved putaway destinations. |
+| Audit Log | `Enterprise > Audit` | Permission changes and denials. |
+| Event Monitor | `Enterprise > Integrations > Events` | Business events and their status. |
 
-![Inventory Balances page with the By Location tab selected](../assets/screens/inventory-balances.png)
+![Balances page with the By Location tab selected](../assets/screens/inventory-balances.png)
 
 *Caption: the balances tabs. Focus: The summary tiles show total, available, allocated and on hold quantity. The tabs above the tiles change the grouping. The teal numbers mark: 1 Available (ATP), 2 Allocated, 3 On Hold.*

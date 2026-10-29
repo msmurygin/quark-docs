@@ -50,7 +50,7 @@ its owner's default. See [41-owner-settings-and-policy-resolution.md](./41-owner
 
 | Item | Value |
 |---|---|
-| Menu path | `Sidebar > Policy > Receipt Policy` |
+| Menu path | `Sidebar > Warehouse Configuration > Policies > Receipt Policy` |
 | Screen | A list, then a tabbed form with three tabs: `General`, `Qty validation against ASN (RF)`, `Qty validation against PO (RF)` |
 | Save | One Save button for the three tabs. It sends one versioned update. |
 | Roles that can change it | `Admin`, `Manager` (create, update, delete). `Operator` and `Viewer` can only read. (`services/app-server/src/web/rpcs/receipt_policy_rpc.rs:7-15`) |

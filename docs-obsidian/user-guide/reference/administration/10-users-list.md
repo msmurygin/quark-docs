@@ -6,7 +6,7 @@ The list is on the left. When you open a user, the user card opens on the right.
 ## How to open it
 
 1. Switch to **Enterprise**. See [Enterprise sidebar](00-administration-overview.md).
-2. Open `Configuration > Users & Roles > Users`.
+2. Open `Users & Roles > Users`.
 
 The menu item is `ent_users_list`. It opens the form `enterprise_users_shell`. The shell has two slots:
 the list `enterprise_users_list` in `slot_1` and the user card `enterprise_user_detail` in `slot_2`.

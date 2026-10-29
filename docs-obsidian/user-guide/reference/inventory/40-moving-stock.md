@@ -10,7 +10,7 @@ Use this page to move stock from one location to another, to repack it into a ne
 
 ## Steps
 
-1. Open `Inventory Balances > Balances`. The tab `By Location` is open.
+1. Open `Management & Control > Inventory > Balances`. The tab `By Location` is open.
 2. Find the position. Use the quick filters `Location`, `SKU` or `Owner`, or `More filters`.
 3. Click the row. The [Move stock document](17-move-stock-document.md) opens.
 4. Choose what to do with the container:
