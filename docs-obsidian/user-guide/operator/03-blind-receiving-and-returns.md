@@ -259,4 +259,4 @@ Blind and return receipts are created when you receive the first line. The recei
 - [02 Receiving against an ASN](02-receiving-against-asn.md)
 - [04 Damage and receipt close](04-damage-and-receipt-close.md)
 - [05 Putaway](05-putaway.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

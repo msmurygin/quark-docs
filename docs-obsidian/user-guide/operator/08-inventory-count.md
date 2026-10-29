@@ -137,4 +137,4 @@ Each location you finish is compared with the system stock. A small difference w
 ## Related guides
 
 - [07 Stock inquiry](07-inventory-inquiry.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

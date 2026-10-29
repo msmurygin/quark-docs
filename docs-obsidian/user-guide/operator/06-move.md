@@ -138,4 +138,4 @@ A move is recorded with the user, the source, the destination and the quantity. 
 
 - [05 Putaway](05-putaway.md)
 - [07 Stock inquiry](07-inventory-inquiry.md)
-- [11 Troubleshooting and messages](11-troubleshooting-and-messages.md)
+- [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

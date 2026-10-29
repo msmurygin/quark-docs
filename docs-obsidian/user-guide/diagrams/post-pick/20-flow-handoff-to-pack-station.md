@@ -2,7 +2,7 @@
 
 **What this shows.** How a picked box becomes a waiting unit at a pack station, and how the station sees its queue.
 
-The "router" (`wms-outbound::flow`) only decides what comes next and where. It moves no stock and packs nothing. At this time the only next step it knows is `Pack`.
+This page focuses on the hand-off to packing. The outbound flow can also continue through consolidation and order control before staging; see the [post-pick overview](00-overview.md).
 
 ```mermaid
 sequenceDiagram

@@ -101,6 +101,7 @@ Read the table. The values are the enum `loc_type`; the descriptions come from t
 | `Stage` | `Staging` | Staging. The owner's pick drop location may be a `Stage`. A closed pick pallet may stand here. |
 | `Door` | `Door` | Dock door. The owner's pick drop location may be a `Door`. A closed pick pallet may stand here. |
 | `Pack` | `Pack station` | A pack station. Only a `Pack` location can be the station of a work area. A closed pick pallet may stand here. |
+| `Control` | `Control station` | A station where an operator confirms that every container of an order has arrived. Only a `Control` location can be the control station of a work area. |
 | `QC` | `Quality control` | Single-purpose destination for "move to QC". |
 | `Damage` | `Damage` | Single-purpose destination for damaged stock. |
 | `Rtv` | `Return to vendor` | Single-purpose destination for return to vendor. |
@@ -382,10 +383,11 @@ Group zones into work areas. Describe lift equipment. Give operators the right t
 - Role: `ADMIN` or `MANAGER`.
 - Zones exist.
 - For the pack station: a location of type `Pack` exists.
+- For order control: a location of type `Control` exists.
 
 ### Steps
 
-1. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Click `New`. Fill `Code` and the settings. Save.
+1. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Click `New`. Fill `Code` and the settings. Set **Pack station** and **Control Station** when the area uses those steps. Save.
 2. In the area, add its zones: use the list `Work Area Zones`, button `New`, pick a `Putaway Zone`, click `Save`.
 3. To name the picking policy: select the area and click `Assign Policy`. Pick a policy. Click `Assign`.
 4. For a policy per equipment kind: in `Policy by Equipment Kind`, click `Add`. Pick an `Equipment Profile` and a `Picking Policy`.
@@ -422,6 +424,7 @@ Work area (`work_area_normal_form`):
 | `Allow Task Release` | May an operator hand back or refuse a task? | On or off. | on |
 | `Picking Policy` | Picking policy of the area. Set by `Assign Policy`. Blank = the default policy `DISCRETE`. | A published picking policy code. | `DISCRETE` |
 | `Pack station` | The pack-station location of the area. | A location of type `Pack`. | `PACK-01` |
+| `Control Station` | The location where complete orders are checked after picking, packing or consolidation. Blank means that this area does not send work to order control. | A location of type `Control`. The whole warehouse uses one control station. | `CTL-01` |
 
 Equipment profile (`equipment_profile_normal_form`). List columns: `Code`, `Description`, `Max Weight`, `Reduction per Level`, `Active`.
 
@@ -459,6 +462,7 @@ System defaults used when the terminal names no work area (`System Settings`):
 
 - The operator list shows every user who has a warehouse assignment (any role), `RF device login` on and status `Active`.
 - A pack-station area shows its `Pack` location.
+- An area with order control shows the warehouse's `Control` location in **Control Station**.
 
 ### If something goes wrong
 
@@ -467,6 +471,7 @@ System defaults used when the terminal names no work area (`System Settings`):
 | `you have no right to take Pick tasks in any work area - ask a supervisor` | The operator has no `Task Permissions` row for the task type, or the equipment excludes every zone. | Add a task permission. |
 | `there are Pick tasks in your work areas, but every one is heavier than your equipment lifts (up to N at ground level) - they wait for other equipment` | The equipment profile is too weak for the pool. | Use other equipment or raise `Max weight`. |
 | Work area `Pack station` refused by trigger `work_area_pack_station_is_a_pack_location` | The location is not of type `Pack`. | Use a `Pack` location. |
+| The area cannot assign a control station because this warehouse checks orders at another station | A different control station is already used in the warehouse. | Select the station named in the message. |
 | Task cannot be released | `Allow Task Release` is off in the area. | A supervisor must use `Return to Pool` or `Reassign` on the task board. |
 | Delete of a work area refused | Zones or permissions refer to it (RESTRICT keys). | Remove those rows first. |
 | Operator missing from the list | The user has `RF device login` off, a status other than `Active`, or no assignment to this warehouse. | Fix the user; click `Sync`. |
@@ -475,6 +480,7 @@ System defaults used when the terminal names no work area (`System Settings`):
 
 - Pick tasks are handed only to operators with a right in the area.
 - A closed pick pallet or a carton goes to the pack station of the area.
+- Containers go through order control only when the area names a control station. A closed pick pallet going directly from picking also needs `Control` in the policy's **Pallet Drop Cell Types**; cartons produced by packing follow the area's station settings.
 - A supervisor works from `Management & Control > Execution Control > Task Board` (columns include `Assignee`, `Status`, `Lease Expires`, `Refusals`; buttons `Return to Pool`, `Reassign`, `Delete Task`).
 
 The rule is in `OperatorBmc::sync_from_enterprise` (`wms-lib-core/src/model/tasks/operator.rs`). A user becomes an active operator of a warehouse when all three are true: `rf_login = true`, `status = 'Active'`, and a row in `user_warehouse` for that warehouse. The role does not matter. The sync sets an operator inactive when one of the three stops being true.

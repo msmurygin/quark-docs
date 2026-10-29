@@ -219,6 +219,10 @@ The `dashboard` form is the home page. It is the default tab of the main work ar
 | `Warehouse Configuration > Topology > 3D Warehouse` | `warehouse_3d` (HTML page) | `03-warehouse-structure.md` |
 | `Warehouse Configuration > Work Areas & Equipment > Work Areas` | `work_area_list_form` | `03-warehouse-structure.md` |
 | `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | `equipment_profile_list_form` | `03-warehouse-structure.md` |
+| `Management & Control > Stations > Distribution Stations` | `distribution_station_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Stations > Consolidation Stations` | `consolidation_station_list_form` | `06-outbound-setup.md` |
+| `Management & Control > Exceptions > Packing Exceptions` | `packing_exception_list_form` | `operator/10-packing-verify.md` |
+| `Management & Control > Execution Control > Order Control (Manual)` | `order_control_tabbed` | `operator/11-order-control-after-picking.md` |
 | `Warehouse Configuration > Settings & Reference Data > System Settings` | `sys_settings_list_form` | `10-checklist-go-live.md` |
 | `Warehouse Configuration > Dashboards > Board Settings` | `dashboard_setting_list_form` | `08-reports-and-dashboards.md` |
 | `Warehouse Configuration > Dashboards > Metric Thresholds` | `dashboard_threshold_list_form` | `08-reports-and-dashboards.md` |

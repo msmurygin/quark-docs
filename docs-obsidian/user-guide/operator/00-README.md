@@ -23,16 +23,13 @@ Use this page to find the right guide, learn the RF keys, and look up a term.
 | 08 | [Inventory count](08-inventory-count.md) | Count a location, or only an item in it |
 | 09 | [Picking](09-picking.md) | Pick orders (discrete pick, pick by area, carriers) |
 | 10 | [Packing, verify and repack](10-packing-verify.md) | Check and close boxes at a pack station, or repack a pallet into cartons |
-| 11 | [Troubleshooting and messages](11-troubleshooting-and-messages.md) | Understand a message |
+| 11 | [Order control after picking](11-order-control-after-picking.md) | Check that every container of an order reached the control station |
+| 12 | [Troubleshooting and messages](12-troubleshooting-and-messages.md) | Understand a message |
+| 13 | [Replenish](13-replenish.md) | Bring stock from storage to a pick location that is running low |
 
-## Processes that are not available yet
+## Processes without a guide yet
 
-The screen definitions contain **no** RF screens for these processes:
-
-- Stage, load and ship.
-- Replenishment.
-
-Do not look for them on the terminal. Ask your supervisor how to do this work.
+The terminal also contains **Consolidation**, **Distribution Station**, **Stage** and **Loading**. Their step-by-step operator guides are still to be written. Follow your site's work instructions for those menu entries.
 
 > The workflows listed in this guide describe the documented operator tasks. Your RF menu follows the configuration of your installation; further workflow guides will be added as the documentation expands.
 
@@ -65,9 +62,15 @@ The status line says **Select function — Esc to change warehouse**.
 | Key | Item | Guide |
 |-----|------|-------|
 | `1` | **Receiving** | 02, 03, 04 |
-| `2` | **Inventory** | 05, 06, 07, 08 |
+| `2` | **Inventory** | 05, 06, 07, 08, 13 |
 | `3` | **Picking** | 09 |
 | `4` | **Packing** | 10 |
+| `5` | **Consolidation** | Not documented yet |
+| `6` | **Order Control** | 11 |
+| `7` | **Distribution Station** | Not documented yet |
+| `8` | **Stage** | Not documented yet |
+
+**Loading** is on the next menu page. Press `9` or `PgDn` to show it.
 
 The submenus are listed below.
 
@@ -92,6 +95,8 @@ The submenus are listed below.
 | `2` | **Move Stock** |
 | `3` | **Putaway** |
 | `4` | **Count Location** |
+| `5` | **Report Unexpected Stock** |
+| `6` | **Replenish** |
 
 **Picking** (menu title **Picking**, header **Picking Menu**):
 
@@ -182,7 +187,7 @@ Press the key shown for the choice. `Esc` goes back.
 
 - Scan a code into the active field. The scanner sends `Enter` at the end.
 - Most codes are changed to upper case for you.
-- Some fields (`SKU` on receiving screens, `LPN` on **Stock Inquiry** and **Move — Find Stock**) can read a label with several data fields. See [Guide 11](11-troubleshooting-and-messages.md#scanning-a-label-with-several-fields).
+- Some fields (`SKU` on receiving screens, `LPN` on **Stock Inquiry** and **Move — Find Stock**) can read a label with several data fields. See [Guide 12](12-troubleshooting-and-messages.md#scanning-a-label-with-several-fields).
 
 ## Roles
 

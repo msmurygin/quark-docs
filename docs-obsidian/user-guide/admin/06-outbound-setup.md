@@ -802,4 +802,4 @@ Otherwise urgency 3. A share counts only when something is reserved. The importa
 
 Example, 40 lie in the pick location, default rule: 40 reserved — 1; 10 reserved — 2; nothing reserved — 3; empty — 1.
 
-The operator's side is `operator/12-replenish.md`.
+The operator's side is `operator/13-replenish.md`.
