@@ -702,7 +702,7 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 
 ![Load card composition and loading progress](../assets/screens/load-card-form.png)
 
-*Load card with planned and physically confirmed units. Focus: required, loaded and remaining counts stay separate.*
+*Open Load before physical loading. Focus: planned units and required, loaded and remaining counts stay separate.*
 
 ### Load and ship on the RF terminal
 
