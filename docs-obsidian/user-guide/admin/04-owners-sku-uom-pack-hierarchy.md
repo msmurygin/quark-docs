@@ -629,11 +629,11 @@ flowchart LR
 
 ![Attribute Definitions list with COLOR selected](../assets/screens/attribute-definitions-list-form.png)
 
-*Capture bookmark: the Attribute Definitions list with `COLOR`, `sku`, `Text`, Required and Active visible.*
+*Attribute Definitions list. Focus: verify the entity type, data type, Required and Active settings for `COLOR`.*
 
 ![SKU attribute value card for COLOR](../assets/screens/sku-attribute-value-edit-form.png)
 
-*Capture bookmark: a saved SKU's Attributes tab with `COLOR` selected and `Text Value = Blue`.*
+*Saved SKU attribute value. Focus: confirm `COLOR` and its text value before saving another change.*
 
 ### Field reference
 
