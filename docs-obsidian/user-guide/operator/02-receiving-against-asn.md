@@ -103,9 +103,6 @@ You can also type a reason code in **Reason** (up to 32 characters).
 
 ### Capture serial numbers
 
-![RCSN01 - Serial Capture](../assets/screens/RCSN01.png)
-*Screen RCSN01: the progress line and the Serial # field. Focus: 1 Serial #. The number matches the teal badge.*
-
 16. On **Serial Capture**, read **Progress**. It shows the serial you are capturing and the total required, for example the first of five.
 17. In **Serial #**, scan one serial. The field holds up to 64 characters and sends itself.
 18. Repeat step 17 for each unit.
