@@ -13,11 +13,11 @@ Use the web move to move stock to another location, repack it into a new LPN or 
 3. Filter by location, SKU, owner, lot or LPN until the exact stock row is visible.
 4. Open that row. The **Move** document shows the source identity, available quantity and destination controls.
 
-![Inventory balances by location with stock, allocation and ATP](../../assets/screens/inventory-balances.png)
+![Move stock form with New LPN selected](../../assets/screens/inventory-move-new-lpn.jpg)
 
-*Caption: Balances > By Location. Open the row for the exact location, SKU, lot and LPN you intend to move.*
+*Caption: the Move form opened from Balances > By Location. New LPN is selected, so the generated code can be previewed or printed before the move is applied.*
 
-The move can use only stock that is not already allocated or picked. The document shows the maximum move quantity. Held stock can require supervisor authorization.
+The move can use only stock that is not already allocated or picked. The document shows the maximum move quantity. Held stock can require supervisor authorization. See [Hold and release stock](04-hold-and-release-stock.md) for the direction and override settings that control this check.
 
 ## Choose the destination
 
@@ -65,3 +65,4 @@ If you select **Cancel** or the move fails, the generated code is not registered
 - [Move stock document](../../reference/inventory/17-move-stock-document.md)
 - [RF operator move](../../operator/06-move.md)
 - [Printing and Labels](../07-printing-and-labels.md)
+- [Hold and release stock](04-hold-and-release-stock.md)

@@ -76,9 +76,9 @@ A hold is fixed to a **code**: a hold on a lot holds every SKU and owner that us
 
 ## How a hold ends
 
-There is no button on the web screens.
+Select one active row on the **Holds** screen and click **Release**. The button is available only when the selected row is still active and the current role may release holds.
 
-- The API method `release_inventory_hold` releases a hold by its id. It writes `release: {reason}` (default `manual release`) to the comments. A hold that is already off is left as it is.
+- A hold that is already off is left as it is.
 - A move of a held container may release and add holds (the hold cascade).
 - The write-off of damaged goods in receiving releases the damage hold.
 - A hold whose release date has passed is released by the 5-minute sweeper. No hold gets a near date today. See [Holds list](20-holds-list.md).
@@ -98,5 +98,4 @@ When the last enforcing hold of a location is released, the status of the locati
 - [Hold form](21-hold-form.md)
 - [Holds list](20-holds-list.md)
 - [Changing the note of a hold](42-changing-the-note-of-a-hold.md)
-- API: `create_inventory_hold_row` (used by the form), `create_inventory_hold` (stateless command), `release_inventory_hold` (stateless command), `list_active_holds_by_lpn`
 - RF terminal: none.
