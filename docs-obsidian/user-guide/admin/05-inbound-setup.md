@@ -39,7 +39,7 @@ There is no separate ASN screen in the menu.
 
 ![Receipts list with receipt numbers, owner, status and type](../assets/screens/receipts-list.png)
 
-*Caption: the receipt list with the buttons New, Delete, Refresh, Release Hold, Put on Hold, Cancel Receipt, Close Receipt. Focus: 1 The Status column (Open, In progress, Closed). 2 The Close Receipt button, which works on the selected receipt.*
+*Caption: the receipt list with the buttons New, Delete, Refresh, Release Hold, Put on Hold, Cancel Receipt and Close Receipt. Focus: 1 The Status column, showing Open and In progress receipts. 2 The Close Receipt button, which works on the selected receipt.*
 
 ![Receipt form, Header tab, for receipt 0000000001](../assets/screens/receipt-detail.png)
 

@@ -12,15 +12,7 @@ updated: 2026-10-30
 
 Create a report that reads warehouse data, asks the user for parameters and produces a PDF from a Typst template.
 
-The designer has four working areas:
-
-- the centre editor contains the Typst template;
-- **Document** shows the current preview;
-- **Parameters** defines the fields a user fills before running the report;
-- **Datasets** contains the read-only SQL queries that supply rows to the template;
-- **Properties** contains the report name, category and description.
-
-The palette on the left can insert a formatting snippet, parameter reference, dataset or dataset column at the cursor. You can also drag an item from the palette into the template.
+The designer keeps the report definition, data and document layout on one screen. The report catalogue remains the starting point for creating, opening and running reports.
 
 ## Before you start
 
@@ -29,6 +21,24 @@ The palette on the left can insert a formatting snippet, parameter reference, da
 - You need permission to open **Report designer**. If the button is not available, ask an Enterprise administrator.
 - Decide who will use the report, what one row means and which filters are needed.
 - Start with a small result set. A report query must be read-only.
+
+The names in this guide describe controls by their purpose. The report designer can use a different interface language from the main warehouse screen, so use the control's position and function when its displayed text differs.
+
+![Reports catalogue with the Report designer and Create report controls](../assets/screens/reports.png)
+
+## Know the designer workspace
+
+| Area | What it is for |
+|---|---|
+| Top bar | Name and code the report, preview it, and create or save it. |
+| Insert palette | Insert a formatting snippet, parameter reference, dataset or dataset column at the current cursor position. You can also drag an item into the template. |
+| Template editor | Write the Typst document layout. The editor includes formatting controls, undo, redo and zoom. |
+| **Document** | Review the rendered preview beside the template. |
+| **Parameters** | Define the values a user must enter before running the report. |
+| **Datasets** | Define and test the read-only SQL queries that supply rows to the template. |
+| **Properties** | Set the report name, category and catalogue description after the report has been created. |
+
+The preview and the template are part of the same workspace. **Save template** saves the template together with its parameters and datasets. **Save properties** saves the catalogue name, category and description separately.
 
 ## 1. Create the report shell
 
