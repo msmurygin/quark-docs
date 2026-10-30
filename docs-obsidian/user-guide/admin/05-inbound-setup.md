@@ -300,71 +300,21 @@ There is no web button and no RF screen for the dispositions. Nothing in the web
 
 ### What you will do
 
-Define the hold reasons your warehouse uses and place a hold.
+Define the hold reasons your warehouse uses and block stock without changing its quantity.
 
 ### Before you start
 
 - Role for reasons: `ADMIN` or `MANAGER` (write). Role to place holds: `ADMIN`, `MANAGER`.
 
-### Steps: edit hold reasons
+Follow [Hold and release stock](13-inventory-control/04-hold-and-release-stock.md) for:
 
-1. Open `Sidebar > Warehouse Configuration > Reason Codes > Hold Codes`.
-2. Click `New`. Fill the fields. Click `Save`.
+- choosing a lot, location or LPN scope;
+- placing and releasing a hold;
+- setting an optional auto-release time;
+- configuring **Enforce**, **Overridable**, **Blocks putting**, **Blocks taking** and **Active**;
+- understanding how a hold affects receiving, moves, allocation and picking.
 
-### Steps: place a hold
-
-1. Open `Sidebar > Management & Control > Inventory > Holds`.
-2. Click `New Hold`.
-3. Pick a `Reason code`. Fill exactly one of `Lot`, `Location`, `Container (LPN)`.
-4. Fill `Comments`. Click `Save`.
-
-![hold_code_list_form - Hold Codes](../assets/screens/hold-code-list-form.png)
-
-*Caption: the hold code list. Focus: 1 Overridable, 2 Enforce.*
-
-![hold_form - Hold](../assets/screens/hold-form.png)
-
-*Caption: the New Hold form. Focus: 1 Reason code, 2 Comments.*
-
-### Field reference
-
-Hold code (`hold_code_normal_form`):
-
-| Field | Meaning | Allowed values | Example |
-|---|---|---|---|
-| `Code` (required) | Key. | Text up to 30 characters. | `QcQuarantine` |
-| `Description` | Free text. | Text up to 100 characters. | |
-| `Rank` (required) | Sort and priority number. | Whole number. | 20 |
-| `Enforce` | The hold really blocks. Default on. | On or off. | on |
-| `Overridable` | A supervisor can override. Default off. | On or off. | off |
-| `Active` | In use. Default on. | On or off. | on |
-| `Blocks putting` | Forbids putting stock in a place under this hold (receive, target of a move). Default on. | On or off. | on |
-| `Blocks taking` | Forbids taking stock from a place under this hold (available stock, allocation, source of a move). Default on. | On or off. | on |
-
-New hold (`hold_form`): `Reason code` (required), `Lot`, `Location`, `Container (LPN)` ("Fill exactly ONE of Lot / Location / Container"), `Comments`.
-
-Seeded hold codes: `None`, `Ok`, `PIHold`, `QcRequired`, `NewItem`, `NotHold`, `QcQuarantine`, `Customs`, `CustomerReturn`, `Expired`, `Damaged`, `Rtv`, `Destroy`, `Lost`, `Other`, `LocBlocked`.
-`LocBlocked` is "Administrative location block (hard, non-overridable)". `PIHold` can be acknowledged.
-
-The receipt hold window lists only codes with `Active` on and `Enforce` on.
-
-### What you should see
-
-- The hold in the list `Holds` with `Scope`, `Target`, `Qty`, `Started`, `Auto-release`, `Reason`, `By`.
-- A location under a hold shows `Status` = `Hold`.
-
-### If something goes wrong
-
-| Message | Meaning | Fix |
-|---|---|---|
-| Code 76 `DestinationLocationHeld` | An enforcing hold is on the destination. | Release the hold, or use the supervisor override when the code is overridable. |
-| Foreign key `fk_inventory_hold_code` | The reason code does not exist. | Add the hold code first. |
-| Delete refused | Holds or SKUs refer to the code (`fk_sku_receipt_hold_code`, `fk_sku_lot_hold_code`). | Change them first. |
-
-### What this affects later
-
-- Setting `MOVE_HOLD_POLICY` (seed `warn`) decides whether a move asks for an acknowledgement (`warn`) or goes on (`silent`).
-- Allocation skips held stock when the hold has `Blocks taking` on.
+For receiving, the important distinction is **Blocks putting**. When it is on, the hold prevents stock from being received or moved into the held location. A permitted supervisor can continue only when the reason is also **Overridable** and the workflow offers a confirmation.
 
 ## 5. Putaway policy
 

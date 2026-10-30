@@ -25,6 +25,10 @@ Use a lot transfer when stock is physically in the correct location and LPN but 
 8. For a serial-tracked SKU, enter the serials that move with this line, one serial for each moved unit. You may leave the list empty only when the line transfers the full free quantity; in that case, every free serial on the chosen stock row moves.
 9. Select **Save**.
 
+![Lot transfer document with the selected stock and lot attributes](../../assets/screens/lot-transfer-line.jpg)
+
+*Caption: a draft lot transfer line. The source stock stays in the same location and LPN; the Lot Attributes table defines the target lot.*
+
 The saved line shows the source identity and a **Lot Attributes** table. **Was** is the value on the source lot. **Becomes** is the value the stock will receive.
 
 ## Set the target lot attributes

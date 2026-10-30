@@ -26,6 +26,10 @@ Use an inventory adjustment when the quantity recorded for a stock position is w
 9. For a serial-tracked SKU, leave **Target Quantity** empty. Enter the individual serial numbers under **Serials to Write Off** and **Serials to Add**. The system calculates the target quantity from those serials.
 10. Select **Save** and repeat for any other stock positions.
 
+![Inventory adjustment document and adjustment line form](../../assets/screens/inventory-adjustment-line.jpg)
+
+*Caption: a draft adjustment with its line form open. The line identifies the stock position and records the final Target Quantity, not a plus-or-minus difference.*
+
 Examples:
 
 | Recorded quantity | Correct quantity | Target quantity |

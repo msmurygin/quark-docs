@@ -207,6 +207,7 @@ The dashboard is the home page, so it opens right after sign-in. The breadcrumb 
 | Correct a recorded stock quantity | `Management & Control > Inventory > Adjustments` | [Adjust stock](13-inventory-control/01-adjust-stock.md) |
 | Change the lot or lot attributes of stock | `Management & Control > Inventory > Lot Transfers` | [Transfer stock to another lot](13-inventory-control/02-transfer-stock-between-lots.md) |
 | Move stock or create an LPN | `Management & Control > Inventory > Balances` | [Move stock and manage LPNs](13-inventory-control/03-move-stock-and-manage-lpns.md) |
+| Block or release stock without changing its quantity | `Management & Control > Inventory > Holds` | [Hold and release stock](13-inventory-control/04-hold-and-release-stock.md) |
 | Supervise tasks and pick assignments | `Management & Control > Execution Control` | [Outbound Setup](06-outbound-setup.md) |
 | Resolve operational exceptions | `Management & Control > Exceptions` | [Packing](../operator/10-packing-verify.md), [Order Control](../operator/11-order-control-after-picking.md) |
 | Configure locations and work areas | `Warehouse Configuration > Topology` and `Work Areas & Equipment` | [Warehouse Structure](03-warehouse-structure.md) |

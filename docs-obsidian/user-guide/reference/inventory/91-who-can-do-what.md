@@ -34,7 +34,7 @@ A button works only when both gates are open. `ADMIN` and `MANAGER` pass every g
 | Open the Holds list | `list_inventory_hold_detail` | Yes | Yes | Yes |
 | `New Hold`, `Save` a hold | `create_inventory_hold_row` | No | No | No |
 | `Save` the note of a hold | `update_inventory_hold` | No | No | No |
-| Release a hold | `release_inventory_hold` (API only, no button) | No | No | No |
+| `Release` a hold | `release_inventory_hold` | No | No | No |
 | Open Adjustments, Counts, Reasons | `inventory_adjustment_list`, `inventory_count_list`, `inventory_adjust_reason_list` and their card methods | Yes | No | Yes |
 | `New`, `Save`, `Add Line`, `From Stock`, `Validate`, `Post`, `Reverse`, `Delete` (adjustments) | `create_inventory_adjustment`, `create_inventory_adjustment_line`, `inventory_adjustment_generate_lines`, `inventory_adjustment_validate`, `inventory_adjustment_post`, `inventory_adjustment_reverse`, `inventory_adjustment_delete`, `inventory_adjustment_remove_line`, `update_...` | Yes | No | No |
 | `Approve` | `inventory_adjustment_approve` | **No** | No | No |
