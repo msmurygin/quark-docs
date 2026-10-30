@@ -640,6 +640,7 @@ sequenceDiagram
 - `ADMIN`, `MANAGER` or `SUPERVISOR` plans dispatches, load plans and transport. `OPERATOR` can run loading and confirm shipment after the Load exists.
 - The order is released and picked. Finish its packing job when packing is required.
 - For the Load path, ready units are at their required `Stage` location and are not held.
+- Register the transport resource before opening the Load. A loading door is optional; when the site uses one, configure it as a warehouse location of type `Door`.
 - Use one path only. An order in an active Load must ship through that Load.
 
 ### Ship one complete order
@@ -672,12 +673,14 @@ The dispatch card is the working screen for the whole journey. Its header keeps 
 1. Open `Sidebar > Management & Control > Shipping > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
 2. Open `Sidebar > Management & Control > Shipping > Dispatches`. Click `New Dispatch`, enter the optional external reference, carrier and door, then click `Create`.
 3. Open the dispatch and stay on `Stops & orders`. Click `Add stop…`, choose the end of the route or a gap between existing stops, and enter the destination. Stop numbers use gaps of 10 so an early route can be adjusted without renumbering every stop.
-4. Click `Add order…` and assign each order to its delivery stop and preferred Stage location. Check the stop, order, stage and readiness columns before planning.
-5. If the truck and door are already known, use `More > Transport unit…` and `More > Door…`. A registered transport unit is required before loading starts. The door is optional: choose it now or when the truck arrives, or leave it unset when the site does not use door assignments.
-6. Click `Plan dispatch…`. The lifecycle bar moves from `Dispatch: draft` to `Dispatch: planned`.
-7. Open `Load plan` and click `Create load plan…`. Choose the loading-order rule, build the sequence and review the stops and physical units.
-8. Freeze the reviewed plan. Freeze commits the planned composition and order; it does not load or ship stock.
-9. Open the Load from the frozen plan. Confirm or choose the registered transport unit; choose the door only when it is known or required. The dispatch card now exposes the same Load under `Loading`.
+4. Click `Add order…` and assign each order to its delivery stop and preferred Stage location. Check the stop, order, stage and readiness columns before planning. This is a route preference; the physical unit can still require an explicit supervisor Stage choice after picking.
+5. If picking finished before this dispatch was planned, open `More > Assign LPN…`. Select the ready root LPN, review its order, current location, dispatch and stop, enter the reason, and confirm. This records the transport decision; it does not move stock.
+6. If a unit still has no Stage, a supervisor uses `RF > Stage > Choose Stage (Supervisor)`. The operator then uses `RF > Stage > Confirm Stage`, scans the unit, reviews the proposed move, and scans the destination Stage. Choosing a Stage and moving the unit are separate actions.
+7. If the truck and door are already known, use `More > Transport unit…` and `More > Door…`. The transport must be registered. The door is optional; when supplied, it must be a warehouse location of type `Door`. Create it under `Warehouse Configuration > Topology > Locations` when the site needs a door that is not listed.
+8. Click `Plan dispatch…`. The lifecycle bar moves from `Dispatch: draft` to `Dispatch: planned`.
+9. Open `Load plan` and click `Create load plan…`. Choose the loading-order rule, build the sequence and review the stops and physical units.
+10. Freeze the reviewed plan. Freeze commits the planned composition and order; it does not load or ship stock.
+11. Open the Load from the frozen plan. Confirm the registered transport unit and, when used, the optional loading door. The dispatch card now exposes the same Load under `Loading`.
 
 Opening the Load assigns its permanent number in the form `LD` plus eight digits, for example `LD00000042`. Use that number to find the Load in the list, identify its card and scan it on the RF terminal. Loads created before this numbering change keep their existing `LOAD-...` codes; do not relabel historical work.
 
@@ -696,16 +699,14 @@ The header shows the dispatch `Departure` when a planned route time is present. 
 ### Load and ship in the web UI
 
 1. Open the dispatch and select `Loading`.
-2. On an `Open` Load, click `Scan truck…`. Enter the registered transport reference, review the truck and door decision, then click `Start loading`.
+2. On an `Open` Load, click `Scan truck…`. Enter the registered transport reference, review the truck and any optional door assignment, then click `Start loading`.
 3. For each physical unit, click `Load LPN…`, scan or enter its root LPN, and review its location, quantity and next sequence. Physically load it, then click `Confirm in trailer`.
 4. When every planned unit is loaded, click `Complete load`. Review the complete counts, then click `Complete`. The status becomes `Loaded`; stock has not left yet.
 5. Open `Shipment` and click `Ship…`. Review the Load, transport, orders, unit counts and readiness checks, then click `Ship · write off stock`.
 
 Before shipment, use `Physical unload…` to record a unit removed from the trailer. Use `Cancel load…` only after every loaded unit has been physically removed and acknowledged.
 
-![Light-theme Loading tab before a Load has been opened](../assets/screens/shipping-loading.jpg)
-
-*The `Loading` tab stays empty until a frozen plan opens a Load. Once opened, it shows the transport, planned units and required, loaded and remaining counts.*
+The `Loading` tab keeps the actual loading sequence and operator confirmation. `Loaded 1 of 1` means the physical loading is complete; stock remains in the warehouse until `Ship`.
 
 ### Load and ship on the RF terminal
 
@@ -717,11 +718,13 @@ Before shipment, use `Physical unload…` to record a unit removed from the trai
 6. After the last unit, press `F5 Complete` on `Scan Unit`. Review `Complete Loading`, then press `F4 Complete`.
 7. On `Load Status`, press `F5 Ship`. On `Confirm Shipment`, review the irreversible warning and complete counts, then press `F4 Ship all`.
 
-![RF Complete Loading review](../assets/screens/LOD05.png)
+The terminal validates each decision before changing the Load. A wrong Load number or transport stays on the same screen. `F4 Complete` is refused while required units are missing. A unit outside the frozen plan and an already-loaded unit are also refused without changing inventory or loading history.
+
+![RF Complete Loading review in the dark handheld theme](../assets/screens/rf-loading-complete.jpg)
 
 *RF `Complete Loading` review. Focus: all required units are confirmed before `F4 Complete`.*
 
-![RF whole-Load shipment confirmation](../assets/screens/LODS01.png)
+![RF whole-Load shipment confirmation in the dark handheld theme](../assets/screens/rf-loading-ship-confirm.jpg)
 
 *RF `Confirm Shipment` screen. Focus: the irreversible warning, transport and complete unit counts before `F4 Ship all`.*
 
@@ -732,24 +735,33 @@ Before shipment, use `Physical unload…` to record a unit removed from the trai
 - `Loading` keeps planned and actual loading facts separate.
 - Goods Issue records shipment history, deducts picked stock, updates serials and order counters, and marks the Load and Dispatch shipped in one transaction.
 
-![Light-theme Shipment tab with the Goods Issue readiness checks](../assets/screens/shipping-goods-issue.jpg)
+![Light-theme Shipment tab after Goods Issue](../assets/screens/shipping-goods-issue.jpg)
 
-*The `Shipment` tab explains every prerequisite before enabling `Ship…`. Shipment writes one receipt per order. The final transaction rechecks physical contents and outbound holds; the action separately requires shipment permission.*
+*After Goods Issue, the same card shows the final Dispatch, Load Plan and Load states together with shipped quantity, receipt count and the closed order.*
+
+![Light-theme Shipment tab with the Goods Issue readiness checks](../assets/screens/shipping-shipment-readiness.jpg)
+
+*Before Goods Issue, the `Shipment` tab explains every prerequisite before enabling `Ship…`. The transaction rechecks physical contents and outbound holds and writes one receipt per order.*
 
 ### If something goes wrong
 
 | Situation | Fix |
 |---|---|
 | The scanned Load does not exist (`LD_NOT_FOUND`) | Check the complete `LD########` number and scan again. An older open Load can still have its original `LOAD-...` code. |
+| The scanned transport does not match the Load | Keep the Load in its loading area. Scan the transport shown on **Confirm Transport**; if the physical truck differs, stop and ask the planner to reconcile it. |
 | The observed version changed | Cancel the decision, refresh or rescan, and review the current state. Do not retry with only a new version number. |
 | The unit is not in this plan (`LD_NOT_IN_PLAN`) | Leave it unloaded. Scan a unit from the reviewed Load Plan, or ask the planner to resolve the membership before loading continues. |
 | The unit is not ready (`LD_UNIT_NOT_READY`) | Leave it unloaded. Complete its required picking or packing state, then review the unit again. |
+| Staging says the unit needs transport intent | Plan the Dispatch, add the order to a valid stop, then assign the ready LPN to that Dispatch. Rescan the unit after the transport decision is recorded. |
+| Staging says `Stage Choice Required` | A supervisor must choose the Stage first. Choosing it does not move stock; the operator must still confirm the physical move. |
 | The unit is not staged or is held (`LD_UNIT_NOT_STAGED`, `LD_UNIT_HELD`) | Leave it unloaded. Move it to the required Stage location or resolve the hold through the approved procedure, then review it again. |
+| The site uses a loading door, but the Open Load dialog has none to choose | You may open the Load without a door only when that matches the site's process. Otherwise create or correct a warehouse location whose type is `Door`, then reopen the dialog. A receipt door text is not a loading-door location. |
 | The unit is out of sequence (`LD_WRONG_LOAD_SEQUENCE`) | Leave it unloaded. Load the current stop group or explicitly planned unit first; do not change the plan merely to bypass the refusal. |
 | The unit is already loaded (`LD_ALREADY_LOADED`) | Do not confirm it again. Review the current Load's composition, progress and unload history before continuing. |
 | The unit belongs to another Load (`LD_IN_ANOTHER_LOAD`) | Stop loading it. Ask a supervisor or support to identify the active Load and reconcile the physical unit before either Load continues. |
 | A unit was confirmed loaded by mistake | Before shipment, use `Physical unload…` on the dispatch `Loading` tab, or `Loading > Unload / Cancel (Supervisor)` on RF. Scan the removed root and enter a reason. This preserves history and does not move stock. |
 | The Load must be cancelled | Physically unload and acknowledge every unit first, then use `Cancel load…`. |
+| RF still shows an older Load state after another station changed it | Leave the screen and open the Load again. Review the current status before the next physical action. |
 | Shipment is already committed | Do not repeat or reverse it from a generic status control. Use the immutable `Shipments` record as the receipt and follow the site's controlled correction process. |
 
 Loading refusal text can be translated or reworded. Support tools and API clients should route on the stable `LD_...` code returned with the refusal, not on its English text.

@@ -45,7 +45,7 @@ Picking answers these questions. Each question has an owner (the setting that an
 | Which box does the pick go into? | Cartonization policy. | [Outbound setup](../06-outbound-setup.md) |
 | Is a task made for the pick? | The order is released, and the cartonization result is "ready". | section 3 |
 | Who may take the task? | Operator rights, **Pick Execution** and work-area zones. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md) |
-| Which task comes first? | Order priority, then the location's **Route Sequence**. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md#8-the-claim-rules-in-the-order-the-system-applies-them) |
+| Which task comes first? | Order priority, then the location's **Route Sequence**. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md#9-how-the-system-chooses-work) |
 | Can this machine lift it? | Equipment **Max Weight**, **Weight Reduction per Level** and zone exclusions. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md) |
 | One order onto a pallet, several boxes on a cart, or a summary step? | The picking policy of the area for the operator's equipment. | [Picking policy settings](21-picking-policy-settings.md) |
 | What must the operator prove at the shelf? | The five confirmation fields. | [Picking policy settings](21-picking-policy-settings.md#7-source-confirmation-fields) |
@@ -100,7 +100,7 @@ When the operator then works the task, the system applies these rules in order:
 
 ## 4. How a task is assigned
 
-See section 2, steps 8 to 13, and [the task claim rules](22-work-areas-equipment-and-permissions.md#8-the-claim-rules-in-the-order-the-system-applies-them). The result is an assigned task for the operator. Every scan and every completed action renews its timeout. If the operator pauses too long, the task returns to the pool and must be requested again.
+See section 2, steps 8 to 13, and [how the system chooses work](22-work-areas-equipment-and-permissions.md#9-how-the-system-chooses-work). The result is an assigned task for the operator. Every scan and every completed action renews its timeout. If the operator pauses too long, the task returns to the pool and must be requested again.
 
 For a cart the assignment takes **all tasks of its cartons in one step** or none. Two operators who start at once cannot get the same carton: the second is told `the selection changed while it was being taken: press again`.
 

@@ -25,10 +25,12 @@ Use this page to find the right guide, learn the RF keys, and look up a term.
 | 12 | [Troubleshooting and messages](12-troubleshooting-and-messages.md) | Understand a message |
 | 13 | [Replenish](13-replenish.md) | Bring stock from storage to a pick location that is running low |
 | 14 | [Batch picking and distribution station](14-batch-picking-and-distribution-station.md) | Collect a wave into shared totes, then sort it into order or store boxes |
+| 15 | [Staging outbound units](15-staging.md) | Choose and confirm the Stage location for a picked unit |
+| 16 | [Loading and shipment](16-loading-and-shipment.md) | Confirm the truck, load units, complete loading and ship |
 
-## Processes without a guide yet
+## Process without a guide yet
 
-The terminal also contains **Consolidation**, **Stage** and **Loading**. Their step-by-step operator guides are still to be written. Follow your site's work instructions for those menu entries.
+The terminal also contains **Consolidation**. Its step-by-step operator guide is still to be written. Follow your site's work instructions for that menu entry.
 
 The terminal screen families around outbound work are:
 
@@ -82,7 +84,7 @@ The status line says **Select function — Esc to change warehouse**.
 | `5` | **Consolidation** | Not documented yet |
 | `6` | **Order Control** | 11 |
 | `7` | **Distribution Station** | 14 |
-| `8` | **Stage** | Not documented yet |
+| `8` | **Stage** | [15](15-staging.md) |
 
 **Loading** is on the next menu page. Press `9` or `PgDn` to show it.
 

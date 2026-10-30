@@ -1,335 +1,198 @@
 ---
-title: "Administrator Guide - Work Areas, Equipment and Operator Permissions"
+title: "Work Areas, Equipment and Operator Permissions"
 type: user-guide
 audience: customer administrator
-status: draft
-updated: 2026-10-29
+status: published
+updated: 2026-10-30
 ---
 
 # Work Areas, Equipment and Operator Permissions
 
-This page lists every setting that decides **who may take a pick task, where, and with what equipment**. It also lists the rules the task manager applies when an operator asks for work.
+Use this setup to decide where an operator may work, which equipment limits apply, and whether the operator may receive new tasks. A valid picking setup needs all three parts:
 
-Paths in the "Affects" lines are relative to `crates/libs/` unless they start with another crate name.
+1. The source zone belongs to a work area.
+2. The operator has `Pick` permission for that work area.
+3. `Pick Execution` is enabled on that permission.
 
-Roles: `Admin` and `Manager` can create and change all rows on this page. `Operator` and `Viewer` can read them. `Supervisor` can also read equipment profiles because the RF screen `Pick by Area` lists them. The policy assignment commands are `Admin` and `Manager` only.
+If any part is missing, the operator will not receive the pick.
 
-Nothing on this page is seeded in a production database. The dev seed creates one area `MAIN_AREA` with zones `DOCK` and `RACK`, and gives the demo users 1000, 1001 and 1002 every task type in that area. The seed does not switch on `Pick Execution`. Without rows, **no operator is handed any task** (see section 6).
+## Before you start
 
-## 1. Work area
+- Sign in as an administrator or manager.
+- Create the required putaway zones and locations first.
+- Publish the picking policy before assigning it to a work area or equipment profile.
+- Decide which operators work on foot and which use equipment with weight or zone limits.
 
-Menu path: `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Table `work_area`.
+## 1. Create a work area
 
-A work area is a group of putaway zones. An operator's rights are a grid of task type and work area. A task reaches its area through `task.from_location -> location.putawayzone -> work_area_zone`.
+Open `Warehouse Configuration > Work Areas & Equipment > Work Areas`, then create or open a work area.
 
-### `Code` (`code`)
-
-- UI label: `Code` (required).
-- Column: `varchar(10)`, unique, not null. Note: **10 characters at most**, not 20.
-- Default: none.
-- What it does: the key. The RF operator types or scans it at `Pick by Area` (screen `PKAA`, title `Pick by Area`). Spaces around it are cut.
-- Affects: `wms-lib-core/src/model/work_area.rs` (`find_by_code`); `wms-outbound/src/picking/commands/dispatch_next.rs:259` and `start.rs`.
-- Message for an unknown code: `no work area has this code: <code>`.
-- Example: area `PICK-A`. The lookup is exact, so the operator must type `PICK-A` as it is stored (case counts).
-- Open work: do not rename. Policies point at the area id; the code is only what people type.
-
-### `Description` (`description`)
-
-- UI label: `Description`.
-- Column: `varchar(200)`, not null, default empty text.
-- Stored only. It has no effect today (shown in lists).
-
-### `Max Concurrent Tasks` (`max_concurrent_tasks`)
-
-- UI label: `Max Concurrent Tasks` (required).
-- Column: `smallint`, not null, default 1. Check: 1 or more (`ck_work_area_max_concurrent_tasks_positive`).
-- What it does: how many tasks one operator may hold at once inside this area, when the terminal names the area.
-- Affects: for task types **other than Pick**, `wms-lib-core/src/model/tasks/task.rs:1287` (`claim_next`: a new task is handed out only while the operator holds fewer than this number).
-- **For Pick it has no effect beyond "greater than 0".** A Pick dispatch first returns the operator's own held task and only checks `max_concurrent > 0` before searching the pool. A cart start refuses when the operator already holds a task (`OperatorHasOtherWork`). So one operator holds either one single Pick task or one cart set, whatever this number says.
-- Example: area limit 3. A putaway operator can hold 3 putaway tasks. A picker still holds 1.
-- When no area is named (old RF entry `Discrete Pick`): the system setting `TASK_MAX_CONCURRENT_DEFAULT` is used and area limits are not applied.
-- Open work: lowering it does not take tasks away from operators who hold more.
-
-### `Allow Task Release` (`allow_task_release`)
-
-- UI label: `Allow Task Release`. Checkbox.
-- Column: `boolean`, not null, default true.
-- What it does: may an operator hand a task back or refuse it in this area. It gates both ways out: "hand back" and "refuse" (the RF screen `Reject Pick`, `PICK11`, and `Skip`/`Reject` in a cart).
-- Affects: `wms-tasks/src/service/release.rs` (`skip_task_in_area`, gate after the "is it yours" and status checks), `work_area_rules.rs:80-103`.
-- Message when off: `returning a task is not allowed in work area <code> — ask a supervisor to move it`. Without an area: `returning a task is not allowed in this warehouse — ask a supervisor to move it`.
-- Example: a picker is stuck on task 812 in area `PICK-A` with the flag off. A supervisor opens `Sidebar > Management & Control > Execution Control > Task Board` and uses `Return to Pool` or `Reassign`.
-- Interaction: `TASK_ALLOW_RELEASE_DEFAULT` rules when no area is named.
-- Open work: takes effect on the next press.
-
-### `Picking Policy` (`picking_policy_code`)
-
-- UI label: `Picking Policy`. Read-only on the card and in the list. Changed only by the list button `Assign Policy`.
-- Column: `work_area.picking_policy_code`, `varchar(20)`, null. NULL means `DISCRETE`.
-- What it does: the default policy code of the area (see `21-picking-policy-settings.md`, section 1.3).
-- Steps: tick one area in the list, press `Assign Policy`, choose a code in the window `Assign Picking Policy`, press `Assign`. The list of codes shows `<code> — <description>` for each published code except `DISCRETE`. Leave it empty to go back to `DISCRETE`. Helper text: `Leave empty: the area works by the default policy DISCRETE.`
-- Command: `work_area_assign_picking_policy` (stateless). The code must have a `Published` revision, checked under a share lock so a retire cannot slip in.
-- Messages: success `Work area {code}: picking policy assigned`. Failure `The policy was not assigned to work area {code}: {error}`. Errors: `Policy {code} has no published revision: it cannot be assigned to a work area`, `Work area {id} not found`. Selection: `Tick exactly one work area`; `The work-area list has moved on — tick the area again and retry`.
-- Affects: `wms-lib-core/src/model/outbound/picking_policy.rs:582-650`.
-- Open work: a live cart assignment keeps its own frozen policy copy. The new code is used at the next start or dispatch.
-- Interaction: a per-equipment row wins over this default (section 3).
-
-### `Pack station` (`pack_station_location`)
-
-- UI label: `Pack station`. Dropdown of locations of type `Pack`. Empty is allowed.
-- Column: `varchar(20)`, null, foreign key to `location(code)`. A database trigger demands the location type `Pack` (`work_area_pack_station_is_a_pack_location`, wms-app 079).
-- What it does: names the place where this area's picked goods go to be packed.
-- Affects:
-  - Cart: only with `Completion` = `Confirm at the drop location`. The carrier delivery location becomes the station.
-  - Pallet: only if the pallet's policy list `Pallet Drop Cell Types` holds `Pack`. The pallet's policy is the policy of the area (for the shift's equipment) when the pallet is opened through `Pick by Area` for a pick in a zone of the area; otherwise `DISCRETE`. The system finds the putaway zone of the pick's destination, then the areas that list that zone, then their stations. It routes only if **exactly one** distinct station answers. If areas disagree, the pallet is not routed.
-  - With no station, nothing changes: picking delivers as before.
-- Messages: `the area's pack station is not a location of this warehouse`, `the area's pack station must be a Pack location`.
-- Example: area `PICK-A` has station `PACK-01`. The policy of the area (or `DISCRETE`, for a pallet that is not opened through the area) has `Stage`, `Door`, `Pack` in the list. A pallet whose destination `STAGE-1` stands in a zone of `PICK-A` is frozen to go to `PACK-01`, and a packing unit waits there.
-- Open work: a pallet or cart that already froze its destination keeps it.
-- The type of the location is not checked again after it became a station.
-
-### `Control Station` (`control_station_location`)
-
-- UI label: `Control Station`. Dropdown of this warehouse's locations of type `Control`. Empty is allowed.
-- What it does: sends the area's outbound containers to one place where the operator checks the whole order after picking, packing or consolidation. Empty means no order control for this area.
-- The warehouse can use only one control station. Another area may select the same location, but a different one is refused and the message names the station already in use.
-- A closed pick pallet goes directly from picking to this station only when its policy also includes `Control` in **Pallet Drop Cell Types**. Cartons produced by packing follow the area's downstream station settings instead.
-- Do not move the station while an order or container is waiting there. Work already sent to the old station keeps that destination and is not redirected by the change.
-- Example: area `PICK-A` names `CTL-01`. Another area may also name `CTL-01`; it cannot name `CTL-02` in the same warehouse.
-- See [Order control after picking](../../operator/11-order-control-after-picking.md) for setup, operator and supervisor steps.
-
-## 2. Work area zone
-
-Table `work_area_zone`. In the area card the list `Work Area Zones`, button `New`.
-
-### `Putaway Zone` (`putawayzone`)
-
-- UI label: `Putaway Zone` (required, popup picker).
-- Column: `varchar(20)`, foreign key to `putawayzone(code)`. Unique with the area (`uq_work_area_putawayzone`). A zone may belong to more than one area.
-- What it does: puts every location of that zone into the area.
-- Affects: the pool filter (section 8), the operator's reachable zones, the pack station search.
-- Example: area `PICK-A` has zones `RACK`, `DOCK`. A task from location `A-01-01` (zone `RACK`) belongs to `PICK-A`.
-- Open work: removing a zone hides its tasks from operators who relied on it. Tasks they already hold stay with them.
-- Delete of an area is refused while zones or permissions refer to it.
-
-## 3. Policy by equipment kind
-
-Card of the work area, list `Policy by Equipment Kind`, buttons `Add`, `Edit`, `Remove`. Table `work_area_picking_policy`. Commands: `work_area_equipment_policy_create`, `_update`, `_delete`, list `work_area_equipment_policy_list`.
-
-### `Equipment Profile` (`equipment_profile_id`) and `Picking Policy` (`picking_policy_code`)
-
-- UI labels: `Equipment Profile` (chosen when you add; cannot be edited later), `Picking Policy`.
-- Columns: `equipment_profile_id bigint` (foreign key, restrict), `picking_policy_code varchar(20)` (upper case, not empty). Unique key `(work_area_id, equipment_profile_id)`.
-- What it does: the area uses a different policy when the operator drives this equipment. It wins over the area default.
-- Affects: `picking_policy.rs:614-635` (a `COALESCE` of this row, then the area default).
-- Example: area `PICK-A` has default `DISCRETE`. Row: equipment `CART` -> `CART6`. An operator who chooses `CART` at `Pick by Area` gets the cart policy. An operator `On foot` gets `DISCRETE`.
-- Messages (said in the reader's language from the narration catalogue; English shown): `no equipment kind has this id: <id>`; `the work area already names a policy for this equipment kind: change that row instead: <code>`; `the work area's policy for this equipment kind is gone: refresh the list`; and `Policy {code} has no published revision: it cannot be assigned to a work area`.
-- Interaction: `Retire` of a policy code is refused while any area uses it, as default or in a row.
-- Open work: same as the area default.
-
-## 4. Equipment profile
-
-Menu path: `Sidebar > Warehouse Configuration > Work Areas & Equipment > Equipment Profiles`. Table `equipment_profile`.
-
-### `Code` (`code`)
-
-- UI label: `Code` (required). `varchar(20)`, unique. Chosen by the operator by code at `Pick by Area`.
-- Messages: `no equipment kind has this code: <code>`.
-
-### `Description` (`description`)
-
-- UI label: `Description`. `varchar(200)`, default empty. Stored only; shown in lists.
-
-### `Max Weight` (`max_weight`)
-
-- UI label: `Max Weight` (required). Column `double precision`, not null, default 0, check 0 or more.
-- What it does: the heaviest load the machine lifts at ground level, in the weight unit of the warehouse. **0 means no limit.**
-- Affects: `wms-lib-core/src/model/tasks/task.rs:1025` (`LIFTABLE_SQL`). A task is liftable when `task weight <= Max Weight - Weight Reduction per Level x location level`.
-- Two cases always pass: `Max Weight` is 0 (or the operator has no profile), and the task weight is unknown (no weight on the pack or the SKU).
-- Example: `Max Weight` 1000, reduction 100. A task at a location of level 3 can weigh up to 700. A task of 800 there is not offered to this operator. A task of 800 at level 0 is offered.
-- Message when only too-heavy tasks remain: `there are Pick tasks in your work areas, but every one is heavier than your equipment lifts (up to 1000 at ground level) — they wait for other equipment`.
-- Open work: takes effect at the next dispatch. A task already held stays.
-
-### `Weight Reduction per Level` (`weight_reduction_per_level`)
-
-- UI label: `Weight Reduction per Level` (required). Column `double precision`, not null, default 0, check 0 or more.
-- What it does: how much lifting power is lost for each level of height. The level is the `Level` field of the location.
-- Affects: same SQL as above. With `Max Weight` 0 it is ignored.
-
-### `Active` (`is_active`)
-
-- UI label: `Active`. Checkbox. Column `boolean`, not null, default true.
-- What it does: an inactive profile cannot be chosen at `Pick by Area`. An operator who already drives it is refused at the next `Pick by Area` that keeps the same equipment, and chooses another kind or `On foot`.
-- Message: `this equipment kind is switched off: <code>`.
-- Affects: `wms-outbound/src/picking/commands/dispatch_next.rs` (`shift_equipment`). A carrier assignment already started, or a carrier still to deliver, is continued first; the refusal comes only when new work is asked for. Until the operator chooses again, the profile stays on the operator, and its lift limit and zone exclusions still apply. Switching a kind off never loosens a limit by itself.
-
-### `Excluded Zone` (table `equipment_profile_zone_exclusion`)
-
-- UI: list `Excluded Zones` on the profile card; field `Putaway Zone` (required).
-- Columns: `equipment_profile_id`, `putawayzone varchar(20)`, unique together.
-- What it does: removes that zone from the zones the operator can reach. A reach truck that cannot enter the `FLOOR` zone excludes `FLOOR`.
-- Affects: `operator_task_permission.rs:155-182` (`NOT EXISTS` on the exclusion table).
-- If every zone of the permitted areas is excluded: `you have no right to take Pick tasks in any work area — ask a supervisor`.
-- Open work: next dispatch.
-
-## 5. Operator and its equipment
-
-Menu path: `Sidebar > Warehouse Configuration > Operator Permissions > Operators`. Table `operator`.
-
-An operator row is a copy of a user. A user becomes an active operator when `RF device login` is on, the status is `Active`, and the user is assigned to the warehouse. The sync runs every 5 minutes. The `Sync` button runs it at once. You cannot create or delete operators.
-
-### `Equipment Profile` (`equipment_profile_id`)
-
-- UI label: `Equipment Profile`. Popup picker, can be empty. The only field you can edit.
-- Column: `bigint`, null, foreign key restrict. NULL means on foot: no lift limit, no excluded zone.
-- Written by: the operator card, and by the RF at `Pick by Area` (screen `PKAE` `Equipment`: 1 = on foot, 2 = from the list `PKAEL`).
-- What it does: the filters of section 8 and the policy choice of section 3.
-- Affects: `wms-tasks/src/service/claim.rs:172-187`, `candidate.rs:376`, `dispatch_next.rs:332-361`.
-- Example: the picker chooses `On foot` for the shift. The profile is cleared. Excluded zones and lift limits no longer apply to them. The area default policy applies.
-- Open work: a choice made at `Pick by Area` replaces the card value for the next shift.
-
-`Login`, `Name` and `Active` are read-only. An inactive operator gets `operator <id> is not an active assignee` from the task manager, or at the RF `your operator record is not active in this warehouse: ask a supervisor`.
-
-## 6. Operator task permission
-
-On the operator card, list `Task Permissions`. Table `operator_task_permission`. One row is one right. No row means no right. Unique key `(operator_id, task_type, work_area_id)`.
-
-### `Task Type` (`task_type`)
-
-- UI label: `Task Type` (required). Dropdown: `Pick`, `Putaway`, `Replenish`, `Move`, `Count`.
-- Column: enum `task_type`.
-- What it does: the kind of task the right covers. `Count` is the inventory count (`24-inventory-count-policy.md`).
-- `Replenish`: there is no replenishment engine in this version, so a `Replenish` right hands out nothing.
-
-### `Work Area` (`work_area_id`)
-
-- UI label: `Work Area` (required, popup picker). Foreign key, restrict.
-- What it does: the area where the right applies. Zones of the area are the zones the operator can reach.
-
-### `Pick Execution` (`pick_execution_enabled`)
-
-- UI label: `Pick Execution`. Checkbox, required.
-- Column: `boolean`, not null, **default false**.
-- What it does: the rollout switch for new Pick work. A row with `Task Type` = `Pick` and this box off lets the operator see the area but hands out no new Pick tasks.
-- Affects: `wms-outbound/src/picking/infrastructure/dispatch.rs:225-247` (`pick_execution_enabled_for_location`: there must be a `Pick` row with the switch on, in an area that contains the zone of the task's source location; with a named area, that area). It gates only **new** issue. A task already held, and the reconnect and commit of it, never stop.
-- What the operator sees: the dispatch answers `No eligible Pick work` (RF `PICK01`). The reason code is `PICK_EXECUTION_ROLLOUT_DISABLED` in the answer's diagnostics. It is not shown on the RF screen.
-- Example: operator `picker-a` has a `Pick` right in `PICK-A` with the box off. They get no pick. Tick the box. The next press hands out a task.
-- Not used for task types other than `Pick`.
-- Interaction: both are needed. Without the right row: `you have no right to take Pick tasks in any work area — ask a supervisor`. With the row but without the box: no work, no message.
-- Open work: switching it off does not take tasks away.
-
-## 7. Task manager system settings
-
-Menu path: `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings`. All five settings are numbers. A value that is empty, zero or negative falls back to the built-in value for the first four.
-
-| Key | Seed | Built-in fallback | What it does | Read at |
-|---|---|---|---|---|
-| `TASK_LEASE_TTL_MIN` | 15 | 15 | Minutes a claimed task is held. Each confirmation, commit or dispatch renews it. When it runs out the reaper returns the task to the pool. | `wms-tasks/src/service/claim.rs:189-219` |
-| `TASK_SKIP_COOLDOWN_MIN` | 10 | 10 | Minutes a **refused** task is hidden from everyone. A hand-back is not hidden. | `claim.rs:222-244` |
-| `TASK_SKIP_ESCALATE_AFTER` | 3 | 3 | Number of refusals after which the task leaves the pool and waits for a supervisor. | `claim.rs:247-264` |
-| `TASK_MAX_CONCURRENT_DEFAULT` | 1 | 1 | Tasks one operator may hold when the terminal names no area. | `work_area_rules.rs:56-70` |
-| `TASK_ALLOW_RELEASE_DEFAULT` | 1 | 1 (allowed) | Hand-back and refusal allowed when no area is named. Here 0 means "not allowed". | `work_area_rules.rs:80-103` |
-
-Why a zero lease falls back to 15: a zero or negative lease would expire at once and give the task to a second operator while the first still carries the goods.
-
-- Lease and carts: a cart assignment's lease is the lease of its tasks. They are renewed together. When none reaches "now", the lease sweeper dissolves the whole assignment and returns its tasks. An assignment with every member committed is not dissolved. It goes to delivery.
-- The reaper and the sweeper run every 60 seconds. The sweeper runs before the reaper. So a task can sit up to about `TASK_LEASE_TTL_MIN` + 1 minute before another operator gets it.
-- A lease that already ran out cannot be renewed: `task <id> lease has expired; claim the work again`.
-- Example: `TASK_SKIP_ESCALATE_AFTER` = 3. Three operators refuse task 812 with a reason. After the third refusal the task has `escalated_at`. Nobody is offered it. A supervisor uses `Reassign` on the task board. The first two refusals each hide it for 10 minutes.
-- Open work: the new value applies to the next claim or renewal. Existing deadlines do not move.
-
-### `Pick Episode Reassignment` (SKU setting that decides who may take a task away)
-
-- UI label: `Pick Episode Reassignment`. Dropdown on the serial-tracking tab of the SKU (`sku_serial_config_form`). Column `sku_serial_config.pick_episode_reassignment_mode`, `varchar(32)`, not null, default `Block`.
-- Values: `Block` (`Block movement`), `Handover` (`Hand over open episode`), `CancelAndRestart` (`Cancel and restart capture`). (The old value `Transfer` was renamed `Handover` in wms-app 040 and wms-meta-ui 079.)
-- What it does: a pick with an open serial capture episode has units the holder already scanned. This value says what happens when the task would change hands (supervisor `Reassign` or `Return to Pool`, an operator's reject, lease expiry).
-
-| Value | Reassign to another operator | Return to pool, reject, lease expiry |
+| Field | What to enter | Effect |
 |---|---|---|
-| `Block` | refused | refused: the task stays with its holder |
-| `Handover` | the open episode goes to the new holder, items kept | allowed; the next holder takes the episode over at the first scan |
-| `CancelAndRestart` | the episode is cancelled, items kept for audit | allowed; the next holder starts a new one |
+| `Code` | A short warehouse code, for example `PICK-A`. | Operators can scan or enter it in `Pick by Area`. Treat the code as a permanent label. |
+| `Description` | A name operators and supervisors will understand. | Helps identify the area in lists. |
+| `Max Concurrent Tasks` | A positive number. | Limits concurrent work for supported task types. A picker still works one discrete task or one cart assignment at a time. |
+| `Allow Task Release` | On when operators may return or reject work. | When off, a supervisor must move blocked work. |
+| `Picking Policy` | A published policy, or empty for the warehouse default. | Controls how new picking work starts and completes in this area. |
+| `Pack station` | A location of type `Pack`, or empty. | Sends eligible completed work to that packing station. |
+| `Control Station` | A location of type `Control`, or empty. | Sends eligible completed orders to order control. |
 
-- Any mode: an `Abandoned` episode keeps the task with its holder until a supervisor closes it (RF `Force-Close Episode (supervisor)`, `RCSN_FORCE`). A pick in a live cart assignment is never moved alone: dissolve the assignment.
-- Affects: `wms-outbound/src/picking/infrastructure/holder_change.rs:1-60` (rule), used by `wms-tasks/src/service/reap.rs`, `release.rs`.
-- Message: `task 812 cannot change hands: SERIAL_EPISODE_OPEN` (other codes: `SERIAL_EPISODE_ABANDONED`, `PICK_ASSIGNMENT_LIVE`).
-- Example: SKU with `Block`. Anna scanned 3 of 5 serials, then her terminal died. The lease expires after 15 minutes. The reaper cannot return the task. Nobody else gets it until Anna comes back, or a supervisor closes the episode.
-- Open work: the value is read at the moment of the change.
+Save the work area before adding zones or equipment-specific rules.
 
-## 8. The claim rules, in the order the system applies them
+### Pack and control stations
 
-For the Pick type the RF calls `pick_dispatch_next`. The generic `task_claim` refuses Pick: `dispatch for Pick tasks is source-owned; use the source capability command`.
+The station location and the picking policy must agree. For example, a pallet reaches a pack or control station only when that destination type is allowed by the policy. Work already in progress keeps the destination it received when it started.
 
-1. **One request at a time per operator.** A lock on the operator queues double presses.
-2. **A live cart assignment is continued first.** Then a carrier dissolved with goods and never delivered (`deliver your carrier with picked goods first`).
-3. **The operator must be active.** See section 5.
-4. **The named area and equipment** (only on `Pick by Area`): the area must exist; the equipment kind must exist and be active; "equipment and on foot" together, "equipment without area", and "area by code and by id" are refused: `choose an equipment kind or on foot, not both`, `the equipment kind is chosen together with a work area`, `name the work area once: by code or by id`.
-5. **The policy** of (area, equipment) is read (section 3). If `Carrier Required` is Yes: only a held task is handed out; otherwise the answer is `Scan Carrier` and no task is claimed.
-6. **A held task comes first.** The oldest claimed task of the operator. If it is another task type: `operator already has Putaway task 41; resume it before requesting Pick work`. If it is no longer executable: `assigned Pick task 812 is no longer executable: <code>`.
-7. **The limit.** Section 1: only `> 0` matters for Pick.
-8. **Reachable zones.** Zones of the areas where the operator has a `Task Type` right, minus the excluded zones. If none: `you have no right to take Pick tasks in work area PICK-A — ask a supervisor` (or `in any work area`).
-9. **The pool.** A task is in the pool when all hold:
-   - status `Created`, no assignee, right task type;
-   - its `from_location` is in a reachable zone;
-   - not escalated;
-   - not refused within the last `TASK_SKIP_COOLDOWN_MIN` minutes;
-   - not excluded earlier in this search;
-   - liftable by the operator's equipment (section 4).
-10. **The order.** `task.priority` ascending (it is the order priority; smaller is sooner; default 50), then the location `Route Sequence` ascending (empty last), then oldest `created_at`, then id.
-11. **The source says yes or no** for the first candidate that is locked (skip-locked, so two operators never wait on one task). The source rules and their codes:
+Only one control station can be used across the warehouse. Another work area cannot point to a different one. Move the station only when no containers are waiting there; containers already routed to the old station will not move automatically.
 
-| Code | Meaning |
+See [Order control after picking](../../operator/11-order-control-after-picking.md) for the complete setup and operating flow.
+
+## 2. Add zones to the work area
+
+Open the work area's zone list and add every putaway zone its operators may reach.
+
+A source location belongs to a picker’s reachable work only through its putaway zone. If `A-04-0` belongs to zone `RACK`, add `RACK` to the work area; do not enter the zone code when the terminal asks for a work-area code.
+
+A zone can belong to more than one work area. Keep overlapping areas intentional so supervisors can explain which policy and equipment rules apply.
+
+## 3. Assign the picking policy
+
+On the work-area list, select exactly one area and choose `Assign Policy`.
+
+- Choose a published picking policy for that area.
+- Leave the value empty to use the default `DISCRETE` policy.
+- A live cart assignment or open pallet keeps its existing policy decision. The new assignment applies to the next start.
+
+For different behavior by equipment, add a policy-by-equipment row on the work area. The equipment-specific policy takes priority over the area default.
+
+See [Picking policy settings](21-picking-policy-settings.md) for every policy option.
+
+## 4. Create equipment profiles
+
+Open `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles`.
+
+| Field | What it controls |
 |---|---|
-| `PICK_EXECUTION_ROLLOUT_DISABLED` | No `Pick Execution` box for this operator and area. |
-| `PICK_NOT_RELEASED` | The pick is not `Released`. |
-| `ORDER_NOT_RELEASED`, `ORDER_TERMINAL` | The order is not released, or is closed or cancelled. |
-| `LOCATION_MISSING`, `LOCATION_BLOCKED` | The source location does not exist, or is not `Ok`, or carries an operation flag (for example `CycleCountActive` after a short). |
-| `INVENTORY_HOLD` | An inventory hold covers the position. |
-| `CARTONIZATION_PENDING`, `CARTONIZATION_BLOCKED`, `CARTONIZATION_INVALID` | The cartonization plan is not ready, is blocked, or contradicts itself. |
-| `IN_CONTINUATION` | The pick is the rest of a box that was closed full. Only a cart start takes it. |
-| `WRONG_TASK_TYPE`, `UNSUPPORTED_SOURCE`, `SOURCE_MISSING`, `SOURCE_TASK_MISMATCH`, `TASK_SNAPSHOT_MISMATCH` | The task and the pick no longer agree. Report to support. |
+| `Code` | The equipment choice shown to the operator. |
+| `Description` | A clear warehouse name such as `Reach truck`. |
+| `Max Weight` | The maximum task weight this equipment may take. |
+| `Weight Reduction per Level` | Reduces the allowed weight for higher storage levels. |
+| `Active` | Makes the profile available for new work. |
+| Excluded zones | Prevents this equipment from receiving work in unsafe or unreachable zones. |
 
-   A refused candidate stays `Created`. It is skipped only in this search. The codes go to `diagnostics` in the answer. The RF shows only `No eligible Pick work`.
-12. **Nothing found.** If zones were reachable but every task is too heavy, the too-heavy message of section 4. Otherwise an empty answer: wait and press again.
+Use exclusions for physical access restrictions, not as a substitute for operator permissions. An operator needs both a reachable area and suitable equipment.
 
-In a named area the search uses only that area's zones (one phase `CurrentArea`). On the old entry the area is not named: the search covers every area the operator may pick in.
+If a profile is deactivated during a shift, work already held is not automatically reassigned. The operator must choose an active profile before requesting new work.
 
-## 9. Reject, skip and the cooldown
+## 5. Assign equipment to an operator
 
-- **Reject** (RF `PICK11` `Reject Pick`, field `Reason`): legal only before anything is picked. It returns the task to the pool, hides it for `TASK_SKIP_COOLDOWN_MIN` and counts one refusal. The reservation stays. In a cart the pick first leaves the assignment, and the cooldown uses the assignment's area.
-- **Skip** in a cart (`PKA25` `Skip`): the stop goes to the end of the route. The task is not touched.
-- **Reason length:** the server accepts at most 80 characters (`skip_reason is too long: 95 chars, max 80`). The RF field `Reason` also stops at 80 (rf-screens 113, P-07).
+Open `Warehouse Configuration > Operator Permissions > Operators` and open the operator.
 
-## 10. What happens to open work when you change these settings
+Set `Equipment Profile` when the operator starts the shift with known equipment. Leave it empty for work on foot. The operator can also choose equipment in `Pick by Area`; that choice applies to the next work request.
 
-| Change | Effect on open work |
+The operator list follows the users assigned to the warehouse. Use `Sync` when a recently assigned user is not yet shown.
+
+## 6. Grant task permission
+
+On the operator card, open `Task Permissions` and add one row for each task type and work area the operator may use.
+
+| Field | What to choose |
 |---|---|
-| Remove a `Task Permissions` row | The operator keeps the tasks they hold. They cannot be handed a new one. A zone they no longer reach still lets them finish a held task. |
-| Untick `Pick Execution` | Same: new issue stops, held work continues. |
-| Remove a zone from an area | Tasks in that zone leave the pool of that area's operators. Held tasks stay. |
-| Change `Max Weight` or add an exclusion | Next dispatch only. |
-| Change the area policy (`Assign Policy`, equipment row) | Next dispatch or cart start. A live assignment is continued first. |
-| Turn `Allow Task Release` off | Next hand-back or refusal is refused. |
-| Change a `TASK_*` setting | Next claim or renewal. |
-| Delete an area | Refused while zones, permissions or policy rows refer to it. |
+| `Task Type` | `Pick`, `Putaway`, `Replenish`, `Move`, or `Count`. |
+| `Work Area` | The area whose zones the operator may reach for this task type. |
+| `Pick Execution` | Enable for a `Pick` row when this operator may receive new pick work. |
 
-## 11. Messages seen by operators and supervisors (summary)
+### Why `Pick Execution` matters
 
-| Message | When |
+A `Pick` permission row by itself is not enough. With `Pick Execution` off, the operator can see the area but receives no new pick. On the terminal, this normally appears as **No eligible Pick work**.
+
+To enable a picker:
+
+1. Open `Operator Permissions > Operators`.
+2. Open the operator.
+3. Open the existing `Pick` permission for the correct work area, or create it.
+4. Enable `Pick Execution`.
+5. Save.
+6. Ask the operator to request work again.
+
+Changing this switch does not interrupt a task already held by the operator.
+
+## 7. Configure task timing
+
+Open `Warehouse Configuration > Settings & Reference Data > System Settings` only when the warehouse needs values different from its operating standard.
+
+| Setting | Purpose |
 |---|---|
-| `you have no right to take Pick tasks in any work area — ask a supervisor` | No permission row, or all zones excluded. |
-| `you have no right to take Pick tasks in work area PICK-A — ask a supervisor` | Same, area named. |
-| `there are Pick tasks in your work areas, but every one is heavier than your equipment lifts (up to N at ground level) — they wait for other equipment` | Section 4. |
-| `returning a task is not allowed in work area PICK-A — ask a supervisor to move it` | `Allow Task Release` off. |
-| `operator already has Putaway task 41; resume it before requesting Pick work` | A held task of another type. |
-| `task 812 is not assigned to you (currently: Some(1002))` | Someone else holds it. |
-| `task 812 is in status Completed, this action does not apply` | Wrong status. |
-| `task 812 lease has expired; claim the work again` | Lease ran out. |
-| `version conflict on task 812 (current version 9)` | The task changed. Code 40. Reload. |
-| `No eligible Pick work` | RF text when the dispatch has nothing. |
+| `TASK_LEASE_TTL_MIN` | Minutes a claimed task remains held while the operator is inactive. |
+| `TASK_SKIP_COOLDOWN_MIN` | Minutes a rejected task waits before it can be offered again. |
+| `TASK_SKIP_ESCALATE_AFTER` | Number of rejections after which the task waits for a supervisor. |
+| `TASK_MAX_CONCURRENT_DEFAULT` | Concurrent-task limit when no work area is selected. |
+| `TASK_ALLOW_RELEASE_DEFAULT` | Whether work without an area may be returned or rejected. |
 
-## 12. Inconsistencies found while reading the code
+Use positive values for the first four settings. Set `TASK_ALLOW_RELEASE_DEFAULT` to `1` to allow release or `0` to disable it. Changes apply to the next claim, renewal, rejection, or release; they do not rewrite existing deadlines.
 
-1. `Max Concurrent Tasks` has no effect on Pick (section 1), although the model comment says it is read by claim since step 6.
-2. Fixed (P-07, commit `356109c80`). The RF field `Reason` on `Reject Pick` (`PICK11` revision 2, `PKA27` revision 3) used to allow 250 characters while the server allows 80. The terminal now stops at 80.
-3. Fixed (P-21). An operator who already drives a switched-off kind is refused at the next `Pick by Area` and chooses again; the limits stay until then (section 4).
-4. The existing guide `06-outbound-setup.md` says `SUPERVISOR` can write pick short reasons. The code allows only `Admin` and `Manager`.
+## 8. Serial-pick reassignment
+
+For a serial-tracked SKU, `Pick Episode Reassignment` decides what happens when an open serial capture would change operators.
+
+| Value | Use it when |
+|---|---|
+| `Block movement` | The same operator must finish the open serial capture. |
+| `Hand over open episode` | A new operator may continue the same open capture. |
+| `Cancel and restart capture` | The old capture should close and the next operator must start a new one. |
+
+Do not reassign a live cart task by itself. Resolve or dissolve the cart assignment through the supervisor workflow.
+
+## 9. How the system chooses work
+
+When an operator asks for a pick, the system checks the current situation in this order:
+
+1. Resume the operator’s held work first.
+2. Confirm the operator is active.
+3. Apply the selected work area and equipment profile.
+4. Confirm the operator has `Pick` permission for the source zone.
+5. Confirm `Pick Execution` is enabled.
+6. Exclude held stock, blocked locations, unsuitable equipment and work that is not released.
+7. Offer the highest-priority eligible task.
+
+Task priority is followed by the warehouse route order and then task age. Two operators cannot receive the same task.
+
+## 10. Reject and return work
+
+- `Reject Pick` is available only before any quantity is picked.
+- A rejected task waits for the configured cooldown and counts toward supervisor escalation.
+- `Skip` on a cart moves the stop later in that cart route; it does not reject the underlying task.
+- When `Allow Task Release` is off, the operator must ask a supervisor to return or reassign the work.
+
+Keep the rejection reason short and operational: describe what prevents the pick and what the supervisor should check.
+
+## 11. What changes affect open work
+
+| Change | Effect |
+|---|---|
+| Remove a task permission | Stops new work in that area; held work can still be completed. |
+| Turn off `Pick Execution` | Stops new picks; held picks continue. |
+| Remove a zone from an area | Removes unclaimed work in that zone from the area; held work stays. |
+| Change equipment weight or exclusions | Applies to the next work request. |
+| Change the picking policy | Applies to the next start; live carts and open pallets keep their existing decision. |
+| Turn off `Allow Task Release` | Applies to the next return or rejection. |
+
+## 12. Troubleshooting
+
+| What the operator sees | What the administrator checks |
+|---|---|
+| **No eligible Pick work** | Confirm released work exists; the source zone belongs to the area; the operator has a `Pick` row for that area; and `Pick Execution` is enabled. |
+| **No eligible Pick work in the area** | Confirm the scanned value is a work-area code, not a putaway-zone code, and that eligible sources belong to one of the area's zones. |
+| No right to take Pick tasks | Add or correct the operator's `Pick` permission for the source area. |
+| All tasks are too heavy for the equipment | Assign suitable equipment or correct the profile’s weight and level settings. |
+| Returning work is not allowed | A supervisor must return or reassign it, or the administrator must enable task release for future work. |
+| The operator already has another task | Finish or return the held task before requesting a new pick. |
+| The task lease expired | Request the work again. If the problem repeats, review the lease duration and connection stability. |
+| The task changed while it was open | Refresh or rescan and review the current task. Do not force the old decision. |
+
+## Related guides
+
+- [Picking](../../operator/09-picking.md)
+- [Picking policy settings](21-picking-policy-settings.md)
+- [Order control after picking](../../operator/11-order-control-after-picking.md)
+- [Task Board](../../reference/tasks/10-task-board.md)
