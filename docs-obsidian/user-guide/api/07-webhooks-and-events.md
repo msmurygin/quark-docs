@@ -103,8 +103,12 @@ Fields you can set through the API:
 |---|---|
 | `code` | A stable name. Required when you create. You cannot change it later. |
 | `name` | A label. |
+| `description` | An optional explanation of the subscriber. |
 | `delivery` | `webhook`, `poll` or `internal`. |
 | `webhook_url` | The URL to POST to. In an update you can clear it with an explicit `null`. |
+| `webhook_headers` | Extra string-valued HTTP headers. This field is write-only because it may contain a secret. |
+| `event_filter` | Event-code patterns such as `process.*`. |
+| `warehouse_filter` | Optional warehouse schema names. |
 | `max_retries` | How many delivery attempts before the delivery is marked `failed`. Database default: 3. |
 | `retry_delay_sec` | The base delay between attempts. Database default: 60. |
 | `is_active` | Only active subscribers receive events (update only). |
@@ -128,9 +132,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   }'
 ```
 
-The public API and web form do not expose `event_filter` (which events), `warehouse_filter` (which warehouses) or `webhook_headers` (additional delivery headers). A new subscriber receives all event codes and starts active. If an integration needs narrower filters or an authentication header, ask the deployment administrator to configure them before enabling delivery.
+The JSON-RPC API accepts `event_filter`, `warehouse_filter` and `webhook_headers`. The WMS subscriber card does not show all three fields, so configure the hidden routing fields through `create_integration_subscriber` or `update_integration_subscriber`, or ask the deployment administrator to apply them. A new subscriber without an explicit event filter receives all event codes and starts active; configure its filter and authentication header before enabling production delivery.
 
-The built-in Integration Platform subscriber starts inactive. Set its destination to your platform event endpoint, add the tenant-scoped `X-Api-Key` header, restrict its event filter as required and test the route before activation.
+The built-in Integration Platform subscriber starts inactive. In the Integration Platform, create a tenant-scoped event key under **Config > WMS Events**. Set the subscriber destination to the displayed event endpoint, add the key as `X-Event-Key`, keep the event filter at `process.*`, and test the route before activation.
 
 How the filters work in the delivery worker:
 
@@ -149,6 +153,7 @@ Content-Type: application/json
 <any extra headers from webhook_headers>
 
 {
+  "source_event_id": 12345,
   "event_name": "process.receipt.closed",
   "entity_name": "receipt",
   "key1": "RC000123",
@@ -158,7 +163,7 @@ Content-Type: application/json
 }
 ```
 
-- The body has no event id and no timestamp. `event_name` is the `event_code`.
+- `source_event_id` is the stable WMS outbox event id. The Integration Platform uses it with its WMS source scope to recognize a repeated delivery. `event_name` is the WMS `event_code`.
 - The worker does **not** sign the request. There is no HMAC header. Protect your endpoint with a secret header set in `webhook_headers`, with network rules, or both.
 - A response with a 2xx status is a success. Any other status, or a network error, is a failure. The worker keeps up to 500 characters of the response text.
 - The HTTP client has a total time-out of 30 seconds for each request. A slower answer is a failure.
@@ -186,10 +191,10 @@ Other delivery fields: `attempts`, `last_attempt`, `next_attempt`, `response_cod
 - The worker reads up to 100 events with status `new` or `partial` in each poll, in id order. It polls every 5 seconds by default (`DELIVERY_WORKER_POLL_SEC`).
 - A failed attempt is retried after `retry_delay_sec × 2^(attempts so far)` seconds. With `retry_delay_sec = 15`: 15 s, 30 s, 60 s, and so on. The exponent stops growing at 20.
 - After `max_retries` attempts the delivery is `failed`. The code has no automatic restart and no replay method for a failed delivery.
-- Delivery is **at least once**. If the worker sends a request and dies before it records the result, it can send it again. Your receiver must tolerate duplicates. The values (`event_name`, `entity_name`, `key1`) are not a unique id. The body has no `key2`.
+- Delivery is **at least once**. If the worker sends a request and dies before it records the result, it can send it again. A receiver should deduplicate on the stable source identity and still tolerate a repeated request. The body has no `key2`.
 - Order is by event id within one poll, but a retry of an old event can arrive after newer events. Do not rely on strict order.
 
-The webhook body and its headers carry no event id. To de-duplicate, build a key from `event_name`, `key1` and the `payload` fields that identify the change. You can also read `list_integration_event` to get the event `id`, but you cannot match a received body to that id with certainty.
+For a custom receiver, use `source_event_id` together with the identity of the WMS source. Do not deduplicate only on `event_name` or `key1`: the same entity can legitimately produce the same event more than once.
 
 ### `poll` subscribers
 
@@ -214,7 +219,7 @@ A result is stored in the event's `internal_result`.
 
 The Integration Platform is a separate service with its own tenant access and REST API. It can receive provider webhooks at `/webhooks/{path}` and authenticated business events at `POST /api/v1/events/emit`.
 
-Connect WMS through a normal `webhook` subscriber whose destination is `<platform>/api/v1/events/emit`. The delivery must include a tenant-scoped platform key in the `X-Api-Key` header. The platform selects matching active flows by `event_name`; the platform key, not a tenant number in the body, determines the tenant.
+Connect WMS through a normal `webhook` subscriber whose destination is `<platform>/api/v1/events/emit`. Create a tenant-scoped event key in **Config > WMS Events** and send it in `X-Event-Key`. The event-only key can submit events but cannot open the platform or call ordinary APIs. The platform selects matching active flows by `event_name`; the event key, not a tenant number in the body, determines the tenant.
 
 See [Triggers, schedules and webhooks](../integration-platform/04-triggers-schedules-and-webhooks.md) for the platform side and [Configuration, access and API](../integration-platform/06-configuration-access-and-api.md) for its access boundary.
 

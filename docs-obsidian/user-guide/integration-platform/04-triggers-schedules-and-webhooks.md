@@ -13,7 +13,7 @@ A flow can start manually, from a schedule, from an incoming webhook or from an 
 | **Manual** | Testing and operator-controlled jobs | A user explicitly selects **Run**. |
 | **Schedule (cron)** | Periodic polling or synchronization | Timezone and automatic pause after repeated failures. |
 | **Webhook** | A provider pushes a change to the platform | HMAC or bearer authentication and a delivery ID. |
-| **Event** | A trusted system publishes a named business event | Tenant API key and stable source event identity. |
+| **Event** | A trusted system publishes a named business event | A tenant-scoped event key and stable source event identity. |
 
 The flow must be active before its configured trigger can execute it.
 
@@ -113,9 +113,88 @@ An event-triggered flow matches its configured event name. An authenticated prod
 }
 ```
 
-Use a stable `source_event_id` and `source_scope` when the producer can provide them. Together they let the platform recognize a repeated delivery without confusing events from different producers. The API key determines the tenant; a tenant number supplied in the JSON body does not change routing.
+Use a stable `source_event_id` and `source_scope` when the producer can provide them. Together they let the platform recognize a repeated delivery without confusing events from different producers. The authentication key determines the tenant; a tenant number supplied in the JSON body does not change routing.
 
-For Quark WMS business events, first configure the WMS subscriber to deliver matching events to the platform with a tenant-scoped platform API key. See [Webhooks and events](../api/07-webhooks-and-events.md) for the WMS event side.
+For Quark WMS, use a dedicated event key rather than a normal platform access key. The event key can submit events only; it cannot open the platform UI, read flows or call the normal tenant API.
+
+## Connect Quark WMS business events
+
+Complete the platform setup first, then activate delivery in WMS. This order prevents the WMS delivery worker from repeatedly calling an endpoint that is not ready.
+
+### 1. Create the tenant event key
+
+1. Open the Integration Platform for the tenant that should own the resulting flow runs.
+2. Open **Config > WMS Events**.
+3. Copy the displayed **Event endpoint**. Its path ends with `/api/v1/events/emit`.
+4. Enter a name that identifies the WMS environment, for example `Production WMS event delivery`.
+5. Select **Create event key**.
+6. Select **Copy key** and put the secret in the approved secret handoff. The secret is shown only on this confirmation card. After you select **Done** or leave the page, the platform cannot display it again.
+
+The key belongs to the current platform tenant. Creating it while the wrong tenant is selected routes accepted events to that wrong tenant even if the JSON body contains another tenant number.
+
+### 2. Configure the WMS subscriber
+
+1. In WMS, switch to **Enterprise** and open `Integrations > Subscribers`.
+2. Open the built-in **Integration Platform** subscriber with code `ipaas`.
+3. Keep **Active** off while you configure it.
+4. Set **Delivery** to `webhook` and set **Webhook URL** to the copied event endpoint.
+5. Store this subscriber header:
+
+   ```json
+   {"X-Event-Key": "<copied event key>"}
+   ```
+
+6. Keep the event filter restricted to WMS business events:
+
+   ```json
+   {"event_codes": ["process.*"]}
+   ```
+
+7. Save the subscriber configuration.
+
+The WMS subscriber card shows the URL and active state but does not expose every routing field. If **Webhook headers** and **Event filter** are not available on your screen, set them with the supported `update_integration_subscriber` JSON-RPC method or ask the deployment administrator to apply them. Do not put the event key in the URL, description or event filter.
+
+`process.*` matches event codes below `process.`, such as `process.order.created`. It does not match `processfoo`, `processfoo.created` or the bare word `process`.
+
+### 3. Activate and verify delivery
+
+1. Confirm that the target event flow is validated and active.
+2. Turn on **Active** for the WMS Integration Platform subscriber and save it.
+3. Perform one controlled WMS action that produces a matching `process.*` event.
+4. In WMS, check **Integrations > Events** and **Deliveries**. The delivery should receive an HTTP 2xx response.
+5. In the Integration Platform, open **Monitor** and confirm that the expected event flow ran in the same tenant in which the key was created.
+
+```mermaid
+sequenceDiagram
+    participant WMS
+    participant Subscriber as Active Integration Platform subscriber
+    participant Receiver as Platform event endpoint
+    participant Flow as Active event flow
+    participant Monitor
+
+    WMS->>WMS: Commit a warehouse action and its process event
+    WMS->>Subscriber: Match the process.* filter
+    Subscriber->>Receiver: POST event with X-Event-Key
+    Receiver->>Receiver: Resolve tenant from the event key
+    Receiver-->>Subscriber: HTTP 201 or deduplicated HTTP 200
+    Receiver->>Flow: Queue the matching event
+    Flow-->>Monitor: Store the run and step results
+```
+
+### Rotate or revoke the key
+
+Rotate without intentionally stopping delivery:
+
+1. Create a new key in **Config > WMS Events** and copy its one-time secret.
+2. Replace `X-Event-Key` in the WMS subscriber with the new secret.
+3. Produce one controlled event and verify both the WMS delivery and the platform run.
+4. Return to **Config > WMS Events** and select **Revoke** for the old key.
+
+Revocation is immediate. A subscriber that still sends the revoked key receives an authentication error and its deliveries enter the WMS retry path. If a newly created secret was lost before it reached WMS, revoke that key and create another one; the list deliberately shows status and dates, never the secret or its hash.
+
+Do not try to reuse an event key in `X-Api-Key`. An `events:write` key is rejected by normal platform endpoints even while it remains active for `/api/v1/events/emit`.
+
+See [Webhooks and events](../api/07-webhooks-and-events.md) for the WMS event envelope, subscriber retries and delivery statuses.
 
 ```mermaid
 sequenceDiagram
@@ -146,4 +225,7 @@ sequenceDiagram
 | Webhook returns an authentication error | Recalculate the signature from the unmodified body or check the bearer token. |
 | Webhook says the delivery ID header is missing | Send exactly one header using the configured name and a non-empty stable value. |
 | Webhook is accepted but no flow runs | Confirm that the webhook and flow are active, then check **Monitor** and the flow trigger. |
-| Event reaches the wrong expectation | Check the exact event name, tenant API key, owner and source identity supplied by the producer. |
+| **Invalid event key** | The `X-Event-Key` value is unknown, expired or revoked. Replace the WMS subscriber header with an active key from the intended tenant. |
+| The WMS delivery is accepted but no flow runs | Confirm that the flow is active and its event trigger matches the exact `event_name`; then check **Monitor** in the tenant that owns the key. |
+| WMS keeps retrying after a key change | Confirm that the subscriber saved the new `X-Event-Key`, then verify one delivery before revoking the old key. |
+| Event reaches the wrong tenant or flow | Check where the event key was created and the exact event name, owner and source identity. The tenant value in the JSON body cannot override the key. |
