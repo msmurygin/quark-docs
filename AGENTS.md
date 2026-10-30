@@ -6,6 +6,8 @@ Write plain English for warehouse users and implementers. Explain tasks, prerequ
 
 Every screenshot published in the English guide must be entirely English. Reject an image if any visible Cyrillic appears in UI chrome, messages, tooltips, report metadata, demo data, annotations or embedded labels. This applies to referenced images and to raw or unused images committed under the public screenshot tree. Run a Cyrillic OCR audit and visually review every match before publishing a screenshot batch.
 
+Use one visual standard for customer screenshots. Capture web UI screens in the light theme at 1280 x 720. The site renders these landscape captures at the full article width. RF terminal screenshots keep their handheld portrait aspect ratio and render as compact figures. Do not mix light and dark web UI captures in a published workflow.
+
 For changed chapters, obtain an independent documentation review against current implementation. The reviewer checks instructions, navigation, examples, diagrams and links; do not launch WMS certification or broad code tests. Run npm run typecheck, npm run test:docs and npm run build in docs-site. Verify affected pages in a browser, including mobile and both colour themes after styling changes. Strict broken links and anchors remain enabled.
 
 Deployment is directly from main through Vercel. No cross-repository workflow or credential is needed. The founder has authorized the dedicated technical writer to publish verified documentation autonomously. This authorization does not cover changing WMS runtime code, product marketing, DNS, accounts, analytics or privacy settings. Keep updates small and report their source revision and checks.
