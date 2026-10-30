@@ -56,12 +56,13 @@ Do the steps in this order. Each step needs the data from the step before.
 | 4 | [Owners, SKUs, Units and Packs](04-owners-sku-uom-pack-hierarchy.md) | Owners, pack hierarchies and SKUs exist. Lot and serial rules are set. |
 | 5 | [Inbound Setup](05-inbound-setup.md) | Receipts can be received. Putaway policy sends stock to locations. |
 | 6 | [Outbound Setup](06-outbound-setup.md) | Orders can be allocated, picked, packed, loaded and shipped; pick locations can be replenished. |
-| 7 | [Printing and Labels](07-printing-and-labels.md) | Labels and printers work. |
-| 8 | [Reports and Dashboards](08-reports-and-dashboards.md) | Reports and the dashboard work. |
-| 9 | [Integrations and API](09-integrations-and-api.md) | ERP and other systems can connect. |
-| 10 | [Go-Live Checklist](10-checklist-go-live.md) | Final check before real work starts. |
-| 11 | [FAQ](11-faq.md) | Answers to common questions. |
-| 12 | [Build a Custom Report](12-build-custom-reports.md) | Create a report with parameters, read-only SQL datasets and a Typst template. |
+| 7 | [Inventory Control](/docs/admin/inventory-control/) | Correct quantities, transfer stock between lots, move stock and manage LPNs. |
+| 8 | [Printing and Labels](07-printing-and-labels.md) | Labels and printers work. |
+| 9 | [Reports and Dashboards](08-reports-and-dashboards.md) | Reports and the dashboard work. |
+| 10 | [Integrations and API](09-integrations-and-api.md) | ERP and other systems can connect. |
+| 11 | [Go-Live Checklist](10-checklist-go-live.md) | Final check before real work starts. |
+| 12 | [FAQ](11-faq.md) | Answers to common questions. |
+| 13 | [Build a Custom Report](12-build-custom-reports.md) | Create a report with parameters, read-only SQL datasets and a Typst template. |
 
 ## Important facts to know before you start
 

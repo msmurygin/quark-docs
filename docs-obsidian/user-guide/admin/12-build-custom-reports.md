@@ -22,8 +22,6 @@ The designer keeps the report definition, data and document layout on one screen
 - Decide who will use the report, what one row means and which filters are needed.
 - Start with a small result set. A report query must be read-only.
 
-The names in this guide describe controls by their purpose. The report designer can use a different interface language from the main warehouse screen, so use the control's position and function when its displayed text differs.
-
 ![Reports catalogue with the Report designer and Create report controls](../assets/screens/reports.png)
 
 ## Know the designer workspace

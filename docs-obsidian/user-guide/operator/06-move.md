@@ -139,3 +139,4 @@ A move is recorded with the user, the source, the destination and the quantity. 
 - [05 Putaway](05-putaway.md)
 - [07 Stock inquiry](07-inventory-inquiry.md)
 - [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)
+- [Web move and LPN management](../admin/13-inventory-control/03-move-stock-and-manage-lpns.md)

@@ -36,6 +36,8 @@ The standard catalogue contains these active 203-DPI labels:
 
 Label codes are exact and case-sensitive. Do not rename `lpn_id_label`, `handling_unit_label` or `shipping_label`; warehouse workflows use those codes when they request a label.
 
+To generate, preview and print an LPN while repacking or moving stock, follow [Move stock and manage LPNs](13-inventory-control/03-move-stock-and-manage-lpns.md#generate-and-print-a-new-lpn).
+
 Seeded templates: `pallet_100x150`, `sku_50x30`, `location_70x40`, `lpn_id_100x50`, `handling_unit_100x50`, `shipping_100x150` (status `applied`).
 
 ## 3. Printer settings in a putaway zone
