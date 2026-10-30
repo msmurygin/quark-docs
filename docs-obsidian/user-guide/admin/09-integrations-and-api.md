@@ -3,7 +3,7 @@ title: "Administrator Guide - Integrations and API"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-10-31
 ---
 
 # Integrations and API
@@ -144,7 +144,7 @@ Subscriber (`ent_integration_subscriber_normal_form`):
 | `Retry Delay (s)` | Seconds between attempts. | Whole number. Default 60. | 60 |
 | `Active` | In use. | On or off. | on |
 
-The event filter (`event_filter`, JSON) picks event codes. It accepts wildcards such as `process.*`. It has no field on this form.
+The event filter (`event_filter`, JSON) picks event codes. It accepts wildcards such as `process.*`. The JSON-RPC create and update methods accept it, but the subscriber card does not show it.
 
 Event registry (`ent_event_registry_normal_form`): `Code` (required), `Name` (required), `Description`, `Active`, `Builtin` (read-only), `Category` (required).
 
@@ -155,6 +155,17 @@ Seeded subscribers:
 | `ipaas` | `webhook` to the Integration Platform event endpoint | **off** | Sends matching process events to the platform. Configure and test the destination and access header before turning it on. |
 | `quark_outbound_execution` | `internal` | on | Allocation top-up after contention or a short pick. **Do not turn off.** |
 | `quark_inventory_count` | `internal` | on | Counts a location when a warehouse event asks for it. **Do not turn off.** |
+
+### Connect the built-in Integration Platform subscriber
+
+1. In the Integration Platform, open **Config > WMS Events** for the intended tenant.
+2. Copy the event endpoint and create an event key. Copy the secret while the one-time confirmation is open.
+3. In WMS, open the built-in subscriber with code `ipaas` and keep it inactive during setup.
+4. Set its webhook URL to the copied endpoint. Store `{"X-Event-Key":"<copied key>"}` in `webhook_headers` and keep `event_filter` set to `{"event_codes":["process.*"]}`.
+5. Activate a matching event flow in the Integration Platform, then turn on the WMS subscriber.
+6. Produce one controlled event and verify the WMS **Deliveries** row and the Integration Platform **Monitor** run.
+
+The subscriber card does not expose `webhook_headers` or `event_filter`. Use the supported `update_integration_subscriber` JSON-RPC method or ask the deployment administrator to apply those fields. For the complete rotation and recovery procedure, see [Triggers, schedules and webhooks](../integration-platform/04-triggers-schedules-and-webhooks.md#connect-quark-wms-business-events).
 
 Business event codes include, for example: `process.order.created`, `process.order.released`, `process.order.closed`, `process.receipt.opened`, `process.receipt.line_received`, `process.receipt.closed`, `process.receipt.damaged_reported`, `process.putaway.completed`, `process.pick.created`.
 
@@ -174,7 +185,7 @@ Business event codes include, for example: `process.order.created`, `process.ord
 
 - The two internal subscribers drive allocation top-up and event-driven counts. If they are off, those functions stop.
 
-There is no web field or public API field for `event_filter` or `warehouse_filter`. Ask the deployment administrator to configure them when a subscriber must receive only selected events or warehouses. Event codes accept `*`, a prefix such as `process.*`, or an exact code. An empty warehouse list allows all warehouses.
+The subscriber card has no field for `event_filter`, `warehouse_filter` or `webhook_headers`, but the JSON-RPC create and update methods accept them. Event codes accept `*`, a prefix such as `process.*`, or an exact code. An empty warehouse list allows all warehouses. Treat `webhook_headers` as write-only: read responses deliberately do not return stored secrets.
 
 ## 4. IPaaS
 

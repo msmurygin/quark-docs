@@ -46,8 +46,8 @@ Click a row to open its card.
 Buttons: `Save` saves and goes back (`generic_save`). `Delete` deletes the subscriber and goes back (`generic_delete`).
 A new subscriber is always saved with `Active` on: the create call has no `is_active` field. Switch it off after the first save if you need to.
 
-The columns `description`, `webhook_headers`, `event_filter` and `warehouse_filter` have no field on the card.
-**A subscriber made on this screen has the filter `{"event_codes": ["*"]}`: it receives every event of every warehouse.** The screen cannot narrow it.
+The columns `description`, `webhook_headers`, `event_filter` and `warehouse_filter` have no field on the card. The JSON-RPC create and update methods accept these fields, and read responses deliberately omit `webhook_headers` because it may hold a secret.
+**A subscriber made on this screen has the filter `{"event_codes": ["*"]}`: it receives every event of every warehouse.** Use the JSON-RPC method or ask the deployment administrator to narrow it before production activation.
 
 ### What each `Delivery` value does
 
@@ -55,7 +55,7 @@ The rules are in the delivery worker.
 
 | Value | What the worker does |
 |---|---|
-| `webhook` | Sends an HTTP POST to an HTTP(S) `Webhook URL` with `Content-Type: application/json` and this body: `event_name`, `entity_name`, `key1`, `warehouse`, `tenant_id`, `payload`. Redirects are refused. DNS answers are pinned and private/special addresses fail with `blocked webhook destination` unless the exact `TENANT_ID@host:port` (or an explicit `system@host:port`) is in `DELIVERY_WEBHOOK_PRIVATE_ALLOWLIST`. The answer must be HTTP 2xx within 30 seconds. With no URL, the delivery fails with `No webhook URL configured`. A failure keeps the text `HTTP {code}: {first 500 characters of the answer}`, or the network error. |
+| `webhook` | Sends an HTTP POST to an HTTP(S) `Webhook URL` with `Content-Type: application/json`, optional configured headers and this body: `source_event_id`, `event_name`, `entity_name`, `key1`, `warehouse`, `tenant_id`, `payload`. Redirects are refused. DNS answers are pinned and private/special addresses fail with `blocked webhook destination` unless the exact `TENANT_ID@host:port` (or an explicit `system@host:port`) is in `DELIVERY_WEBHOOK_PRIVATE_ALLOWLIST`. The answer must be HTTP 2xx within 30 seconds. With no URL, the delivery fails with `No webhook URL configured`. A failure keeps the text `HTTP {code}: {first 500 characters of the answer}`, or the network error. |
 | `poll` | The worker only creates the delivery row. It stays `pending`. Nothing is sent. |
 | `queue` | Not handled. The delivery is marked `failed` with the error `unknown delivery method queue`. |
 | `internal` | Not in the drop-down. Used by two built-in subscribers that run work inside the system. See below. |
@@ -95,13 +95,13 @@ Two subscribers with `Delivery` `internal` are made by migrations. They run work
 
 ## Rules
 
-| Rule | Where it comes from |
+| Rule | What it means |
 |---|---|
-| `Code` and `tenant_id` together are unique. | Key `integration_subscriber_code_tenant_id_key`. Because `tenant_id` is empty on this screen, the database does not treat two rows as equal: **two subscribers can have the same code** (the migration says so in `007_internal_outbound_execution_delivery.sql`). |
-| After the first save, `Name`, `Delivery`, `Webhook URL`, `Max Retries`, `Retry Delay` and `Active` can change. | `update_integration_subscriber`. Clearing `Webhook URL` is allowed. |
-| Deleting a subscriber deletes its delivery rows. | The foreign key `integration_event_delivery.subscriber_id` is `ON DELETE CASCADE`. |
+| Keep `Code` unique and stable. | Treat it as the subscriber's permanent integration identifier, even if another row could be saved with the same value. |
+| After the first save, `Name`, `Delivery`, `Webhook URL`, `Max Retries`, `Retry Delay` and `Active` can change. | You can also clear an existing webhook URL. |
+| Deleting a subscriber removes its delivery history. | Export any history needed for an audit before deleting the subscriber. |
 
-The address is not checked. The worker posts to any URL you enter, from the app server.
+The delivery worker accepts only final HTTP(S) URLs, refuses redirects and blocks private or special-purpose destinations unless the deployment explicitly allows the exact tenant and address.
 
 ## Who can use it
 

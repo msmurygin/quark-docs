@@ -7,7 +7,7 @@ Use this page to connect an outside system to the event stream, to change how it
 - You hold the role `ADMIN` and can open Enterprise.
 - You know how the outside system wants the events. The screen offers `webhook`, `poll` and `queue`. **Only `webhook` sends anything.** `poll` keeps the delivery waiting and sends nothing. `queue` is not handled and every delivery for it fails. See [Subscribers](22-subscribers.md).
 - For a webhook: the full HTTP(S) address and an agreement with the receiving system on what it does with the message and what it answers. It must answer with an HTTP 2xx code within 30 seconds. Private-network receivers must be listed as an exact `TENANT_ID@host:port` in `DELIVERY_WEBHOOK_PRIVATE_ALLOWLIST`; use `system@host:port` only for an endpoint intentionally shared by all tenants.
-- Know that a new subscriber receives **every** event of every warehouse. The screen cannot narrow it.
+- Know that a new subscriber created from this card receives **every** event of every warehouse. The card cannot narrow it; the JSON-RPC create and update methods can set event and warehouse filters.
 - The app server validates and resolves the address when it delivers an event. It refuses redirects and blocks private or special-purpose destinations unless the exact authority is configured as described above.
 
 ## Steps
@@ -30,6 +30,7 @@ For each event, one HTTP POST with `Content-Type: application/json` and this bod
 
 | Key | What it holds |
 |---|---|
+| `source_event_id` | The stable WMS outbox event id. |
 | `event_name` | The event code, for example `process.receipt.closed`. |
 | `entity_name` | The kind of record, for example `receipt`. |
 | `key1` | The first key of the record, for example the receipt number. |
@@ -37,7 +38,7 @@ For each event, one HTTP POST with `Content-Type: application/json` and this bod
 | `tenant_id` | The tenant, or empty. |
 | `payload` | The details of the event, as JSON. |
 
-The screen has no field for extra headers (for example a token). The column exists in the table but only a database change can set it.
+The screen has no field for extra headers, filters or descriptions. The supported `create_integration_subscriber` and `update_integration_subscriber` JSON-RPC methods accept `webhook_headers`, `event_filter`, `warehouse_filter` and `description`. For the Integration Platform receiver, create a key under **Config > WMS Events** and store it as `{"X-Event-Key":"<copied key>"}` before activation.
 
 ## What changes
 

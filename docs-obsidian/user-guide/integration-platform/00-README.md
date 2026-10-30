@@ -18,7 +18,7 @@ Use this guide if you configure or support integrations. You do not need to chan
 | Create, edit, validate and activate a flow | [Templates and Flow Builder](03-templates-and-flow-builder.md) |
 | Start a flow manually, on a schedule, from a webhook or from an event | [Triggers, schedules and webhooks](04-triggers-schedules-and-webhooks.md) |
 | Investigate a failure, retry a run and configure alerts | [Monitoring and notifications](05-monitoring-and-notifications.md) |
-| Set shared values and prepare access to the platform | [Configuration, access and API](06-configuration-access-and-api.md) |
+| Set shared values, prepare platform access and create WMS event keys | [Configuration, access and API](06-configuration-access-and-api.md) |
 
 ## How the parts fit together
 
@@ -56,7 +56,7 @@ flowchart LR
 | **Webhooks** | Give an external system a URL that starts a flow. |
 | **API Keys** | Store and revoke encrypted credentials. |
 | **Notifications** | Send flow and schedule alerts to a team channel. |
-| **Config** | Maintain system defaults and tenant overrides used by flows. |
+| **Config** | Maintain system defaults, tenant overrides and tenant-scoped WMS event keys. |
 | **Monitor** | Inspect run and step results, then retry failed runs. |
 
 ![Integration Platform welcome page with the three getting-started steps and template actions](../assets/screens/integration-platform-welcome.png)
