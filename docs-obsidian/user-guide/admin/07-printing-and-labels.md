@@ -3,7 +3,7 @@ title: "Administrator Guide - Printing and Labels"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-10-30
 ---
 
 # Printing and Labels
@@ -20,6 +20,8 @@ updated: 2026-10-10
 Labels are made in ZPL for Zebra printers. The server sends the ZPL to the printer's network port (default 9100).
 
 Your site installer connects the printer network and label renderer. Label design has a web screen: open `Sidebar > Overview > Reports`, then click **Label designer**. If the button is not available, ask an Enterprise administrator for label-designer access.
+
+The label designer uses English controls, regardless of the language selected for the main web UI. This includes its element palette, property panels, messages and save controls.
 
 ## 2. Seeded labels
 

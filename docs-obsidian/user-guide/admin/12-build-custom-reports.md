@@ -19,6 +19,7 @@ The designer keeps the report definition, data and document layout on one screen
 - Switch to the warehouse whose data you want to use. Do not stay in Enterprise mode.
 - Open `Sidebar > Overview > Reports`.
 - You need permission to open **Report designer**. If the button is not available, ask an Enterprise administrator.
+- The report and label designers use English controls, regardless of the language selected for the main web UI.
 - Decide who will use the report, what one row means and which filters are needed.
 - Start with a small result set. A report query must be read-only.
 
@@ -37,6 +38,19 @@ The designer keeps the report definition, data and document layout on one screen
 | **Properties** | Set the report name, category and catalogue description after the report has been created. |
 
 The preview and the template are part of the same workspace. **Save template** saves the template together with its parameters and datasets. **Save properties** saves the catalogue name, category and description separately.
+
+```mermaid
+flowchart LR
+    A[Create report shell] --> B[Add parameters]
+    B --> C[Add and test datasets]
+    C --> D[Build the Typst template]
+    D --> E[Preview with sample values]
+    E --> F[Save template]
+    F --> G[Run from the catalogue]
+    G -->|Needs changes| C
+```
+
+*Build and test the data before polishing the document. A normal catalogue run is the final check.*
 
 ## 1. Create the report shell
 
