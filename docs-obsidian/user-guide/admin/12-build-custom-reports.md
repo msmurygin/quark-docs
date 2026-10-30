@@ -3,7 +3,7 @@ title: "Build a Custom Report"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-30
+updated: 2026-10-31
 ---
 
 # Build a Custom Report
@@ -40,6 +40,10 @@ The designer keeps the report definition, data and document layout on one screen
 | **Properties** | Set the report name, category and catalogue description after the report has been created. |
 
 The preview and the template are part of the same workspace. **Save template** saves the template together with its parameters and datasets. **Save properties** saves the catalogue name, category and description separately.
+
+![Report designer workspace with the insertion palette, Typst editor and document preview](../assets/screens/report-builder-workspace.png)
+
+*The insertion palette is on the left, the Typst template is in the centre and the rendered document is on the right. This example uses demonstration values only.*
 
 ```mermaid
 flowchart LR
@@ -82,6 +86,10 @@ Open **Properties** and set:
 
 Click **Save properties**. This button saves the catalogue properties, not the Typst template.
 
+![Properties tab with the report name, category and description](../assets/screens/report-builder-properties.png)
+
+*The report code is fixed after creation. Use **Properties** to maintain the catalogue name, category and description.*
+
 ## 3. Define parameters
 
 Use a parameter when the person running the report must choose a date, code, number or yes/no value.
@@ -99,6 +107,10 @@ Use a parameter when the person running the report must choose a date, code, num
 
 4. Add the other parameters in the order that makes sense to the user.
 5. Click **Save template** after the datasets and template are ready.
+
+![Parameters tab with a required SKU search field](../assets/screens/report-builder-parameters.png)
+
+*Each row defines one value that the user supplies before the report runs.*
 
 The template reads a parameter as `report_data.params.<code>`. For example:
 
@@ -120,6 +132,10 @@ A dataset is one read-only SQL query. Its rows become data for the Typst templat
 4. Replace the starter query with a complete query.
 5. Click the run button on the dataset card.
 6. Check the returned column names and sample rows.
+
+![Dataset tab with a read-only SQL query, parameter binding and sample rows](../assets/screens/report-builder-dataset-result.png)
+
+*Run the dataset before writing the final layout. The grid confirms the column names that the Typst template can use; the rows shown here are synthetic examples.*
 
 Dataset rules:
 
@@ -209,6 +225,10 @@ The formatting toolbar can insert bold, italic, underline, headings, lists, form
 4. Compare the preview rows with the dataset test result.
 5. Click **Save template**.
 6. Return to the report album and run the report as a normal user.
+
+![Document tab with the rendered SKU catalogue beside its Typst template](../assets/screens/report-builder-preview.png)
+
+*The final preview uses the current template, parameter values and dataset results. Check the PDF before saving the template.*
 
 Reports without parameters can preview automatically after an edit. Reports with parameters preview only after you click **Preview** and supply the values.
 
