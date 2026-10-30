@@ -1,66 +1,71 @@
 # Orders list
 
-The orders list shows every outbound order (shipment order) of the active warehouse.
-An order is a request from a customer: "send these items to this address".
-The order has lines. A line says which SKU, in which unit, how many.
+The Orders list shows the outbound orders of the active warehouse. An order identifies what the customer needs, where it must go and when it should ship. Its lines identify the SKUs and quantities.
 
 ## How to open it
 
 1. Sign in and select a warehouse.
-2. In the left sidebar open `Management & Control`.
-3. Open `Orders & Waves`, then click `Orders`.
+2. Open `Management & Control > Orders & Waves > Orders`.
 
-The sidebar item is `Management & Control > Orders & Waves > Orders` (menu item `shipment_order_menu`, form `shipment_order_list`).
-Related outbound screens are split between `Orders & Waves`, `Shipping`, `Execution Control`, `Exceptions` and `Stations`.
+If the list is empty or an expected order is missing, confirm the warehouse code in the top bar and clear active filters.
 
-## What the screen has
+## Screen overview
 
-| Part | What it is |
+| Area | What it does |
 |---|---|
-| Toolbar | Two buttons: `New` and `Refresh`. |
-| Grid | One row per order, 50 rows per page (the page size can be changed to 10, 20 or 100). A check box starts each row. |
-| Row click | Click a row to open the order. It opens in the [order screen](01-order-screen-overview.md). |
+| Orders toolbar | Creates a new order or refreshes the list. |
+| Filter bar | Narrows the list by order number, status, owner, ship-to customer, date or another available column. |
+| **Columns** | Changes which columns are shown and their order. |
+| **Views** | Saves and reopens a useful filter or column arrangement when saved views are available. |
+| Orders table | Shows one order per row. Select a row to open the order screen. |
+| Paging controls | Changes the page and the number of orders shown. |
 
-The check boxes are on, but no button of the list uses them.
-There is no delete button on the list and no status button.
-Release, Allocate, Cancel and the other order buttons are on the order screen.
+See [Interface overview](../../admin/01-interface-overview.md#4-list-screens) for the common list controls.
 
 ## Toolbar
 
 | Button | What it does |
 |---|---|
-| `New` | Opens a new empty order in the order screen. The order number is taken from the counter at this moment. See [Creating an order](30-creating-an-order.md). |
-| `Refresh` | Reads the list again. |
+| **New** | Opens an empty order. The order number is assigned when the new order is opened. See [Creating an order](30-creating-an-order.md). |
+| **Refresh** | Reads the list again without changing an order. |
 
-## Columns
+Order actions such as **Release**, **Allocate**, **Unallocate** and **Cancel** are on the order screen, not on the list.
 
-The list reads from the API method `list_shipment_order`. The row count comes from `count_shipment_order`. Every column is read only.
+## Main columns
 
-| Label | Column | Type | Filter | Notes |
-|---|---|---|---|---|
-| `ID` | `id` | Whole number | Number | Hidden. It is the row key. |
-| `Order #` | `order_number` | Text | Text | The number of the order. |
-| `Status` | `status` | Badge | Text | `New`, `Partially allocated`, `Allocated`, `Partially released`, `Released`, `Partially picked`, `Picked`, `Closed` or `Cancelled`. See [Order statuses](90-order-statuses-and-transitions.md). The labels come from the code list `ORDER_STATUS`. |
-| `Owner` | `owner_id` | Whole number | Number | Shows the owner code. |
-| `Ship To` | `ship_to_id` | Whole number | Number | Shows the code of the customer. |
-| `Priority` | `priority` | Whole number | Number | 1 to 99. Smaller is more urgent. |
-| `Requested Ship` | `requested_ship_date` | Date | Date | The date the customer wants the goods to leave. |
-| `Ordered` | `order_date` | Date and time | Date | When the order was made. Not the ordered quantity: the line column with the same label is a quantity. |
+| Column | Meaning |
+|---|---|
+| **Order #** | The order number. Select it or its row to open the order. |
+| **Status** | The current stage of the order, such as New, Released, Picked, Closed or Cancelled. See [Order statuses and transitions](90-order-statuses-and-transitions.md). |
+| **Owner** | The inventory owner responsible for the order. |
+| **Ship To** | The destination customer or site. |
+| **Priority** | The order's priority. A smaller number is more urgent. |
+| **Requested Ship** | The requested shipping date. |
+| **Ordered** | When the order was created. On this list, Ordered is a date and time, not a quantity. |
 
-No column has a start sort. Source for the code lists and the owner lookup: the column definitions of form `shipment_order_list` (renderer `CodeListBadgeRenderer`, formatter `fk:owners:code`) in `001_baseline.sql`.
-The labels of the statuses are in `crates/libs/wms-lib-sql/sql/wms-app/migrations/018_the_code_lists_speak_the_products_language.sql:48-56`.
+Additional columns may be available through **Columns**. Every value on the Orders list is read only; open the order to make a change.
 
-## What the list does not have
+## Find an order
 
-- No `Close` button. Closing an order exists only in the API (`shipment_order_close`). See [Order statuses](90-order-statuses-and-transitions.md).
-- No hold. An order has no on-hold status.
-- No wave, packing or shipping screen. Packing is done on the RF terminal. See [Related pages](#related-pages).
+1. Use a quick filter or select **More filters**.
+2. Enter the order number or choose another filter value.
+3. Check the active-filter chips above the table.
+4. Select the matching order row.
+
+The order opens in an existing or new workspace tab. See [Order screen overview](01-order-screen-overview.md).
+
+## What the list does not do
+
+- Selecting a check box does not change an order by itself.
+- Orders cannot be deleted from this list.
+- Release, allocation and cancellation decisions are made after opening the order.
+- Picking and packing are completed through their warehouse workflows, not from the Orders list.
 
 ## Related pages
 
-- [Order screen](01-order-screen-overview.md)
+- [Order screen overview](01-order-screen-overview.md)
 - [Creating an order](30-creating-an-order.md)
 - [Order statuses and transitions](90-order-statuses-and-transitions.md)
 - [Who can do what](91-who-can-do-what.md)
-- API: `list_shipment_order`, `count_shipment_order`, `get_shipment_order`
-- RF terminal: picking, see the [Operator guide: Picking](../../operator/09-picking.md). Packing, see [Operator guide: Packing and verify](../../operator/10-packing-verify.md).
+- [Operator guide: Picking](../../operator/09-picking.md)
+- [Operator guide: Packing and verify](../../operator/10-packing-verify.md)

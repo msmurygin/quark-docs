@@ -16,6 +16,8 @@ current product. Follow the linked screen references for field-level details.
 
 ## How to read this guide
 
+Start with [Interface overview](01-interface-overview.md) if this is your first time using Quark WMS. It explains the web workspace, lists, record cards, disabled actions and the RF terminal layout once, so the workflow pages can stay focused on the warehouse task.
+
 Each procedure uses the same layout:
 
 1. **What you will do**
@@ -47,6 +49,7 @@ Do the steps in this order. Each step needs the data from the step before.
 
 | Step | Guide | Result |
 |---|---|---|
+| Start | [Interface Overview](01-interface-overview.md) | You understand the web workspace, lists, cards and RF terminal layout. |
 | 1 | [First Login and Navigation](01-first-login-and-navigation.md) | You can sign in and find every screen. |
 | 2 | [Users, Roles and Permissions](02-users-roles-permissions.md) | Users exist. Each user has a warehouse and a role. |
 | 3 | [Warehouse Structure](03-warehouse-structure.md) | Zones, locations (including Stage, Door, Pack, Pick-to) and work areas exist. |
@@ -62,7 +65,7 @@ Do the steps in this order. Each step needs the data from the step before.
 
 ## Important facts to know before you start
 
-1. **Create warehouses from Enterprise mode.** Open `Enterprise > Warehouses`, click **Add warehouse**, fill the code, name, schema and storage units, then click **Create warehouse**. Wait for **Ready** before assigning users or activating the warehouse. See [Warehouse Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
+1. **Create warehouses from Enterprise mode.** Switch to **Enterprise**, select `Warehouses`, click **Add warehouse**, fill the code, name, schema and storage units, then click **Create warehouse**. Wait for **Ready** before assigning users or activating the warehouse. See [Warehouse Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 2. **User status `Locked` and `Disabled` block every way in.**
    Such a user cannot sign in, open sessions end on the next request, and the user's API keys are refused. `Active` and `Invited` are let in.
 3. **Loading and Goods Issue are separate decisions.** A `Loaded` Load has not deducted stock. Shipment is an explicit, irreversible Goods Issue. See [Dispatch, loading and Goods Issue](06-outbound-setup.md#10-dispatch-loading-and-goods-issue).

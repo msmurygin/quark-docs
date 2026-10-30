@@ -53,6 +53,22 @@ function customerReadme(source: string, apiUrl: string): Node[] {
     {type: 'heading', depth: 1, children: [t('Getting started')]},
     {type: 'paragraph', children: [t('Choose a guide for your role or the task you want to complete.')]},
     {
+      type: 'paragraph',
+      children: [
+        {
+          type: 'strong',
+          children: [
+            {
+              type: 'link',
+              url: 'admin/interface-overview/',
+              children: [t('New to Quark WMS? Start with Interface overview')],
+            },
+          ],
+        },
+        t(' to learn the web workspace, common screen patterns and RF terminal layout.'),
+      ],
+    },
+    {
       type: 'list',
       ordered: false,
       spread: false,
