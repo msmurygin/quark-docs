@@ -206,8 +206,10 @@ a{text-underline-offset:3px}
 .markdown :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }
 .markdown td { overflow-wrap: anywhere; }
 .doc-figure { margin: 2rem 0; }
-.doc-figure img { margin-inline: auto; cursor: zoom-in; height: auto; max-width: 100%; }
-.doc-figure img[height][width]:not([width='2880']) { max-width: min(100%, 300px); }
+.doc-figure img { margin-inline: auto; cursor: zoom-in; width: 100%; height: auto; max-width: 100%; }
+/* Landscape web captures use the full article width. Portrait RF captures stay compact. */
+.doc-figure img[width='780'],
+.doc-figure img[width='240'] { width: auto; max-width: min(100%, 300px); }
 .doc-figure figcaption { margin: 12px auto 0; max-width: 72ch; font-size: 13px; line-height: 1.6; color: var(--qd-mute); }
 .doc-figure figcaption strong { color: var(--qd-ink); }
 .shot-missing { display: block; width: 100%; box-sizing: border-box; padding: 24px; border: 1px dashed var(--qd-line-2); background: var(--qd-paper-2); color: var(--qd-mute); font-size: 13px; }
