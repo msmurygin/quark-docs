@@ -3,10 +3,12 @@ title: "Administrator Guide - First Login and Navigation"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-29
+updated: 2026-10-30
 ---
 
 # First Login and Navigation
+
+This page explains how to sign in, choose a warehouse and find a screen. Read [Interface overview](01-interface-overview.md) for the common layout of lists, record cards, document lines and the RF terminal.
 
 ## 1. Sign in
 
@@ -44,7 +46,7 @@ The sign-in form and user administration use the same eight-character minimum. P
 ### What you should see
 
 - The main screen opens with the left sidebar.
-- Your active warehouse is part of your session. The visual position is not documented in the metadata.
+- The active warehouse code appears in the top bar.
 
 ### If something goes wrong
 
@@ -86,21 +88,21 @@ If you hold `ADMIN` in any warehouse, the first row of the pop-up is `Enterprise
 ### What you should see
 
 - In a warehouse: the **warehouse sidebar** (section 3).
-- In Enterprise mode: the **enterprise sidebar** (section 4). The warehouse code is `ENTERPRISE` and the warehouse id is `0`.
+- In Enterprise mode: the **enterprise sidebar** (section 4). The warehouse button shows `ENTERPRISE`.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
-| The `Reports` page shows a banner instead of reports | In Enterprise mode the report data sets have no warehouse schema. | Switch to a real warehouse. |
+| The `Reports` page shows a banner instead of reports | Operational reports require a warehouse. | Switch to a warehouse. |
 | You are in Enterprise mode but every screen is denied | Your role in the linked warehouse is not `ADMIN`. | Ask an administrator to give you `ADMIN` on a warehouse. |
 
 ### What this affects later
 
-- Data is stored per warehouse schema. A record made in `WH1` is not visible in `WH2`.
+- Warehouse data is separated. A record made in `WH1` is not visible in `WH2`.
 - Users, roles, event settings and the code lists of the enterprise live above all warehouses.
 
-## 3. Warehouse sidebar (menu 1, "Sidebar navigation")
+## 3. Warehouse sidebar
 
 The tree below follows the current English sidebar.
 
@@ -193,49 +195,21 @@ Notes:
 
 The dashboard is the home page, so it opens right after sign-in. The breadcrumb entry **Dashboard** brings you back to it and clears the other screens.
 
-### Menu item to screen
+### Where to find common work
 
-| Menu path | Opens (form code) | Covered in |
+| What you want to do | Menu path | Guide |
 |---|---|---|
-| `Warehouse Configuration > Settings & Reference Data > Code List` | `code_list_list_form` | [FAQ](11-faq.md), [Inbound Setup](05-inbound-setup.md) |
-| `Warehouse Configuration > Reason Codes > Hold Codes` | `hold_code_list_form` | [Inbound Setup](05-inbound-setup.md) |
-| `Warehouse Configuration > Product Data > Owners` | `owner_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Warehouse Configuration > Topology > Locations` | `location_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Warehouse Configuration > Topology > Putaway Zones` | `putawayzone_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Warehouse Configuration > Topology > 3D Warehouse` | `warehouse_3d` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Warehouse Configuration > Work Areas & Equipment > Work Areas` | `work_area_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | `equipment_profile_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Management & Control > Stations > Distribution Stations` | `distribution_station_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Stations > Consolidation Stations` | `consolidation_station_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Exceptions > Packing Exceptions` | `packing_exception_list_form` | [Packing](../operator/10-packing-verify.md) |
-| `Management & Control > Execution Control > Order Control (Manual)` | `order_control_tabbed` | [Order Control](../operator/11-order-control-after-picking.md) |
-| `Warehouse Configuration > Settings & Reference Data > System Settings` | `sys_settings_list_form` | [Go-Live Checklist](10-checklist-go-live.md) |
-| `Warehouse Configuration > Dashboards > Board Settings` | `dashboard_setting_list_form` | [Reports and Dashboards](08-reports-and-dashboards.md) |
-| `Warehouse Configuration > Dashboards > Metric Thresholds` | `dashboard_threshold_list_form` | [Reports and Dashboards](08-reports-and-dashboards.md) |
-| `Warehouse Configuration > Product Data > Packs` | `pack_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Warehouse Configuration > Policies > Allocation Policy` | `allocation_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Warehouse Configuration > Policies > Putaway Policy` | `putaway_policy_list_form` | [Inbound Setup](05-inbound-setup.md) |
-| `Warehouse Configuration > Policies > Cartonization Policy` | `cartonization_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Warehouse Configuration > Policies > Lot Policy` | `lot_policy_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Warehouse Configuration > Policies > Receipt Policy` | `receipt_policy_list_form` | [Inbound Setup](05-inbound-setup.md) |
-| `Warehouse Configuration > Reason Codes > Pick Short Reasons` | `pick_short_reason_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Warehouse Configuration > Policies > Picking Policies` | `picking_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Warehouse Configuration > Counting > Cycle Count Policies` | `inventory_count_policy_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-| `Management & Control > Handling Units > Handling Unit Registry` | `handling_unit_registry_type_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Warehouse Configuration > Product Data > Barcode Formats` | `barcode_format_list_form` | [Printing and Labels](07-printing-and-labels.md) |
-| `Management & Control > Receiving > Receipts` | `receipt_list` | [Inbound Setup](05-inbound-setup.md) |
-| `Warehouse Configuration > Product Data > SKUs` | `sku_list` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Warehouse Configuration > Product Data > Attributes` | `attribute_def_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
-| `Management & Control > Orders & Waves > Orders` | `shipment_order_list` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Inventory >...` | inventory balances, holds, adjustments, counts, replenishments and pending move-in | [Inbound Setup](05-inbound-setup.md), [FAQ](11-faq.md) |
-| `Overview > Reports` | reports catalogue | [Reports and Dashboards](08-reports-and-dashboards.md) |
-| `Management & Control > Execution Control > Task Board` | `task_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Execution Control > Pick Assignments` | `pick_assignment_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Exceptions > Pick Target Exceptions` | `pick_target_exception_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Management & Control > Exceptions > Skip History` | `task_skip_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
-| `Warehouse Configuration > Operator Permissions > Operators` | `operator_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
-
-`Management & Control > Handling Units > Handling Unit Registry` opens the registry list.
+| Review receipts | `Management & Control > Receiving > Receipts` | [Inbound Setup](05-inbound-setup.md) |
+| Review or release orders | `Management & Control > Orders & Waves > Orders` | [Outbound Setup](06-outbound-setup.md) |
+| Build and release waves | `Management & Control > Orders & Waves > Waves` | [Outbound Setup](06-outbound-setup.md) |
+| Review loads and dispatch work | `Management & Control > Shipping` | [Outbound Setup](06-outbound-setup.md) |
+| Check stock, holds or counts | `Management & Control > Inventory` | [Inventory guides](../reference/inventory/00-inventory-overview.md) |
+| Supervise tasks and pick assignments | `Management & Control > Execution Control` | [Outbound Setup](06-outbound-setup.md) |
+| Resolve operational exceptions | `Management & Control > Exceptions` | [Packing](../operator/10-packing-verify.md), [Order Control](../operator/11-order-control-after-picking.md) |
+| Configure locations and work areas | `Warehouse Configuration > Topology` and `Work Areas & Equipment` | [Warehouse Structure](03-warehouse-structure.md) |
+| Configure owners, SKUs and packs | `Warehouse Configuration > Product Data` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| Configure warehouse rules | `Warehouse Configuration > Policies` | [Inbound Setup](05-inbound-setup.md), [Outbound Setup](06-outbound-setup.md) |
+| Open operational reports | `Overview > Reports` | [Reports and Dashboards](08-reports-and-dashboards.md) |
 
 ![Warehouse sidebar with all top-level sections collapsed](../assets/screens/menu-navigation-collapsed.png)
 
@@ -245,7 +219,7 @@ The dashboard is the home page, so it opens right after sign-in. The breadcrumb 
 
 *Caption: the warehouse sidebar with `Management & Control > Shipping` expanded. Each deeper level is indented; other branches remain collapsed.*
 
-## 4. Enterprise sidebar (menu 3, "Enterprise Sidebar")
+## 4. Enterprise sidebar
 
 ```
 Enterprise Overview
@@ -277,39 +251,18 @@ Notes:
 - `IPaaS` is available under `Integrations`; it is no longer shown in a warehouse sidebar.
 - `Metadata Studio`, `RF UI Designer` and `RPC Documentation` are grouped under `Platform Tools`.
 
-| Menu path | Form code |
+| Menu path | What it is for |
 |---|---|
-| `Users & Roles > Users` | `enterprise_users_shell` |
-| `Users & Roles > Roles` | `enterprise_role_detail` |
-| `Audit` | `enterprise_audit_log` |
-| `Permission Matrix` | `enterprise_permission_matrix` |
-| `Translations` | `translations_tabbed` |
-| `Shared Handling Unit Types` | `handling_unit_type_list_form` |
-| `Integrations > Event Registry` | `ent_event_registry_list_form` |
-| `Integrations > Events` | `ent_integration_event_list_form` |
-| `Integrations > Subscribers` | `ent_integration_subscriber_list_form` |
-| `Integrations > Deliveries` | `ent_event_delivery_list_form` |
-| `Integrations > IPaaS` | Integration Platform |
-| `Platform Tools > Metadata Studio` | Metadata Studio |
-| `Platform Tools > RF UI Designer` | RF UI Designer |
-| `Platform Tools > RPC Documentation` | RPC method reference |
+| `Warehouses` | Create and monitor warehouses. |
+| `Users & Roles > Users` | Create users, assign warehouses and manage user access. |
+| `Users & Roles > Roles` | Review roles and the permissions assigned to them. |
+| `Permission Matrix` | Compare access across roles. |
+| `Audit` | Review recorded changes and actions. |
+| `Translations` | Maintain customer translations. |
+| `Shared Handling Unit Types` | Maintain handling-unit types shared by warehouses. |
+| `Integrations` | Configure events, subscribers, deliveries and the Integration Platform. |
+| `Platform Tools` | Open Metadata Studio, RF UI Designer and the API reference. |
 
 ## 5. Common screen types
 
-| Screen type | What it looks like | Typical buttons |
-|---|---|---|
-| List | A table with filters, paging (10, 20, 50 or 100 rows) and row selection. | `New`, `Delete`, `Refresh` |
-| Card (Normal form) | Fields in a form. | `Save`, `Delete` |
-| Tabbed card | A card with several tabs. | `Save`, `Delete` |
-| Modal | A pop-up with a short form. | A confirm button and a cancel button. |
-| Wizard | A pop-up with steps. | `Back`, `Next`, `Finish` |
-
-Rules that apply everywhere:
-
-- A field marked required in the metadata cannot be left empty.
-- A field with a picker (type `PopupValuePicker`) opens a list. Pick one row.
-- Lists that show "Version" use optimistic locking. If someone else saved first, you get a conflict message:
-  `Someone changed this record after you opened it. Look at the current version and make your change again.`
-  Refresh and repeat your change.
-
-The generic message for an empty required field is **{Field name} is required**, for example **Code is required**. Some forms use a more specific message.
+Lists, record cards, document headers and lines, modals, wizards and the RF terminal are described in [Interface overview](01-interface-overview.md). Read that page once, then return here for the menu path to the task you need.

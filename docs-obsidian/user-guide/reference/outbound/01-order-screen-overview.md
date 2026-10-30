@@ -1,85 +1,97 @@
 # Order screen
 
-The order screen opens when you click a row of the [orders list](00-orders-overview.md) or press `New`.
-It shows one order. The **header** is in the top part. The **lines** are in the bottom part.
+The order screen shows one outbound order. Use it to review the order header and lines, save changes, reserve stock and release work to the warehouse.
 
-## Layout
+## How to open it
 
-The screen is a shell form (`shipment_order_shell`) with two slots.
+1. Open `Management & Control > Orders & Waves > Orders`.
+2. Select an order row, or select **New** to start an order.
 
-| Slot | Form | Content |
+## Screen overview
+
+The screen is divided into an upper order area and a lower lines area.
+
+| Area | What it contains |
+|---|---|
+| Breadcrumb | The path back to the Orders list and the current order number. |
+| Order toolbar | Actions for the whole order: **Save**, **Release**, **Cancel**, **Allocate**, **Unallocate** and **Ship order**. |
+| Order tabs | Header, destination, picks, tasks, cartons, exceptions, fulfilment and shipment history. |
+| Order header | Order number, status, owner, priority, requested ship date and other order-level information. |
+| Lines toolbar | Actions that apply to order lines. |
+| Order lines | The SKUs, units, ordered quantities, cancellations, allocations and line statuses. |
+
+The upper and lower areas have separate toolbars. Check which area you are working in before selecting **New**, **Save** or another action.
+
+See [Interface overview](../../admin/01-interface-overview.md#5-record-and-document-screens) for the common header-and-lines pattern.
+
+## Order tabs
+
+| Tab | What it holds | Details |
 |---|---|---|
-| Top | `shipment_order_tabbed` ("Shipment Order") | The header, in six tabs. |
-| Bottom | `shipment_order_line_list` ("Order Lines") | The lines of the order. |
+| **Header** | Order number, status, type, owner, priority, requested ship date and notes. | [Header tab](10-header-tab.md) |
+| **Ship To** | Destination customer, carrier and cancellation reason. | [Ship To tab](11-ship-to-tab.md) |
+| **Picks** | Stock reserved for the order. | [Picks tab](12-picks-tab.md) |
+| **Tasks** | Picking work created for the order. | [Tasks tab](13-tasks-tab.md) |
+| **Cartons** | Planned cartons. This tab is read only. | [Cartons tab](14-cartons-tab.md) |
+| **Cartonization exceptions** | Lines the cartonization plan could not place. This tab is read only. | [Cartonization exceptions tab](15-cartonization-exceptions-tab.md) |
+| **Fulfilment — base quantities** | Ordered, cancelled, picked, shipped and remaining quantities in each SKU's base unit. This tab is read only. | Use it to review what remains to fulfil. |
+| **Shipments — base quantities** | Each completed Goods Issue, including the quantity, receipt, Load when applicable, time and user. This tab is read only. | Use it as the shipment history. |
 
-The top form shows a back arrow (the form is set to show one).
+## Order toolbar
 
-## Tabs
-
-| Tab | Page | What it holds |
+| Button | What it does | Details |
 |---|---|---|
-| `Header` | [Header tab](10-header-tab.md) | Order number, status, type, owner, priority, requested ship date, notes. |
-| `Ship To` | [Ship To tab](11-ship-to-tab.md) | Customer, carrier, cancel reason. |
-| `Picks` | [Picks tab](12-picks-tab.md) | The reservations of the order. One row per pick. Has `Delete Selected`. |
-| `Tasks` | [Tasks tab](13-tasks-tab.md) | The pick tasks of this order. Has `Return to Pool`, `Reassign`, `Delete Task`. |
-| `Cartons` | [Cartons tab](14-cartons-tab.md) | The boxes the plan says to use. Read only. |
-| `Cartonization exceptions` | [Cartonization exceptions tab](15-cartonization-exceptions-tab.md) | The lines the plan could not place. Read only. |
+| **Save** | Creates a new order or saves changed order fields. | [Creating an order](30-creating-an-order.md), [Editing an order](31-editing-an-order.md) |
+| **Release** | Checks the order, reserves available stock and releases warehouse work. | [Releasing an order](35-releasing-an-order.md) |
+| **Cancel** | Cancels the order after a cancellation reason is selected. | [Cancelling an order](40-cancelling-an-order.md) |
+| **Allocate** | Reserves available stock for order lines that are not fully allocated. | [Allocating an order](36-allocating-an-order.md) |
+| **Unallocate** | Returns reservations that have not entered warehouse work. | [Unallocating an order](37-unallocating-an-order.md) |
+| **Ship order** | Opens a review window for direct Goods Issue of ready picked content. Confirmation deducts stock and cannot be undone from this screen. | Use this for one order that is not committed to an active Load. Load shipment is a separate workflow. |
 
-## Order toolbar (`shipment_order_tabbed`)
+After **Release**, **Cancel**, **Allocate**, **Unallocate** or a confirmed **Ship order**, the screen refreshes the order status and the available actions.
 
-| Button | Code | What it does | Page |
-|---|---|---|---|
-| `Save` | `so_ts` | Creates the order, or saves the changed fields of a saved order. | [Creating an order](30-creating-an-order.md), [Editing an order](31-editing-an-order.md) |
-| `Release` | `so_release` | Checks the order, launches it, and reserves stock. | [Releasing an order](35-releasing-an-order.md) |
-| `Cancel` | `so_cancel` | Cancels the whole order. Needs the `Cancel Reason` of the Ship To tab. | [Cancelling an order](40-cancelling-an-order.md) |
-| `Allocate` | `so_allocate` | Reserves stock for the lines that have no reservation yet. | [Allocating an order](36-allocating-an-order.md) |
-| `Unallocate` | `so_unalloc` | Gives back the reservations that are not in work. | [Unallocating an order](37-unallocating-an-order.md) |
-
-After `Release`, `Cancel`, `Allocate` and `Unallocate` the whole order screen is drawn again, so the status and the grey buttons are new.
-There is no `Delete` button for an order and no `Close` button.
-There was a `Preview Allocation` button. It was removed. The API method `shipment_order_allocate_preview` still exists, but no button calls it.
+An order cannot be deleted from this screen. Goods Issue and order cancellation are controlled business actions; they are not the same as deleting a record.
 
 ## Lines area
 
-The lines list has its own toolbar. See [Order lines list](20-order-lines-list.md).
-Click a line to open the **line card**. The card replaces the lines list in the bottom slot. See [Line card](21-line-card.md).
+The lower area shows the lines of the order. See [Order lines list](20-order-lines-list.md).
 
-## What changes on screen with the status
+Select a line to open its line card. The card replaces the lines list in the lower area. Use the breadcrumb or back action in that area to return to the list. See [Line card](21-line-card.md).
 
-The screen greys the buttons and the fields that the server would refuse.
-The server decides. The screen only shows it early.
-The orders are grouped in three families.
+## Why buttons and fields become grey
 
-| Family | Statuses | Remark |
-|---|---|---|
-| New family | `New`, `Partially allocated`, `Allocated` | Not launched. The order has never been released. |
-| Released family | `Partially released`, `Released`, `Partially picked`, `Picked` | Launched. Also an order that was released and whose lines were all cancelled, even if it reads `New` again. |
-| Finished | `Closed`, `Cancelled` | Also any status the screen does not know. |
+The order status and your permissions determine what can be changed. A grey button is not available in the current state.
 
-The family uses the status **and** the launch marker (`released_at`). The marker wins over a New-family status.
+| Order stage | What you can normally do |
+|---|---|
+| New or allocated, but not released | Edit the order and its lines, save it, allocate stock or release it. |
+| Released or being picked | Update the remaining editable header fields, review picks and tasks, allocate remaining quantity or cancel allowed quantity. |
+| Picked | Review the completed picking result. Allocation is no longer available. |
+| Closed or cancelled | Review the order. Order and line fields are read only. |
 
-| | New family | Released family | Finished |
+More detailed rules:
+
+| Field or action | Before release | After release | Closed or cancelled |
 |---|---|---|---|
-| Fields `Type`, `Ship To`, `Carrier` | Editable | Read only | Read only |
-| Fields `Priority`, `Requested Ship`, `Notes` | Editable | Editable | Read only |
-| `Save` (order) | On | On | Grey |
-| `Release` | On | On only when the status is `Partially released`, else grey | Grey |
-| `Cancel` | On | On | Grey |
-| `Allocate` | On | On, but grey when the status is `Picked` | Grey |
-| `Unallocate` | On only for `Partially allocated`, `Allocated`, `Partially released`, `Released` | same | Grey |
-| Line list `New` | On | Grey | Grey |
-| Line card `Delete` | On, but grey for a line that has a reservation | Grey | Grey |
-| Line card `Cancel Qty` | Grey | On | Grey |
-| Line card `Save` | On | On | Grey |
-| Line field `Ordered` | Editable | Editable | Read only |
-| Line fields `SKU`, `UOM` | Editable, but read only for a line that has a reservation | Read only | Read only |
+| Type, Ship To and Carrier | Editable | Read only | Read only |
+| Priority, Requested Ship and Notes | Editable | Editable while the order remains active | Read only |
+| **Save** order | Available | Available for editable fields | Grey |
+| **Release** | Available | Available only when more quantity can be released | Grey |
+| **Cancel** | Available | Available while cancellation is allowed | Grey |
+| **Allocate** | Available | Available until picking is complete | Grey |
+| **Unallocate** | Available when unused reservations exist | Available only before picking starts and unused reservations exist | Grey |
+| **Ship order** | Selectable; selecting it shows why direct shipment is refused | Selectable; it opens the review when eligible, otherwise it shows a refusal | Selectable; selecting it shows why direct shipment is refused |
+| **New** line | Available | Grey | Grey |
+| Edit SKU or unit on a line | Available before stock is reserved | Read only | Read only |
+| Edit ordered quantity | Available | Available while the remaining quantity can be changed | Read only |
 
-A New order that has not been saved has no status yet. The screen then changes nothing.
+If another user changes the order while you have it open, refresh the order and repeat your change against the current version.
 
 ## Related pages
 
 - [Orders list](00-orders-overview.md)
+- [Creating an order](30-creating-an-order.md)
 - [Order statuses and transitions](90-order-statuses-and-transitions.md)
 - [Who can do what](91-who-can-do-what.md)
-- API behind the buttons: `shipment_order_create`, `shipment_order_update`, `shipment_order_release`, `shipment_order_cancel`, `shipment_order_allocate`, `shipment_order_cancel_allocation`
-- RF terminal: none. Orders are made and released on the web.
+- [Picking](../../operator/09-picking.md)
+- [Packing and verify](../../operator/10-packing-verify.md)
