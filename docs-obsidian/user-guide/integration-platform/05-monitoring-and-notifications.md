@@ -27,6 +27,8 @@ Connector Health refreshes automatically. A healthy connector does not guarantee
 
 The list includes successful, failed, running and pending runs. A run can also finish as **outcome_unknown** when the platform cannot prove whether an external write completed.
 
+The filters search the saved run history, not only the cards already visible on the page. Select **Load more** to extend the list into older runs. If auto-refresh is on, new runs appear without removing the older cards you already loaded. Changing a filter starts a new list for that selection.
+
 ![Monitor run details with a successful result, duration and step timeline](../assets/screens/integration-platform-monitor-run.png)
 
 *Caption: Monitor run details for a controlled log-only test. Focus: the header and step timeline confirm which flow ran and whether every step completed.*
