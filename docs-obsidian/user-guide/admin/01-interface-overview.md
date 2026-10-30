@@ -53,6 +53,10 @@ The web workspace keeps global navigation around the active screen.
 
 The top bar can also contain account, help, product-tool and theme buttons. The available shortcuts depend on your installation and permissions.
 
+![Web workspace with the current sidebar, top bar and Control Center dashboard](../assets/screens/interface-dashboard.png)
+
+*Caption: the web workspace. Focus: the global navigation remains around the active dashboard; callout 1 marks a sidebar group and callout 2 marks the Order Flow section.*
+
 ## 3. Sidebar and open screens
 
 The warehouse sidebar starts with its three top-level groups collapsed.
@@ -87,6 +91,10 @@ A list screen shows one record per row. Orders, receipts, locations, SKUs and in
 | Check box | Selects records for a toolbar action. A check box does nothing by itself. |
 | Paging controls | Changes the page and the number of rows shown. |
 
+![Orders list with filters, columns and saved views](../assets/screens/interface-order-list.png)
+
+*Caption: a typical list screen. Focus: use More filters to narrow the rows, Columns to control the table and Views to reuse a layout.*
+
 ### Find and open a record
 
 1. Open the list from the sidebar.
@@ -110,6 +118,10 @@ A record screen shows one business object, such as an order, receipt, location o
 | Detail toolbar | Actions that apply only to the lines or detail area. |
 
 The header and its lines can have separate toolbars. Check which toolbar you are using before selecting **New**, **Save** or **Delete**.
+
+![Order document with separate header and line toolbars](../assets/screens/interface-order-detail.png)
+
+*Caption: a header-and-lines document. Focus: callout 1 marks actions for the whole order; callout 2 marks actions for its lines.*
 
 Buttons and fields change with the record status and your permissions:
 
