@@ -30,8 +30,6 @@ If nothing was fixed, the retry gives the same answer.
 The toast is `Exception {id}: {status}`, for example `Exception 12: Resolved`. It reads the same when the repair failed again, so look at the `Status` column after the grid is read again.
 Pressing `Retry` on an exception that is already `Resolved` or `Cancelled` writes nothing and answers its result.
 
-Source: `crates/libs/wms-outbound/src/picking/commands/retry_carton_exception.rs:1-60`, `crates/libs/wms-outbound/src/picking/target/recovery.rs:192-300`, `crates/libs/wms-outbound/src/domain/target_exception/aggregate.rs:62-99`.
-
 ## If it is refused
 
 The failure message is `Exception {id} was not retried: {error}`. The list is read again.
@@ -44,9 +42,6 @@ The failure message is `Exception {id} was not retried: {error}`. The list is re
 | `the pick assignment changed meanwhile: try again: {code}` | `PICK_ASSIGNMENT_CHANGED` | The cart membership changed while the command ran. |
 
 Other refusals can come from the locks and the planner. They arrive as plain messages of the command.
-Sources: `aggregate.rs:30-35` (not recovering), `refusal_wording.rs:243-273`, `crates/libs/wms-lib-core/src/model/narration/mod.rs:2291-2292`, `101_carton_execution_exceptions.sql` part 5 (messages of the web button).
-
-> Not confirmed by code: the wording of a retry that fails on a locked row or on the planner budget. To verify: retry an exception while another user runs a command on the same order.
 
 ## What it affects
 

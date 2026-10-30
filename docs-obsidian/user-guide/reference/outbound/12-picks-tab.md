@@ -28,8 +28,6 @@ Every column is read only.
 | `Task` | `task_status` | Text | Status of the task of the pick. Empty when no task exists. |
 | `Picker` | `assignee` | Text | The user name of the person who holds the task. |
 
-Source: form `shipment_order_picks_form` in `001_baseline.sql` and `wms-meta-ui` migrations 015 and 083. The view is defined in `crates/libs/wms-lib-sql/sql/wms-app/migrations/046_the_picks_tab_names_the_dropid_and_the_picker.sql`.
-
 The columns have no start sort. The `ID` column is the only hidden one.
 
 ## Pick status
@@ -43,9 +41,6 @@ The status is the value of `pick_detail.status` (`pick_detail_status`).
 | `Picked` | The pick is done. |
 | `Cancelled` | The pick was cancelled. |
 | `Shorted` | The picker found less than reserved. The missing part was given back. |
-
-Source: the type in `001_baseline.sql`; the rule "a pick counts as released when its status is `Released`" in `crates/libs/wms-outbound/src/domain/shipment_order/status_derive.rs:22-27`.
-The words of the five values are read from the type. The tab shows the stored spelling.
 
 ## The Carton cell
 
@@ -61,7 +56,6 @@ One cell answers one question: "where does this go?" It shows the box code when 
 
 If the outcome is `Planned` and the code is missing, the cell says `carton code not available`.
 Each word has a hover text. The words are the message keys `grid.outcome_*` and `grid.carton_code_missing`. The Russian words are in `wms-meta-ui` migration 015.
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/cell_renderers.rs:11-60`, `wms-meta-ui` migrations 015, 030 and 031.
 
 ## Toolbar
 

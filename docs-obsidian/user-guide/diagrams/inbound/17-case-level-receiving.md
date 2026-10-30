@@ -26,17 +26,6 @@ Reading notes:
 - The unplanned-case policy (what to do with a scanned case that is not on the ASN) is the first value found of: the payload and `owner_config.default_unplanned_case_on_asn`. If the granularity is `Pallet` or `Case` and none is found, the load is refused. With `Aggregate` the policy is ignored.
 - Both values are saved on the receipt header and do not change later.
 - The method is a `stateless_command`, open to `Admin` and `Manager`.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Steps | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/create_case_level_asn.rs:230-315` |
-| Payload check | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/create_case_level_asn.rs:650-752` |
-| The two cascades | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/create_case_level_asn.rs:173-214`, `:341-370` |
-| Containers and case rows | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/create_case_level_asn.rs:484-620` |
-| Roles and class | `crates/services/app-server/src/web/rpcs/case_level_commands_rpc.rs:17-45` |
-
 ## Diagram 2. The RF screens
 
 **What this shows:** the RF screens of case-level receiving and the method each one calls.
@@ -57,17 +46,8 @@ Reading notes:
 
 - `RCCASE01` refuses a receipt whose granularity is not exactly `Case`. A `Pallet` receipt is told to use "Receive Against ASN".
 - After each scan the screen goes back to `RCCASE02`. When the response says `line_complete`, it goes to `RCCASE_DONE` first.
-- On `RCCASE02`, `F2` on the Case field lists the receipt's unreceived cases (`find_unreceived_cases`). The picker `RCCASE_LIST`, which nothing opened, was removed (F-31, rf-screens 121).
+- On `RCCASE02`, `F2` on the Case field lists the receipt's unreceived cases (`find_unreceived_cases`). The picker `RCCASE_LIST`, which nothing opened, was removed.
 - Closing uses the normal close screens (page 16).
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Screens `RCCASE01`, `RCCASE02`, `RCCASE02LINE`, `RCCASE_DONE` | `crates/libs/wms-lib-sql/sql/rf-screens/080_uc_case_level_declarative.sql:41`, `:128`, `:268`, `:419`, `:487` |
-| Screens `RCCASE_REPAL`, `RCCASE_CANCEL` | `crates/libs/wms-lib-sql/sql/rf-screens/085_uc_case_level_exceptions.sql:34`, `:107` |
-| Granularity gate of the entry screen | `crates/services/app-server/src/web/rpcs/case_level_rpc.rs:443-473` |
-
 ## Diagram 3. What one scan does
 
 **What this shows:** how `receipt_receive_case_level_line` treats a scanned case label.
@@ -99,21 +79,6 @@ Reading notes:
 - `line_complete` is true when the line `qty_received` is at least `qty_expected`.
 - The 12 rules of page 13, serial capture, auto holds and damage information are not part of this command.
 - The scan does not change the receipt status, the line status or the completion. They are recomputed by `receipt_close` (see the findings file).
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Body of the command | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:193-292` |
-| Header lock (not terminal only) | `crates/libs/wms-inbound/src/service/receipt/shared/receipt_locking.rs:42-60`, `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:651-666` |
-| Planned case commit | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:313-449` |
-| Unit conversion | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:555-564` |
-| Quantity check and grant | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:580-641` |
-| Deposit and LPN choice | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:758-783`, `:817-960` |
-| Line quantity update | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:969-983`, `crates/libs/wms-lib-core/src/model/receipt/receipt_detail.rs:673-691` |
-| Unplanned path | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:1011-1244` |
-| Roles and class | `crates/services/app-server/src/web/rpcs/case_level_commands_rpc.rs:17-62` |
-
 ## Diagram 4. What the settings change
 
 **What this shows:** which setting decides each outcome of a scan, and what the operator sees.
@@ -143,15 +108,6 @@ Reading notes:
 - Codes 27 and 28 need the capability for the code (supervisor), or a supervisor grant for the line of the case. The grant must name `receipt:<id>/line:<detail id>`.
 - There is no shortage error percent. A case that is short is refused only through `shortage_override`.
 - `receipt_without_asn`, `receipt_without_po` and the PO fields are not read here either (page 13).
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Check of the quantity | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:463-483`, `crates/libs/wms-inbound/src/service/receipt/validation/rules/case_qty.rs:40-91` |
-| Grant subject for a case | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/receive_case_level_line.rs:123-142`, `:598-608` |
-| Code numbers | `crates/libs/wms-shared/src/validation_codes.rs` (`QtyExcess` = 27, `QtyShortage` = 28) |
-
 ## Diagram 5. Exceptions: move cases, cancel a case
 
 **What this shows:** the two exception commands and what each one changes.
@@ -177,21 +133,6 @@ Reading notes:
 - The cancelled case no longer counts in the parent line's expected quantity. The command bumps the line version and recomputes line/header completion in the same transaction.
 - Closing a receipt marks case rows still in `Planned` as `NotReceived`. Their planned container rows are retained for audit and later disposal hygiene.
 - Roles: move cases is open to the floor roles. Cancel a case is for `Supervisor`, `Manager` and `Admin`.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Move cases | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/replace_pallet.rs:101-266`, `crates/libs/wms-lib-core/src/model/container/container.rs:1365-1380`, `:1897-1918` |
-| Cancel a case | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/cancel_planned_case.rs:60-185` |
-| Roles | `crates/services/app-server/src/web/rpcs/case_level_commands_rpc.rs:17-25` |
-
-## Not confirmed by code
-
-- How the web UI shows case-level receipts. Only the API and the RF screens were read. To verify: open a case-level receipt in the receipt screen.
-- `Pallet`-granularity receipts use the same RF case-scan flow as `Case`: both modes keep the per-case audit trail. Their inventory deposit differs after the scan (`Pallet` consolidates stock under the pallet; `Case` keeps case-level balances). `Aggregate` remains in Receive Against ASN.
-- Whether the `Warning` value of `unplanned_case_on_asn` is meant to prompt the operator. The code treats it like `Allow`.
-
 ## Related pages
 
 - [Reference: expected boxes tab](../../reference/inbound/16-expected-boxes-tab.md)

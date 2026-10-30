@@ -23,7 +23,7 @@ All columns are read only.
 | `Prefix` | `key_prefix` | Text, 20 characters | Yes | The first 20 characters of the key, for example `wms_live_sk_AB12CD34`. It tells keys apart. It is not enough to use the key. |
 | `Expires` | `expires_at` | Date and time | Yes | When the key stops working. Empty means it never expires. |
 | `Revoked` | `revoked_at` | Date and time | Yes | When the key was revoked. Empty means not revoked. |
-| `Last Used` | `last_used_at` | Date and time | Yes | The last time the key was accepted. The server writes it when it checks the key against the database, not on every call. Calls answered from the 30-second cache do not update it, so it can be late by up to that time (`crates/libs/wms-lib-auth/src/authentication/api_key.rs:302`). |
+| `Last Used` | `last_used_at` | Date and time | Yes | The last time the key was accepted. The server writes it when it checks the key against the database, not on every call. Calls answered from the 30-second cache do not update it, so it can be late by up to that time. |
 | `Status` | `status` | Text | No | `Revoked` when `revoked_at` is set, otherwise `Expired` when `expires_at` has passed, otherwise `Active`. Calculated by the view. |
 
 The secret part of the key is stored only as an Argon2id hash (`key_hash`). The hash is never sent to the screen or the audit log.
@@ -53,7 +53,7 @@ The form is `enterprise_user_api_key_created`. It shows, all read only:
 | `This key will not be shown again — copy it now.` | A warning. |
 
 The button `I saved it — Close` closes the window. The key cannot be shown again, because only its hash is kept.
-If the window cannot be filled, the new key is revoked at once and you see an error (`api_key_actions.rs`, function `deliver_or_compensate`).
+If the window cannot be filled, the new key is revoked at once and you see an error.
 
 ## Window: Revoke API Key
 
@@ -65,8 +65,8 @@ and the buttons `Cancel` and `Revoke`.
 
 ## How a key is used
 
-A program sends the key in the HTTP header `Authorization: Bearer wms_live_sk_...` (`crates/libs/wms-lib-web/src/middleware/mw_auth.rs:43`).
-The server accepts the key only when all of these hold (`api_key.rs`):
+A program sends the key in the HTTP header `Authorization: Bearer wms_live_sk_...`.
+The server accepts the key only when all of these hold:
 
 1. The key exists and matches its hash.
 2. It is not revoked.
@@ -82,12 +82,12 @@ A key acts with the **role of its user**. It has no permissions of its own. See 
 
 ## What it affects
 
-- A new key is a new row in `enterprise.user_api_key` and an audit row of kind `api_key_mutation`. The audit row holds the id, user, name, prefix and expiry, never the key or its hash (`crates/services/app-server/src/web/rpcs/user_api_key_rpc.rs`).
+- A new key is a new row in `enterprise.user_api_key` and an audit row of kind `api_key_mutation`. The audit row holds the id, user, name, prefix and expiry, never the key or its hash.
 - Revoking sets `revoked_at` and writes a second audit row.
 
 ## Who can use it
 
-The API methods `generate_user_api_key`, `revoke_user_api_key`, `list_user_api_key`, `get_user_api_key` and `count_user_api_key` are open to the default role `ADMIN` only (`user_api_key_rpc.rs:11`).
+The API methods `generate_user_api_key`, `revoke_user_api_key`, `list_user_api_key`, `get_user_api_key` and `count_user_api_key` are open to the default role `ADMIN` only.
 
 ## Related pages
 

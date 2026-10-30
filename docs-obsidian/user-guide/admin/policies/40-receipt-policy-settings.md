@@ -31,8 +31,7 @@ how strict to be when an operator receives goods.
 
 ### 1.1 Which policy is used
 
-The server picks the policy for one SKU like this
-(`wms-inbound/src/service/receipt/validation/validation_service.rs:37-62`):
+The server picks the policy for one SKU like this:
 
 1. `sku.receipt_policy_id`.
 2. If that is empty: `owner_config.default_receipt_policy_id` of the SKU's owner.
@@ -40,8 +39,7 @@ The server picks the policy for one SKU like this
 
    `Receipt Validation Policy for sku <SKU> not found: sku.receipt_policy_id is NULL and owner_config.default_receipt_policy_id is also NULL (owner_id=<id>)`
 
-**Important.** In the database `sku.receipt_policy_id` is `NOT NULL DEFAULT 1`
-(`wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2148`). No later migration
+**Important.** In the database `sku.receipt_policy_id` is `NOT NULL DEFAULT 1`. No later migration
 changes that. So step 1 always finds a value. Step 2 (the owner default) is never
 reached today. A new SKU that you do not configure gets policy id 1 (`STD`), not
 its owner's default. See [41-owner-settings-and-policy-resolution.md](./41-owner-settings-and-policy-resolution.md).
@@ -53,7 +51,7 @@ its owner's default. See [41-owner-settings-and-policy-resolution.md](./41-owner
 | Menu path | `Sidebar > Warehouse Configuration > Policies > Receipt Policy` |
 | Screen | A list, then a tabbed form with three tabs: `General`, `Qty validation against ASN (RF)`, `Qty validation against PO (RF)` |
 | Save | One Save button for the three tabs. It sends one versioned update. |
-| Roles that can change it | `Admin`, `Manager` (create, update, delete). `Operator` and `Viewer` can only read. (`services/app-server/src/web/rpcs/receipt_policy_rpc.rs:7-15`) |
+| Roles that can change it | `Admin`, `Manager` (create, update, delete). `Operator` and `Viewer` can only read. |
 | API methods | `create_receipt_policy`, `update_receipt_policy`, `delete_receipt_policy`, `delete_many_receipt_policy`, `get_receipt_policy`, `list_receipt_policy`, `count_receipt_policy` |
 
 Rules for saving:
@@ -65,10 +63,8 @@ Rules for saving:
 - The server checks the **final merged policy**, not only the fields you sent.
 - Percent fields accept whole numbers from 0 to 100. Empty means "not set".
   Messages: `qty_validation must be one of None, Sku or Lot`,
-  `<field> must be between 0 and 100`, `receipt policy code cannot be empty`
-  (`wms-lib-core/src/model/policies/receipt_policy.rs:215-268`).
-  The database repeats these rules as CHECK constraints
-  (`wms-app/migrations/020_receipt_policy_is_a_versioned_configuration.sql`).
+  `<field> must be between 0 and 100`, `receipt policy code cannot be empty`.
+  The database repeats these rules as CHECK constraints.
 - You cannot delete a policy that a SKU uses. The database refuses it
   (`fk_sku_receipt_policy_id`, `ON DELETE RESTRICT`, `001_baseline.sql:18133-18137`).
   If an owner points to the policy, the owner's default is set to empty
@@ -92,7 +88,7 @@ setting. See section 5 (Supervisor rights).
 
 Every receive command that puts goods in the warehouse runs the same rule list in
 the same order: receive against ASN, blind receive, blind line, return, return
-line (`inbound/validation/validation_pipeline.rs:24-37`, `:201`). The first rule
+line. The first rule
 that refuses stops the receive. Nothing is saved when a rule refuses.
 
 | # | Rule | Code | Reads these settings | Section |
@@ -112,13 +108,10 @@ that refuses stops the receive. Nothing is saved when a rule refuses.
 | 12 | Auto holds (the rule itself never refuses; the hold step refuses the receive when a hold cannot be placed) | none | SKU hold code, owner shelf-life multiplier | 6.2 |
 
 The "dry run" used by the RF screens runs the same list in the same order, but
-collects every refusal instead of stopping at the first
-(`validation_pipeline.rs:405-560`). A unit test keeps the two lists equal
-(lists at `validation_pipeline.rs:27-52`, test `dry_run_runs_every_live_rule_in_order` at `:668`).
+collects every refusal instead of stopping at the first. A unit test keeps the two lists equal.
 
 Rule 4 (held location) runs **before** the quantity rule on purpose. The operator
-should not confirm a shortage for a shelf that is closed anyway
-(`validation_pipeline.rs:284-288`).
+should not confirm a shortage for a shelf that is closed anyway.
 
 ## 3. Field list at a glance
 
@@ -142,13 +135,11 @@ Of the 26 settings, **11 are used** by the server today: `receipt_without_lpn`,
 
 ## 4. Field reference
 
-The seed row is created by the baseline migration
-(`wms-app/migrations/001_baseline.sql:8683-8685`): id 1, code `STD`, description
+The seed row is created by the baseline migration: id 1, code `STD`, description
 `Std Receipt Policy`, every `allow_error` = `Allow`, both `*_qty_validation` =
 `None`, every flag `false`, every percent empty.
 
-The **dev seed** changes the `STD` row on a development database only
-(`wms-lib-sql/sql/dev_only/install-db/900-dev-seed.sql:772-778`):
+The **dev seed** changes the `STD` row on a development database only:
 `qty_validation = 'Sku'`, `shortage_override = true`, `shortage_override_percent = 5`.
 
 ### 4.1 Identity and bookkeeping
@@ -179,12 +170,11 @@ The **dev seed** changes the `STD` row on a development database only
 - **Meaning**: free text. Display only.
 
 #### `version`
-- **UI**: hidden. It travels with the form so that Save can prove what it read
-  (`wms-meta-ui/migrations/040_receipt_policy_form_carries_its_version.sql`).
+- **UI**: hidden. It travels with the form so that Save can prove what it read.
 - **Column and type**: `version`, integer, `> 0`, starts at 1, +1 on every save.
 - **Meaning**: optimistic lock. Two admins cannot overwrite each other.
 - **Message on conflict**: an optimistic-lock error that carries the current
-  `{ "version": N }` (`receipt_policy_rpc.rs:198-206`). Reload the screen.
+  `{ "version": N }`. Reload the screen.
 
 #### `add_who`, `add_when`, `mod_who`, `mod_when`
 - Audit columns. Set by the server. No effect on receiving.
@@ -206,10 +196,8 @@ The **dev seed** changes the `STD` row on a development database only
 - **Default**: schema `Allow`. Seed `Allow`.
 - **Meaning**: what happens when the operator receives goods and gives **no LPN**
   (a loose receive).
-- **Affects**: rule 1 of the pipeline, for ASN receive, blind receive and returns
-  (`inbound/validation/validation_pipeline.rs:88-112`, called at `:229`). The web
-  Receive dialog also reads it to show whether an LPN is needed
-  (`inbound/receive_context.rs:212`).
+- **Affects**: rule 1 of the pipeline, for ASN receive, blind receive and returns. The web
+  Receive dialog also reads it to show whether an LPN is needed.
   An empty string counts as "no LPN".
 - **Messages**:
   - `Warning`: `This receive has no LPN` (code 25, the operator can confirm; no supervisor right is needed, see section 5).
@@ -237,12 +225,11 @@ The **dev seed** changes the `STD` row on a development database only
 - **Meaning**: what happens when the operator receives a SKU that is **not on the
   ASN** (not on any line of this receipt).
 - **Affects**:
-  - ASN receive (`inbound/receive/receive_against_asn.rs:253-266`). The server
+  - ASN receive. The server
     looks for a line in 4 steps (the "cascade"). If no line matches, the policy is
     asked **before** the server creates a new line with expected quantity 0. A
     refusal therefore leaves no line behind.
-  - Case-level receive of an unplanned case whose SKU is also not on the ASN
-    (`inbound/case_level/commands/receive_case_level_line.rs:1115-1124`). There only
+  - Case-level receive of an unplanned case whose SKU is also not on the ASN. There only
     `HardError` refuses. `Warning` behaves like `Allow` (no question is asked).
   - Blind receive does not use it (there is no ASN).
 - **Messages (ASN receive)**:
@@ -255,7 +242,7 @@ The **dev seed** changes the `STD` row on a development database only
   `None`, the new line expects 0, so **any quantity is an excess**. The server then
   asks code 27 (see 4.11). Because the new line is created in the same command, no
   supervisor grant can name it in advance: a supervisor must confirm at the
-  receiver's own terminal (`inbound/shared/override_grant.rs`, `GrantTarget::NewLine`).
+  receiver's own terminal.
   The integration test `wms-inventory/tests/no_sku_on_asn_integration.rs` shows this.
 - **When you change it**: affects only the next scan.
 
@@ -277,16 +264,14 @@ The **dev seed** changes the `STD` row on a development database only
 - **Meaning**: the received quantity must be a whole multiple of the SKU's
   **largest pack tier**. The largest tier is the biggest `base_qty` that is above 1
   in the SKU's pack (for example a pallet of 480, or a case of 12).
-- **Affects**: rule 6 (`inbound/validation/rules/qty_pack_multiple.rs:44-62`,
-  `:100-128`). The rule is skipped when the setting is `Allow`, when the SKU has no
+- **Affects**: rule 6. The rule is skipped when the setting is `Allow`, when the SKU has no
   pack, when the pack is missing, or when the pack has no tier above 1.
 - **Message**: `qty <qty> is not a multiple of pack <pack_qty>` (code 30).
   `Warning`: the operator can confirm. `HardError`: final.
 - **Example**: pack tiers 1, 12, 480. Largest tier 480. Policy `HardError`. The
   operator receives 500. `500 % 480 != 0`, so the receive is refused. 960 passes.
-- **Interactions**: the rule compares the quantity as the command carries it
-  (`ReceiveAgainstAsn.qty`). The comparison does not convert units first.
-  See the "To verify" note in section 9.
+- **Interactions**: the rule compares the received quantity with the largest
+  pack tier. Use the same unit in the receipt and pack hierarchy.
 - **Confirm**: under `Warning` the operator confirms code 30 themselves; no
   supervisor is needed. The code catalogue lists it with the other
   policy-switched checks (class `SupervisorOverride`, overridable, no
@@ -299,7 +284,7 @@ The **dev seed** changes the `STD` row on a development database only
 - **Default**: schema `Allow`. Seed `Allow`.
 - **Meaning**: one switch for the date checks. The dates come from the lot
   attributes the operator captured. Every format the receive stores is read: `YYYY-MM-DD`, `DD.MM.YYYY`, `DD/MM/YYYY`, `MM/DD/YYYY` and ISO date-time (`parse_captured_date`). A date that cannot be read at all is ignored by the rule. A date that was not typed is first worked out from the manufactured date (expiration = manufactured + SKU `expire_days`, and so on), and the checks judge the dates after that ([lot policy and attributes](32-lot-policy-and-attributes.md)).
-- **Affects**: rule 8 (`inbound/validation/rules/date_deviations.rs`). The
+- **Affects**: rule 8. The
   first failing check stops the rule. "Today" is the warehouse day
   (`WAREHOUSE_TIMEZONE`), and a date is fit only when it is LATER than
   today + N.
@@ -337,16 +322,13 @@ The **dev seed** changes the `STD` row on a development database only
   - `Sku`: the server adds up **all lines of this SKU** on the receipt.
   - `Lot`: the server adds up the lines with the same **supplier lot**
     (`external_lot`) as the scan. If the scan has no supplier lot, or no line
-    carries that lot, it works like `Sku`
-    (`inbound/validation/validation_qty.rs:234-296`).
+    carries that lot, it works like `Sku`.
 - **Affects**: rule 7. Blind receives and returns never run the check, because
   they have no plan to compare with (`skip_qty_rollup_check = true`).
-  The web Receive dialog shows the allowed limits only when this is not `None`
-  (`inbound/receive_context.rs:97-125`).
+  The web Receive dialog shows the allowed limits only when this is not `None`.
 - **Interactions**: the nine `excess_*` and `shortage_*` fields do nothing while
-  this is `None`. The screen greys them out (`web-ui-server/src/extensions/generic/qty_validation_render.rs:41-60`).
-- **If the stored value is not one of the three**: the server treats it as `None`
-  (`validation_qty.rs:244-245`). The database CHECK stops such a value anyway.
+  this is `None`. The screen greys them out.
+- **If the stored value is not one of the three**: the server treats it as `None`. The database CHECK stops such a value anyway.
 - **When you change it**: from `None` to `Sku` mid-receipt: the next scan is judged
   against everything already received on the receipt. Earlier scans are not
   re-checked.
@@ -382,7 +364,7 @@ a confirmation (soft limit) or is refused (hard limit).
   - Nothing expected, hard (`excess_error` on): `Owner <owner> is set to disallow Receipts for Received Qty > Expected Qty`
 - **Nothing expected**: if the SKU's expected total is 0 or less, **any** quantity is
   an excess. The percents are ignored. The result is "confirm" unless
-  `excess_error` is on, then "refused" (`validation_qty.rs:121-135`). This happens
+  `excess_error` is on, then "refused". This happens
   even when `excess_override` is off.
 - **Example**: expected 100, received 0. `excess_override` on at 5, `excess_error`
   on at 20.
@@ -394,7 +376,7 @@ a confirmation (soft limit) or is refused (hard limit).
   (SUPERVISOR). See section 5.
 - **Interactions**: if the soft percent is not lower than the hard percent, nobody
   can confirm: the hard limit wins first. The web dialog shows this as "no approval
-  possible" (`receive_context.rs:107-116`).
+  possible".
 - **When you change it**: only future scans. Quantities already received are not
   re-checked and no document changes.
 
@@ -402,8 +384,7 @@ a confirmation (soft limit) or is refused (hard limit).
 - **UI**: tab ASN, `Excess Message` (checkbox).
 - **Column and type**: `excess_message`, boolean, default `false`.
 - **Affects**: **Stored only. It has no effect today.** The server never reads it.
-  It is only enabled or disabled on the screen. The quick-dev test that flips it
-  (`services/app-server/examples/app_server_quick_dev.rs:6343-6400`) gets the same
+  It is only enabled or disabled on the screen. The quick-dev test that flips it gets the same
   result with it on or off.
 
 ### 4.13 `shortage_override`, `shortage_override_percent`
@@ -422,8 +403,8 @@ a confirmation (soft limit) or is refused (hard limit).
   last open line** of the SKU. A line is "open" when it is not closed or cancelled
   and its received quantity is below its expected quantity. If another line of the
   same SKU is still open, the total being low is "work still to come", not a
-  shortage (`validation_qty.rs:63-80`). Excess has no such rule.
-- **Affects**: code 28 (`validation_qty.rs:407-445`). The same function decides
+  shortage. Excess has no such rule.
+- **Affects**: code 28. The same function decides
   whether a shortage reason is asked for (section 6.4).
 - **Message**: `Owner <owner> reports shortage > <override %>% (got <short %, 2 decimals>% short). Receive Anyway?`
   The refusal also carries `shortage_required: true` and the name of the reason
@@ -478,9 +459,7 @@ supplier-lot total under `Lot`).
 
 ### 4.18 Case-level receiving uses the same fields in a different way
 When goods are received case by case (receipt granularity `Pallet` or `Case`),
-each case is compared with its planned quantity
-(`inbound/validation/rules/case_qty.rs:38-87`, called from
-`inbound/case_level/commands/receive_case_level_line.rs:616`).
+each case is compared with its planned quantity.
 
 - It uses `excess_error`, `excess_error_percent`, `excess_override`,
   `excess_override_percent`, `shortage_override`, `shortage_override_percent`.
@@ -509,14 +488,10 @@ policy value.
 | 30 | Pack multiple | operator, but only when the policy is `Warning` (see 4.8) | none |
 | all others | hard refusals | nobody | not overridable |
 
-Source: `wms-shared/src/validation_codes.rs:537-600` (table `supervisor_gate`).
-
 - The three rights are stored as `api` permissions of the role `SUPERVISOR`
   (role id 1004). `Admin` and `Manager` do **not** hold them. This is the
-  two-person rule: the receiver cannot approve their own discrepancy
-  (`wms-app/migrations/001_baseline.sql:19989-19991`). A superuser (user type
-  superuser) passes every capability check
-  (`inbound/shared/capabilities.rs`).
+  two-person rule: the receiver cannot approve their own discrepancy. A superuser (user type
+  superuser) passes every capability check.
 - **Two ways to confirm a gated code**:
   1. *At the same terminal.* A person who holds the right sends the code in
      `acknowledged_overrides`.
@@ -535,13 +510,11 @@ Source: `wms-shared/src/validation_codes.rs:537-600` (table `supervisor_gate`).
   - cannot be used for a line the command creates itself (a SKU not on the ASN);
   - is checked for its authority per pair. `Admin` and `Manager` can mint move
     grants but **cannot** authorise receipt pairs.
-  (`inbound/shared/override_grant.rs:1-60`, `services/app-server/src/web/rpcs/override_grant_rpc.rs`)
 - If the caller sends a gated code but lacks the right, and no grant covers it, the
-  refusal is final (not overridable) and says: `<original text up to the question>. A supervisor must authorise this.`
-  (`validation_outcome.rs:293-312`). For close it says:
+  refusal is final (not overridable) and says: `<original text up to the question>. A supervisor must authorise this.`. For close it says:
   `You don't have permission to close receipt <number> with a discrepancy. Ask a supervisor.`
 - When a grant is used, the audit event names the **supervisor** as the person who
-  authorised, not the receiver (`validation_outcome.rs:119`, `:368-410`). The event is
+  authorised, not the receiver. The event is
   `ReceiptOverrideApplied` and carries the code, the message, the grant id and, for
   code 28, the shortage reason.
 
@@ -565,26 +538,23 @@ line, not by the receipt policy. See [32-lot-policy-and-attributes.md](./32-lot-
   - confirmable: `Location <loc> is on hold (<code>). Receive here anyway?`
   - final: `Location <loc> is blocked (<code>) — receive somewhere else.`
   The operator's own confirmation is enough. The damage bay is allowed to take the
-  `Damaged` hold, and a discard staging location may carry the `Destroy` hold
-  (`rules/rule.rs:30-47`).
+  `Damaged` hold, and a discard staging location may carry the `Destroy` hold.
 - **Auto holds** (never refuse, rule 12). The server collects holds to place after
-  the goods are deposited (`inbound/validation/validation_holds.rs:49-89`):
+  the goods are deposited:
   1. The SKU field `receipt_hold_code` (screen label under the SKU). Empty,
      `None`, `Ok` or `NotHold` mean "no hold". Any other code is applied. The code
-     `NewItem` is applied only for the **first receive ever** of that SKU
-     (`validation_internal_helpers.rs:113-150`).
+     `NewItem` is applied only for the **first receive ever** of that SKU.
   2. Shelf-life warning band: if the lot's expiration date (typed, or worked out from `expire_days`) is not later than
      today + `min_shelf_life_on_rec` × `shelf_life_warning_multiplier_pct` / 100,
      the hold `QcQuarantine` is placed. The multiplier is the owner setting
      `Shelf-Life Warning Multiplier (%)` (default 200). With 100 the band equals the
-     minimum shelf life. The band needs `min_shelf_life_on_rec` to be set
-     (`validation_internal_helpers.rs:156-188`).
+     minimum shelf life. The band needs `min_shelf_life_on_rec` to be set.
   3. Temperature warning band: if the captured temperature is outside the SKU's
      `warning_temperature_min` to `warning_temperature_max`, the hold `QcQuarantine`
      is placed. Both bounds must be set.
   - The hold goes on the **LPN** if there is one, otherwise on the **location**.
     A location hold freezes the whole shelf. Without an LPN and without a location,
-    no hold is evaluated (`validation_internal_helpers.rs:43-52`).
+    no hold is evaluated.
   - A hold the rules require is **not optional**. The holds are placed inside the
     receive transaction. If the hold service refuses one (for example a location
     that takes no location hold), the whole line is rolled back and nothing is
@@ -593,13 +563,11 @@ line, not by the receipt policy. See [32-lot-policy-and-attributes.md](./32-lot-
     `context` carries `hold_code` and `scope` (`lpn:`, `loc:` or `lot:`).
     `holds_applied` in the result is therefore always what was really placed.
     The same is true for the holds placed by a return that needs refurbishing and by
-    a damage report with the action `Hold`
-    (`ReceiptError::HoldNotPlaced`, `wms-inbound/src/error.rs`;
-    `wms-inbound/src/service/receipt/lifecycle/auto_holds.rs`). Fixed in F-44
+    a damage report with the action `Hold`. Fixed in F-44
     (commit `81bc152f1`).
 
 ### 6.3 Temperature (codes 50 and 51)
-No receipt policy value is involved. It uses SKU fields (`inbound/validation/rules/temperature.rs:56-100`):
+No receipt policy value is involved. It uses SKU fields:
 - SKU `requires_temperature_capture` off: skipped.
 - On and no temperature given: `SKU <code> requires temperature capture` (code 51, final).
 - Below `min_temperature`: `temperature <t> below min <min>` (code 50, confirmable).
@@ -608,7 +576,7 @@ No receipt policy value is involved. It uses SKU fields (`inbound/validation/rul
 ### 6.4 Shortage reason (code 43)
 - When a shortage (code 28) applies to the scan, the receive must carry a
   `shortage_reason`. The reason must be an **active** value of the code list
-  `shortage_reason` (`inbound/validation/rules/shortage_reason.rs:67-110`).
+  `shortage_reason`.
 - Blind, return and case-level receives never ask for a reason.
 - Messages (code 43, final, `context` names the field and the list):
   - none given: `Receiving less than expected — say why (shortage reason)`
@@ -637,7 +605,7 @@ hard blockers that nobody can override:
 | An unresolved serial-capture episode | 73 | `Receipt <number> has <n> unresolved serial-capture episode(s): <list>. <hint>` |
 | A damage record without a final disposition | 77 | `Receipt <number> has <n> damage record(s) awaiting final disposition` |
 
-Then it asks: is this a *discrepancy*? (`repo/completion_compute.rs:236-245`)
+Then it asks: is this a *discrepancy*?
 
 | Receipt completion | Discrepancy? |
 |---|---|
@@ -665,8 +633,7 @@ would make the received quantity negative is refused:
 ## 8. Damage, returns and blind receipts
 
 ### 8.1 Damage report
-The report is a command `receipt_report_damage`. Rules
-(`inbound/damage/report_damage.rs:150-340`):
+The report is a command `receipt_report_damage`. Rules:
 
 1. `damaged_qty` must be above 0: `damaged_qty must be > 0, got <n>`.
 2. `reason_code` must be an active value of the code list `damage_reason`:
@@ -674,8 +641,7 @@ The report is a command `receipt_report_damage`. Rules
 3. The damaged quantity cannot exceed what arrived on the line minus what is
    already reported:
    `damaged_qty <n> exceeds what is available on this line: arrived <a>, already reported damaged <d>, available <v>`.
-4. The **owner** decides what happens next, by severity
-   (`owner_config.damage_*_action`, `report_damage.rs:966-996`):
+4. The **owner** decides what happens next, by severity:
 
 | Severity | Owner setting (UI label) | Schema default | What the server does for each action |
 |---|---|---|---|
@@ -687,7 +653,7 @@ The report is a command `receipt_report_damage`. Rules
    Cosmetic/Minor `None`, Major `Hold`, Total `Reject`.
 5. The enum also has `WriteOff`, `RTV`, `Repurpose`, `Destroy`. **Choosing one of
    these has no automatic effect today.** The damage is recorded, a warning is
-   logged, and the result says `None` (`report_damage.rs:850-890`). Run the explicit
+   logged, and the result says `None`. Run the explicit
    disposition command instead. Also, the screen dropdown uses the code list
    `damage_action`, which holds only `None`, `Hold`, `Reject`. The four extra values
    can be set only by API.
@@ -703,8 +669,7 @@ Error when no RTV place exists: `no RTV destination configured: pass dest_loc or
 Settings are in file 41.
 
 ### 8.2 Returns (customer returns)
-`receipt_receive_return` and its line version
-(`inbound/receive/return_line_finalizer.rs`). The operator picks a **condition**.
+`receipt_receive_return` and its line version. The operator picks a **condition**.
 
 | Condition | Where the goods go | Quantity bucket | Hold or disposition |
 |---|---|---|---|
@@ -730,30 +695,6 @@ with no plan.
 - `receipt_without_asn`, `receipt_without_po` and `no_sku_on_asn` are not used.
 - The owner flag `hide_expected_qty_from_operator` (`Hide Expected Qty (Blind)`) has
   no effect today (file 41).
-
-## 9. Bugs, inconsistencies and items to verify
-| # | Finding | Where |
-|---|---|---|
-| 1 | The owner default receipt policy is never used, because `sku.receipt_policy_id` is `NOT NULL DEFAULT 1`. The code comment claims it is the fallback. | `001_baseline.sql:2148`, `validation_service.rs:21-56` |
-| 2 | Code 30 is "never overridable" in the code table but confirmable under `Warning`. | `validation_codes.rs:571`, `validation_service.rs:185`, `qty_pack_multiple.rs:119-125` |
-| 3 | Nine PO fields, `receipt_without_po`, `receipt_without_asn`, `no_sku_on_po`, `asn_po_qty_discrepancy`, `excess_message`, `shortage_message` are stored only. Codes 22 and 29 are declared but never raised. | search over `*.rs` |
-| 4 | `return_reason_code` is required on the return commands but never used. | `receive_return.rs:43`, `receive_return_line.rs:56` |
-| 5 | Return `NeedsRefurb` writes the audit mark `QcRequired` on the line but places the hold `CustomerReturn`. | `shared/lookups.rs` (derive function), `return_line_finalizer.rs:646` |
-| 6 | Four damage actions (`WriteOff`, `RTV`, `Repurpose`, `Destroy`) can be configured but do nothing. | `report_damage.rs:850-890` |
-| 7 | The case-level quantity check ignores `qty_validation = None` and prints the owner as `OWNER-<id>`. | `receive_case_level_line.rs:612-616` |
-| 8 | Fixed (F-44, commit `81bc152f1`). An auto hold that cannot be placed now refuses the receive; before, it was logged and the goods came in free. | `lifecycle/auto_holds.rs`, `error.rs` (`HoldNotPlaced`) |
-
-**To verify (unit of the quantity).** The pack-multiple and excess rules use
-`ReceiveAgainstAsn.qty` as given (`receive_against_asn.rs:378`). The expected
-quantity on the line is stored in the base unit. If a client sends a quantity in
-`uom_received` (for example cases) the rule may compare cases with units. Steps to
-check: create a SKU with pack tiers 1 and 12, an ASN line expecting 12, policy
-`qty_validation = Sku`, `excess_error = true`, `excess_error_percent = 0`. Call
-`receipt_receive_against_asn` with `qty = 1`, `uom_received = "CS"`. If the call is
-accepted, the rule compares in the operator unit; if it is refused as excess
-(1 case = 12 units, not over 12), it converts first. The web Receive dialog sends
-base units, so the web is not affected.
-
 ## 10. Recipes
 | Goal | Set |
 |---|---|

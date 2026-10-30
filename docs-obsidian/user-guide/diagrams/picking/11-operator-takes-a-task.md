@@ -52,24 +52,6 @@ sequenceDiagram
 - `drop_to_close` names the pallet of the operator when it holds goods and the answer does not go onto it. The RF then opens `PICK13` (close pallet) first.
 - A task already held is returned first, with its lease renewed. If it is no longer executable the dispatch refuses with `AssignedSourceIneligible`. If it is a task of another type it refuses with `OtherTaskActive`.
 - When there is no right in any area the answer is `NoWorkArea`. When rights exist but only tasks too heavy for the equipment remain, the answer is `TooHeavyForEquipment`.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Order of the steps, queue, resume, named area | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:220-300` |
-| Equipment saved on the operator | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:332-380` |
-| Carrier area: held task or `ScanCarrier` | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:272-300` |
-| `drop_to_close` | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:465-496` |
-| Operator active, own task first, limit check, zones, phases, lock and assign | `crates/libs/wms-tasks/src/service/candidate.rs:271-470` |
-| Pool filter and order | `crates/libs/wms-lib-core/src/model/tasks/task.rs:618-650` and `:999-1027` |
-| Reachable zones | `crates/libs/wms-lib-core/src/model/tasks/operator_task_permission.rs:155-182` |
-| `Pick Execution` gate and the other source rules | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:221-275` and `:115-206` |
-| Assign with lease | `crates/libs/wms-lib-core/src/model/tasks/task.rs:654-678` |
-| Pick refused by the generic claim | `crates/libs/wms-tasks/src/service/claim.rs:291-312` |
-| RF entries and the screens' payloads | `crates/libs/wms-lib-sql/sql/rf-screens/095_uc_pick_assignment.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql` |
-| API method | `docs-obsidian/user-guide/api/openrpc.json` (`pick_dispatch_next`) |
-
 ## Related pages
 
 - [How a cart assignment starts](12-cart-assignment.md)

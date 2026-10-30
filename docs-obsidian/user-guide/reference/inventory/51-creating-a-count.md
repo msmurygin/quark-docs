@@ -31,8 +31,6 @@ The details of every field are on [Count header](27-count-header.md).
 | Container unknown | `no container {code}` |
 | Comment too long | `a comment is at most 500 characters` |
 
-> Not confirmed by code: the exact way the screen shows an error from the save. To verify: press `Save` with `Type` set to `Event` and read the message.
-
 ## What changes
 
 | What | Change |

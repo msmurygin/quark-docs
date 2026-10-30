@@ -24,8 +24,6 @@ The menu item is `task_board_menu`.
 A click on a row does not open anything. The board has no card.
 The task data is read only. The paper-pick input columns are editable and are saved only through **Save Picks**; they do not edit task accounting directly.
 
-> Not confirmed by code: in which order the rows come when you open the board. The metadata sets no sort for this list. To verify: open the board on a warehouse with several tasks and read the `Created` column.
-
 ## Columns
 
 Table: `task` (read through the view `task_board`). The base task columns below are read only.
@@ -63,7 +61,6 @@ Table: `task` (read through the view `task_board`). The base task columns below 
 
 The `Pick Assignment` column shows only a live assignment (`Building`, `Ready`, `Picking`, `Delivering`).
 A task of a dissolved assignment shows no code.
-Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/051_the_supervisor_sees_pick_assignments.sql:27-80`.
 
 ### Paper-pick columns
 
@@ -92,7 +89,6 @@ A claim sets the lease to now plus the setting `TASK_LEASE_TTL_MIN` (15 minutes 
 The RF terminal renews it with `task_heartbeat` and with each progress report.
 The system returns a task to the pool when the lease time is past.
 The result is `Created`, no holder, `How Returned` = `Expired`, `Return Reason` = `auto-release (lease expired)`.
-Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:1886-1923`.
 
 ### Available From
 
@@ -100,14 +96,12 @@ The column is the time of the last **refusal** plus the cooldown.
 The cooldown is the setting `TASK_SKIP_COOLDOWN_MIN` (10 minutes by default).
 Until that time nobody is offered the task, not even the operator who refused it.
 The column is empty for a task that was handed back, taken back by a supervisor, or returned by an expired lease. These doors do not start a cooldown.
-Source: view `task_board` in `051_the_supervisor_sees_pick_assignments.sql:61-64`; `task.rs:1546-1551` and `task.rs:1685-1708`.
 
 ### Escalated
 
 When the number of refusals reaches the setting `TASK_SKIP_ESCALATE_AFTER` (3 by default), the system sets `Escalated`.
 An escalated task is offered to nobody, even after the cooldown.
 Only `Reassign` takes it out. `Reassign` also sets `Refusals` back to 0 and clears `Escalated`.
-Source: `task.rs:1550-1552` (escalation), `task.rs:1627-1637` (reassign).
 
 ## Toolbar buttons
 
@@ -131,12 +125,8 @@ The grey texts are:
 | `Reassign` | `Select a task that is Assigned, InProgress, or escalated to a supervisor` |
 | `Delete Task` | `Select at least one task` |
 
-Source: the rows for form 294 in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:5517-5520`.
-The toolbar is drawn again each time you tick or untick a row (interaction `int_task_board_selection`).
-With no row or with several rows ticked, the two one-row buttons stay grey, because there is no single row to read the status from. Source: the note in `086_the_supervisor_sees_and_dissolves_pick_assignments.sql:553-566`, which describes the same kind of gate.
-
 The test for `Reassign` reads a value of the board view that is not a column on the screen.
-The value is `yes` for `Assigned`, `InProgress`, and for `Created` with `Escalated` set. Source: view `task_board`, `051_the_supervisor_sees_pick_assignments.sql:53-57`.
+The value is `yes` for `Assigned`, `InProgress`, and for `Created` with `Escalated` set.
 
 ## Who can use it
 

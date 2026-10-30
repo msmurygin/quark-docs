@@ -45,18 +45,6 @@ Reading notes.
 - A lot with an empty date for the chosen key goes last, in `Fifo` and in `Lifo`.
 - If two lots tie, the next sort rank of the step decides (see [page 21](21-influence-policy-selection.md)).
 - The rotation is read once per line, from the SKU of the line, at allocation time. A change on the SKU is used by the next allocation. Reservations already made stay.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| SKU facts read: rotation, `rotate_by`, minimum shelf life | `crates/libs/wms-outbound/src/allocation/trace.rs:904-950` |
-| `Fefo` uses the expiration date; the other keys | `crates/libs/wms-outbound/src/allocation/select.rs:323-343` |
-| Direction, empty dates last | `crates/libs/wms-outbound/src/allocation/select.rs:345-366` |
-| Lot dates and lot creation time come with the candidate rows | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:449-453` |
-| Rank `LotRotation` is one of three working ranks | `crates/libs/wms-outbound/src/allocation/step.rs:178-199` |
-| Screen labels `Rotate By`, `Min Shelf Life on Pick` | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:10469`, `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:10197` |
-
 ## 2. Which lots are too close to expiry
 
 **What this shows.** The settings `Min Shelf Life on Pick` and `Shelf Life` remove lots from the list before any sorting. The pick boundary is checked again when the picker confirms.
@@ -83,16 +71,6 @@ Reading notes.
 - Value 0 or empty: only lots that expire today or earlier are dropped.
 - At pick confirmation, the code refuses a lot that does not expire later than today + `Min Shelf Life on Pick` with the refusal `SourceExpired`. A pick that was reserved long ago can meet this refusal.
 - `Shelf Life` is the minimum days of life at shipping; allocation reserves only lots that will still clear it. `min_shelf_life_on_rec` is a receiving check. `expire_days` is read at receiving, where it works out a missing expiration.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Limit date from the SKU values | `crates/libs/wms-outbound/src/allocation/trace.rs` (`lot_dating::threshold`), `crates/libs/wms-inventory/src/domain/lot_dating/aggregate.rs` |
-| SQL filter on the expiration date | `find_allocation_candidates` in `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs` |
-| The pick limit at commit | `judge_pick_lot` in `crates/libs/wms-outbound/src/domain/pick_confirmation/evidence.rs`, `prove_source` in `crates/libs/wms-outbound/src/picking/confirmation/at_commit.rs` |
-| SKU values read at commit | `crates/libs/wms-outbound/src/picking/confirmation/shelf_life.rs` (`reserved_lot_verdict`) |
-
 ## 3. What the Lot Policy changes
 
 **What this shows.** The Lot Policy of the SKU acts at receiving and at picking. It does not choose which lot is reserved.
@@ -114,17 +92,6 @@ Reading notes.
 - `Show on pick` and `Verification` of the Lot Policy change what the picker sees and has to confirm for the reserved lot. The picking area describes this.
 - The owner field `owner_config.default_lot_policy_id` exists, but no code reads it. The SKU field `sku.lot_policy_id` is the only selector.
 - Not confirmed by code: that a date the Lot Policy does not ask for at receiving stays empty on the lot, and so sorts last under rotation. The policy page says an unshown date gets no prompt, but a value that is sent anyway is still saved. To verify: receive a lot with `Show` off for the expiration date, then run `shipment_order_allocate_preview` on a SKU with `Fefo` and look at the order of the positions.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Allocation reads lot dates, not the policy | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:449-453` |
-| Pick card shows the attributes marked `show_on_pick` | `crates/libs/wms-outbound/src/picking/confirmation/lot_display.rs:43-80` |
-| Attributes the picker can be asked about, by `Verification` | `crates/libs/wms-outbound/src/domain/pick_confirmation/plan.rs:139-153` |
-| Lot Policy is chosen by the SKU only | `crates/libs/wms-outbound/src/picking/confirmation/source_facts.rs:215-235` |
-| No code reads `default_lot_policy_id` | `crates/libs/wms-lib-core/src/model/owners/owner_config.rs:104` |
-
 ## Related pages
 
 - [How a step chooses stock](21-influence-policy-selection.md)

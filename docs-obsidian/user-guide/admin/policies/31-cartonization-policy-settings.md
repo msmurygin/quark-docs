@@ -38,15 +38,14 @@ policies. Open one to see a single editor (a "Component" form, tag
 4. **Cartons in solver order**
 
 One toolbar has **Refresh** and **Save**. One Save writes the header and all
-cartons together, in one transaction. Source: `wms-lib-sql/sql/wms-meta-ui/migrations/045_cartonization_policy_is_one_component.sql`
+cartons together, in one transaction.
 (labels at lines 100-140), `ui/wms-component/components/cartonization-policy/CartonizationPolicy.tsx`.
 
 The policy has a version number. Save sends the version you loaded. If
 someone else saved first, the save is refused with an optimistic-lock error
-and you must reload (`wms-lib-core/src/model/policies/cartonization_aggregate.rs:406-420`).
+and you must reload.
 `cartonization_policy_save` is a stateful command. `cartonization_policy_create`
-and the delete commands are stateless
-(`crates/services/app-server/src/web/rpcs/cartonization_policy_rpc.rs`).
+and the delete commands are stateless.
 
 ## Part 1: Policy header (table `cartonization_policy`)
 
@@ -58,10 +57,9 @@ and the delete commands are stateless
 - **Default**: no default. Seed: `STD` (id 1).
 - **Meaning**: The short name of the policy. It shows in lists and in the SKU
   and owner pickers.
-- **Affects**: Create refuses an empty code (`cartonization_aggregate.rs:274-279`).
-  The code is copied into the plan's policy snapshot (`snapshot.rs:34`) but no
-  rule branches on it. The code cannot be changed by save
-  (`code: None`, `cartonization_aggregate.rs:~490`).
+- **Affects**: Create refuses an empty code.
+  The code is copied into the plan's policy snapshot but no
+  rule branches on it. The code cannot be changed by save.
 - **Example**: `STD`, `FRAGILE`. Ten characters at most.
 - **Interactions**: Must be unique across policies.
 - **When empty**: Create is refused: "cartonization policy code cannot be empty".
@@ -77,7 +75,7 @@ and the delete commands are stateless
   engine read. Stored only. It has no effect today.
 - **Example**: "Parcel boxes".
 - **Interactions**: none.
-- **When empty**: Allowed. Save sends "clear name" (`cartonization_aggregate.rs:~484`).
+- **When empty**: Allowed. Save sends "clear name".
 - **If you change it**: No effect on orders.
 
 ### Description
@@ -100,13 +98,10 @@ and the delete commands are stateless
   row `STD` is `true` (added by migration 002, whose default was true).
 - **Meaning**: Says the policy is ready for use.
 - **Affects**: Only the save rule: an active policy needs at least one active
-  carton, or save is refused ("an active cartonization policy needs at least
-  one active carton", `cartonization_aggregate.rs:257-261`). **The engine
+  carton, or save is refused. **The engine
   does not read this flag when it plans an order.** `plan_reservation_over`
-  loads the policy by id and uses it whatever its `active` value is
-  (`plan.rs:124-130`); policy resolution does not check it either
-  (`wms-lib-core/src/model/sku.rs:908-923`). Only the cartons' own `active`
-  flag is used (`plan.rs:193`).
+  loads the policy by id and uses it whatever its `active` value is; policy resolution does not check it either. Only the cartons' own `active`
+  flag is used.
 - **Example**: A policy named by a SKU but set inactive still plans orders for
   that SKU.
 - **Interactions**: To stop a policy from planning, remove it from the SKUs and
@@ -121,11 +116,10 @@ and the delete commands are stateless
   (`Allow`, `Prevent`), not null.
 - **Default**: schema `Prevent`. Seed `Prevent`.
 - **Meaning**: May one pick line be spread over more than one carton?
-- **Affects**: `blocks_of` (`plan.rs:221-246`). `Allow`: each unit is a
+- **Affects**: `blocks_of`. `Allow`: each unit is a
   block. `Prevent`: all units of one pick are one block, and a block goes
-  whole into one carton or stays unplaced. The validator checks the same rule
-  (`validate.rs:139,156`). When a pick line crosses cartons the pick row is
-  split into several pick rows (`write.rs:~180`).
+  whole into one carton or stays unplaced. The validator checks the same rule. When a pick line crosses cartons the pick row is
+  split into several pick rows.
 - **Example**: BOX-S holds 20 units (`max_units = 20`) and is the only active
   carton. A pick of 30 small items:
   - `Prevent`: the 30 units are one block, it does not fit one carton, so the
@@ -137,7 +131,7 @@ and the delete commands are stateless
 - **When empty**: Not possible (not null).
 - **If you change it**: Existing plans stay. The next reserve or release
   recalculates the plan if the input fingerprint changed, and the policy is
-  part of the fingerprint (`ensure.rs:194`, `snapshot.rs:100-130`).
+  part of the fingerprint.
 
 #### Value `Allow`
 
@@ -156,7 +150,7 @@ pick is stopped.
   (`BinPacking3d`), not null.
 - **Default**: `BinPacking3d`. Seed same.
 - **Meaning**: Names the packing method.
-- **Affects**: Copied into the plan snapshot (`ensure.rs:424`). Nothing
+- **Affects**: Copied into the plan snapshot. Nothing
   branches on it, because there is only one value. Stored only. It has no
   effect today.
 - **Example**: n/a (one choice).
@@ -172,7 +166,7 @@ pick is stopped.
   (`ExtremePoints`), not null.
 - **Default**: `ExtremePoints`. Seed same.
 - **Meaning**: Names the placement method.
-- **Affects**: Copied to the snapshot (`ensure.rs:425`). No branch. Stored
+- **Affects**: Copied to the snapshot. No branch. Stored
   only. It has no effect today.
 - **Example**: n/a.
 - **Interactions**: none.
@@ -184,13 +178,11 @@ pick is stopped.
 - **Screen**: Solver settings > **Iterations per unit²**. Integer, minimum 1
   on the screen.
 - **Column**: `cartonization_policy.iterations_per_unit_sq`, int, not null,
-  must be greater than 0 (check `cartonization_policy_solver_limits_valid`,
-  wms-app migration 022; save refuses 0 or less: "iterations_per_unit_sq must
-  be positive", `cartonization_aggregate.rs:177-181`).
+  must be greater than 0.
 - **Default**: 30. Seed 30.
 - **Meaning**: The work budget grows with the square of the number of units.
   This is the multiplier.
-- **Affects**: `SolverBudget::for_units` (`budget.rs:32-47`), called from
+- **Affects**: `SolverBudget::for_units`, called from
   `plan.rs:147`.
 - **Example**: 12 units: 30 x 12 x 12 = 4,320. That is below the minimum
   50,000, so the limit is 50,000. 100 units: 30 x 10,000 = 300,000, inside
@@ -211,9 +203,7 @@ pick is stopped.
 - **Affects**: `budget.rs:38-46` (lower clamp).
 - **Example**: 3 units: 30 x 9 = 270, raised to 50,000. About 41 units are
   needed before the formula (30 x 41² = 50,430) exceeds the minimum.
-- **Interactions**: Must not be above Maximum iterations (save refuses:
-  "max_iterations_cap cannot be less than min_iterations",
-  `cartonization_aggregate.rs:182-188`).
+- **Interactions**: Must not be above Maximum iterations.
 - **When empty**: Not allowed.
 - **If you change it**: Applies to the next calculation only.
 
@@ -225,8 +215,7 @@ pick is stopped.
 - **Default**: 2,000,000. Seed 2,000,000.
 - **Meaning**: The highest budget. A huge order cannot run forever.
 - **Affects**: `budget.rs:39,46` (upper clamp). If the work reaches this
-  number, the command returns the budget-exceeded error and no plan is saved
-  (`error.rs:55-56`).
+  number, the command returns the budget-exceeded error and no plan is saved.
 - **Example**: 400 units want 4,800,000 steps; the cap gives 2,000,000. If the
   solver needs more than that, the order has no plan. About 259 units are
   needed before the cap applies (30 x 259² = 2,012,430).
@@ -241,8 +230,8 @@ pick is stopped.
 - **Column**: `cartonization_policy.max_candidates`, int, not null, greater than 0.
 - **Default**: 2,000. Seed 2,000.
 - **Meaning**: Intended as a cap on candidate placements.
-- **Affects**: Validated on save (`cartonization_aggregate.rs:190`) and copied
-  to the snapshot (`ensure.rs:430`, `snapshot.rs:120`). **The solver never
+- **Affects**: Validated on save and copied
+  to the snapshot. **The solver never
   reads it.** Search: `grep -rn max_candidates crates --include=*.rs` returns
   only the model, validation, snapshot and test files. Stored only. It has
   no effect today. It still changes the plan fingerprint, so editing it makes
@@ -263,8 +252,7 @@ pick is stopped.
   migration 022).
 - **Default**: `MinCartons`. Seed `MinCartons`.
 - **Meaning**: The goal of the packing.
-- **Affects**: Save refuses any value except `MinCartons`
-  (`cartonization_policy.rs:629-636`, `cartonization_aggregate.rs:164-166`):
+- **Affects**: Save refuses any value except `MinCartons`:
   "the goal ... is not yet implemented by the engine: only MinCartons is
   counted" (the message text is Russian in the source). The solver has no
   other goal. It always opens as few cartons as the greedy pass and the
@@ -276,8 +264,7 @@ pick is stopped.
 
 #### Value `MinCartons` ("Minimum cartons")
 
-The only working goal. Fewest cartons, then the smallest box that fits
-(shrink pass, `pack.rs:815-900`).
+The only working goal. Fewest cartons, then the smallest box that fits.
 
 #### Values `MinUnusedVolume`, `MinPickSplits`, `BalanceWeight`
 
@@ -291,11 +278,7 @@ one reason that the solver cannot place something. Each drop-down offers
 **Stop** and **Ship as is**.
 
 **Truth about all six.** The code reads the six values and then throws them
-away. Every unplaced row gets action `Stop`, always
-(`write.rs:556-572`, function `action_for`, which ends with the literal
-`"Stop"`). Save refuses `ShipAsIs` ("ShipAsIs is reserved for an explicit
-factory pack level; solver exceptions must Stop",
-`cartonization_policy.rs:638-648`, `cartonization_aggregate.rs:167-175`).
+away. Every unplaced row gets action `Stop`, always. Save refuses `ShipAsIs`.
 The drop-down still lists "Ship as is", greyed with a reason. Only `Stop`
 can be saved.
 
@@ -307,7 +290,7 @@ same facts for Affects/When empty/If you change it:
 
 - **Affects**: `write.rs:556-572`. Value is read into `_configured` and not
   used. The value `Stop` is written to `cartonization_unplaced.action`. The
-  pick becomes `Blocked` (`write.rs:619`).
+  pick becomes `Blocked`.
 - **When empty**: Not possible (not null).
 - **If you change it**: Nothing changes in behaviour. A saved policy with the
   old value `ShipAsIs` (from before migration 032) is still readable, is
@@ -317,12 +300,12 @@ same facts for Affects/When empty/If you change it:
 
 | Setting | Screen label | Column | Reason it answers | Default |
 |---|---|---|---|---|
-| No dimensions | Exception handling > **No dimensions** | `on_no_dimensions` | A unit has a zero length, width or height (`pack.rs:400-405`). | `Stop` |
-| No weight | **No weight** | `on_no_weight` | Weight unknown while the carton has a gross limit (`pack.rs:438-470`). | `Stop` |
-| No carton candidates | **No carton candidates** | `on_no_carton_candidates` | The policy has no active carton (`pack.rs:574-582`). | `Stop` |
-| No carton fits | **No carton fits** | `on_no_carton_fits` | No active carton fits the unit (`pack.rs:629`). | `Stop` |
-| Weight exceeded | **Weight exceeded** | `on_weight_exceeded` | Contents are heavier than every carton's gross limit (`pack.rs:621-625`). | `Stop` |
-| Split prevented | **Split prevented** | `on_split_prevented` | A block does not fit one carton but would if split (`pack.rs:584-612`). | `Stop` |
+| No dimensions | Exception handling > **No dimensions** | `on_no_dimensions` | A unit has a zero length, width or height. | `Stop` |
+| No weight | **No weight** | `on_no_weight` | Weight unknown while the carton has a gross limit. | `Stop` |
+| No carton candidates | **No carton candidates** | `on_no_carton_candidates` | The policy has no active carton. | `Stop` |
+| No carton fits | **No carton fits** | `on_no_carton_fits` | No active carton fits the unit. | `Stop` |
+| Weight exceeded | **Weight exceeded** | `on_weight_exceeded` | Contents are heavier than every carton's gross limit. | `Stop` |
+| Split prevented | **Split prevented** | `on_split_prevented` | A block does not fit one carton but would if split. | `Stop` |
 
 All six: column type `cartonization_exception_action`
 (`ShipAsIs`, `Stop`), not null; seed `Stop`.
@@ -350,9 +333,9 @@ Old value kept for reading only. It cannot be saved. The runtime treats it as
 - **Default**: 1. Seed 1.
 - **Meaning**: A counter for the whole policy (header and cartons). It rises
   on every save.
-- **Affects**: Optimistic lock on save (`cartonization_aggregate.rs:410-420`).
+- **Affects**: Optimistic lock on save.
   `aggregate_view` reads header and cartons again until they match the same
-  version (`cartonization_aggregate.rs:333-378`), so the solver never sees a
+  version, so the solver never sees a
   half-saved policy.
 - **Example**: Two supervisors open version 3. The first saves (becomes 4).
   The second save is refused.
@@ -365,11 +348,11 @@ Old value kept for reading only. It cannot be saved. The runtime treats it as
 Each row is one real, physical box type. There is no separate box catalog.
 Block title on screen: **Cartons in solver order**. Buttons: **Add carton**,
 move up, move down, remove. The array order on screen becomes the
-`sequence`: 10, 20, 30 and so on on every save (`cartonization_aggregate.rs:526-530`).
+`sequence`: 10, 20, 30 and so on on every save.
 
 A new row on the screen starts inactive, with all numbers 0
 (`ui/wms-component/components/cartonization-policy/draft.ts:174-187`).
-Remove deletes the row on save (`cartonization_aggregate.rs:508-514`).
+Remove deletes the row on save.
 
 **Units**: lengths in the warehouse length unit (default `MM`), weights in the
 warehouse weight unit (default `G`). Inner sizes, not outer sizes.
@@ -381,10 +364,8 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
   unique inside the policy (`uq_carton_policy_step`).
 - **Default**: none. Seed: `BOX-S`, `BOX-M`, `BOX-L`.
 - **Meaning**: The name of the box type.
-- **Affects**: Stored in the plan carton snapshot (`step_num_snapshot`,
-  `write.rs:~440`) and in details like `largest active carton BOX-L`
-  (`pack.rs:470-540`). Save refuses an empty code, a duplicate, or a code
-  longer than 20 characters (`cartonization_aggregate.rs:210-225`). Save
+- **Affects**: Stored in the plan carton snapshot and in details like `largest active carton BOX-L`. Save refuses an empty code, a duplicate, or a code
+  longer than 20 characters. Save
   refuses a rename ("carton code ... is immutable", `:~470`).
 - **Example**: `BOX-M`.
 - **Interactions**: none.
@@ -411,10 +392,10 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Default**: 0 (schema). Seed: 10, 20, 30.
 - **Meaning**: The order in which the solver tries cartons. Ties go to the
   lower id.
-- **Affects**: `ordered` (`pack.rs:390-394`) sorts by `(sequence, id)`. When a
+- **Affects**: `ordered` sorts by `(sequence, id)`. When a
   block does not fit any open carton, the solver opens the **first** carton in
-  this order that fits (`pack.rs:360-385`). The later shrink pass tries smaller
-  volumes first, whatever the order (`pack.rs:844-860`).
+  this order that fits. The later shrink pass tries smaller
+  volumes first, whatever the order.
 - **Example**: List order BOX-L, BOX-S. A tiny item opens BOX-L first. The
   shrink pass then moves it into BOX-S if it fits, so the final box is still
   the smallest that holds the contents. Order still matters when the shrink
@@ -431,12 +412,9 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Column**: `cartonization_policy_detail.active`, boolean, not null.
 - **Default**: schema `true`; a new screen row starts `false`. Seed `true`.
 - **Meaning**: May the solver use this box type?
-- **Affects**: Only active cartons become candidates (`plan.rs:190-208`).
+- **Affects**: Only active cartons become candidates.
   An active carton must have all three inner sizes above 0, and when
-  `max_gross_weight` is above 0 it needs `0 < tare_weight < max_gross_weight`
-  (`cartonization_policy.rs:598-621`, check constraints
-  `cartonization_active_carton_has_dimensions` and
-  `cartonization_carton_weights_are_executable`, wms-app migration 022).
+  `max_gross_weight` is above 0 it needs `0 < tare_weight < max_gross_weight`.
   An inactive row is a draft and is not validated.
 - **Example**: Switch BOX-L off: no new plan uses BOX-L. Orders already
   planned in BOX-L keep it.
@@ -475,11 +453,9 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Column**: `tare_weight`, double precision, not null, 0 or more, finite.
 - **Default**: 0. Seed: BOX-S 200; BOX-M 400; BOX-L 700 (g).
 - **Meaning**: Weight of the empty box.
-- **Affects**: Added to the content weight when the gross limit is tested
-  (`pack.rs:140-146, 723-740`). Copied to the container as its own
-  `tare_weight` when the planned carton is created (`write.rs:424`). Packing
-  uses that container tare for the expected weight
-  (`domain/packing_carton/aggregate.rs:117`).
+- **Affects**: Added to the content weight when the gross limit is tested. Copied to the container as its own
+  `tare_weight` when the planned carton is created. Packing
+  uses that container tare for the expected weight.
 - **Example**: BOX-S: tare 200 g, limit 5,000 g, units 450 g each. 10 units:
   200 + 4,500 = 4,700, fine. The 11th unit would make 5,150, which is
   over the limit, so it goes to another carton.
@@ -498,13 +474,13 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Default**: 0. Seed: BOX-S 5,000; BOX-M 15,000; BOX-L 25,000 (g).
 - **Meaning**: The most the whole box may weigh, tare included. 0 means no
   limit.
-- **Affects**: `room_by_weight` (`pack.rs:723-740`). When above 0 every unit
+- **Affects**: `room_by_weight`. When above 0 every unit
   must have a known weight, or it cannot go in (reason `NoWeight`). The
-  validator re-checks it (`validate.rs:371`). The reason `WeightExceeded` is
-  chosen in `blocked_by_weight` (`pack.rs:438-470`).
+  validator re-checks it. The reason `WeightExceeded` is
+  chosen in `blocked_by_weight`.
 - **Example**: Limit 5,000 g, tare 200 g: content up to 4,800 g.
 - **Interactions**: A tare type's own limit must be at least this limit, or
-  save is refused (`fits_carton`, `handling_unit/fit.rs:35-50`).
+  save is refused.
 - **When empty**: 0 = no limit and weight is not checked.
 - **If you change it**: New plans only.
 
@@ -514,7 +490,7 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Column**: `max_units`, int, not null, 0 or more.
 - **Default**: 0. Seed: BOX-S 20; BOX-M 50; BOX-L 0.
 - **Meaning**: The most units one box may hold. 0 means no limit.
-- **Affects**: `room_by_count` (`pack.rs:714-716`). A block that is blocked
+- **Affects**: `room_by_count`. A block that is blocked
   only by this limit is reported as "Nothing fits", not as a weight reason.
 - **Example**: BOX-S 20: unit 21 goes to the next box.
 - **Interactions**: Counts physical units of any pack level.
@@ -532,12 +508,10 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 - **Meaning**: Which real box type (a handling-unit type) this carton row
   stands for.
 - **Affects**: On save, a named type must exist, be active, hold goods, and
-  be big enough: inner size and gross limit at least the carton's
-  (`cartonization_aggregate.rs:81-117`). At the floor, when the picker scans
+  be big enough: inner size and gross limit at least the carton's. At the floor, when the picker scans
   a real box for this planned position, the box must have this type, or the
-  bind is refused (`picking/target/bind.rs:92-96`, "type not planned"). If no
-  type is named, the real box only has to be big enough
-  (`bind.rs:100-106`).
+  bind is refused. If no
+  type is named, the real box only has to be big enough.
 - **Example**: Carton row BOX-M names type `EVA_TOTE`. A scanned box of type
   `CARTON_B` is refused.
 - **Interactions**: An inactive carton row is only checked for a dangling id.
@@ -547,8 +521,7 @@ warehouse weight unit (default `G`). Inner sizes, not outer sizes.
 
 ## Part 3: Which policy an order uses
 
-Order of lookup, per SKU and owner (`sku.rs:908-923`, read at
-`read_from_db.rs:199`):
+Order of lookup, per SKU and owner:
 
 1. `sku.cartonization_policy_id`
 2. else `owner_config.default_cartonization_policy_id`
@@ -568,8 +541,7 @@ Order of lookup, per SKU and owner (`sku.rs:908-923`, read at
 - **Example**: SKU GLASS names policy `FRAGILE`. Other SKUs use the owner
   default `STD`. One order with both gets two parts that never share a box.
 - **Interactions**: Wins over the owner default. Picks with different
-  policies are solved separately and never share a carton (`reservation.rs`
-  partitions by policy id).
+  policies are solved separately and never share a carton.
 - **When empty**: The owner default is used.
 - **If you change it**: Existing plans stay. Next reserve or release
   recalculates because the policy part changed.
@@ -606,21 +578,20 @@ items. See also [34-sku-level-settings.md](34-sku-level-settings.md).
 - **Example**: `EA` level true; `PL` level false.
 - **Interactions**: Cannot be true together with Factory package
   (`ck_pack_item_cartonization_mode`, wms-app migration 032). Factory package
-  is tested first (`reservation.rs:136`).
+  is tested first.
 - **When empty**: Not applicable.
 - **If you change it**: Next plan only.
 
 ### Factory package (`ship_as_is`)
 
 - **Screen**: API only. `create_pack_with_items`, `update_pack_with_items`,
-  `update_pack_item` (`app-server/src/web/rpcs/pack_rpc.rs`). No screen field.
+  `update_pack_item`. No screen field.
 - **Column**: `pack_item.ship_as_is`, boolean, not null.
 - **Default**: `false`.
 - **Meaning**: This level is a factory-sealed package. It ships without an
   outbound box.
 - **Affects**: `reservation.rs:136`. The pick gets outcome `ShipAsIs` with a
-  frozen proof of the pack revision (`write.rs:225-245`, check
-  `ck_pick_factory_package_proof`).
+  frozen proof of the pack revision.
 - **Example**: A 6-pack of drink cartons sold whole.
 - **Interactions**: Excludes `cartonize`.
 - **When empty**: Not applicable.
@@ -634,7 +605,7 @@ items. See also [34-sku-level-settings.md](34-sku-level-settings.md).
 - **Default**: `All90`.
 - **Meaning**: Which ways the unit may be turned in the box.
 - **Affects**: `read_from_db.rs:261-270`; `best_placement` tries each
-  distinct orientation (`pack.rs:670-700`).
+  distinct orientation.
 - **Example**: A 300 x 100 x 50 unit with `None` must go in as 300 x 100 x 50.
   With `All90` it may stand on its end.
 - **Interactions**: Fewer orientations means more "Nothing fits".
@@ -668,8 +639,6 @@ Shown on the order screen (tabs Picks, Cartons, Exceptions):
 | `Pending` | `pending` | Not calculated yet. |
 
 Plan status: `Planned`, `PlannedWithExceptions`, `Stale`, `Superseded`.
-Source: `wms-meta-ui/migrations/015_*.sql`, `wms-app/migrations/007_*.sql`,
-`008_*.sql`.
 
 Exceptions tab texts: "No dimensions", "No weight", "No candidate cartons",
 "Nothing fits", "Overweight", "Splitting not allowed", and the fix hints
@@ -686,9 +655,8 @@ look for a switch.
 - **Screen**: none. Not a setting.
 - **Column**: none. The verdict is stored in `packing_carton.weight_verdict`,
   enum `packing_weight_verdict` (`Recorded`, `NotComparable`).
-- **Meaning**: The measured weight is kept, never enforced
-  (`domain/packing_carton/aggregate.rs:12-14`).
-- **Affects**: `judge_close` (`aggregate.rs:138-215`).
+- **Meaning**: The measured weight is kept, never enforced.
+- **Affects**: `judge_close`.
 - **Example**: Expected 4,700 g, measured 6,100 g: the box still closes with
   verdict `Recorded`. Nothing warns.
 - **When empty**: A missing measured weight refuses the close
@@ -736,7 +704,6 @@ look for a switch.
    The screen shows all of them as if they did.
 2. The order-screen hint for outcome `SHIP AS IS` still says "an exception the
    policy allowed". Today only a factory pack level gives that outcome.
-   (`wms-meta-ui/migrations/015_*.sql:62-67`.)
 3. The three non-working objectives remain in the drop-down on purpose.
 4. To check the unread settings yourself: change the value on a test policy,
    reserve the same order again, and compare the plan fingerprint

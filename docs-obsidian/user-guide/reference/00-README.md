@@ -58,16 +58,6 @@ When a field has the note **Stored only. It has no effect today.** it means this
 the value is saved and shown, but no rule, check, report or screen reads it to decide anything.
 This was checked by searching the code.
 Keep the field for your own information, but do not expect the system to act on it.
-
-### Not confirmed by code
-
-Some facts cannot be proven by reading the code alone.
-They are marked like this:
-
-> Not confirmed by code: what is unclear. To verify: exact steps.
-
-Follow the steps on a test warehouse before you rely on the fact.
-
 ### Related pages
 
 Every page ends with a list of related pages.

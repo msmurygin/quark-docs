@@ -63,11 +63,8 @@ Use this to remove tasks that nobody has taken. Their picks go back in reserve.
 | Refused as a whole | `Tasks could not be deleted: {error}` |
 
 The call is `task_delete_many`. It finds the order of each task itself and has no version. A task that is taken comes back as a named refusal and does not stop the others.
-Source: `crates/services/web-ui-server/src/extensions/customization/task/lifecycle_action.rs:44-130`, and the `generic_rpc_command` bindings in `wms-meta-ui` migrations 062 and 063.
 
 After `Delete Task` an order with no task in work reads `Allocated` again, and `Release` is on again for it. See [Releasing an order](35-releasing-an-order.md).
-
-> Not confirmed by code: the status words that `Tasks` shows for a task after the return to pool, and the rules of `task_force_release` and `task_reassign` beyond the grey conditions above. They belong to the task manager. To verify: use the task on the board and read the `Status` and `How Returned` columns.
 
 ## Related pages
 

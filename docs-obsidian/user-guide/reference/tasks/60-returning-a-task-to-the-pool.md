@@ -35,7 +35,6 @@ The task row now shows:
 | `Version` | Up by one |
 
 The command writes your user as the one who changed the row. It writes no line in the audit log, and the reason text is erased when the next operator takes the task.
-Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:1649-1708` and the comment of `TaskError::ReasonRequired` in `crates/libs/wms-tasks/src/error.rs`.
 
 The return does not write a line in [Skip History](40-skip-history.md). That list shows only operator refusals and hand backs.
 
@@ -57,13 +56,11 @@ The window stays open. The grid is not changed.
 | `Say why the task is being returned to the pool` | The reason is empty. | Type a reason. |
 | `The task board has moved on — reselect the task and try again` | The ticked row is not on the board any more, or its version is not known. | Refresh and tick again. |
 
-Sources: `crates/libs/wms-tasks/src/service/release.rs:296-370`, `crates/libs/wms-tasks/src/error.rs`, `crates/libs/wms-outbound/src/picking/infrastructure/holder_change.rs:74-83`, `062_receipt_and_task_use_rpc_command.sql:100-150`.
-
 ## What it affects
 
 - The old holder's terminal no longer has the task. A later report from the old holder is refused.
 - The task is offered again to operators who have the right and the equipment for it.
-- For a `Count` task, the count rules never refuse a return to the pool. Only a reassign can be refused by them. Source: `crates/libs/wms-inventory/src/domain/inventory_count/task_manager.rs:109-127`.
+- For a `Count` task, the count rules never refuse a return to the pool. Only a reassign can be refused by them.
 
 ## Related pages
 

@@ -51,20 +51,6 @@ Reading notes.
 - After the policy has chosen the orders, the first read is repeated for the chosen ids under the order locks. An order that changed in between is dropped with the reason `eligibility changed while acquiring order locks`.
 - Preview (`wave_policy_preview`) shows the same plan and writes nothing.
 - The save is a full replace. A field that is left out becomes empty or false. In particular, leaving out `auto_release` turns it off.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Candidate SQL: statuses, priority, ship date, owner, carrier, claim, order | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:311-344` |
-| Value checks and limits | `crates/libs/wms-outbound/src/waves/policy.rs:355-420` |
-| Grouping, batches, line and order limits, run limit | `crates/libs/wms-outbound/src/waves/policy.rs:430-510` |
-| Second read under locks and the reason texts | `crates/libs/wms-outbound/src/waves/policy.rs:239-343` |
-| Allowed statuses | `crates/libs/wms-outbound/src/waves/policy.rs:26` |
-| Wave codes are made by the system: `A` + run id + `-` + batch | `crates/libs/wms-outbound/src/waves/policy.rs:518-524` |
-| Wire shape: required and optional keys | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:66-89` |
-| Roles: policy create, save, build: Admin, Manager | `crates/services/app-server/src/web/rpcs/wave_rpc.rs:15-22` |
-
 ## 2. When the build runs and who releases the wave
 
 **What this shows.** The schedule fields and `auto_release`.
@@ -94,18 +80,6 @@ Reading notes.
 - A scheduled build runs as the system user. A build by hand runs as the caller. The worker releases the orders as the user who requested the release.
 - A wave built with `auto_release` shows `Released` when the worker has finished, even if some members are `Blocked` or `Failed`.
 - Nobody tells the operator about a blocked member except `wave_get` and the server log.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Due policy: active and `next_run_at <= now`, skip locked | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:261-278` |
-| `next_run_at` after create and save | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:193-257` |
-| Next slot is the first boundary after now | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:283-305` |
-| `auto_release` prepares the release | `crates/libs/wms-outbound/src/waves/policy.rs:288-294` |
-| Inactive policy refuses a build; version check | `crates/libs/wms-outbound/src/waves/policy.rs:225-236` |
-| Scheduler loop | `crates/libs/wms-outbound/src/waves/scheduler.rs:36-108` |
-
 ## 3. What a wave changes in allocation
 
 **What this shows.** The two places where a wave touches stock or tasks.
@@ -122,15 +96,6 @@ Reading notes.
 - The worker takes members in the order of the member id. For a wave from a policy the members are added in the plan order, so the order with the smallest priority number reserves first.
 - The stock choice for each order is the same as for a single release. A wave has no stock rule of its own.
 - A task of an order that is in a wave carries `wave_id`. The claim stays after the release, so a later top-up task carries it too.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Members are claimed by lowest id | `crates/libs/wms-lib-core/src/model/outbound/wave.rs:608-641` |
-| Members added in plan order | `crates/libs/wms-outbound/src/waves/policy.rs:270-293` |
-| Wave id for tasks | `crates/libs/wms-outbound/src/waves/task_grouping.rs:8-18`, `crates/libs/wms-outbound/src/service/order/allocate.rs:427-434` |
-
 ## Stored only. It has no effect today.
 
 | Field | Note |
@@ -140,15 +105,6 @@ Reading notes.
 | `wave_order.priority` | Copied from the order priority by the builder, or given in `wave_add_order`. Read by nothing |
 | `wave_order.sequence` | Position in the batch. It only sets the order of the member list that `wave_get` returns. It does not change the release order |
 | `wave.completed_at`, statuses `InProgress`, `Completed` | Never set |
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Member list sorted by `sequence` | `crates/libs/wms-lib-core/src/model/outbound/wave.rs:379-393` |
-| `priority` of a member is only written | `crates/libs/wms-lib-core/src/model/outbound/wave.rs:452-488` |
-| Statuses exist but are never assigned | `crates/libs/wms-lib-core/src/model/outbound/wave.rs:21-28` |
-
 ## Related pages
 
 - [Wave build and release](12-journey-wave.md)

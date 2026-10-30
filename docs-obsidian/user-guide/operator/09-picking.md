@@ -2,20 +2,32 @@
 
 ## What you will do
 
-Pick goods for orders. There are three ways to work:
+Pick goods for orders. The warehouse can use five work patterns:
 
-- **Discrete Pick**: you get one pick at a time and put the goods on a pallet.
-- **Pick by Area**: you work in a work area. You may take a carrier with boxes and walk a route.
-- **Paper picking**: you record the result in the web task grid, keep the goods on a pick pallet in transit, and place the pallet when the trip is finished.
+1. **Discrete Pick onto a pallet**: work on one order's task at a time. The pallet travels with you and is closed at its destination with `F2`. A large order can continue on more than one pallet.
+2. **Cart picking into order boxes**: take several orders at once. Each cart position holds one order's box, and every picked item goes straight into that box. The boxes leave the cart at delivery.
+3. **Summary step on a cart**: an optimisation of cart picking. When several orders need the same item from the same source, visit the source once and divide the quantity between their order boxes there.
+4. **Batch picking for a distribution station**: collect part of a wave route into a shared tote, deliver the tote, then sort the goods into order or store boxes at the station. See [14 Batch picking and distribution station](14-batch-picking-and-distribution-station.md).
+5. **Paper picking from the web workplace**: record the result from a paper list in the web task grid. This workflow intentionally has no terminal screens. The pick pallet stays in transit until you use **Place Pallet**.
 
-You also close pallets, deliver carriers, and report problems (short, reject, box full, box damaged).
+Across these patterns, the same warehouse rules can require source confirmation or a substitute LPN, apply the configured short action, handle a full or damaged box, let a supervisor change the destination, and send the finished order to [order control](11-order-control-after-picking.md).
+
+| Work pattern | Where the operator works | Screen family |
+|---|---|---|
+| Discrete pick onto a pallet | RF terminal | `PICK01`–`PICK15` |
+| Cart picking into order boxes | RF terminal | `PKA00`–`PKA31`; box exceptions use `PKA50`–`PKA52` |
+| Summary step on a cart | RF terminal, inside the cart route | `PKAA` and the related cart-route screens |
+| Batch picking for a distribution station | RF terminal: route, then station | `SPR00`–`SPR07`, then `STN01`–`STN62` |
+| Paper picking | Web workplace | No terminal screens by design |
+
+Packing, consolidation, order control, staging and loading continue in their own terminal menus after picking when the outbound route requires them.
 
 ## Before you start
 
 - Have empty pallet labels that start with `DRP` (for discrete pick).
 - For carrier work, have an empty carrier and empty boxes.
 - Know your work area and what equipment you use.
-- Some picks ask you to confirm the source: location, item, LPN, lot or a lot attribute. The screens ask in the order the system sets.
+- Some picks ask you to confirm the source location, item, source LPN, lot or lot attributes.
 - Your user must have the right to take pick work in your work area.
 - A supervisor is needed to dissolve an assignment that already has picked goods, and to close a pallet that belongs to another operator.
 - For paper picking, have a pick pallet label that starts with `DRP`, unless the **Pick pallet (DRP…, optional)** field is optional in your warehouse.
@@ -33,9 +45,10 @@ Your supervisor gives each operator the right to take pick work per work area. T
 | `2` | **Pick by Area** | Work in a work area, with or without a carrier |
 | `3` | **Deliver Carrier** | Deliver a carrier you scan |
 | `4` | **Force-Close Episode (supervisor)** | Supervisor only. See [04](04-damage-and-receipt-close.md). |
+| shown key | **Station Route** | Collect a station wave into shared totes. See [14](14-batch-picking-and-distribution-station.md). |
 
-![RF Picking menu: Discrete Pick, Pick by Area, Deliver Carrier and Force-Close Episode](../assets/screens/rf-picking-menu.png)
-*Screen PICKM: the Picking menu. Focus: Discrete Pick is option 1.*
+![RF Picking menu with Station Route](../assets/screens/rf-picking-menu.png)
+*Screen PICKM: the Picking menu. Focus: choose Station Route for a wave assigned to a distribution station.*
 
 ## A. Discrete Pick
 
@@ -123,7 +136,7 @@ On each screen the line above the field shows what is expected. The footer shows
 *Screen PICK06: expected LPN and Scan LPN. Focus: 1 Source LPN, 2 Scan LPN.*
 
 ![PICK14 - Confirm Lot](../assets/screens/PICK14.png)
-*Screen PICK14: expected lot and Scan lot.*
+*Screen PICK14: expected lot and Scan lot. Focus: compare the expected lot with the source, then scan its label.*
 
 ![PICK15 - Confirm Lot Attribute](../assets/screens/PICK15.png)
 *Screen PICK15: attribute name, expected value, and Value.*
@@ -392,8 +405,6 @@ Keys on a summary step:
 
 A serial-tracked item is never part of a summary step. It stays a stop of its own.
 
-Source: `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql`, `112_uc_pick_aggregated_cart_followups.sql`; `crates/libs/wms-outbound/src/picking/README.md` (Summary step).
-
 ### B4. Skip a stop
 
 ![PKA25 - Skip](../assets/screens/PKA25.png)
@@ -446,7 +457,7 @@ Source: `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql`
 ### B8. Recovery
 
 ![PKA52 - Recovery](../assets/screens/PKA52.png)
-*Screen PKA52: Place, Reason, Picks left.*
+*Screen PKA52: Place, Reason, Picks left. Focus: review the affected cart position and remaining picks before handing the work to a supervisor.*
 
 1. On **Recovery**, check **Place**, **Reason** (the error code) and **Picks left**.
 2. Press `F4` (**Hand Over**). The rest goes to the supervisor.
@@ -501,7 +512,7 @@ To deliver a carrier from the menu, use **Deliver Carrier** (`PKA40`).
 
 ## C. Paper picking in the web app
 
-Use this workflow when you pick from a printed list and record the result in **Management & Control > Execution Control > Task Board** or on an order's **Tasks** tab.
+Use this workflow when you pick from a printed list and record the result in **Management & Control > Execution Control > Task Board** or on an order's **Tasks** tab. It is a web-workplace workflow by design; do not look for it in the terminal menu.
 
 ### C1. Record a completed pick
 
@@ -575,7 +586,7 @@ flowchart TD
 | **there are {type} tasks in your work areas, but every one is heavier than your equipment lifts (up to {w} at ground level) — they wait for other equipment** | Your equipment cannot lift the work. | Ask your supervisor. |
 | **operator already holds task {id}: finish it first** | You already have a pick. | Finish it, or return it. |
 | **operator already has {type} task {id}; resume it before requesting Pick work** | Same. | Resume your task. |
-| **task {id} lease has expired; claim the work again** | You took too long. | Ask for work again. |
+| The task expired while you were working | The task was returned to the work pool after a long pause. | Ask for work again. |
 | **task {id} is not assigned to you (currently: {user})** | Another user has the task. | Ask for work again. |
 | **Pick task {id} has instructions the picker has not acknowledged** | You skipped the instructions. | Read and acknowledge them. |
 | **pick {id} needs source confirmation first: {list}** | You must confirm the source first. | Scan the location, item, LPN or lot as asked. |
@@ -611,7 +622,7 @@ flowchart TD
 | **pick assignment {code} has picked goods: a supervisor must dissolve it** | A supervisor must approve the dissolve. | Follow the **Supervisor Confirmation** steps. |
 | **pick assignment {code} has {n} stops left on its route** | The route is not done. | Finish the route, or dissolve. |
 | **the picks of position {n} wait for carton recovery: hand them over** | A position needs recovery. | Use **Recovery**. |
-| **version conflict on task {id} (current version {n})** | Someone changed the task. | Ask for work again. |
+| The work changed after you opened it | Another action changed the task. | Return to the work screen and ask for work again. |
 | **No permission: {screen}** or **No permission** | Your user may not do this. | Tell your supervisor which screen you were using and what you tried to do. |
 
 When there is no work, the line above **Current loc** says **No eligible Pick work**. On **Get Area Work** it says **No eligible Pick work in the area**. A refusal from the server shows in the same place.
@@ -620,9 +631,17 @@ A fresh system has three published short-reason codes: `SHORT` (the stock is bel
 
 The server decides in this order. First, if you already hold a live carrier job, or a carrier that was dissolved with goods and not delivered, that job opens again. Next, if you did not name an area (**Discrete Pick**), you get a single pick. If you named an area, the picking policy for that area and your equipment decides. If the policy needs no carrier, you get a single pick. If it needs a carrier, you get a task you already hold, or else **Scan Carrier**.
 
+## When the destination no longer accepts the goods
+
+Do not leave a loaded pallet, cart or box at a convenient location. The destination is part of the open picking work and must be changed by a supervisor.
+
+For a cart that is waiting for delivery, the supervisor opens `Sidebar > Management & Control > Execution Control > Pick Assignments`, selects exactly one waiting assignment, and clicks **Change Destination**. For a loaded pick pallet whose frozen destination is no longer usable, the supervisor opens `Sidebar > Management & Control > Execution Control > Pick Pallets (Manual)`, selects the pallet, and clicks **Change Destination**.
+
+The supervisor selects a location that can accept the goods, enters the reason and confirms. The changed destination also guides later pallets and carts of the affected orders where they are compatible. The operator then follows the new destination shown by the terminal. A loaded pallet can be changed only when its old destination no longer accepts it; an ordinary preference is not enough.
+
 ## What the supervisor sees
 
-Each committed pick moves stock to the pallet (DROPID) or box. A short pick releases the rest. A dissolved assignment returns boxes to the registry and tasks to the pool. A rejected pick is stored with your reason.
+Each committed pick moves stock to the pallet or box. A short pick releases the rest. A dissolved assignment returns boxes to the registry and tasks to the pool. A rejected pick is stored with your reason. The supervisor can also see carts waiting for delivery and loaded pick pallets that need another destination.
 
 ## Related guides
 

@@ -17,7 +17,7 @@ Paths in the "Affects" lines are relative to `crates/libs/` unless they start wi
 ## 1. Where and who
 
 - Menu path: `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`.
-- Roles that change reasons: `Admin`, `Manager` (`app-server/src/web/rpcs/pick_short_reason_rpc.rs:21`). `Supervisor` can only read. `Operator` cannot read the list, but the RF short command works for them.
+- Roles that change reasons: `Admin`, `Manager`. `Supervisor` can only read. `Operator` cannot read the list, but the RF short command works for them.
 - A reason has revisions with the status `Draft`, `Published`, `Retired`. Only one revision of a code can be `Published`. Only a `Published` revision is used on the floor. A short that names a code with no published revision is refused.
 - The reason is **not** a code list value. It is its own record so that actions have typed meaning. Table `pick_short_reason` (header) and `pick_short_reason_action` (one row per action).
 - Reasons are frozen into each short: the published revision and its enabled actions are copied into the event that starts the clean-up. Changing a reason later does not change a short that already happened.
@@ -117,7 +117,7 @@ Columns of `pick_short_reason_action`:
 | Value | What the system does | Runs? |
 |---|---|---|
 | `ReleaseCurrentRemainder` | Gives back the reservation of the part of THIS pick that was not found. Always needed (publish refuses without an enabled one). | Yes, in the short itself (inventory `execute_reserved_short`). |
-| `BlockSourceLocation` | Sets the location flag `CycleCountActive` on the source location. Allocation skips it. Dispatch gives no new work from it (`LOCATION_BLOCKED`). Whole location, whatever the `Scope`. | Yes, in the short (`short.rs:392`). |
+| `BlockSourceLocation` | Sets the location flag `CycleCountActive` on the source location. Allocation skips it. Dispatch gives no new work from it (`LOCATION_BLOCKED`). Whole location, whatever the `Scope`. | Yes, in the short. |
 | `ReleaseRelatedReservations` | Releases the reservations of other picks at the location (inside the `Scope`) that nobody is working on. | Yes, in the background phase. |
 | `RelocateResidualToMissing` | Moves the free, unreserved stock left at the location to the `Lost` location of the zone (or to a fixed location). | Yes, in the background phase. |
 | `CreateInventoryCount` | Starts a count of the location (or joins the live one). | Yes, in the background phase, after the move. |
@@ -131,15 +131,15 @@ Columns of `pick_short_reason_action`:
 ### `Enabled` (`enabled`)
 
 - UI label: `Enabled`. Checkbox. `boolean`, default true.
-- What it does: a disabled action is dropped when the reason is read at run time (`wms-outbound/src/domain/pick_short_reason/aggregate.rs:56-59`). It is not copied into the short event and is not executed. The publish rules also ignore it.
+- What it does: a disabled action is dropped when the reason is read at run time. It is not copied into the short event and is not executed. The publish rules also ignore it.
 
 ### `Scope` (`scope`)
 
 - UI label: `Scope`. Dropdown. Enum `pick_short_action_scope`: `CurrentPick`, `SameSourceStock`, `CurrentSkuAtLocation`, `EntireLocation`. Null allowed.
 - Seeds: `CurrentPick` for `ReleaseCurrentRemainder`; `EntireLocation` for block, release, relocate and reallocate; `CurrentSkuAtLocation` for the count.
 - What it does, per action:
-  - `ReleaseRelatedReservations`: selects the picks to release (`remediation.rs:246-265`). `EntireLocation`: every live pick at the location. `CurrentSkuAtLocation`: same owner and SKU. `SameSourceStock`: same owner, SKU, lot and source container. `CurrentPick` or empty: **no pick is released** (the current pick is already settled).
-  - `RelocateResidualToMissing`: **only `EntireLocation` works**. Publish refuses any other value: `action RelocateResidualToMissing has incompatible configuration: residual relocation covers the entire location` (`domain/pick_short_reason/aggregate.rs`). The run-time clean-up still refuses a narrower scope (`remediation.rs:185-188`), so a row written around publish would fail there. Fixed in P-06 (commit `52e3757a8`). See section 11, item 1.
+  - `ReleaseRelatedReservations`: selects the picks to release. `EntireLocation`: every live pick at the location. `CurrentSkuAtLocation`: same owner and SKU. `SameSourceStock`: same owner, SKU, lot and source container. `CurrentPick` or empty: **no pick is released** (the current pick is already settled).
+  - `RelocateResidualToMissing`: **only `EntireLocation` works**. Publish refuses any other value: `action RelocateResidualToMissing has incompatible configuration: residual relocation covers the entire location`. The run-time clean-up still refuses a narrower scope, so a row written around publish would fail there. Fixed in P-06 (commit `52e3757a8`). See section 11, item 1.
   - `CreateInventoryCount`: publish demands `CurrentSkuAtLocation` or `EntireLocation`. At run time the count is always of the whole location. The value is not read after publish. Stored only.
   - Other actions: the value is not read.
 - Rule: the scope of `ReleaseRelatedReservations` must be as wide as the scope of `RelocateResidualToMissing` (order: `CurrentPick` < `SameSourceStock` < `CurrentSkuAtLocation` < `EntireLocation`).
@@ -154,7 +154,7 @@ Columns of `pick_short_reason_action`:
 
 - Labels: `Target Mode`, `Fixed Location` (the second shows only when the first is `FixedLocation`).
 - Enum `pick_short_target_mode`: `ZoneMissingToLoc`, `FixedLocation`. `fixed_location` is `varchar(20)`, foreign key to `location`. The database check `chk_pick_short_fixed_target` wants a location exactly when the mode is `FixedLocation`.
-- Used only by `RelocateResidualToMissing` (`picking/remediation.rs`, function `resolve_quarantine_destination`).
+- Used only by `RelocateResidualToMissing`.
   - `ZoneMissingToLoc`: the field `Missing To Location` of the putaway zone of the source location (`PutawayZoneBmc::missing_toloc_for_location`). Default `LOST`. If the zone has none: `source location <code> has no zone missing location`.
   - `FixedLocation`: the named location. Publish message if it is empty: `action RelocateResidualToMissing has incompatible configuration: FixedLocation requires a location code`.
 - A relocate row without a mode: `... residual relocation requires a target mode`.
@@ -169,7 +169,7 @@ Columns of `pick_short_reason_action`:
 ### `Order Scope` (`order_scope`)
 
 - UI label: `Order Scope`. Enum `pick_short_order_scope`: `CurrentOrder`, `OrdersWithReleasedReservations`, `CurrentAndAffectedOrders`.
-- Used only by `ReallocateReleasedDemand` (`remediation.rs:559-580`):
+- Used only by `ReallocateReleasedDemand`:
   - `CurrentOrder`: only the order of the shorted pick.
   - `OrdersWithReleasedReservations`: only orders that lost a reservation in the release step.
   - `CurrentAndAffectedOrders` (or empty): both.
@@ -183,7 +183,7 @@ Columns of `pick_short_reason_action`:
 
 ## 5. Rules checked when you publish
 
-`Publish` runs the same rules the floor uses (`domain/pick_short_reason/aggregate.rs:52-155`). Messages:
+`Publish` runs the same rules the floor uses. Messages:
 
 | Message | Cause |
 |---|---|
@@ -207,7 +207,7 @@ Retire has no guard. If you retire the only published revision of `SHORT`, every
 
 ## 6. What runs after a short, in order
 
-### 6.1 In the short itself (one transaction, `short.rs`)
+### 6.1 In the short itself
 
 1. The found quantity moves to the pallet (discrete) or the box (cart). A zero short moves nothing.
 2. The part not found is released from this pick's reservation (`ReleaseCurrentRemainder`).
@@ -218,11 +218,9 @@ Retire has no guard. If you retire the only published revision of `SHORT`, every
 
 Nothing in 1 to 6 happens if any rule fails: the whole short rolls back.
 
-### 6.2 In the background (delivery worker, `picking/remediation.rs`)
+### 6.2 In the background
 
-The event is delivered to the internal subscriber `quark_outbound_execution`. It has 3 attempts, with a wait of 15 seconds that doubles (`wms-enterprise/migrations/007...sql`, `integration_delivery.rs:414`). After the third failure the delivery is `failed`; the metric `failed_event_delivery` of the view `pick_cutover_gate` counts it. Each step is repeat-safe.
-
-To verify the retry numbers on your system: run `SELECT max_retries, retry_delay_sec FROM enterprise.integration_subscriber WHERE code = 'quark_outbound_execution';` in the enterprise database. The seed row says 3 and 15.
+The event is delivered to the internal subscriber `quark_outbound_execution`. It has 3 attempts, with a wait of 15 seconds that doubles. After the third failure the delivery is `failed`; the metric `failed_event_delivery` of the view `pick_cutover_gate` counts it. Each step is repeat-safe.
 
 | Step | Action | Detail |
 |---|---|---|
@@ -316,9 +314,9 @@ Pick asks pallet `LPN0007`. Not there. The operator enters found quantity 0, rea
 
 ## 11. Inconsistencies found
 
-1. ~~A published reason can break every short that uses it.~~ Fixed (P-06, commit `52e3757a8`). Publish now refuses `RelocateResidualToMissing` with a `Scope` other than `EntireLocation`, so the clean-up (`picking/remediation.rs:185-188`) can no longer meet one.
-2. The editor helper text and the publish message still say counting "is not implemented" (`aggregate.rs:97-100`), and `picking/README.md` says the count is "unexecuted in MVP". The count runs (`remediation.rs:499-540`).
-3. Fixed (P-07, commit `356109c80`). The RF `Note` field used to allow 500 characters while the server allows 200 (`short.rs:564`). `PICK10R` revision 2 and `PKA26` revision 2 stop at 200 (`rf-screens/113_rf_inputs_fit_the_server_limits.sql`).
+1. ~~A published reason can break every short that uses it.~~ Fixed (P-06, commit `52e3757a8`). Publish now refuses `RelocateResidualToMissing` with a `Scope` other than `EntireLocation`, so the clean-up can no longer meet one.
+2. The editor helper text and the publish message still say counting "is not implemented", and `picking/README.md` says the count is "unexecuted in MVP". The count runs.
+3. Fixed (P-07, commit `356109c80`). The RF `Note` field used to allow 500 characters while the server allows 200. `PICK10R` revision 2 and `PKA26` revision 2 stop at 200 (`rf-screens/113_rf_inputs_fit_the_server_limits.sql`).
 4. `Required`, `Trigger After`, `Supervisor Review` and the actions `HoldInventory`, `HoldContainer`, `RequestSupervisorReview` look like settings but change nothing (section 4).
 5. The existing guide `06-outbound-setup.md` lists `SUPERVISOR` as a writer of reasons. The code allows `Admin` and `Manager` only.
 6. Fixed (P-21). `New Revision` copies the actions of the published revision.

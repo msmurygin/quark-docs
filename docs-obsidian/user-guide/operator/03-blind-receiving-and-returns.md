@@ -14,7 +14,7 @@
 - Know the location for the goods. The defaults are `STAGE` (blind) and `RETURN` (return).
 - The operator role may use blind and return receiving. Case-level cancel (**Cancel Planned Case**) needs a supervisor, a manager or an administrator.
 
-The screen puts `RETURN` in **To Loc**, the location the standard warehouse set-up creates (it said `RETURNS` before F-26, which does not exist). If your warehouse uses another return location, change **To Loc** to the one your supervisor names. A location that does not exist is refused (see **Invalid location {code}** below).
+The screen puts `RETURN` in **To Loc**, the location the standard warehouse set-up creates. If your warehouse uses another return location, change **To Loc** to the one your supervisor names. A location that does not exist is refused (see **Invalid location {code}** below).
 
 ## A. Receive Blind
 

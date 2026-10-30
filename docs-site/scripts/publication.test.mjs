@@ -4,7 +4,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync,readd
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {sanitizePublicGuideTree,sanitizePublicMarkdownSource,sanitizePublicObject,sanitizePublicText} from '../src/build/public-guide-sanitize.mjs';
+import {PUBLIC_FORBIDDEN_PATTERNS,sanitizePublicGuideTree,sanitizePublicMarkdownSource,sanitizePublicObject,sanitizePublicText} from '../src/build/public-guide-sanitize.mjs';
 const site=resolve(import.meta.dirname,'..');
 for(const mode of ['production','preview'])test(`${mode} output has the right robots and API canonical metadata`,()=>{
  const dir=mkdtempSync(join(tmpdir(),'quark-docs-test-'));try{
@@ -95,6 +95,8 @@ test('API publication sanitizer removes internal development narrative and prese
  assert.equal(sanitizePublicText('A useful sentence (`task.rs:12`).'),'A useful sentence.');
  assert.equal(sanitizePublicText('Keep this customer result. That is how they are written in the code.'),'Keep this customer result.');
  assert.equal(sanitizePublicObject({description:'Label missing in English: a diagnostic note.'}).description,'');
+ assert.equal(sanitizePublicText('See 03-request-and-response-format.md. Configure enterprise.warehouse.'),'See request and response format guide. Configure warehouse settings.');
+ assert.equal(sanitizePublicText('Keep this result. Each of these has been searched in the Rust code.'),'Keep this result.');
 });
 
 test('publication sanitizer preserves screenshot-only paragraphs',()=>{
@@ -165,6 +167,76 @@ Refresh and try again.`;
  const clean=sanitizePublicMarkdownSource(source);
  assert.match(clean,/Keep this instruction/);assert.match(clean,/action is refused/);assert.match(clean,/## Recovery/);assert.match(clean,/Refresh and try again/);
  assert.doesNotMatch(clean,/Label missing|findings file|Russian words|written in the code|## Findings|abc1234/i);
+});
+
+test('publication sanitizer removes every author-note spelling of to verify',()=>{
+ const source=`# Customer guide
+
+Keep this instruction.
+
+**Warning (bug, to verify).** Deactivate changes a version. To verify on a test warehouse: run a raw UPDATE and inspect it.
+
+- **To verify** (needs a running system): call an internal command.
+- Keep this warehouse step.
+
+See the "To verify" note in section 9.
+
+## Recovery
+
+Use load_get to verify the physical departure object.`;
+ const clean=sanitizePublicMarkdownSource(source);
+ assert.match(clean,/Keep this instruction/);assert.match(clean,/Keep this warehouse step/);assert.match(clean,/Use load_get to verify the physical departure object/);
+ assert.doesNotMatch(clean,/Warning \(bug|To verify on|\*\*To verify\*\*|See the "To verify"|raw UPDATE/i);
+});
+
+test('early sanitizer removes author verification notes across the documentation corpus',()=>{
+ const docs=resolve(site,'../docs-obsidian/user-guide');
+ const files=[];
+ const walk=(dir)=>{for(const entry of readdirSync(dir,{withFileTypes:true})){const path=join(dir,entry.name);if(entry.isDirectory())walk(path);else if(entry.name.endsWith('.md'))files.push(path);}};
+ walk(docs);
+ const authorNote=/(?:^|^\s*[-*+]\s+|[\n.!?]\s+|\(\s*|>\s*|\|\s*)(?:\*\*)?to verify(?:\*\*)?\b|\bnot confirmed(?: by code)?\b|\bwhere it comes from\b|\b(?:I\s+)?searched\s+in\b/im;
+ for(const file of files){
+  const clean=sanitizePublicMarkdownSource(readFileSync(file,'utf8'));
+  assert.doesNotMatch(clean,authorNote,file);
+ }
+});
+
+test('publication sanitizer scans large customer text without regex backtracking stalls',()=>{
+ const customerText='Customer-facing warehouse instruction without implementation evidence. '.repeat(15000);
+ const tree={type:'root',children:[{type:'table',children:[
+  {type:'tableRow',children:[{type:'tableCell',children:[{type:'text',value:'Instruction'}]}]},
+  {type:'tableRow',children:[{type:'tableCell',children:[{type:'text',value:customerText}]}]},
+ ]}]};
+ const started=process.hrtime.bigint();
+ sanitizePublicGuideTree(tree);
+ const elapsedMs=Number(process.hrtime.bigint()-started)/1e6;
+ assert.ok(elapsedMs<2000,`large-text sanitization took ${elapsedMs.toFixed(1)} ms`);
+ assert.match(tree.children[0].children[1].children[0].children[0].value,/Customer-facing warehouse instruction/);
+});
+
+test('publication sanitizer rewrites raw guide filenames and hides internal fix history',()=>{
+ const tree={type:'root',children:[
+  {type:'paragraph',children:[{type:'text',value:'See '},{type:'inlineCode',value:'02-users-roles-permissions.md'},{type:'text',value:' and configure '},{type:'inlineCode',value:'enterprise.warehouse'},{type:'text',value:'.'}]},
+  {type:'paragraph',children:[{type:'text',value:'Fixed in P-06 (commit 52e3757a8).'}]},
+ ]};
+ sanitizePublicGuideTree(tree);
+ const rendered=JSON.stringify(tree);
+ assert.match(rendered,/users roles permissions guide/);
+ assert.match(rendered,/warehouse settings/);
+ assert.doesNotMatch(rendered,/\.md|enterprise\.warehouse|P-06|52e3757a8/);
+});
+
+test('public-output rules reject raw author files, audit headings and source revisions',()=>{
+ const forbidden=[
+  '<h2>Findings</h2>',
+  'See 06-outbound-setup.md before continuing.',
+  'Source revision abc123456789',
+  'Run app-server check-config.',
+  'Edit enterprise.warehouse directly.',
+ ];
+ for(const value of forbidden){
+  assert.ok(PUBLIC_FORBIDDEN_PATTERNS.some((pattern)=>{pattern.lastIndex=0;return pattern.test(value);}),value);
+ }
 });
 
 test('early Markdown sanitizer protects descriptions, tables, lists and search text',()=>{

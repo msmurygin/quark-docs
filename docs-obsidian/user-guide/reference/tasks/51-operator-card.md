@@ -22,19 +22,15 @@ Table: `operator`.
 | `Equipment Profile` | `equipment_profile_id` | Whole number, chosen from a list of equipment profiles | No | Empty = on foot | The machine the operator drives. The only field you can change here. The RF terminal can also write it: see below. |
 
 `Login`, `Name` and `Active` are written by the sync and by nothing else. The method `update_operator` accepts only `equipment_profile_id`.
-Source: `crates/services/app-server/src/web/rpcs/operator_rpc.rs:1-12,60-75` and `crates/libs/wms-lib-core/src/model/tasks/operator.rs` (`OperatorForUpdate`).
 
 To empty `Equipment Profile`, use `Clear value` in the picker footer and press `Save`.
 The method treats an explicit empty value as "on foot" (`WithExplicitNulls`).
-
-> Not confirmed by code: that the `Clear value` button is visible on this picker. The widget has it only when the form switches it on, and the migration that did so is archived. To verify: open the picker on an operator who has a profile.
 
 ### The terminal can change it too
 
 When an operator asks for pick work on the RF terminal and names a machine, the system writes that machine to this field.
 If the operator says "on foot", the field is emptied. If the operator names nothing, the field is left as it is.
 So the value on the card is the machine of the last shift, not only what a supervisor typed.
-Source: `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:329-360` and `OperatorBmc::set_shift_equipment_profile`.
 
 ### What the equipment profile does
 
@@ -42,9 +38,6 @@ Source: `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:329-360`
 |---|---|
 | Handing out work | The profile gives a lifting limit: `max_weight`, lowered by `weight_reduction_per_level` for each level of the location. A task heavier than that limit is not offered to this operator. A profile with `max_weight` 0, or no profile, means no limit. |
 | Cart picking | The work area has its own picking policy for each equipment profile. The policy of the operator's profile is the one used. |
-
-Sources: `crates/libs/wms-tasks/src/service/claim.rs:170-187`, `crates/libs/wms-lib-core/src/model/equipment_profile.rs:55-90`, `crates/libs/wms-outbound/src/picking/commands/start.rs:182-190`.
-The profiles themselves are set up in the work area screens, not here.
 
 ## Who can use it
 

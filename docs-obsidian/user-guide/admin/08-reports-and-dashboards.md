@@ -14,18 +14,15 @@ updated: 2026-10-10
 
 Open the report catalogue, run a report, and check that the report service is set up.
 
-Reports are produced by a separate service named **Quark Reports**.
-The web UI shows it inside a frame. The service has no users of its own.
-The web UI signs a short token (5 minutes) that carries the user, the language, the warehouse and the allowed report codes.
+To create your own report, follow [Build a Custom Report](12-build-custom-reports.md). It covers parameters, read-only SQL datasets, Typst templates, preview and saving.
+
+Reports are produced by **Quark Reports** and shown inside the web UI. The report uses the active warehouse, language, date format and timezone from your current session.
 
 ### Before you start
 
-- Role to run reports: all roles (`print_report`, `list_report_album`, `get_report_album` and `set_report_favorite` are granted to `ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR`; `VIEWER` also holds `print_report` and `set_report_favorite`).
+- All standard warehouse roles can run reports and manage their own favourites.
 - You work in a **warehouse**, not in Enterprise mode.
-- The installer set these two values for `web-ui-server`:
-  - `REPORTS_SERVICE_URL`: the address of the report service.
-  - `REPORTS_JWT_SECRET`: a shared secret of at least 32 bytes. The report service reads the same secret as `QUARK_REPORTS_JWT_SECRET`.
-- The report service runs, and its catalogue was loaded (`import-catalog`).
+- The installer has enabled Quark Reports and loaded the site's report catalogue.
 
 ### Steps
 
@@ -73,10 +70,7 @@ Inventory count reports (category `inventory`). Each asks for a period, `date_fr
 - `Count Variance Causes` names a seeded cause by the description of the cause list, which is English (`Mix-up with another item`). The board names it in the reader's language. Your own causes appear as you named them. A difference accepted before causes existed appears as not recorded.
 - `Inventory Accuracy` and the board's `Inventory accuracy` use one definition: a location's **first** count matched when every line matched.
 
-Access rule today:
-
-- The token carries `reports = ["*"]`, so **every** report is allowed for every user. The code comment calls this "step 1". Narrowing the list per role is not built.
-- The `designer` claim (permission to open the report editor) is true only when the user passes the Studio-admin check.
+All standard warehouse roles can run the reports currently offered by the catalogue. **Report designer** is shown only to users with designer access.
 
 ### What you should see
 
@@ -87,21 +81,16 @@ Access rule today:
 
 | Message | Meaning | Fix |
 |---|---|---|
-| A banner `wms-reports-unconfigured` instead of the frame | `REPORTS_SERVICE_URL` or `REPORTS_JWT_SECRET` is missing, or the secret is shorter than 32 bytes. | Ask the installer to set both. |
-| A banner `wms-reports-enterprise` | You are in Enterprise mode. | Switch to a warehouse. |
-| A banner `wms-reports-unavailable` | The token could not be signed. | Check the secret and the logs. |
-| The frame is blank or refuses to load | The address in `REPORTS_SERVICE_URL` does not match the address the frame uses. | Check the address ("Nothing was done. Check REPORTS_SERVICE_URL against the address ..."). |
-| The report service refuses to start | `QUARK_REPORTS_RENDER_KEY` is missing (at least 32 bytes). | Set it. |
-| The catalogue is empty | The catalogue was never imported or `reports[]` is empty. | Run `quark-reports import-catalog`. |
+| Reports are not configured | The reports module is not available for this installation. | Ask the installer to enable Quark Reports. |
+| Reports are unavailable in Enterprise mode | Reports need a warehouse data context. | Switch to a warehouse. |
+| The frame is blank or unavailable | The reports module could not open or your session expired. | Refresh once. If it continues, ask the system administrator to check the reports service. |
+| The catalogue is empty | No report is available to your session. | Ask an administrator to check the report catalogue and your access. |
 
 ### What this affects later
 
-- The frame uses your active warehouse schema for its data sets.
-- Report run history is stored in the report service schema `reports`.
-- Deletions in your own report tables do not travel to the service (see its install guide).
-
-- The old report definition screen is retired. Its menu item `report_def_menu` is inactive and does not reach the sidebar.
-- Report definitions are added in two ways. The command `quark-reports import-catalog` loads the catalogue. Or a Studio admin clicks `Report designer` above the frame on `Sidebar > Overview > Reports` and edits there. The same page has `Label designer`.
+- Every run uses the warehouse that is active when the report opens.
+- A user with designer access can click **Report designer** above the catalogue to create or edit a report. See [Build a Custom Report](12-build-custom-reports.md).
+- The same page can open **Label designer** when label design is enabled for the installation.
 
 ## 2. Dashboard
 

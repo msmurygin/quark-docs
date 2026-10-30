@@ -17,12 +17,12 @@ Paths start at `crates/libs/` unless they say otherwise. `file:line` shows where
 ## 1. How a policy is read and written
 
 - A policy is **one flat record**. Selection filters, grouping, size limits, schedule and release mode all live in the same row (`wave_policy`). Migrations: `wms-lib-sql/sql/wms-app/migrations/078_wave_policy_builder.sql`, `081_wave_policy_scheduling.sql`, `082_wave_policy_automatic_release.sql`.
-- `wave_policy_save` **replaces every user field** at once. It is not a patch. A field you leave out becomes empty or false, with one exception rule below. Read the policy first (`wave_policy_get`), change what you need, send it all back with the version you read (`wms-lib-core/src/model/outbound/wave_policy.rs:212-246`).
-- Required keys on the wire: `code`, `eligible_statuses`, `include_undated`, `group_by_owner`, `group_by_carrier`, `group_by_requested_ship_date`, `max_orders`, `max_waves_per_run`, `is_active`. Optional keys: `description`, `priority_from`, `priority_to`, `requested_ship_days_ahead`, `owner_id`, `carrier_id`, `max_lines`, `schedule_interval_minutes`, `schedule_starts_at`, `auto_release` (`wave_policy.rs:66-89`).
+- `wave_policy_save` **replaces every user field** at once. It is not a patch. A field you leave out becomes empty or false, with one exception rule below. Read the policy first (`wave_policy_get`), change what you need, send it all back with the version you read.
+- Required keys on the wire: `code`, `eligible_statuses`, `include_undated`, `group_by_owner`, `group_by_carrier`, `group_by_requested_ship_date`, `max_orders`, `max_waves_per_run`, `is_active`. Optional keys: `description`, `priority_from`, `priority_to`, `requested_ship_days_ahead`, `owner_id`, `carrier_id`, `max_lines`, `schedule_interval_minutes`, `schedule_starts_at`, `auto_release`.
 - **The schema defaults do not apply through the API.** The API has no default for `max_orders` (schema 100), `max_waves_per_run` (schema 10), `is_active` (schema true) or `eligible_statuses` (schema all three). You must send them. The defaults apply only to a direct SQL insert.
-- `auto_release` has a default on the wire: if you leave it out, it is `false`. A `wave_policy_save` that forgets this key **turns auto-release off** (`wave_policy.rs:86-87`).
+- `auto_release` has a default on the wire: if you leave it out, it is `false`. A `wave_policy_save` that forgets this key **turns auto-release off**.
 - No wave policy exists after install. No migration and no development seed creates one (`grep` of `wms-lib-sql` finds no insert).
-- Normalisation: the code is trimmed; statuses are trimmed and duplicates dropped (`waves/policy.rs:355-423`).
+- Normalisation: the code is trimmed; statuses are trimmed and duplicates dropped.
 
 Example (create a policy that builds every hour, without auto-release):
 
@@ -49,7 +49,7 @@ Example (create a policy that builds every hour, without auto-release):
 }
 ```
 
-Roles: `wave_policy_create`, `wave_policy_save`, `wave_policy_build` = Admin, Manager. Read and preview = Admin, Manager, Supervisor (`app-server/src/web/rpcs/wave_rpc.rs:15-22`).
+Roles: `wave_policy_create`, `wave_policy_save`, `wave_policy_build` = Admin, Manager. Read and preview = Admin, Manager, Supervisor.
 
 ## 2. Policy fields (table `wave_policy`)
 
@@ -77,7 +77,7 @@ Each card has the same rows. "Code" in the last column of "What it affects" is t
 | What it does | The name of the policy. Used only to find it (`wave_policy_list` sorts by it). It is **not** part of generated wave codes. |
 | What it affects | Nothing in the engine. |
 | Example | `DAY`, `NIGHT-EXPRESS` |
-| Refusals | `wave policy code must not be blank`; `wave policy code must not exceed 30 characters`; `a wave policy with this code already exists` (error code `WAVE_POLICY_CODE_ALREADY_EXISTS`) (`waves/policy.rs:28-36`, `error.rs:57-60`) |
+| Refusals | `wave policy code must not be blank`; `wave policy code must not exceed 30 characters`; `a wave policy with this code already exists` (error code `WAVE_POLICY_CODE_ALREADY_EXISTS`) |
 | When you change it | `wave_policy_save` can rename the policy. Existing waves are not affected. |
 
 ### 2.3 `description`
@@ -123,7 +123,7 @@ Each card has the same rows. "Code" in the last column of "What it affects" is t
 
 ### 2.6 `priority_to`
 
-Same as 2.5 but the upper bound: takes orders with priority **at most** this number (`wave_policy.rs:322`). Example: `priority_to = 50` skips orders with priority 51 or more. Empty = no upper bound.
+Same as 2.5 but the upper bound: takes orders with priority **at most** this number. Example: `priority_to = 50` skips orders with priority 51 or more. Empty = no upper bound.
 
 ### 2.7 `requested_ship_days_ahead`
 
@@ -282,13 +282,13 @@ Same as 2.11, with the requested ship date. Orders with no date form their own g
 | Type | date and time, may be empty |
 | What it does | When the policy is next due. Owned by the scheduler; you cannot write it. Returned by `wave_policy_get`. |
 | What it affects | `wave_policy.rs:250-267` (a policy is due when active and `next_run_at <= now`) |
-| Interactions | Empty while the policy is inactive or has no schedule (`chk_wave_policy_next_run`). After a run it moves to `next_run_at + interval x (whole intervals since the slot + 1)`, that is the first boundary after now (`wave_policy.rs:283-290`). |
+| Interactions | Empty while the policy is inactive or has no schedule (`chk_wave_policy_next_run`). After a run it moves to `next_run_at + interval x (whole intervals since the slot + 1)`, that is the first boundary after now. |
 | Example | Slot 08:00, interval 60, finished at 08:00:05: next 09:00. Server down until 10:30: one run, then 11:00. |
 | Does not bump | `version` (the scheduler does not change the user version). |
 
 ### 2.20 `last_scheduled_at`
 
-Read-only. The slot time that the scheduler committed most recently (`wave_policy.rs:283`). Informational. Empty until the first scheduled run. A build by hand does not set it.
+Read-only. The slot time that the scheduler committed most recently. Informational. Empty until the first scheduled run. A build by hand does not set it.
 
 ### 2.21 `auto_release`
 
@@ -349,7 +349,7 @@ One row per build (by hand or by schedule), and one row per scheduled slot whose
 | `outcome` | `Succeeded` (default; every build before wms-app 094) or `Failed`. |
 | `error` | Why a `Failed` run failed. Empty exactly when the run succeeded (check `chk_wave_policy_run_failure_says_why`). A failed run has 0 candidates and takes the slot's unique index, so one slot is never recorded twice. |
 
-The counts are results. Nothing reads them back (`wave_policy.rs:347-397`).
+The counts are results. Nothing reads them back.
 
 ## 4. Wave (table `wave`)
 
@@ -397,7 +397,7 @@ Constraints (`077_manual_order_waves.sql:36-58`): the markers must agree with th
 | `wave_id` | The wave. |
 | `claimed_at`, `claimed_by` | When and who. |
 
-A claim is written when an order is added to a wave, removed when a Draft member is removed, and removed for all members when a wave is cancelled. It is **not** removed when the wave is released or settled. A policy build and a manual add skip claimed orders (`wave_policy.rs:328`, `aggregate.rs:55-80`).
+A claim is written when an order is added to a wave, removed when a Draft member is removed, and removed for all members when a wave is cancelled. It is **not** removed when the wave is released or settled. A policy build and a manual add skip claimed orders.
 
 ## 7. Fixed values (not settings)
 
@@ -442,7 +442,7 @@ Meanings: page 12, section 4.
 | `schedule_interval_minutes must be between 1 and 10080` | Interval |
 | `wave membership changed while the command was acquiring locks; retry with the current version` | Race during build |
 
-All these refusals are hard failures except the version conflict and the membership change (code 40, class `Retry`). Source: `waves/policy.rs:28-56`, `waves/error.rs`.
+All these refusals are hard failures except the version conflict and the membership change (code 40, class `Retry`).
 
 ## 10. What happens when you change a policy
 

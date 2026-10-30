@@ -39,8 +39,6 @@ The order is a draft until you release it. A draft may have no lines. `Release` 
 | Event | `process.order.created`. |
 | Lines | None. |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/save_action.rs:56-110` (the screen), `crates/libs/wms-outbound/src/service/order/create.rs` (the command).
-
 After the first save the screen knows the order. The next `Save` is an update, so pressing `Save` again does not make a second order.
 
 ## What can go wrong
@@ -51,8 +49,6 @@ After the first save the screen knows the order. The next `Save` is an update, s
 | `order type '{code}' not found` | The type does not exist. | Pick another type. |
 | `ship_to owner {id} is not a customer (owner_type must be 'Cus')` | The `Ship To` owner is not a customer. | Pick a customer. |
 | `Save failed: ...` and the grid refreshes | The server refused the request. | Read the message. |
-
-> Not confirmed by code: what the screen shows when `Priority` is outside 1 to 99. The database refuses it (`chk_shipment_order_priority`), but the text that reaches the screen was not traced. To verify: type 0 in `Priority` of a new order and press `Save`.
 
 ## Related pages
 

@@ -16,8 +16,6 @@ Buttons: `Cancel` closes the window. `Return to Pool` runs the command `task_for
 
 The window does not tell you the 80 character limit. A longer text is refused with `skip_reason is too long: {len} chars, max 80`.
 
-> Not confirmed by code: whether the `Reason` box stops typing at 80 characters. To verify: type 90 characters and press `Return to Pool`. The command refusal above is what the code guarantees.
-
 ## Reassign Task (`task_reassign_modal`)
 
 Opened by `Reassign`. Data object `task_reassign`.

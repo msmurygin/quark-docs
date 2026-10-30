@@ -24,11 +24,6 @@ A button works only when all gates are open.
 | `VIEWER` | Yes | Read |
 | `SUPERVISOR` | No | None |
 
-Source: `crates/libs/wms-lib-auth/src/authorization/reconciler.rs:104-117`. The code gives no default to any other role.
-The cell for `SUPERVISOR` is therefore "no" by the code. The product description of this role is "authorizes overrides". Administrators usually grant it the screens by hand.
-
-> Not confirmed by code: that no other seed gives `SUPERVISOR` the Task Manager screens on a new database. The search of the enterprise and warehouse migrations found no such grant. To verify: on a fresh test database sign in as `SUPERVISOR` and look at the sidebar.
-
 ## Gates 2 and 3: buttons
 
 `Yes` means the default role has the right. `No` means it has not.
@@ -76,8 +71,6 @@ The `SUPERVISOR` column assumes an administrator has already granted that role t
 - The code comments in `task_commands_rpc.rs`, `seeder.rs` and `release.rs` speak of a "supervisor band" for `task_reassign`, `task_force_release` and `task_delete`. The role list in code is `Admin, Manager` only. `SUPERVISOR` has no default right to these methods. See findings file `docs-obsidian/plans/reference-findings-tasks.md`.
 - For the three task buttons, `SUPERVISOR` holds the web action and lacks the method. The button opens and the command is refused.
 - `OPERATOR` holds the web action `generic_rpc_command` and `generic_save`, but the methods behind the buttons on `Pick Assignments`, `Pick Target Exceptions`, `Operators` and `Task Permissions` refuse it.
-
-> Not confirmed by code: the exact refusal text a role sees on each button. To verify: sign in as `OPERATOR` (and as a custom `SUPERVISOR` with the screens granted) on a test warehouse and press each button.
 
 ## Related pages
 

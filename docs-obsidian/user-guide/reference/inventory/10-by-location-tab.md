@@ -25,8 +25,6 @@ Every column is read only. Quick filter means the column has a quick filter box 
 | `Status` | `hold_status` | Text | Text | No | Yes | `On hold` when any hold that is on applies to the row. Empty when no hold applies. |
 | `Hold reason` | `hold_detail` | Text | Text | No | Yes | The code of the hold and what it is fixed to, for example `QcQuarantine · Container`. Empty when no hold applies. |
 
-Sources: the form list in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql` (form `inventory_balance_list`); the view in `crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:77-155`; the table `inventory_balances` in `001_baseline.sql` of the same folder.
-
 Widths of the columns in the table: `inventory_balances.lot` is `varchar(10)` and `location` is `varchar(20)` (widened by wms-app migration 089); `sku_code` is `varchar(50)`. `qty`, `qty_allocated` and `qty_picked` are `double precision`. A balance row must have `0 <= qty_allocated <= qty` (database check `chk_inv_bal_qty_allocated`).
 
 ## What each column affects
@@ -48,9 +46,7 @@ Widths of the columns in the table: `inventory_balances.lot` is `varchar(10)` an
 
 ## Row click
 
-A click on a row opens [Move stock](17-move-stock-document.md). The document needs the row's location, SKU, lot, owner and container, and the quantities shown above. They are read from the row when you click and kept in the session (`crates/services/web-ui-server/src/extensions/customization/balance/move_action.rs:55-63`).
-
-> Not confirmed by code: what the Move stock document does for a balance whose container is `InTransit`, `Empty` or in another unusual status. The list does not filter by container status. To verify: click a row whose container is `InTransit` and press `Move`; read the message.
+A click on a row opens [Move stock](17-move-stock-document.md). The document needs the row's location, SKU, lot, owner and container, and the quantities shown above. They are read from the row when you click and kept in the session.
 
 ## Related pages
 

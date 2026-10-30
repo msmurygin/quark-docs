@@ -27,8 +27,6 @@ The code is `crates/services/web-ui-server/src/components/layout/balances_shell.
 A legend under the strip says `Stored — DB column` and `Computed — view / aggregation`. Column values are drawn in two styles to show which kind they are.
 The legend also says `hover row → ⋮ for actions`. No row action is defined for the lists of this screen (`Row action` is `no` for every column in the metadata).
 
-> Not confirmed by code: what the strip shows when the warehouse has no stock at all. To verify: open `Balances` in a new empty warehouse. The code uses 0 for a missing value.
-
 ## The tabs
 
 All seven tabs show a count next to the tab name (`Shows count` is on for every tab).
@@ -48,7 +46,7 @@ Every list has a filter bar (`More filters`), a `Columns` menu and `Views`, like
 
 ## ATP (available to promise)
 
-ATP is the quantity that can be promised to an order. It is computed by the view `inventory_balance_atp` (`crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:77-155`):
+ATP is the quantity that can be promised to an order. It is computed by the view `inventory_balance_atp`:
 
 ```
 ATP = max( 0 , qty − qty_allocated − qty_picked − (qty if a blocking hold applies, else 0) )

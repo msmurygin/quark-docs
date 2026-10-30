@@ -29,7 +29,7 @@ A difference within the count tolerances is accepted on its own when the counter
 
 ## What the server does
 
-`inventory_count_accept` works in one transaction (`crates/libs/wms-inventory/src/service/inventory_count/accept.rs`):
+`inventory_count_accept` works in one transaction:
 
 1. Checks the cause before it writes anything: an active value of `count_variance_cause` that is not the system's own. The comment is at most 200 characters.
 2. Locks the count and the location row and checks the status and the version. A difference worth more than the accepter's limit is refused with `COUNT_VARIANCE_ABOVE_LIMIT` unless the user has `inventory_count.accept_large_variance`.

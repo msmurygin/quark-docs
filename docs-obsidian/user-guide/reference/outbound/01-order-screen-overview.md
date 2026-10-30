@@ -14,8 +14,6 @@ The screen is a shell form (`shipment_order_shell`) with two slots.
 
 The top form shows a back arrow (the form is set to show one).
 
-> Not confirmed by code: where the back arrow leads. To verify: open an order from the list, click the arrow, and note the screen that opens.
-
 ## Tabs
 
 | Tab | Page | What it holds |
@@ -26,8 +24,6 @@ The top form shows a back arrow (the form is set to show one).
 | `Tasks` | [Tasks tab](13-tasks-tab.md) | The pick tasks of this order. Has `Return to Pool`, `Reassign`, `Delete Task`. |
 | `Cartons` | [Cartons tab](14-cartons-tab.md) | The boxes the plan says to use. Read only. |
 | `Cartonization exceptions` | [Cartonization exceptions tab](15-cartonization-exceptions-tab.md) | The lines the plan could not place. Read only. |
-
-Source: form `shipment_order_tabbed` in `001_baseline.sql` and the tab rows added by `wms-meta-ui` migrations 015 and 086.
 
 ## Order toolbar (`shipment_order_tabbed`)
 
@@ -41,7 +37,7 @@ Source: form `shipment_order_tabbed` in `001_baseline.sql` and the tab rows adde
 
 After `Release`, `Cancel`, `Allocate` and `Unallocate` the whole order screen is drawn again, so the status and the grey buttons are new.
 There is no `Delete` button for an order and no `Close` button.
-There was a `Preview Allocation` button. It was removed. The API method `shipment_order_allocate_preview` still exists, but no button calls it (`crates/services/web-ui-server/src/extensions/customization/shipment_order/allocate_action.rs:1-9`).
+There was a `Preview Allocation` button. It was removed. The API method `shipment_order_allocate_preview` still exists, but no button calls it.
 
 ## Lines area
 
@@ -60,7 +56,7 @@ The orders are grouped in three families.
 | Released family | `Partially released`, `Released`, `Partially picked`, `Picked` | Launched. Also an order that was released and whose lines were all cancelled, even if it reads `New` again. |
 | Finished | `Closed`, `Cancelled` | Also any status the screen does not know. |
 
-The family uses the status **and** the launch marker (`released_at`). The marker wins over a New-family status (`status_render.rs:285-293`).
+The family uses the status **and** the launch marker (`released_at`). The marker wins over a New-family status.
 
 | | New family | Released family | Finished |
 |---|---|---|---|
@@ -78,11 +74,7 @@ The family uses the status **and** the launch marker (`released_at`). The marker
 | Line field `Ordered` | Editable | Editable | Read only |
 | Line fields `SKU`, `UOM` | Editable, but read only for a line that has a reservation | Read only | Read only |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/status_render.rs:218-262` (the grey buttons) and `:72-92`, `:150-168` (the read only fields).
-
-A New order that has not been saved has no status yet. The screen then changes nothing (`status_render.rs`, the early return on an empty status).
-
-> Not confirmed by code: whether a grey button shows a tooltip. Only the line `Delete` has a coded reason ("This line has reservations — Unallocate first to remove it"). To verify: hover over a grey `Release` on a `Released` order.
+A New order that has not been saved has no status yet. The screen then changes nothing.
 
 ## Related pages
 

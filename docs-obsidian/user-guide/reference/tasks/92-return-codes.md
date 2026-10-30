@@ -5,8 +5,6 @@ This page lists the codes that the Task Manager commands use, in plain words, an
 
 ## Codes of the task commands
 
-Source: `TaskError::to_rf_envelope` in `crates/libs/wms-tasks/src/error.rs` and `DissolveError::into_model_error_said` in `crates/libs/wms-outbound/src/picking/commands/dissolve.rs`.
-
 | Code | Class | Meaning | Where you meet it |
 |---|---|---|---|
 | 0 | HardFail | A plain refusal with a message. Nothing to retry. | Many. See below. |
@@ -53,8 +51,6 @@ For the shared meaning of 40, 42 and 44 see [Return codes](../inbound/92-return-
 | `CARTON_REPLAN_REQUIRED` | A position waits for carton recovery. | `Dissolve` |
 | `CARTON_EXCEPTION_NOT_RECOVERING` | The box-full exception does not wait for recovery. | `Retry` |
 | `IN_PICK_ASSIGNMENT` | A single-task pick door was used for a task that is in a live pick assignment. | RF only |
-
-Sources: `crates/libs/wms-outbound/src/picking/infrastructure/holder_change.rs:74-83`, `crates/libs/wms-inventory/src/domain/inventory_count/aggregate.rs:165`, `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:491-507`, `crates/libs/wms-outbound/src/picking/error.rs:178-240`, `crates/libs/wms-outbound/src/domain/target_exception/aggregate.rs:207`.
 
 ## Related pages
 

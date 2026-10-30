@@ -39,9 +39,6 @@ Buttons: `Save` (`generic_validate`, then `generic_save`) and `Delete` (`generic
 
 A row is unique for one operator, one task type and one work area (`uq_operator_task_permission`).
 A work area that has permission rows cannot be deleted (foreign key `RESTRICT`), and an operator cannot be deleted either.
-Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql` (table `operator_task_permission` and its constraints).
-
-> Not confirmed by code: the exact text shown when you save a second row for the same operator, type and area. The database refuses it. To verify: add the same row twice on a test warehouse.
 
 ## What the rights do
 
@@ -52,7 +49,6 @@ Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql` (table
 | `Pick Execution` = `No` on a `Pick` row | New pick work is refused for the operator in that area. Work the operator already holds can be finished. |
 
 The flag has no effect on the other task types. It is read only when pick work is handed out.
-Sources: `crates/libs/wms-tasks/src/error.rs` (`NoWorkArea`), `crates/libs/wms-lib-core/src/model/tasks/operator_task_permission.rs:106-140`, `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:205-245`, `039_pick_cutover_hardening.sql`.
 
 Zones belong to a work area. The zone of a location decides which area a task is in (`work_area_zone`).
 The equipment profile of the operator then removes the zones and tasks the machine cannot serve. See [Operator card](51-operator-card.md).
@@ -69,8 +65,6 @@ The equipment profile of the operator then removes the zones and tasks the machi
 
 - Who is offered which task on the RF terminal.
 - Nothing already held: a task that an operator holds is not taken away when the row is deleted.
-
-> Not confirmed by code: that a held task is not taken away. No code path was found that reacts to a deleted permission row. To verify: delete a row while the operator holds a task of that type.
 
 ## Related pages
 

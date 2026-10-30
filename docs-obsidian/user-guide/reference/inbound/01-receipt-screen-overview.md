@@ -56,8 +56,6 @@ The card has its own tabs. See [Line detail tab](21-line-detail-tab.md).
 | `OnHold` | Same as above. | `New` and `Delete` are grey: "The receipt is closed, cancelled or on hold - lines can no longer be added or removed". |
 | `Closed`, `Cancelled` | Every field is read only. | `New` and `Delete` are grey with the same text. |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/receipt/header_render_action.rs:29-83` and the bindings of the form `receipt_detail_list`.
-
 ## Related pages
 
 - [Receipts list](00-receipts-overview.md)

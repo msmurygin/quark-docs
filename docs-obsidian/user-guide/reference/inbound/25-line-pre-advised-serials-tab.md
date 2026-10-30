@@ -17,7 +17,7 @@ The list is read only and has no toolbar.
 ## How rows get here
 
 No screen, no API method and no import writes these rows today.
-The only code that creates them is the data layer itself (`crates/libs/wms-lib-core/src/model/receipt/receipt_detail_advised_serial.rs`), which is used by tests.
+The only code that creates them is the data layer itself, which is used by tests.
 On a normal installation the tab is empty.
 
 ## What it affects
@@ -32,7 +32,6 @@ A serial that is not on the list is refused with code 95 (`SerialAsnNotAdvised`)
 `Serial {serial} is not on the ASN pre-advised list for receipt line {id}. Scan only serials vendor pre-advised, or open a discrepancy report.`
 The refusal cannot be overridden.
 A line with an empty list accepts any serial.
-Source: `crates/libs/wms-serial/src/service/serial/commands/capture_serial.rs:332-370`.
 
 ## Messages
 

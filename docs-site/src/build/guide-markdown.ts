@@ -86,11 +86,6 @@ export const createParseFrontMatter = (guideDir: string): MarkdownConfig['parseF
     return {frontMatter: {...frontMatter, title: 'Getting started', sidebar_label: 'Getting started', slug: '/'}, content};
   }
 
-  if (rel === 'assets/MISSING-SCREENSHOTS.md') {
-    // Linked from two guide pages; reachable, but not part of the navigation.
-    return {frontMatter: {...frontMatter, unlisted: true, title: 'Screens without a picture'}, content};
-  }
-
   const h1 = /^# +(.+?)\s*$/m.exec(content);
   if (h1) {
     const clean = h1[1].replace(/^\d+\s+/, '');
@@ -129,7 +124,7 @@ function splitFocus(caption: Node) {
   caption.children = out;
 }
 
-/** A screenshot the guide mentions but nobody has captured yet (see assets/MISSING-SCREENSHOTS.md). */
+/** A screenshot the guide mentions but nobody has captured yet. */
 function pendingShot(img: Node): Node {
   return {
     type: 'emphasis',

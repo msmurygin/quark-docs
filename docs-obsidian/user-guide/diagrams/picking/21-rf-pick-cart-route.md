@@ -49,22 +49,6 @@ sequenceDiagram
 - `pick_reject` is allowed only before anything is picked. The pick first leaves the assignment, then the task returns to the pool as `Refused` with a cooldown. The refusal counter goes up, and `Allow Task Release` of the area can forbid it.
 - With `Quantity` = `Aggregated`, consecutive stops of one source in one location become one summary step: `AggregatedPick`. A skip or reject there takes the whole group. A commit and a short still go one place at a time, each into its own box.
 - A position whose box was closed full and whose repair failed holds its picks. Every route command and the delivery refuse with `CARTON_REPLAN_REQUIRED` until the operator hands the picks over. See [Box full](31-box-full-and-target-exceptions.md).
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Route order | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:26-47` |
-| Grouping of stops into one step | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:56-115` |
-| Route command checks | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:120-300` |
-| Deposit into the position's box | `crates/libs/wms-outbound/src/picking/deposit/direct_to_target.rs:1-125` |
-| Choose pallet or box | `crates/libs/wms-outbound/src/picking/deposit/mod.rs:60-105` |
-| Skip | `crates/libs/wms-outbound/src/picking/commands/skip.rs:1-60` |
-| Reject inside an assignment | `crates/libs/wms-outbound/src/picking/commands/reject.rs:1-60` and `:130-200` |
-| Short inside an assignment | `crates/libs/wms-outbound/src/picking/commands/short.rs:1-30` |
-| `Delivering` and `Picking` flip | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:840-880` |
-| RF screens and their calls | `crates/libs/wms-lib-sql/sql/rf-screens/096_uc_pick_route.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/112_uc_pick_aggregated_cart_followups.sql` |
-
 ## Related pages
 
 - [Short pick](22-short-pick.md)

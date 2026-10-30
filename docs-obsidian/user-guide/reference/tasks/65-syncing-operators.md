@@ -36,20 +36,15 @@ The messages are:
 | `Operators are up to date — nothing changed` | Nothing to do. A second press reads like this. It is not an error. |
 | `Operator sync failed: {message}` | The call failed. For example `Choose a warehouse first — operators are synced per warehouse`. |
 
-Source: `crates/libs/wms-lib-core/src/model/tasks/operator.rs:200-274`, `crates/services/web-ui-server/src/extensions/customization/operator/sync_action.rs:20-60`.
-
 ## The same sync runs by itself
 
 A background job runs the same sync for every active warehouse every 5 minutes.
 The first run comes 5 minutes after the server starts. Until then the list can be empty.
-Source: `crates/services/app-server/src/services/cleanup_tasks.rs:150,990-1016`.
 
 ## What it affects
 
 - Only an active operator can be the target of `Reassign`.
 - A deactivated operator can no longer be given pick work by a new `pick_dispatch_next`. The shift-equipment step refuses an inactive operator.
-
-> Not confirmed by code: what happens to the tasks an operator holds when the sync deactivates the operator. The sync changes only the operator row. The lease reaper returns the tasks when the lease runs out. To verify: deactivate a user who holds a task and watch the `Task Board`.
 
 ## Related pages
 

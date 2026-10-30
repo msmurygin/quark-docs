@@ -78,7 +78,7 @@ For these rows, `Resource Type` is `server_action`, `Resource` is the denied han
 
 ### What `Detail` holds
 
-For a change event, `detail` has five keys (`crates/libs/wms-lib-auth/src/authorization/audit.rs:143`):
+For a change event, `detail` has five keys:
 
 | Key | Meaning |
 |---|---|
@@ -90,12 +90,12 @@ For a change event, `detail` has five keys (`crates/libs/wms-lib-auth/src/author
 
 For a `permission_denied` event, `detail` holds `{"scope": "enterprise"}` or `{"scope": "warehouse"}`.
 
-Secrets are not written. The keys `key_hash`, `password_hash`, `token_salt`, `plaintext_key`, `pwd` and `pwd_salt` are replaced by `[redacted]` (`audit.rs`, constant `REDACT_KEYS`).
-For a user, only an allowed list of columns is written, so the password hash never appears (`UserBmc::mutation_audit_columns`, `user.rs:446`).
+Secrets are not written. The keys `key_hash`, `password_hash`, `token_salt`, `plaintext_key`, `pwd` and `pwd_salt` are replaced by `[redacted]`.
+For a user, only an allowed list of columns is written, so the password hash never appears.
 Whether a password changed is visible through `pwd_changed_at`.
 Migration `018_user_mutation_audit_holds_no_credentials.sql` removed password hashes that older versions had written.
 
-The `Detail` column shows the JSON as compact text in small grey type. A text longer than 60 characters is cut to its first 57 characters and `…`; the full text is in the tooltip (renderer `JsonSummaryRenderer`, `crates/services/web-ui-server/src/rendering/cell_renderer.rs`, function `json_summary`). The list loads when `detail` is a JSON object: the server turns an object in a text field into its compact JSON text (`BioValue::decode_from_server`, F-05, commit `49bbbf5f1`). Before the fix the whole list answered HTTP 503 as soon as one row had a JSON `detail`.
+The `Detail` column shows the JSON as compact text in small grey type. A text longer than 60 characters is cut to its first 57 characters and `…`; the full text is in the tooltip. The list loads when `detail` is a JSON object: the server turns an object in a text field into its compact JSON text. Before the fix the whole list answered HTTP 503 as soon as one row had a JSON `detail`.
 
 ## Good to know
 
@@ -107,8 +107,7 @@ The `Detail` column shows the JSON as compact text in small grey type. A text lo
 
 ## Who can use it
 
-The API methods `list_audit_log`, `get_audit_log`, `count_audit_log` and `list_audit_event_kinds` are open to the default roles `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`
-(`crates/services/app-server/src/web/rpcs/audit_log_rpc.rs:7`).
+The API methods `list_audit_log`, `get_audit_log`, `count_audit_log` and `list_audit_event_kinds` are open to the default roles `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`.
 In Enterprise only `ADMIN` reaches the screen.
 
 ## Related pages

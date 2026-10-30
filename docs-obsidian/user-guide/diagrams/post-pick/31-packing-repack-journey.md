@@ -55,28 +55,6 @@ sequenceDiagram
 - A close judges only what is inside the output carton: not empty, one order, a weight above 0. There is no expected content to compare with.
 - A first close of an output carton creates a router unit of its own (`Package`, `Pack` done). A reopen of the carton makes that unit wait for `Pack` again. A void of an empty carton that was closed and reopened marks that unit `Consumed`.
 - `packing_source_complete` is a stateful command on the obligation version. The others in this diagram are stateless, except the close (stateful on the carton).
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Action follows the unit kind | `crates/libs/wms-outbound/src/domain/packing_obligation/aggregate.rs:57` |
-| Repack open makes an obligation and no carton | `crates/libs/wms-outbound/src/packing/commands/work_open.rs:178` |
-| Next carton: rules of the carton to open | `crates/libs/wms-outbound/src/domain/packing_carton/aggregate.rs:344` |
-| Carton open is stateless and needs a `Repack` obligation | `crates/libs/wms-outbound/src/packing/commands/carton_open.rs:1` |
-| Add moves picked stock through inventory | `crates/libs/wms-outbound/src/packing/commands/add.rs:176` |
-| Add needs an open source and an open output carton | `crates/libs/wms-outbound/src/packing/commands/add.rs:167` |
-| Remove moves goods back or to another carton | `crates/libs/wms-outbound/src/packing/commands/remove.rs:238` |
-| Remove is journalled `Unpack` | `crates/libs/wms-outbound/src/packing/commands/remove.rs:271` |
-| First close of an output carton makes a `Package` unit | `crates/libs/wms-outbound/src/packing/commands/carton_close.rs:259` |
-| `carton_full` records a non-blocking exception | `crates/libs/wms-outbound/src/packing/commands/carton_close.rs:282` |
-| Complete source: nothing of the order may be left | `crates/libs/wms-outbound/src/packing/commands/source_complete.rs:14` |
-| Complete source consumes the unit | `crates/libs/wms-outbound/src/domain/packing_obligation/aggregate.rs:121` |
-| Complete source may pack the order | `crates/libs/wms-outbound/src/packing/commands/source_complete.rs:154` |
-| Void of an output carton only when empty | `crates/libs/wms-outbound/src/domain/packing_carton/aggregate.rs:385` |
-| RF screens `PACK10` to `PACK14` | `crates/libs/wms-lib-sql/sql/rf-screens/108_uc_pack_repack.sql:11` |
-| Roles and classes of the commands | `crates/services/app-server/src/web/rpcs/packing_rpc.rs:30` |
-
 ## Related pages
 
 - [Packing, verify and repack (operator)](../../operator/10-packing-verify.md)

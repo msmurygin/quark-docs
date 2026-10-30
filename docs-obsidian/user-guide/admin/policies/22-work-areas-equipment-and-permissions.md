@@ -12,9 +12,9 @@ This page lists every setting that decides **who may take a pick task, where, an
 
 Paths in the "Affects" lines are relative to `crates/libs/` unless they start with another crate name.
 
-Roles: `Admin` and `Manager` can create and change all rows on this page. `Operator` and `Viewer` can read them (`app-server/src/web/rpcs/work_area_rpc.rs:6-16`, `equipment_profile_rpc.rs:6-18`, `operator_rpc.rs:20-31`). `Supervisor` can also read equipment profiles because the RF screen `Pick by Area` lists them. The policy assignment commands are `Admin` and `Manager` only (`picking_policy_rpc.rs:17`).
+Roles: `Admin` and `Manager` can create and change all rows on this page. `Operator` and `Viewer` can read them. `Supervisor` can also read equipment profiles because the RF screen `Pick by Area` lists them. The policy assignment commands are `Admin` and `Manager` only.
 
-Nothing on this page is seeded in a production database. The dev seed (`wms-lib-sql/sql/dev_only/install-db/900-dev-seed.sql:601-631`) creates one area `MAIN_AREA` with zones `DOCK` and `RACK`, and gives the demo users 1000, 1001 and 1002 every task type in that area. The seed does not switch on `Pick Execution`. Without rows, **no operator is handed any task** (see section 6).
+Nothing on this page is seeded in a production database. The dev seed creates one area `MAIN_AREA` with zones `DOCK` and `RACK`, and gives the demo users 1000, 1001 and 1002 every task type in that area. The seed does not switch on `Pick Execution`. Without rows, **no operator is handed any task** (see section 6).
 
 ## 1. Work area
 
@@ -45,9 +45,9 @@ A work area is a group of putaway zones. An operator's rights are a grid of task
 - Column: `smallint`, not null, default 1. Check: 1 or more (`ck_work_area_max_concurrent_tasks_positive`).
 - What it does: how many tasks one operator may hold at once inside this area, when the terminal names the area.
 - Affects: for task types **other than Pick**, `wms-lib-core/src/model/tasks/task.rs:1287` (`claim_next`: a new task is handed out only while the operator holds fewer than this number).
-- **For Pick it has no effect beyond "greater than 0".** A Pick dispatch first returns the operator's own held task (`wms-tasks/src/service/candidate.rs:295-310`) and only checks `max_concurrent > 0` before searching the pool (`candidate.rs:335-348`). A cart start refuses when the operator already holds a task (`OperatorHasOtherWork`). So one operator holds either one single Pick task or one cart set, whatever this number says.
+- **For Pick it has no effect beyond "greater than 0".** A Pick dispatch first returns the operator's own held task and only checks `max_concurrent > 0` before searching the pool. A cart start refuses when the operator already holds a task (`OperatorHasOtherWork`). So one operator holds either one single Pick task or one cart set, whatever this number says.
 - Example: area limit 3. A putaway operator can hold 3 putaway tasks. A picker still holds 1.
-- When no area is named (old RF entry `Discrete Pick`): the system setting `TASK_MAX_CONCURRENT_DEFAULT` is used and area limits are not applied (`wms-tasks/src/service/work_area_rules.rs`).
+- When no area is named (old RF entry `Discrete Pick`): the system setting `TASK_MAX_CONCURRENT_DEFAULT` is used and area limits are not applied.
 - Open work: lowering it does not take tasks away from operators who hold more.
 
 ### `Allow Task Release` (`allow_task_release`)
@@ -78,7 +78,7 @@ A work area is a group of putaway zones. An operator's rights are a grid of task
 - UI label: `Pack station`. Dropdown of locations of type `Pack`. Empty is allowed.
 - Column: `varchar(20)`, null, foreign key to `location(code)`. A database trigger demands the location type `Pack` (`work_area_pack_station_is_a_pack_location`, wms-app 079).
 - What it does: names the place where this area's picked goods go to be packed.
-- Affects (`wms-outbound/src/flow/route.rs`, `picking/commands/start.rs:205-218`, `deposit/onto_pallet.rs:97-106`):
+- Affects:
   - Cart: only with `Completion` = `Confirm at the drop location`. The carrier delivery location becomes the station.
   - Pallet: only if the pallet's policy list `Pallet Drop Cell Types` holds `Pack`. The pallet's policy is the policy of the area (for the shift's equipment) when the pallet is opened through `Pick by Area` for a pick in a zone of the area; otherwise `DISCRETE`. The system finds the putaway zone of the pick's destination, then the areas that list that zone, then their stations. It routes only if **exactly one** distinct station answers. If areas disagree, the pallet is not routed.
   - With no station, nothing changes: picking delivers as before.
@@ -106,7 +106,7 @@ Table `work_area_zone`. In the area card the list `Work Area Zones`, button `New
 - UI label: `Putaway Zone` (required, popup picker).
 - Column: `varchar(20)`, foreign key to `putawayzone(code)`. Unique with the area (`uq_work_area_putawayzone`). A zone may belong to more than one area.
 - What it does: puts every location of that zone into the area.
-- Affects: the pool filter (section 8), the operator's reachable zones (`wms-lib-core/src/model/tasks/operator_task_permission.rs:155-182`), the pack station search.
+- Affects: the pool filter (section 8), the operator's reachable zones, the pack station search.
 - Example: area `PICK-A` has zones `RACK`, `DOCK`. A task from location `A-01-01` (zone `RACK`) belongs to `PICK-A`.
 - Open work: removing a zone hides its tasks from operators who relied on it. Tasks they already hold stay with them.
 - Delete of an area is refused while zones or permissions refer to it.
@@ -160,7 +160,7 @@ Menu path: `Sidebar > Warehouse Configuration > Work Areas & Equipment > Equipme
 - UI label: `Active`. Checkbox. Column `boolean`, not null, default true.
 - What it does: an inactive profile cannot be chosen at `Pick by Area`. An operator who already drives it is refused at the next `Pick by Area` that keeps the same equipment, and chooses another kind or `On foot`.
 - Message: `this equipment kind is switched off: <code>`.
-- Affects: `wms-outbound/src/picking/commands/dispatch_next.rs` (`shift_equipment`). A carrier assignment already started, or a carrier still to deliver, is continued first; the refusal comes only when new work is asked for. Until the operator chooses again, the profile stays on the operator, and its lift limit and zone exclusions still apply (`wms-tasks/src/service/claim.rs`, `lift_capacity`). Switching a kind off never loosens a limit by itself.
+- Affects: `wms-outbound/src/picking/commands/dispatch_next.rs` (`shift_equipment`). A carrier assignment already started, or a carrier still to deliver, is continued first; the refusal comes only when new work is asked for. Until the operator chooses again, the profile stays on the operator, and its lift limit and zone exclusions still apply. Switching a kind off never loosens a limit by itself.
 
 ### `Excluded Zone` (table `equipment_profile_zone_exclusion`)
 
@@ -231,8 +231,8 @@ Menu path: `Sidebar > Warehouse Configuration > Settings & Reference Data > Syst
 
 Why a zero lease falls back to 15: a zero or negative lease would expire at once and give the task to a second operator while the first still carries the goods.
 
-- Lease and carts: a cart assignment's lease is the lease of its tasks. They are renewed together. When none reaches "now", the lease sweeper dissolves the whole assignment and returns its tasks (`wms-outbound/src/picking/lease.rs`). An assignment with every member committed is not dissolved. It goes to delivery.
-- The reaper and the sweeper run every 60 seconds (`app-server/src/services/cleanup_tasks.rs:142, 908`). The sweeper runs before the reaper. So a task can sit up to about `TASK_LEASE_TTL_MIN` + 1 minute before another operator gets it.
+- Lease and carts: a cart assignment's lease is the lease of its tasks. They are renewed together. When none reaches "now", the lease sweeper dissolves the whole assignment and returns its tasks. An assignment with every member committed is not dissolved. It goes to delivery.
+- The reaper and the sweeper run every 60 seconds. The sweeper runs before the reaper. So a task can sit up to about `TASK_LEASE_TTL_MIN` + 1 minute before another operator gets it.
 - A lease that already ran out cannot be renewed: `task <id> lease has expired; claim the work again`.
 - Example: `TASK_SKIP_ESCALATE_AFTER` = 3. Three operators refuse task 812 with a reason. After the third refusal the task has `escalated_at`. Nobody is offered it. A supervisor uses `Reassign` on the task board. The first two refusals each hide it for 10 minutes.
 - Open work: the new value applies to the next claim or renewal. Existing deadlines do not move.
@@ -257,7 +257,7 @@ Why a zero lease falls back to 15: a zero or negative lease would expire at once
 
 ## 8. The claim rules, in the order the system applies them
 
-For the Pick type the RF calls `pick_dispatch_next` (`wms-outbound/src/picking/commands/dispatch_next.rs`). The generic `task_claim` refuses Pick: `dispatch for Pick tasks is source-owned; use the source capability command`.
+For the Pick type the RF calls `pick_dispatch_next`. The generic `task_claim` refuses Pick: `dispatch for Pick tasks is source-owned; use the source capability command`.
 
 1. **One request at a time per operator.** A lock on the operator queues double presses.
 2. **A live cart assignment is continued first.** Then a carrier dissolved with goods and never delivered (`deliver your carrier with picked goods first`).
@@ -267,15 +267,15 @@ For the Pick type the RF calls `pick_dispatch_next` (`wms-outbound/src/picking/c
 6. **A held task comes first.** The oldest claimed task of the operator. If it is another task type: `operator already has Putaway task 41; resume it before requesting Pick work`. If it is no longer executable: `assigned Pick task 812 is no longer executable: <code>`.
 7. **The limit.** Section 1: only `> 0` matters for Pick.
 8. **Reachable zones.** Zones of the areas where the operator has a `Task Type` right, minus the excluded zones. If none: `you have no right to take Pick tasks in work area PICK-A — ask a supervisor` (or `in any work area`).
-9. **The pool.** A task is in the pool when all hold (`task.rs:999`):
+9. **The pool.** A task is in the pool when all hold:
    - status `Created`, no assignee, right task type;
    - its `from_location` is in a reachable zone;
    - not escalated;
    - not refused within the last `TASK_SKIP_COOLDOWN_MIN` minutes;
    - not excluded earlier in this search;
    - liftable by the operator's equipment (section 4).
-10. **The order.** `task.priority` ascending (it is the order priority; smaller is sooner; default 50), then the location `Route Sequence` ascending (empty last), then oldest `created_at`, then id (`task.rs:630-641`).
-11. **The source says yes or no** for the first candidate that is locked (skip-locked, so two operators never wait on one task). The source rules (`picking/infrastructure/dispatch.rs`) and their codes:
+10. **The order.** `task.priority` ascending (it is the order priority; smaller is sooner; default 50), then the location `Route Sequence` ascending (empty last), then oldest `created_at`, then id.
+11. **The source says yes or no** for the first candidate that is locked (skip-locked, so two operators never wait on one task). The source rules and their codes:
 
 | Code | Meaning |
 |---|---|
@@ -330,6 +330,6 @@ In a named area the search uses only that area's zones (one phase `CurrentArea`)
 ## 12. Inconsistencies found while reading the code
 
 1. `Max Concurrent Tasks` has no effect on Pick (section 1), although the model comment says it is read by claim since step 6.
-2. Fixed (P-07, commit `356109c80`). The RF field `Reason` on `Reject Pick` (`PICK11` revision 2, `PKA27` revision 3) used to allow 250 characters while the server allows 80 (`wms-tasks/src/service/release.rs:64`). The terminal now stops at 80 (`wms-lib-sql/sql/rf-screens/113_rf_inputs_fit_the_server_limits.sql`).
+2. Fixed (P-07, commit `356109c80`). The RF field `Reason` on `Reject Pick` (`PICK11` revision 2, `PKA27` revision 3) used to allow 250 characters while the server allows 80. The terminal now stops at 80.
 3. Fixed (P-21). An operator who already drives a switched-off kind is refused at the next `Pick by Area` and chooses again; the limits stay until then (section 4).
-4. The existing guide `06-outbound-setup.md` says `SUPERVISOR` can write pick short reasons. The code allows only `Admin` and `Manager` (`app-server/src/web/rpcs/pick_short_reason_rpc.rs:21`).
+4. The existing guide `06-outbound-setup.md` says `SUPERVISOR` can write pick short reasons. The code allows only `Admin` and `Manager`.

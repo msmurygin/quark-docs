@@ -47,7 +47,7 @@ held. It names a **hold code**. The code decides what the hold forbids.
 | Menu path (holds) | `Sidebar > Management & Control > Inventory > Holds` |
 | Roles that edit codes | `Admin`, `Manager` (create, update, delete). Everyone reads. |
 | Scopes of a hold | one LPN, one lot, or one location |
-| Default code when none is given | `QcQuarantine` (`wms-inventory/src/service/hold.rs:355-370`) |
+| Default code when none is given | `QcQuarantine` |
 | Default release | none: the release date is set 36 500 days ahead unless `auto_release_at` is given |
 | Refusal for an in-transit location | `location <loc> holds only open pick pallets: it takes no location hold (hold the pallet by its LPN)` |
 
@@ -59,7 +59,7 @@ Screen labels: `Code`, `Description`, `Rank`, `Enforce`, `Overridable`, `Blocks 
 #### `code`
 - **Column and type**: `inventory_hold_code.code`, varchar(30), unique.
 - **Meaning**: the name of the hold kind. The words `Damaged`, `Destroy`, `QcQuarantine`, `QcRequired`, `CustomerReturn`, `NewItem` are also written by program code (auto holds, damage, returns).
-- **Affects**: an unknown code in a hold fails safe: **it blocks** (`wms-inventory/src/movement/hold_policy.rs:152-172`).
+- **Affects**: an unknown code in a hold fails safe: **it blocks**.
 - **When you change it**: do not rename or delete a code that holds, SKUs or program code use. Deleting leaves existing holds with an unknown code, which then block everything.
 
 #### `description`
@@ -67,12 +67,12 @@ Screen labels: `Code`, `Description`, `Rank`, `Enforce`, `Overridable`, `Blocks 
 - **Affects**: shown to the supervisor in the override question for a move (`describe()` in `hold_policy.rs:110-114`). Blank means the bare code is shown.
 
 #### `rank`
-- **Type**: bigint, required. **Stored only. It has no effect today.** Nothing reads it (comment at `wms-lib-core/src/model/policies/inventory_hold_code.rs:50-61`). The form still requires a number.
+- **Type**: bigint, required. **Stored only. It has no effect today.** Nothing reads it. The form still requires a number.
 
 #### `enforce` - `Enforce`
 - **Type**: boolean, default `true`.
 - **Meaning**: does this code forbid anything **in moves and receives**? `false` = informational only.
-- **Affects**: `decide()` in `hold_policy.rs:152-172`: `enforce = false` gives `Allow` in both directions. Also decides whether a location hold turns the location status to `Hold` (`service/hold.rs:439-490`).
+- **Affects**: `decide()` in `hold_policy.rs:152-172`: `enforce = false` gives `Allow` in both directions. Also decides whether a location hold turns the location status to `Hold`.
 - **Does not affect**: availability for orders. See 2.4, note A.
 
 #### `overridable` - `Overridable`
@@ -81,7 +81,7 @@ Screen labels: `Code`, `Description`, `Rank`, `Enforce`, `Overridable`, `Blocks 
 - **Affects**: moves (code 80/83/84 pairs) and the receive rule for held locations (code 76). Not used for availability.
 
 #### `block_inbound_flow` - `Blocks putting`
-- **Type**: boolean, not null, default `true` (`wms-app/migrations/011_a_hold_says_what_it_forbids.sql:54-56`).
+- **Type**: boolean, not null, default `true`.
 - **Meaning**: the hold forbids **putting** stock into the place it covers.
 
 #### `block_outbound_flow` - `Blocks taking`
@@ -90,7 +90,7 @@ Screen labels: `Code`, `Description`, `Rank`, `Enforce`, `Overridable`, `Blocks 
 
 #### `active` - `Active`
 - **Type**: boolean, default `true`.
-- **Meaning**: `false` switches the code off everywhere. In moves it means "enforce = false" (`policy_row`, `hold_policy.rs:196-213`). In availability an inactive code is skipped.
+- **Meaning**: `false` switches the code off everywhere. In moves it means "enforce = false". In availability an inactive code is skipped.
 
 **How the flags combine** for a move or a receive (`HoldPolicy::decide`):
 
@@ -161,13 +161,13 @@ The seed also lists the `rank` values 0, 1, 15, 17, 18, 19, 20, 30, 40, 50, 60, 
   availability.
 - **B. Location holds and the location status.** A location hold that enforces in
   **either** direction sets `location.status` to `Hold` (or `Damage` for the code
-  `Damaged`) (`service/hold.rs:439-520`). Pick dispatch and putaway read that status.
+  `Damaged`). Pick dispatch and putaway read that status.
   So for a location hold, "Blocks taking = no" does not make the stock pickable:
   the status is still `Hold`. The two direction flags are exact for **LPN and lot**
   holds, for the availability view and for moves.
 - **C. Moves that ignore holds.** "Progressive" move types (release from QC, move
   to QC, move to damage and similar) skip the LPN/lot hold check whatever
-  `MOVE_HOLD_POLICY` says (`validation.rs:332-345`).
+  `MOVE_HOLD_POLICY` says.
 
 ### 2.5 Holds that program code places
 
@@ -216,9 +216,6 @@ SKU field `lot_hold_code`: **Stored only. It has no effect today.** Nothing read
 
 Other refusals: `reason <R> is not on the adjustment reason list` (`REASON_UNKNOWN`),
 `reason <R> is retired` (`REASON_INACTIVE`).
-
-Source: `wms-inventory/src/domain/inventory_adjustment/aggregate.rs:94-230`,
-`service/inventory_adjustment/mod.rs:255-290`, `reason_settings.rs`.
 
 Details:
 - The document needs approval if **any** reason on it (the header reason or any line
@@ -321,7 +318,7 @@ file 40, section 8.1.
 
 A report needs an **active** reason: `reason_code '<x>' is not a valid damage_reason`.
 The tag `metadata.severity` only decides under which severity the **picker** offers
-the reason (`inbound/damage/vocabulary.rs`). The server does **not** check that the
+the reason. The server does **not** check that the
 reason matches the severity. A reason with no tag is offered under every severity.
 
 | Code | Description | Offered under | Order |
@@ -411,8 +408,7 @@ edited with `receipt_detail` updates). There is no code list for it: any text is
 
 Database rules: `positions` needs `holds_containers` and must be at least 1; at least
 one of `holds_inventory`, `holds_containers` must be on; sizes and weights are not
-negative; `code_prefix` is 1 to 10 characters `A-Z` and `0-9`
-(`wms-enterprise/migrations/012_handling_unit_type.sql`).
+negative; `code_prefix` is 1 to 10 characters `A-Z` and `0-9`.
 
 ### 8.2 Fields
 
@@ -436,12 +432,11 @@ negative; `code_prefix` is 1 to 10 characters `A-Z` and `0-9`
 
 **Usage policy.** For one unit, the effective policy is: the unit's own
 `usage_policy_override`, else the type's `default_usage_policy`, else by the owner of
-the asset: asset of the warehouse = `WarehouseShared`, asset of a client = `OwnOnly`
-(`wms-inventory/src/domain/handling_unit/aggregate.rs:60-70`).
+the asset: asset of the warehouse = `WarehouseShared`, asset of a client = `OwnOnly`.
 - `WarehouseShared`: the unit may hold any owner's goods.
 - `OwnOnly`: only the goods of the client who owns it. Message: `this box may not hold this owner's goods`.
 
-**Bind rules for a pick box** (`wms-outbound/src/picking/target/bind.rs:112-200`), in
+**Bind rules for a pick box**, in
 this order: not the carrier itself (`this is the carrier itself`); has a handling unit
 type (`this is not a registered box`); not on hold (`the box is on hold`); not already
 on a carrier (`the box is already on this carrier`, `the box is already on another carrier`);
@@ -472,18 +467,4 @@ These are versioned reasons with typed actions, not a code list. Full rules are 
 | Seeded reasons | `SHORT` (physical stock below system quantity; partial and zero allowed), `LPN_NOT_FOUND` (pallet not in the location; **no partial quantity**), `WRONG_LOCATION` (stock not where the system says; partial allowed) |
 | Seeded actions of each | `ReleaseCurrentRemainder` (current pick, required), `BlockSourceLocation` (entire location, required), `ReleaseRelatedReservations` (entire location, required), `RelocateResidualToMissing` (entire location, required, target zone-missing-to-location, after reservation release), `ReallocateReleasedDemand` (entire location, required, after residual relocation, current and affected orders, success when fully allocated, retry `BOUNDED_DEFAULT`, supervisor review on), `CreateInventoryCount` (current SKU at location, **not required**, after residual relocation) |
 
-Sources: `wms-app/migrations/036_pick_short_reason.sql`, `071_count_on_scan_and_putaway_exceptions.sql`.
-
 ---
-
-## 10. Findings
-
-| # | Finding | Where |
-|---|---|---|
-| 1 | Availability (view `inventory_balance_atp`, `covers_position`) ignores `enforce` and `overridable`; moves obey them. A hold with a non-enforcing code (`None`, `Ok`, `NotHold`) still makes stock unavailable. | `011_…sql:93-115`, `inventory_hold.rs:223-232`, `hold_policy.rs:152-172` |
-| 2 | For a location hold, the status `Hold` (read by pick dispatch and putaway) ignores direction. `Blocks taking = no` does not make stock pickable. | `service/hold.rs:439-520` |
-| 3 | `rank`, `shippable`, `return_inspection`, `tare_weight`, `tracking`, `lot_hold_code`, `target_disposition` are stored only or unused (`return_reason_code` is now stored on the return line). | search over `*.rs` |
-| 4 | Four owner damage actions (`WriteOff`, `RTV`, `Repurpose`, `Destroy`) exist in the database enum but not in the dropdown list and do nothing automatic. | `report_damage.rs:850-890` |
-| 5 | The server does not check that a damage reason matches the chosen severity. | `report_damage.rs` (`validate_code_list_value`) |
-| 6 | The adjustment reason flags (`allow_*`, `requires_*`) can only be changed in the database; the screen edits `count_after_post` only. | `reason_settings.rs`, `wms-meta-ui 111` |
-| 7 | Fixed (F-44, commit `81bc152f1`). An auto hold that cannot be placed refuses the receive (`HoldNotPlaced`); the line is rolled back. | `inbound/lifecycle/auto_holds.rs`, `inbound/error.rs` |

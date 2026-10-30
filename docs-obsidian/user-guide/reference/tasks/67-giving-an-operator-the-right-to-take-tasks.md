@@ -43,8 +43,6 @@ Tasks the operator already holds are not changed.
 | A message about a missing value | `Task Type` or `Work Area` is empty. The form needs both. |
 | A duplicate message | The same operator, type and area exist already. |
 
-> Not confirmed by code: the exact text of these refusals on the screen. To verify: try each on a test warehouse.
-
 ## What it affects
 
 - What the operator is offered on the RF terminal. See [Task Permissions](52-task-permissions.md#what-the-rights-do).

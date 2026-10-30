@@ -33,8 +33,6 @@ Use this page to fill an adjustment from the stock that exists: for example, eve
 | Document | Back to `Draft`. The version goes up. |
 | Stock | Nothing. A document made only of generated lines posts as "no change". |
 
-Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/generate_lines.rs`.
-
 ## Related pages
 
 - [Adjustment line card](25-adjustment-line-card.md)

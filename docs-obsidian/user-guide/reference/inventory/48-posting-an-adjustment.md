@@ -16,7 +16,7 @@ Use this page to make the stock equal to the targets of the document. `Post` is 
 
 ## What the server does
 
-`inventory_adjustment_post` (`crates/libs/wms-inventory/src/service/inventory_adjustment/post.rs`) works in one transaction, in this order:
+`inventory_adjustment_post` works in one transaction, in this order:
 
 1. Locks the header, then checks the version (return code 40 on a stale one), then locks the lines.
 2. Checks the status: `Validated` without an approval need, or `Approved`.
@@ -47,8 +47,6 @@ The error text for the cases:
 | Stock appeared while locking | `the stock changed while the adjustment was being posted; post it again` | 41 |
 | Document changed since you opened it | `version conflict on inventory_adjustment {id}` | 40 |
 | Same key, other request | An idempotency conflict | 42 |
-
-> Not confirmed by code: how the window shows the refused lines (the answer carries them in `context.lines`; the message line shows only the first part). To verify: post a document with a refused line and read the screen.
 
 ## What changes
 

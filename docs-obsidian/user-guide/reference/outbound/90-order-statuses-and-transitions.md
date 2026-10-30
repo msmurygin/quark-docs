@@ -1,7 +1,6 @@
 # Order statuses and transitions
 
 This page lists the statuses of an order and of its lines, what moves them, and what each status allows.
-The rules live in `crates/libs/wms-outbound/src/domain/shipment_order/aggregate.rs` and `status_derive.rs`.
 
 ## Statuses are worked out, not typed
 
@@ -32,8 +31,6 @@ How the status is chosen:
 3. The highest step any live line reached counts: reserved, handed out, picked. Partly and fully count as the same step. A set `released_at` lifts the step to at least "handed out".
 4. On that step the order reads the full form only when **every** live line reached the full form of that step or higher. Else it reads `Partially ...`.
 
-Source: `status_derive.rs:90-150`.
-
 Since 2026-09-12 the step "handed out" is measured by **tasks**: a pick counts as handed out when its status is `Released`, which is when a pick task exists for it. An order whose tasks were partly deleted reads `Partially released`.
 
 ## Line statuses
@@ -49,8 +46,6 @@ Since 2026-09-12 the step "handed out" is measured by **tasks**: a pick counts a
 | `Allocated` | `Allocated` | Reserved reached ordered - cancelled. |
 | `PartiallyAllocated` | `Partially allocated` | Something is reserved. |
 | `NotAllocated` | `Not allocated` | Nothing is reserved. A new line starts here. |
-
-Source: `status_derive.rs:46-80`; labels in `wms-app` migration 018 (code list `ORDER_LINE_STATUS`).
 
 ## The launch mark
 
@@ -79,9 +74,7 @@ It is not a status. It outranks one: an order that reads `New` but has the mark 
 There is no `Close` button. The API method `shipment_order_close` closes a launched order when every line is finished. It writes `closed_at` and a summary of the lines (counts and quantities, and who closed it). The event is `process.order.closed`.
 Before the picking phase the only way a line became finished was cancelling it. The code comment says the command was written first and was not given a shortcut.
 
-No action makes a line `Closed` by shipping today. The folder `crates/libs/wms-outbound/src/shipping/` holds only a `README.md` ("reserved; no compiled Rust module yet"), and no code writes `qty_shipped`. A line reads `Closed` only after its order is closed: `derive_line_status` returns `Closed` first when the order has `closed_at` (`crates/libs/wms-outbound/src/domain/shipment_order/status_derive.rs:46-53`). `shipment_order_close` is refused with `LinesStillOpen` while a line is not `Closed` or `Cancelled` (`aggregate.rs:247-257`). So today an order can be closed only when every line is finished by cancelling its quantity.
-
-Source: `aggregate.rs:236-285`, `crates/libs/wms-outbound/src/service/order/close.rs`.
+No action makes a line `Closed` by shipping today. The folder `crates/libs/wms-outbound/src/shipping/` holds only a `README.md` ("reserved; no compiled Rust module yet"), and no code writes `qty_shipped`. A line reads `Closed` only after its order is closed: `derive_line_status` returns `Closed` first when the order has `closed_at`. `shipment_order_close` is refused with `LinesStillOpen` while a line is not `Closed` or `Cancelled`. So today an order can be closed only when every line is finished by cancelling its quantity.
 
 ## What each status allows
 
@@ -104,8 +97,6 @@ Source: `aggregate.rs:236-285`, `crates/libs/wms-outbound/src/service/order/clos
 \*\* Only for a line with no reservation.
 
 Note 3: the button is on for `Partially picked` and `Picked`, but the command refuses an order that has a picked quantity: `line {n} already has {qty} picked`. Those two statuses mean something is picked.
-
-Source: `crates/libs/wms-outbound/src/service/shared/mutability.rs`, `status_render.rs:218-262`, and the gates quoted on the task pages.
 
 ## Related pages
 

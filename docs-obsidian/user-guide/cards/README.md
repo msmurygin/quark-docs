@@ -1,6 +1,6 @@
 # Task cards
 
-One A5 page per RF process, data-driven. Source: `cards.en.json` (text, keys, screens), `ui.en.json` (interface words), `template.html` (layout), `build.mjs` (renderer and checker). Output: `dist/`.
+One A5 page per RF process, data-driven.
 
 ## Rebuild
 

@@ -16,7 +16,7 @@ Paths start at `crates/libs/` unless they say otherwise. `file:line` shows where
 
 There is **no web screen** and no RF screen for waves or wave policies. Everything is done through the API (methods `wave_*` and `wave_policy_*`). The sidebar has no wave menu. The only places where a wave shows in the UI are indirect: the tasks carry a `wave_id`, and the orders are released. See `06-outbound-setup.md`, section 4, and `09-integrations-and-api.md`.
 
-Wire rules for every command: send `meta.idempotency_key` (a new UUID for each new request; the same one when you repeat a request). A command on an existing wave or policy also sends the version you read (`expected_wave_version` or `expected_policy_version`) in `data`. The commands return code 40 and the current state when the version is old (`wms-outbound/src/waves/error.rs:80-120`).
+Wire rules for every command: send `meta.idempotency_key` (a new UUID for each new request; the same one when you repeat a request). A command on an existing wave or policy also sends the version you read (`expected_wave_version` or `expected_policy_version`) in `data`. The commands return code 40 and the current state when the version is old.
 
 | Method | What it does | Kind | Version in `data` | Roles | Code |
 |---|---|---|---|---|---|
@@ -67,7 +67,7 @@ Release in both ways allocates stock inside the same transaction as the launch (
 |---|---|---|
 | `Draft` | Open. Orders can be added and removed. | Creation |
 | `Planned` | Frozen. Members are queued (`Pending`). The worker is releasing them. | `wave_release`, auto-release of a policy, `wave_retry_blocked` |
-| `Released` | Settled: no member is `Pending` or `Processing` any more. Some members may still be `Blocked` or `Failed`. | The worker, after the last queued member finishes (`wms-lib-core/src/model/outbound/wave.rs:337-373`) |
+| `Released` | Settled: no member is `Pending` or `Processing` any more. Some members may still be `Blocked` or `Failed`. | The worker, after the last queued member finishes |
 | `InProgress` | Reserved in the list. **No code sets it.** | none |
 | `Completed` | Reserved in the list. **No code sets it.** `completed_at` is never written. | none |
 | `Cancelled` | Cancelled before release finished. | `wave_cancel` |
@@ -85,8 +85,6 @@ Transitions that exist: `Draft -> Planned -> Released`, `Released -> Planned` (r
 | `Skipped` | The release hit an error, but the order was **already released** (by someone else). It counts as done. |
 | `Blocked` | The order **refused** to release for a business reason. Shows `last_error_code` and `last_error_detail`. Needs a fix, then `wave_retry_blocked`. Also used for members that were queued when the wave was cancelled (`WAVE_CANCELLED`). |
 | `Failed` | The release failed for a technical reason (not a business refusal), for example a lock timeout or a system error. Can be retried. |
-
-Source: `wms-outbound/src/waves/worker.rs:160-188`, `wave.rs:548-569`.
 
 ### 4.3 What "blocked" means in each place
 
@@ -122,8 +120,6 @@ An order can be added when it is not terminal (`Closed`, `Cancelled`), not relea
 - `order {id} is already claimed by active wave {wave}` (error code `ORDER_ALREADY_IN_ACTIVE_WAVE`)
 - `wave member sequence must be positive`, `wave member priority must not be negative`
 
-(`wms-outbound/src/domain/wave/aggregate.rs:11-100`)
-
 ### 5.2 From a policy: preview
 
 `wave_policy_preview` reads the live orders and shows the plan. It writes nothing and takes no lock, so the answer can be old a moment later. It returns:
@@ -133,7 +129,7 @@ An order can be added when it is not terminal (`Closed`, `Cancelled`), not relea
 - `batches`: for each future wave, its group (owner, carrier, ship date), its orders and its line count;
 - `exclusions`: each left-out order with a reason.
 
-Exclusion reasons you can see (`wms-outbound/src/waves/policy.rs:465-495`, `:330-333`):
+Exclusion reasons you can see:
 
 - `order exceeds max_lines and cannot be split`
 - `deferred by max_waves_per_run`
@@ -141,7 +137,7 @@ Exclusion reasons you can see (`wms-outbound/src/waves/policy.rs:465-495`, `:330
 
 ### 5.3 From a policy: build now
 
-`wave_policy_build` (Admin, Manager) does the same plan for real, in one transaction (`waves/policy.rs:239-343`):
+`wave_policy_build` (Admin, Manager) does the same plan for real, in one transaction:
 
 1. Lock the policy row. Check the version. Refuse an inactive policy: `wave policy {id} is inactive`.
 2. Read the candidates and plan the batches.
@@ -150,17 +146,17 @@ Exclusion reasons you can see (`wms-outbound/src/waves/policy.rs:465-495`, `:330
 5. If `auto_release` is on, prepare each wave for release in the same transaction (section 6.1).
 6. Close the run with the counts.
 
-Wave codes are made by the system: `A` + run id in hexadecimal + `-` + batch number in hexadecimal. Example: run 26, batch 2 gives `A1A-2`. They fit the 30-character limit even for the biggest run id (`policy.rs:523`).
+Wave codes are made by the system: `A` + run id in hexadecimal + `-` + batch number in hexadecimal. Example: run 26, batch 2 gives `A1A-2`. They fit the 30-character limit even for the biggest run id.
 
 A build that finds no candidate still writes a run with zero waves.
 
 ### 5.4 From a policy: schedule
 
-If the policy has an interval and a start time and is active, the app-server builds waves by itself. Every 5 seconds it asks each warehouse for due policies (at most 10 slots per warehouse per tick) (`app-server/src/services/cleanup_tasks.rs:158-163`). For one due policy:
+If the policy has an interval and a start time and is active, the app-server builds waves by itself. Every 5 seconds it asks each warehouse for due policies (at most 10 slots per warehouse per tick). For one due policy:
 
-1. Lock the policy row with "skip if locked", so two servers never run the same slot (`wave_policy.rs:250-267`).
+1. Lock the policy row with "skip if locked", so two servers never run the same slot.
 2. Build exactly like "build now", marking the run with the slot time (`scheduled_for`).
-3. Move `next_run_at` to the first slot **after now** (`wave_policy.rs:272-295`).
+3. Move `next_run_at` to the first slot **after now**.
 4. Commit. If anything fails, everything rolls back and the same slot stays due.
 
 A slot can run only once: there is a unique index on `(policy_id, scheduled_for)` (migration 081). If the server was off for several slots, **one** catch-up run happens and the missed slots are skipped. Example: interval 60 minutes, start 08:00, server down until 10:30. At 10:30 one run happens (for the 08:00 slot). Next run is 11:00, not 09:00 or 10:00.
@@ -171,7 +167,7 @@ The scheduler works as the system user (user id 0).
 
 ### 6.1 Freeze and queue (`wave_release`, or auto-release)
 
-Rules (`waves/commands.rs:254-303`, `domain/wave/aggregate.rs:130-147`):
+Rules:
 
 - The wave must be `Draft`: `wave must be Draft to release the wave; current status is {status}`.
 - The wave must have at least one member: `an empty wave cannot be released`.
@@ -187,13 +183,13 @@ Nothing is released yet. The call returns the wave and the member counts (`Pendi
 
 ### 6.2 The worker
 
-Every 2 seconds the worker takes up to 100 queued members per warehouse (`cleanup_tasks.rs:156-159`). For each member (`waves/worker.rs:47-263`):
+Every 2 seconds the worker takes up to 100 queued members per warehouse. For each member:
 
-1. **Claim** (own transaction): take the lowest `wave_order.id` that is `Pending` in a `Planned` wave of the current generation, or a `Processing` one older than 300 seconds. Set `Processing`, add 1 to `attempt_count`. (`wave.rs:608-641`)
-2. **Release** (own transaction): run `ReleaseShipmentOrder` as the user who requested the release (or as the system user if that user is 0), with the stored expected version and key. This validates the order, freezes its ship-to address, allocates stock, creates tasks. (`worker.rs:84-158`)
-3. **Record** (own transaction): store `Released`, `Skipped`, `Blocked` or `Failed`, the order's new version and status, or the error. If no member of this generation is `Pending` or `Processing` any more, set the wave to `Released`. (`worker.rs:190-263`)
+1. **Claim** (own transaction): take the lowest `wave_order.id` that is `Pending` in a `Planned` wave of the current generation, or a `Processing` one older than 300 seconds. Set `Processing`, add 1 to `attempt_count`.
+2. **Release** (own transaction): run `ReleaseShipmentOrder` as the user who requested the release (or as the system user if that user is 0), with the stored expected version and key. This validates the order, freezes its ship-to address, allocates stock, creates tasks.
+3. **Record** (own transaction): store `Released`, `Skipped`, `Blocked` or `Failed`, the order's new version and status, or the error. If no member of this generation is `Pending` or `Processing` any more, set the wave to `Released`.
 
-Classification of a failed release (`worker.rs:160-188`):
+Classification of a failed release:
 
 | Situation | Member status | `last_error_code` |
 |---|---|---|
@@ -204,23 +200,23 @@ Classification of a failed release (`worker.rs:160-188`):
 | Wave vanished or unreadable | `Failed` | `WAVE_NOT_FOUND`, `WAVE_READ_FAILED` |
 | Wave has no releasing user, or the user cannot be used, or the warehouse scope is missing | `Failed` | `WAVE_RELEASE_USER_MISSING`, `WAVE_RELEASE_USER_INVALID`, `WAVE_SCOPE_MISSING` |
 
-A shortage of stock is **not** a block. The order releases with a partial allocation (page 10). A bad allocation policy is not a block either: the order still launches, and the allocation error is part of the order release result (`release.rs:354-380`). Check the order after the wave if stock is short.
+A shortage of stock is **not** a block. The order releases with a partial allocation (page 10). A bad allocation policy is not a block either: the order still launches, and the allocation error is part of the order release result. Check the order after the wave if stock is short.
 
 ### 6.3 Who gets stock first
 
-The worker takes members in the order of `wave_order.id`, which is the order they were added. For a policy wave, that is the plan order: lowest `priority` number first, then earliest requested ship date (undated last), then lowest order id (`wave_policy.rs:330-332`). Within one wave, the first order allocates first and takes what it needs. The `sequence` and `priority` of the member are **not** used for this (`wave.rs:627` sorts only by id).
+The worker takes members in the order of `wave_order.id`, which is the order they were added. For a policy wave, that is the plan order: lowest `priority` number first, then earliest requested ship date (undated last), then lowest order id. Within one wave, the first order allocates first and takes what it needs. The `sequence` and `priority` of the member are **not** used for this.
 
 If you run several app-server instances, the "skip if locked" claim lets two workers process different members at the same time, so the order is then approximate.
 
 ### 6.4 Cancel (`wave_cancel`)
 
-Allowed when the wave is `Draft` or `Planned` and no member is `Processing`, `Released` or `Skipped` (`aggregate.rs:104-120`). Effect: members that were `Pending` become `Blocked` with code `WAVE_CANCELLED` and detail `wave was cancelled before this order started`; all claims of the wave are deleted (the orders are free again); the wave becomes `Cancelled`.
+Allowed when the wave is `Draft` or `Planned` and no member is `Processing`, `Released` or `Skipped`. Effect: members that were `Pending` become `Blocked` with code `WAVE_CANCELLED` and detail `wave was cancelled before this order started`; all claims of the wave are deleted (the orders are free again); the wave becomes `Cancelled`.
 
 Refusals: `wave cannot be cancelled while an order is processing or already released`. For a wave that is `Released` or `Cancelled`, the text is `a wave can be cancelled only while Draft or Planned; current status is {status}`.
 
 ## 7. Retry (`wave_retry_blocked`)
 
-Use it after you fixed the cause of a `Blocked` or `Failed` member (`waves/commands.rs:305-362`).
+Use it after you fixed the cause of a `Blocked` or `Failed` member.
 
 Rules:
 
@@ -243,14 +239,12 @@ Typical blocked texts (`detail`) and the fix:
 | `version conflict on shipment_order {id}` | Someone changed the order after the wave was released for processing | Retry; the retry takes the new version |
 | `cannot {action} an order in status {status}` | Wrong status for the action | Check the order |
 
-(Texts from `wms-outbound/src/service/order/validate.rs:60-135` and `error.rs:27-34`.)
-
 ## 8. Operator view: what you see and what you do not
 
 - **API.** `wave_get` returns `wave`, `members` (each with status, `attempt_count`, `last_error_code`, `last_error_detail`, `outcome_order_version`, `outcome_order_status`) and `progress` with these counts: `draft`, `pending`, `processing`, `released`, `blocked`, `failed`, `skipped`.
 - **Wave list.** `wave_list` sorts by `add_when` descending (1 to 200 rows, default 50). There are no filters.
 - **Order screen.** An order released by a wave looks like any released order. Its status is `Released` or `PartiallyReleased`.
-- **Tasks.** The tasks of a released order carry the wave id (`wms-outbound/src/waves/task_grouping.rs:8-18`). The claim stays after release, so a later top-up task also carries it.
+- **Tasks.** The tasks of a released order carry the wave id. The claim stays after release, so a later top-up task also carries it.
 - **Logs.** The server logs `wave release pass` and `wave policy schedule pass` lines, and `wave policy scheduler failed` when a build fails. A pass that had failures is logged with the number of `failures`.
 
 ## 9. Worked example with numbers

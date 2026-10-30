@@ -56,27 +56,6 @@ A Load can contain only part of an order. That Goods Issue is valid: the line or
 Normal complete-order Goods Issue closes automatically, so integrations do not call `shipment_order_close` after `shipment_order_ship`. Use the separate command only when the lifecycle genuinely needs closing after all line quantities are already accounted for.
 
 `close_summary` records line count, ordered, cancelled and shipped quantities, and the user who closed the order.
-
-## What to verify
-
-- `Fulfilment — base quantities` shows current ordered, allocated, picked, shipped and remaining quantities.
-- `Shipments — base quantities` shows immutable Goods Issue deltas by line.
-- A fully shipped order is `Closed`; a split departure can be `PartiallyShipped`.
-- Replaying the same command with the same idempotency key returns the committed result instead of shipping twice.
-- There is no generic status edit or shipment reversal. Correct mistakes through the site's controlled correction process, using the shipment history as the receipt.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Direct order Goods Issue | `crates/libs/wms-outbound/src/domain/shipment_order/shipping.rs`, `service/order/ship.rs` |
-| Whole-Load Goods Issue | `crates/libs/wms-outbound/src/service/load/ship.rs` |
-| Close invariant and summary | `crates/libs/wms-outbound/src/domain/shipment_order/aggregate.rs`, `service/order/close.rs` |
-| Derived order and line statuses | `crates/libs/wms-outbound/src/domain/shipment_order/status_derive.rs` |
-| Direct shipment web review | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/20261015141509_manual_shipment_confirmation.sql` |
-| Whole-Load web review | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/20261015141530_workstation_whole_load_shipment.sql` |
-| RF shipment confirmation | `crates/libs/wms-lib-sql/sql/rf-screens/129_uc_load_shipment.sql` |
-
 ## Related pages
 
 - [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue)

@@ -124,12 +124,10 @@ If you leave **Repack: Pack Items** with `Esc`, the carton stays open. The termi
 | **the container is on hold: {container}** | A hold stands on the pallet or carton. | Tell your supervisor. |
 | **say where the goods go: back into the source or into another carton** | **Put into** is empty or not an open carton or the pallet. | Scan the pallet or an open carton. |
 | **the goods must go into another container** | **Put into** is the carton itself. | Scan another label. |
-| **SERIAL_PACKING_NOT_SUPPORTED** | The carton holds serial-tracked stock. | Not supported today. |
-| **version conflict on ...** | The carton changed after you looked (an item was added or taken out). | Look at the screen again and close the carton again. |
+| The carton contains serial-tracked stock and cannot be repacked here | This workflow cannot move those serial-tracked goods. | Stop and ask a supervisor for the site's serial-handling process. |
+| The carton changed while you were working | An item was added or removed after the screen loaded. | Review the carton again, then repeat the action. |
 
 Voiding an empty output carton and reopening a closed carton have no screen yet.
-
-Source: `crates/libs/wms-lib-sql/sql/rf-screens/108_uc_pack_repack.sql`, `crates/libs/wms-outbound/src/packing/README.md` (Repack).
 
 ### Leave
 

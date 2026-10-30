@@ -30,19 +30,6 @@ Reading notes:
 - The check "every step can run" happens for all steps before the first step runs. One bad step refuses the whole policy. Examples: scope `AssignedSlot`, ordering `NearestToSlot`, `Must be empty` together with `Consolidate`, a condition value that does not exist, a `Location type` condition that leaves no authorized type.
 - The pallet is the container and everything inside it. Lines are grouped by owner, SKU and lot. Only stock above zero counts.
 - The policy is `COALESCE(sku.putaway_policy_id, owner_config.default_putaway_policy_id)` for each SKU. A SKU with neither is not counted. The pallet needs exactly one distinct policy.
-
-### Where it comes from
-
-| Gate | Source |
-|---|---|
-| Container, location, stock checks and messages | `crates/libs/wms-inventory/src/putaway/mod.rs:1320-1360`, `:120-162` |
-| Pallet read: lines, cube, weight, stack limit, positions required, zone and location preferences, pack size | `crates/libs/wms-inventory/src/putaway/mod.rs:1360-1550` |
-| One policy per pallet | `crates/libs/wms-inventory/src/putaway/policy.rs:92-155` |
-| SKU policy, then owner default | `crates/libs/wms-lib-core/src/model/sku.rs:867-885` |
-| Whole-policy check before any step | `crates/libs/wms-inventory/src/putaway/mod.rs:856-885`, `crates/libs/wms-inventory/src/putaway/step.rs:184-260` |
-| Step loop | `crates/libs/wms-inventory/src/putaway/mod.rs:908-1290` |
-| Reasons `no_eligible_location`, `pallet_already_reserved` | `crates/libs/wms-inventory/src/putaway/command.rs:56-61`, `:149-161` |
-
 ## Diagram 2. What happens inside one step
 
 **What this shows:** the gates of a single step and the status the trace records when a step is skipped.
@@ -71,18 +58,6 @@ Reading notes:
 - A step that read 5 full batches and found nothing is marked as stopped at its scan budget (`batch_cap_reached`). The next step runs.
 - `ZoneFromSku` and `LocationFromSku` use the first line of the pallet only.
 - With `Temperature` on, the test is an overlap of the zone range and the SKU range, for every line. An empty bound means no limit on that side.
-
-### Where it comes from
-
-| Gate | Source |
-|---|---|
-| Guard | `crates/libs/wms-inventory/src/putaway/step.rs:382-388`, `crates/libs/wms-inventory/src/putaway/mod.rs:936-940` |
-| Pallet conditions (`Product` and `Lot` family) | `crates/libs/wms-inventory/src/putaway/product.rs:343-372`, `crates/libs/wms-inventory/src/putaway/mod.rs:945-954` |
-| Scope to zone or location; first line of the pallet | `crates/libs/wms-inventory/src/putaway/step.rs:517-565`, `crates/libs/wms-inventory/src/putaway/mod.rs:956-980` |
-| Temperature | `crates/libs/wms-inventory/src/putaway/step.rs:438-475`, `crates/libs/wms-inventory/src/putaway/mod.rs:1007-1032` |
-| 20 per batch, 5 batches | `crates/libs/wms-inventory/src/putaway/candidates.rs:28-32`, `crates/libs/wms-inventory/src/putaway/mod.rs:1051-1117` |
-| Named location: one candidate | `crates/libs/wms-inventory/src/putaway/candidates.rs:594-602`, `crates/libs/wms-inventory/src/putaway/mod.rs:1226-1284` |
-
 ## Diagram 3. The four checks on a candidate
 
 **What this shows:** the order of the four checks, the codes each can refuse with, and the second pass under the lock.
@@ -111,26 +86,6 @@ Reading notes:
 - `Landing` is the same function that the move runs. Details are on [23-putaway-influence-master-data.md](23-putaway-influence-master-data.md).
 - `pallet_already_reserved` stops the whole scan: another request holds this pallet's single live reservation.
 - A pallet that already stands in the candidate location skips the fit switches of the capacity check. The section check and the other three checks still run.
-
-### Where it comes from
-
-| Check | Source |
-|---|---|
-| Order of the four checks | `crates/libs/wms-inventory/src/putaway/predicate.rs:1041-1048` |
-| Occupancy rule (`MixCheck` from three step columns) | `crates/libs/wms-inventory/src/putaway/predicate.rs:129-142`, `:449-651` |
-| Consolidate rule | `crates/libs/wms-inventory/src/putaway/predicate.rs:764-850` |
-| Capacity rule | `crates/libs/wms-inventory/src/putaway/predicate.rs:282-447` |
-| Landing rule and code mapping | `crates/libs/wms-inventory/src/putaway/predicate.rs:852-1017` |
-| Second pass under the lock, codes `under_lock:*`, `location_gone`, `lock_timeout` | `crates/libs/wms-inventory/src/putaway/reserve.rs:118-240`, `crates/libs/wms-inventory/src/putaway/mod.rs:731-780` |
-| Fixed gate in SQL | `crates/libs/wms-lib-core/src/model/location.rs:2097-2183` |
-| Authorized types for putaway | `crates/libs/wms-inventory/src/movement/validation.rs:135-148` |
-| Types narrowing | `crates/libs/wms-inventory/src/putaway/candidates.rs:140-175`, `:400-440` |
-
-## Not confirmed by code
-
-- Redirect ordering by distance (`suggest_nearby`) is called only from the move when a directed move is redirected. It is not a screen or an API method of its own. It is shown on [20-putaway-journey.md](20-putaway-journey.md).
-- `LocationFromSku` needs `sku.putaway_loc`. Whether warehouses fill it is data, not code.
-
 ## Related pages
 
 - [Putaway journey](20-putaway-journey.md)

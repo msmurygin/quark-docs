@@ -28,15 +28,13 @@ Paths are relative to `crates/libs/` unless they start with `crates/`.
 | Column sizes | `config_key` up to 30 characters, `config_value` and `default_value` up to 50, `description` up to 120. A longer value is refused by the database. |
 | Reading rules | The server reads `config_value`. Some readers fall back to `default_value` when `config_value` is empty (marked "value, else default" below). |
 
-Source: `wms-lib-core/src/model/sys_settings.rs`, `services/app-server/src/web/rpcs/sys_settings_rpc.rs`.
-
 ### 1.1 How the server reads a value
 
 | Reader | What it does | Used for |
 |---|---|---|
 | `get_int` | Reads `config_value`. Whole numbers and the words `true/yes/on` (= 1) and `false/no/off` (= 0), in any case, spaces ignored. Anything else, or empty, counts as "not set" and the caller uses its built-in default. | most keys |
 | `get_int_effective` | Reads `config_value`; if it is empty, reads `default_value`. | `TASK_*` |
-| `lock_timeout_ms` | The one reader of every `*_LOCK_TIMEOUT_MS` key. It reads like `get_int_effective`, and answers 5000 for anything that is not a number above 0: no row, empty, text, `0`, a negative number (`SystemSettingsBmc::lock_timeout_ms`, `wms-lib-core/src/model/sys_settings.rs:226`). | `RECEIPT_LOCK_TIMEOUT_MS`, `ORDER_LOCK_TIMEOUT_MS`, `PUTAWAY_LOCK_TIMEOUT_MS` |
+| `lock_timeout_ms` | The one reader of every `*_LOCK_TIMEOUT_MS` key. It reads like `get_int_effective`, and answers 5000 for anything that is not a number above 0: no row, empty, text, `0`, a negative number. | `RECEIPT_LOCK_TIMEOUT_MS`, `ORDER_LOCK_TIMEOUT_MS`, `PUTAWAY_LOCK_TIMEOUT_MS` |
 | `setting_is_on` | `get_int` result is not 0. A value that cannot be read means **off**. | audit keys, `CHECK_DIGIT_ENABLED` |
 | text reader | Returns `config_value` as is. | `LOC_GEN_PATTERN`, `MOVE_HOLD_POLICY`, `LABEL_RENDERER_URL` |
 
@@ -91,7 +89,7 @@ fresh install runs.
 - **Type and range**: on/off (`1/0`, `true/false`). Not set or unreadable = off.
 - **Default**: seed `1`, `Default Value` `1` (wms-app 109; it was `false` before P-24).
 - **Meaning**: may a receipt be closed when its completion is `Partial`, or `Over`/`Pending` against a plan?
-- **Affects**: `receipt_close` (`wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:196-226`).
+- **Affects**: `receipt_close`.
   Description: `Per D-21. Permit close with completion=Partial|Over via supervisor override (code 71).`
   - Off: the close is refused for good. Message: `Cannot close receipt <number>: completion is <Partial|Over|Pending> and ALLOW_CLOSE_WITH_DISCREPANCY is off` (code 71, not overridable).
   - On: the close needs code 71 confirmed by a person with the right `receipt.override_close_discrepancy`, or a supervisor grant for `receipt:<id>`. Before approval, the message is `Receipt <number> is <completion> — supervisor override required to close`.
@@ -103,7 +101,7 @@ fresh install runs.
 - **Type and range**: whole milliseconds above 0. Not set, empty, `0` or less = 5000 (section 1.1). Reads `Value`, then `Default Value`.
 - **Default**: seed `5000`.
 - **Meaning**: how long a receipt command waits for the receipt row that another command holds.
-- **Affects**: every receipt command (`wms-inbound/src/repo/locking.rs:19-28`) and receipt line planning (`planning/parent_lock.rs:122`).
+- **Affects**: every receipt command and receipt line planning.
 - **Message when it runs out**: `receipt is locked, please retry (timeout <ms>ms)` (code 41, retry).
 - **Example**: two operators receive onto the same receipt. The second waits up to 5 seconds, then gets code 41 and presses again.
 - **When you change it**: takes effect on the next command.
@@ -111,25 +109,25 @@ fresh install runs.
 #### `ORDER_LOCK_TIMEOUT_MS`
 - **Seeded** `5000` (wms-app 091). Before that migration no row existed and the key did not show on the screen.
 - **Type and range**: whole milliseconds above 0. Not set, empty, `0` or less = 5000 (section 1.1). Reads `Value`, then `Default Value`.
-- **Affects**: order commands (allocate, release, cancel) wait for the order lock (`wms-outbound/src/repo/locking.rs:19-28`).
+- **Affects**: order commands (allocate, release, cancel) wait for the order lock.
 - **Message**: `order is locked by another operation (waited <ms>ms)` (code 41, retry).
 
 #### `IDEMPOTENCY_TTL_DAYS`
 - **Type and range**: whole days. Not set = 7.
 - **Meaning**: how long a stored answer for an idempotency key is kept. A repeated request with the same key and payload inside this time returns the first answer instead of running again.
-- **Affects**: every stateless or stateful command through the pipeline (`wms-shared/src/idempotency.rs:486-491`). The cleaner removes older keys.
+- **Affects**: every stateless or stateful command through the pipeline. The cleaner removes older keys.
 - **When you change it**: new keys use the new time. Keys already stored keep their own expiry.
 
 #### `ENABLE_RECEIPT_AUDIT`
 - **Type and range**: on/off. Not set or unreadable = off.
 - **Default**: seed `1`, `Default Value` `1` (wms-app 109; it was `false` before P-24).
 - **Meaning**: write a field-level history of every change to a receipt header.
-- **Affects**: table `receipt_audit` (screen tab `Audit` of the receipt) through `ReceiptBmc::audit_setting_key` (`wms-lib-core/src/model/receipt/receipt.rs:608`, `base/audit.rs:36-56`). A daily sweeper deletes audit rows older than **365 days**. That limit is a constant (`RECEIPT_AUDIT_RETENTION_DAYS`), not a setting (`crates/services/app-server/src/services/cleanup_tasks.rs:121`).
+- **Affects**: table `receipt_audit` (screen tab `Audit` of the receipt) through `ReceiptBmc::audit_setting_key`. A daily sweeper deletes audit rows older than **365 days**. That limit is a constant (`RECEIPT_AUDIT_RETENTION_DAYS`), not a setting.
 - **When you change it**: off stops new rows. Old rows stay until the sweeper removes them.
 
 #### `ENABLE_SKU_AUDIT`
 - **Type and range**: on/off. Seed `false`.
-- **Affects**: table `sku_audit` (tab `Audit` of the SKU) (`wms-lib-core/src/model/sku.rs:573`). Not swept.
+- **Affects**: table `sku_audit` (tab `Audit` of the SKU). Not swept.
 - **When you change it**: no past history is created when you switch it on.
 
 ### 2.2 Moves and putaway
@@ -153,13 +151,13 @@ fresh install runs.
 #### `COUNT_ON_PUTAWAY_DEVIATION`
 - **Type and range**: `1` = on. Anything else = off. Seed `0`.
 - **Description**: `Directed putaway with an acknowledged deviation (code 85): 0=nothing, 1=count the destination location`.
-- **Affects**: after a directed putaway move that the operator pushed through with an acknowledged deviation, the server asks for a count of the destination location (`movement/service.rs:862-880`, reader `validation.rs:748-762`). It only writes an outbox event; the count starts after the move commits.
+- **Affects**: after a directed putaway move that the operator pushed through with an acknowledged deviation, the server asks for a count of the destination location. It only writes an outbox event; the count starts after the move commits.
 - **When you change it**: next deviating move.
 
 #### `COUNT_ON_PICK_CANCELLED`
 - **Type and range**: `1` = on. Anything else = off. Seed `0` (wms-app 119).
 - **Description**: `Order cancelled while its pick's source was already confirmed: 0=nothing, 1=count the source location`.
-- **Affects**: an order cancel asks for a count of the source location of every pick it removes whose source an operator had already confirmed (`wms-outbound/src/picking/cancelled_pick.rs`, called from `service/order/cancel.rs`). It only writes an outbox event; the count starts after the cancel commits. Count spec Appendix N.
+- **Affects**: an order cancel asks for a count of the source location of every pick it removes whose source an operator had already confirmed. It only writes an outbox event; the count starts after the cancel commits. Count spec Appendix N.
 - **When you change it**: next order cancel.
 
 #### `PUTAWAY_RESERVATION_TTL_MIN`
@@ -172,7 +170,7 @@ fresh install runs.
 - **Seeded** `5000` (wms-app 091).
 - **Type and range**: whole milliseconds above 0. Not set, empty, or 0 or less = 5000 (`DEFAULT_LOCK_TIMEOUT_MS`). Reads `Value`, then `Default Value`.
 - **Meaning**: how long a putaway suggestion waits for a location that another operator is reserving.
-- **Affects**: `wms-inventory/src/putaway/reserve.rs:362-366` (`lock_timeout_ms`); the value goes to `LocBmc::lock_all_by_code` (`reserve.rs:145`).
+- **Affects**: `wms-inventory/src/putaway/reserve.rs:362-366` (`lock_timeout_ms`); the value goes to `LocBmc::lock_all_by_code`.
 
 #### `OVERRIDE_GRANT_TTL_SECONDS`
 - **Not seeded.**
@@ -192,8 +190,8 @@ fresh install runs.
 #### `LOC_GEN_PATTERN`
 - **Type and range**: text up to 50 characters. Empty or not set = `<AISLE_PREFIX><AISLE>-<LEVEL>-<LOC>`.
 - **Description**: `location code generation pattern`.
-- **Meaning**: the shape of the codes made by the bulk generator. Placeholders: `<AISLE_PREFIX>`, `<AISLE>`, `<AISLE_SUFFIX>`, `<LEVEL_PREFIX>`, `<LEVEL>`, `<LEVEL_SUFFIX>`, `<LOC_PREFIX>`, `<LOC>`, `<LOC_SUFFIX>` (`wms-lib-core/src/model/location.rs:1079-1092`).
-- **Affects**: `gen_locs` only (`location_rpc.rs:112-119`, `:150-165`).
+- **Meaning**: the shape of the codes made by the bulk generator. Placeholders: `<AISLE_PREFIX>`, `<AISLE>`, `<AISLE_SUFFIX>`, `<LEVEL_PREFIX>`, `<LEVEL>`, `<LEVEL_SUFFIX>`, `<LOC_PREFIX>`, `<LOC>`, `<LOC_SUFFIX>`.
+- **Affects**: `gen_locs` only.
 - **Example**: aisle prefix `A`, aisle `01`, level `02`, loc `03` with the default gives `A01-02-03`.
 - **When you change it**: only locations generated afterwards.
 
@@ -202,25 +200,25 @@ fresh install runs.
 All five read `Value`, then `Default Value`. A value of 0 or less is replaced by the built-in default, except where noted.
 
 #### `TASK_LEASE_TTL_MIN`
-- **Default**: seed 15, built-in 15 (`wms-tasks/src/service/claim.rs:26`, `:190-214`).
+- **Default**: seed 15, built-in 15.
 - **Meaning**: minutes a claimed task is held for the operator before the reaper gives it back to the pool.
 - **Example**: an operator claims a task and the radio dies. After 15 minutes another operator can get it.
 - **When you change it**: leases created later. A lease already running keeps its end time.
 
 #### `TASK_SKIP_COOLDOWN_MIN`
-- **Default**: seed 10, built-in 10 (`claim.rs:218-235`).
-- **Meaning**: minutes a refused (skipped) task is invisible to everyone before it returns to the pool. The supervisor board view uses the same number (SQL view in `wms-app/migrations/051_…sql:88`, which needs whole digits above 0, else 10).
+- **Default**: seed 10, built-in 10.
+- **Meaning**: minutes a refused (skipped) task is invisible to everyone before it returns to the pool. The supervisor board view uses the same number.
 
 #### `TASK_SKIP_ESCALATE_AFTER`
-- **Default**: seed 3, built-in 3 (`claim.rs:240-260`).
+- **Default**: seed 3, built-in 3.
 - **Meaning**: after this many refusals, the task leaves the pool and waits for a supervisor.
 
 #### `TASK_MAX_CONCURRENT_DEFAULT`
-- **Default**: seed 1, built-in 1 (`wms-tasks/src/service/work_area_rules.rs:63-80`).
+- **Default**: seed 1, built-in 1.
 - **Meaning**: how many tasks one operator may hold at once **when the terminal names no work area**. When a work area is named, that work area's `max_concurrent_tasks` applies and this setting is ignored.
 
 #### `TASK_ALLOW_RELEASE_DEFAULT`
-- **Default**: seed 1, built-in on (`work_area_rules.rs:84-108`).
+- **Default**: seed 1, built-in on.
 - **Meaning**: may an operator hand back or refuse a task when the terminal names no work area. `0` is a real "no" here (not replaced). With a named work area, its `allow_task_release` applies.
 
 ### 2.5 Printing
@@ -229,7 +227,7 @@ All five read `Value`, then `Default Value`. A value of 0 or less is replaced by
 - **Type and range**: URL, text up to 50 characters. Seed `http://localhost:8086`.
 - **Description**: `Per D-16, D-22. External Typst/label renderer service URL. Used by LabelPrintService::print_label.`
 - **Meaning and order**: the address of the label renderer. The setting wins **only if its `Value` differs from its own `Default Value`**. Otherwise the environment variable `RENDERER_URL` is used. If that is empty too, `http://localhost:8086`. An empty `Value` means "use the environment".
-- **Affects**: all label printing from the warehouse (`wms-lib-core/src/renderer_url.rs:159-175`). When the setting overrides the environment with a different address, the server logs one warning per schema and address.
+- **Affects**: all label printing from the warehouse. When the setting overrides the environment with a different address, the server logs one warning per schema and address.
 - **Example**: seed row. `Value` = `Default Value` = `http://localhost:8086`, so the environment wins. Set `Value` = `http://render.internal:8086`: it differs from the default, so it wins.
 - **When you change it**: the next print.
 
@@ -280,9 +278,6 @@ These are hard-coded. There is no screen and no key.
 | Scope | one `dashboard_setting` row per warehouse (`id = 1`), plus one threshold row per metric |
 | Versioning | both are versioned. A save sends the version it read. Stale: optimistic-lock conflict with the current version. |
 
-Source: `wms-dashboard/src/domain/setting/aggregate.rs`, `wms-dashboard/src/service/setting/`,
-`wms-app/migrations/080_dashboard_settings.sql`, `wms-meta-ui/migrations/123_dashboard_settings_screens.sql`.
-
 If the settings cannot be read, the board is drawn with the defaults and shows
 `board settings unavailable — showing the defaults`.
 
@@ -315,7 +310,7 @@ Seed: one row made by migration 080 (`INSERT … (id) VALUES (1)`), so a save is
 #### `show_demo` - `Show demo figures`
 - **Column and type**: boolean, not null, default `true`.
 - **Meaning**: whether demo numbers may appear.
-- **Affects**: a slot with a demo-only source (`dock_utilisation`, and the exception `below_reorder_point`) shows the sample figure when on. When off it shows `no source` (`snapshot.rs:286-292`). Real measured numbers are never changed by this.
+- **Affects**: a slot with a demo-only source (`dock_utilisation`, and the exception `below_reorder_point`) shows the sample figure when on. When off it shows `no source`. Real measured numbers are never changed by this.
 - **Helper text on the screen**: `Off: a slot, row or panel with no module behind it says so instead of drawing the design's figure.`
 
 #### `throughput_plan_per_hour` - `Throughput plan (units/hour)`
@@ -349,7 +344,7 @@ One row per metric (unique on `metric_key`). Without a row the metric has no ale
   Messages: `a threshold needs an alert level, a critical level, or both`,
   `the critical level must be at least as bad as the alert level`,
   `a threshold level must be a finite number`.
-- **How a value is judged** (`aggregate.rs:196-216`): a level is reached **at** its value. `Above`: `value >= critical` is Critical, `value >= alert` is Alert. `Below`: `value <= …`. A value that is not a number is normal. Only measured values are judged; demo values and failed reads are always normal (`snapshot.rs:164-170`).
+- **How a value is judged**: a level is reached **at** its value. `Above`: `value >= critical` is Critical, `value >= alert` is Alert. `Below`: `value <= …`. A value that is not a number is normal. Only measured values are judged; demo values and failed reads are always normal.
 - **Example**: metric `shipments_pending`, `Above`, alert 40, critical 60. A value of 40 is Alert, 60 is Critical, 39 is normal. For `inventory_accuracy`, `Below`, alert 98, critical 95: 98 is Alert, 95 is Critical.
 - **Affects**: only the colour/level of the rail slot. No document or stock changes.
 
@@ -359,14 +354,14 @@ One row per metric (unique on `metric_key`). Without a row the metric has no ale
 |---|---|---|---|
 | `LABEL_RENDERER_URL` | system setting | label renderer address (section 2.5) | yes |
 | `Auto-Print LPN` (`owner_config.auto_print_lpn_on_receive`) | owner, tab `Receiving` | print the LPN label after a receive (file 41, B.8) | yes |
-| Printer assignment | table `printer_assignments`, API only | which printer a print goes to. Fields: `scope_type` (`User`, `Zone`, `Owner`, `Warehouse`), `scope_id` (the user id, zone id or owner id; empty for the warehouse), `printer_id`, `priority` (default 100, lower wins inside a scope), `is_active` (default true). Order: **Zone → User → Owner → Warehouse** (`wms-lib-core/src/model/printer_assignments.rs:170-222`). A print with no location has no zone, so the order is User → Owner → Warehouse. | yes |
-| Printer configuration | table `printer_configurations`, API only (`printer_configuration_rpc.rs`) | `code`, `name`, `description`, `printer_host`, `printer_port` (default 9100), `printer_model`, `zone_code`, `is_default`, `label_definition_id`, `is_active` (default true) | only `code`, `printer_host`, `printer_port` are used (`wms-printing/src/label_print_service.rs:772-822`). **`is_active`, `zone_code`, `is_default`, `label_definition_id`, `printer_model` are stored only**: a printer with `is_active = false` still prints if an active assignment points to it. |
+| Printer assignment | table `printer_assignments`, API only | which printer a print goes to. Fields: `scope_type` (`User`, `Zone`, `Owner`, `Warehouse`), `scope_id` (the user id, zone id or owner id; empty for the warehouse), `printer_id`, `priority` (default 100, lower wins inside a scope), `is_active` (default true). Order: **Zone → User → Owner → Warehouse**. A print with no location has no zone, so the order is User → Owner → Warehouse. | yes |
+| Printer configuration | table `printer_configurations`, API only | `code`, `name`, `description`, `printer_host`, `printer_port` (default 9100), `printer_model`, `zone_code`, `is_default`, `label_definition_id`, `is_active` (default true) | only `code`, `printer_host`, `printer_port` are used. **`is_active`, `zone_code`, `is_default`, `label_definition_id`, `printer_model` are stored only**: a printer with `is_active = false` still prints if an active assignment points to it. |
 | Label definitions and templates | tables `label_definitions`, `label_templates`; designer in `Sidebar > Overview > Reports` | the label layout. The code looks a label up by its exact code: `lpn_id_label` (receive), `handling_unit_label` (handling unit registry), `shipping_label` (carton close) | yes |
 | Zone printer fields | `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`, `Default Report Printer` | meant to set default printers | **Stored only. They have no effect today.** The model reads and writes them; no print path reads them. Use a printer assignment with scope `Zone`. |
 
 Print results never fail the business command. A missing printer, a missing
 template or an unreachable device is logged and the receive or the carton close still
-succeeds (`wms-inbound/.../shared/auto_print.rs:25-30`).
+succeeds.
 
 See also the guide `../07-printing-and-labels.md`.
 
@@ -374,14 +369,3 @@ See also the guide `../07-printing-and-labels.md`.
 
 - System settings: 19 seeded + 1 read but not seeded = **20 keys**. All 20 are read by code.
 - Dashboard: 4 board settings (`rail` as one field of six slots, `show_demo`, `throughput_plan_per_hour`, `expiring_within_days`) plus the hidden `version`, and 4 threshold fields (`metric_key`, `bad_when`, `alert_at`, `critical_at`).
-
-## 8. Findings
-
-| # | Finding | Where |
-|---|---|---|
-| 1 | Fixed (P-13, commit `420b6746a`). `RECEIPT_LOCK_TIMEOUT_MS` and `ORDER_LOCK_TIMEOUT_MS` used to pass `0` to PostgreSQL, which means "wait for ever". All three lock time-out keys now go through `SystemSettingsBmc::lock_timeout_ms`, which uses 5000 for `0`, a negative number or text. `ORDER_LOCK_TIMEOUT_MS` and `PUTAWAY_LOCK_TIMEOUT_MS` are now seeded (wms-app 091). | `wms-lib-core/src/model/sys_settings.rs:226`, `wms-inbound/src/repo/locking.rs`, `wms-outbound/src/repo/locking.rs` |
-| 2 | Fixed (P-24, wms-app 109). `ENABLE_RECEIPT_AUDIT` and `ALLOW_CLOSE_WITH_DISCREPANCY` used to have `Value` `1` and `Default Value` `false`; the default now matches. | `109_a_setting_default_says_what_a_fresh_install_does.sql` |
-| 3 | `PUTAWAY_RESERVATION_TTL_MIN` with a non-numeric `Value` skips `Default Value` and uses the constant 15. The task keys fall back to `Default Value` instead. | `pending_move_in.rs:736-741` |
-| 4 | `CHECK_DIGIT_ENABLED` is read by `create_loc` only, not by the bulk generator, although its description says "new locations". | `location_rpc.rs:44`, `:112-119` |
-| 5 | Zone printer fields on the putaway zone screen, and `is_active`, `zone_code`, `is_default`, `label_definition_id` of a printer configuration, are stored only. | search over `*.rs` |
-| 6 | The `printer_assignments` column comment lists the order `User → Zone → Owner → Warehouse`; the code does `Zone → User → Owner → Warehouse`. | `001_baseline.sql:3892`, `printer_assignments.rs:170-184` |

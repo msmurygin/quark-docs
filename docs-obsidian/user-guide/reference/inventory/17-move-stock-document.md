@@ -36,7 +36,7 @@ A new code is made each time you press `regenerate`. After a label was printed f
 
 ## Rules the screen checks first
 
-The checks run in this order (`crates/services/web-ui-server/src/extensions/customization/balance/move_mapping.rs:125-151`). The first one that fails stops the move and shows its message.
+The checks run in this order. The first one that fails stops the move and shows its message.
 
 | Order | Rule | Message |
 |---|---|---|
@@ -57,10 +57,10 @@ If the document was left open and the server forgot the position, the message is
 
 ## What the server does
 
-The button `Move` runs the web action `balance_move`, which calls the API method `move_execute` once (`move_action.rs:127-330`). The call carries an idempotency key made when the document opened. Pressing `Move` again replays the same answer instead of moving twice.
+The button `Move` runs the web action `balance_move`, which calls the API method `move_execute` once. The call carries an idempotency key made when the document opened. Pressing `Move` again replays the same answer instead of moving twice.
 
 - **Source**: a row with a container is moved as that container (`source_container_id`). A loose row is found by location, SKU, lot and owner.
-- **Quantity**: when the whole row is move-available, that value sends no quantity (a full move). If some units are allocated, the allowed maximum is lower and is sent as a partial move. The primitive supports partial moves (`crates/libs/wms-inventory/src/movement/service.rs:396-400`).
+- **Quantity**: when the whole row is move-available, that value sends no quantity (a full move). If some units are allocated, the allowed maximum is lower and is sent as a partial move. The primitive supports partial moves.
 - **Recursive**: always on. The move takes the child containers with the container.
 - **Source type**: `manual`.
 
@@ -84,10 +84,6 @@ A refusal that cannot be overridden shows `Move failed: {message}`. The message 
 | `full move refused: only {a} of {r} is available — the rest is reserved` | Some of the stock is allocated or picked. |
 | `container move refused: container {id} still holds reserved stock` | The same, for a container move. |
 | `the stock at destination {location} changed while the move was being prepared; repeat the move` | Someone else changed the destination at the same moment. Repeat the move. |
-
-> Not confirmed by code: what the screen does for a partial move of **serial-tracked** stock. The document says that the units are picked on scan on the RF terminal, and the code comment says the primitive rejects a partial serial move without scanned serials. To verify: type a smaller quantity for a position with serials and press `Move`; read the message.
-
-> Not confirmed by code: the exact `Move failed:` text for an override that nobody authorises. To verify: as `OPERATOR`, move stock out of a location that has a `QcQuarantine` hold, then cancel the supervisor window.
 
 ## What it affects
 

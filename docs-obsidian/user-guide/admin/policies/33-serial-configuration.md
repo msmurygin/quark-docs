@@ -18,26 +18,21 @@ Main menu **SKU** > open a SKU > tab **Serial Tracking** (form
 SKU (cascade). It is saved together with the SKU by the "save all" action
 (`create_sku_full`, `update_sku_full`). The row can also be changed through
 the RPCs `create_sku_serial_config`, `update_sku_serial_config`,
-`get_sku_serial_config_by_sku` (roles Admin and Manager for writes)
-(`app-server/src/web/rpcs/sku_serial_config_rpc.rs:24-29`).
+`get_sku_serial_config_by_sku` (roles Admin and Manager for writes).
 
 On the screen, the master switch **Continuous Serial Tracking** gates the
-other fields. When it is off, the dependent fields are disabled (form gate on
-form 200, `wms-meta-ui/migrations/001_baseline.sql:5438`). In the database the
+other fields. When it is off, the dependent fields are disabled. In the database the
 other columns keep whatever they hold.
 
 If a SKU has **no** `sku_serial_config` row, it is not tracked. All code
-treats a missing row as "not tracked" (`SerialPolicy::requires_serials`,
-`wms-serial/src/service/serial_policy.rs:225-231`;
-`SkuSerialConfigBmc::serial_tracked_skus`, `wms-lib-core/src/model/sku_serial_config.rs:403-424`).
+treats a missing row as "not tracked".
 The question "is this SKU tracked" is asked for a SKU code **and its owner**, because a SKU code is unique per owner
 and not for the whole warehouse. Two owners may share a code and only one of them track it by serial: the other
 owner's stock is not treated as serial-tracked. Fixed in P-03 (commit `1c8a9a4ed`); before, the match was by code only.
 
 Seed data: the base install has no `sku_serial_config` rows. The dev seed
 makes two SKUs tracked: SKU id 1 (`PerUnit`) and SKU id 5 (`PerCase`), both
-with `profile_mode = Flexible`, deferred capture on
-(`wms-lib-sql/sql/dev_only/install-db/900-dev-seed.sql:691-700`).
+with `profile_mode = Flexible`, deferred capture on.
 
 ## Part 1: Settings
 
@@ -47,16 +42,9 @@ with `profile_mode = Flexible`, deferred capture on
 - **Column**: `sku_serial_config.continuous_serial_tracking`, boolean, not
   null, default `false`.
 - **Meaning**: The master switch. Is every unit of this SKU tracked by serial?
-- **Affects**: Receiving checks serials only when it is on
-  (`wms-inbound/.../validation/validation_serial.rs:56-60`). It also drives:
-  receipt completion (`wms-inbound/src/repo/completion.rs:276`,
-  `completion_compute.rs:147`), deferred capture
-  (`receive/deferred_serial_capture.rs:116`), the pick serial rule
-  (`wms-outbound/src/picking/commands/commit.rs:409-420`, RF pick screens
-  `queries/work.rs:144`, `queries/assignment.rs:513`), the pack-station block
-  (`packing/queries/contents.rs:81`), the stock adjustment refusal
-  (`wms-inventory/src/stock_adjust/service.rs:307-322`), and the movement
-  guard (`movement/serial_episode_policy.rs:15-22`).
+- **Affects**: Receiving checks serials only when it is on. It also drives:
+  receipt completion, deferred capture, the pick serial rule, the pack-station block, the stock adjustment refusal, and the movement
+  guard.
 - **Example**: Receive 10 EA of a tracked SKU with no serials and no deferred
   capture: refused with code 65 `SerialRequired` "SKU ... requires serial per
   unit".
@@ -78,10 +66,9 @@ with `profile_mode = Flexible`, deferred capture on
   default `PerUnit`. Check allows only `PerUnit`, `PerCase`, `PerPallet`,
   `PerInnerPack`.
 - **Meaning**: What object carries one serial number.
-- **Affects**: `SerialPolicy::expected_serial_count`
-  (`serial_policy.rs:611-657`) computes how many serials a receive or a pick
-  must supply. Used at receiving (`validation_serial.rs:100-113`) and at pick
-  commit (`commit.rs:409-430`).
+- **Affects**: `SerialPolicy::expected_serial_count` computes how many serials a receive or a pick
+  must supply. Used at receiving and at pick
+  commit.
 - **Example**: Receive 10 CS where 1 CS = 100 EA and 1 PL = 1,000 EA.
   - `PerUnit`: 10 x 100 = 1,000 serials.
   - `PerCase`: 10 serials (one per submitted unit of measure).
@@ -90,7 +77,7 @@ with `profile_mode = Flexible`, deferred capture on
 - **Interactions**: `PerPallet` looks for the pack item with UOM exactly `PL`.
   `PerInnerPack` looks for UOM exactly `IP`. If there is no pack, or no such
   item, or its base quantity is 0, the code falls back to the `PerUnit` count
-  and writes a warning in the log (`serial_policy.rs:626-648`). It truncates the
+  and writes a warning in the log. It truncates the
   result to a whole number.
 - **When empty**: Not possible.
 - **If you change it**: Applies to the next receive or pick. Serials already
@@ -106,7 +93,7 @@ with `profile_mode = Flexible`, deferred capture on
   not finished.
 - **Affects**: Only one value matters. `permits_unfinished_lpn_relocation`
   returns true only when tracking is on **and** mode is `Flexible` **and**
-  deferred capture is on (`wms-inventory/src/movement/serial_episode_policy.rs:15-22`).
+  deferred capture is on.
   Used at `serial_episode_policy.rs:159-170`. `Strict` and `NotTracked` act
   the same: an open capture blocks the move.
 - **Example**: A pallet with an open capture episode may be moved as a whole
@@ -125,7 +112,7 @@ An open capture blocks any move of its pallet. Same effect.
 #### Value `Flexible`
 
 An unchanged full LPN may be relocated while capture is open. The open
-episode moves with it (`serial_episode_policy.rs:~190-230`, `rebase`).
+episode moves with it.
 
 ### Allow deferred capture (`allow_deferred_capture`)
 
@@ -170,11 +157,10 @@ episode moves with it (`serial_episode_policy.rs:~190-230`, `rebase`).
 - **Column**: `sku_serial_config.serial_parse_mode`, enum `serial_parse_mode`,
   not null, default `None`.
 - **Meaning**: How the serial is cut out of the scanned barcode.
-- **Affects**: `extract_serial_from_scan` (`serial_policy.rs:290-326`).
+- **Affects**: `extract_serial_from_scan`.
 - **Interactions**: `Fixed` needs Parse Start Position and Serial Length.
   `Bounded` needs Parse Start After and Serial Length. Missing parts give an
-  error `serial_parse_mode=<mode> requires <field> on sku_serial_config`
-  (`serial_policy.rs:98-103`).
+  error `serial_parse_mode=<mode> requires <field> on sku_serial_config`.
 - **When empty**: Not possible.
 - **If you change it**: Next scan.
 
@@ -226,9 +212,8 @@ Length` characters.
 - **Meaning**: The number of characters in one serial.
 - **Affects**: Cut length for `Fixed` and `Bounded`. Also checked on every
   serial: if set, the serial must have exactly this many characters
-  (Unicode characters, not bytes). `validate_serial_format`
-  (`serial_policy.rs:561-585`), used by the deferred capture loop. The inline
-  receive check (`validation_serial.rs:115-135`) checks the mask only, not the
+  (Unicode characters, not bytes). `validate_serial_format`, used by the deferred capture loop. The inline
+  receive check checks the mask only, not the
   length.
 - **Example**: Length 9: `SN12345` (7) is refused in the capture loop with
   "length mismatch: expected 9 chars, got 7" (code 66).
@@ -240,10 +225,8 @@ Length` characters.
 - **Screen**: **Serial Mask Format**.
 - **Column**: varchar(200), null allowed.
 - **Meaning**: A regular expression the serial must match.
-- **Affects**: Inline receive check (`validation_serial.rs:115-135`, code 66,
-  not overridable) and the capture loop (`serial_policy.rs:578-590`). An
-  invalid regular expression is a system error, not an operator error
-  (`validation_serial.rs:118-130`, `serial_policy.rs:140-146`). The pattern is
+- **Affects**: Inline receive check and the capture loop. An
+  invalid regular expression is a system error, not an operator error. The pattern is
   not anchored for you: use `^` and `$`.
 - **Example**: `^SN[0-9]{5}$`. `SN12345` passes. `SN123` fails.
 - **When empty**: Empty or null: no check.
@@ -254,7 +237,7 @@ Length` characters.
 - **Screen**: **Serials per Barcode**. Required.
 - **Column**: int, not null, default 1.
 - **Meaning**: How many serials one barcode holds.
-- **Affects**: `extract_serials_from_scan` (`serial_policy.rs:358-440`). Values
+- **Affects**: `extract_serials_from_scan`. Values
   of 1 or less (the code uses `max(1)`) follow the parse mode. Above 1,
   auto-increment (if on) or a multi-serial split is used. The split must give
   exactly this number of serials, or the scan is refused.
@@ -281,8 +264,7 @@ Length` characters.
 - **Example**: Length 8, per barcode 3: the scan must have 24 characters; it
   is cut into 3 pieces of 8.
 - **When empty**: If per barcode is above 1 and neither delimiter nor fixed
-  length is set, the scan is refused with a configuration message
-  (`MissingConfig`, `serial_policy.rs:426-431`).
+  length is set, the scan is refused with a configuration message.
 
 ### Auto-Increment (`serial_auto_increment`)
 
@@ -332,8 +314,7 @@ Length` characters.
 - **Column**: varchar(20), null allowed.
 - **Affects**: Stored only. It has no effect today. The code `SerialCheckDigitFailed`
   (87) is defined and listed, but nothing raises it. The barcode parser has its
-  own `check_digit_algorithm`, which belongs to the barcode **format**
-  (`wms-inventory/src/barcode_parser.rs:923-935`), not to this column.
+  own `check_digit_algorithm`, which belongs to the barcode **format**, not to this column.
 
 ### Require globally unique (`require_unique_global`)
 
@@ -380,9 +361,7 @@ Length` characters.
 ### Pick episode reassignment (`pick_episode_reassignment_mode`)
 
 - **Screen**: **Pick Episode Reassignment**. Options: **Block movement**,
-  **Hand over open episode**, **Cancel and restart capture**
-  (`wms-meta-ui/migrations/073_pick_execution_admin_ui.sql:196-212`,
-  `079_*.sql`).
+  **Hand over open episode**, **Cancel and restart capture**.
 - **Column**: varchar(32), not null, default `Block`. Check allows `Block`,
   `Handover`, `CancelAndRestart` (wms-app migrations 037, 040).
 - **Meaning**: What happens to a pick's open serial capture when the pick is
@@ -407,8 +386,7 @@ Length` characters.
 - **Screen**: **Max Serials per LPN**.
 - **Column**: int, null allowed, default 1000.
 - **Meaning**: Warn if one LPN would hold more serials than this.
-- **Affects**: `SerialService::register_at_receive` (`serial_service.rs:244-285`,
-  reader `:606-616`). The check runs when a receive targets an LPN:
+- **Affects**: `SerialService::register_at_receive`. The check runs when a receive targets an LPN:
   existing active serials on the container + new ones must be at most the
   limit. Refused with code 91 `SerialMassAnomaly`, **overridable**.
 - **Example**: Limit 1,000. LPN holds 990. Receive 20 more: 1,010 > 1,000, refused
@@ -423,8 +401,7 @@ Length` characters.
 - **Column**: int, null allowed, default 30.
 - **Meaning**: Warn if a serial ships sooner than this many minutes after it
   was received.
-- **Affects**: `serial_ship` (`commands/ship_serial.rs`) runs `check_velocity`
-  (`serial_service.rs`; default `DEFAULT_VELOCITY_THRESHOLD_MIN = 30`). When
+- **Affects**: `serial_ship` runs `check_velocity`. When
   the serial ships sooner after receipt than this, the ship still goes
   through, and the serial gets a history row `AnomalyFlagged` with reason
   `SerialVelocityAnomaly`, and the event `process.serial.flagged_anomaly`
@@ -451,13 +428,13 @@ Length` characters.
 - **Column**: boolean, null allowed, default `false`.
 - **Meaning on the screen**: True = guards block by default.
 - **Affects**: Stored only. It has no effect today. Each guard has a fixed
-  severity in code (`AnomalySeverity::Block|Warn|Flag`, `serial_service.rs:36-44`).
+  severity in code.
 
 ## Part 2: What the system does with serials
 
 ### Serial states
 
-Status enum `serial_status` (`wms-lib-core/src/model/inventory/inventory_balances_serial.rs:100-250`):
+Status enum `serial_status`:
 
 | State | Meaning |
 |---|---|
@@ -492,24 +469,22 @@ check done by the calling command, not by this table.
 Episode statuses: `Open`, `InProgress`, `AwaitingConfirmation`, `Committed`,
 `Cancelled`, `Abandoned`. Business operations an episode can be for:
 `Receive`, `Putaway`, `Move`, `Pick`, `Pack`, `Ship`, `Return`, `Adjust`,
-`Inventory` (`wms-lib-core/src/model/serial_capture/episode.rs:62-125`). In
+`Inventory`. In
 practice code opens episodes for Receive and Pick.
 
 ### Uniqueness
 
 One serial number is unique per owner: `uq_serial_per_owner`
 (`serial_number`, `owner_id`). At receive, `any_active_with_serials` refuses a
-batch containing a serial that is already received for the owner (code 67
-`SerialDuplicate`, `validation_serial.rs:143-165`). A serial whose row is
-`Disposed` cannot be registered again (code 92, not overridable,
-`serial_service.rs:632-660`).
+batch containing a serial that is already received for the owner. A serial whose row is
+`Disposed` cannot be registered again.
 
 ### Anomaly rules, in plain terms
 
 | Rule and code | Status today |
 |---|---|
-| 88 Return without ship | Enforced when returning (`commands/return_serial.rs:75`). |
-| 89 Same serial at two locations | A background scan every 6 hours logs it (`cleanup_tasks.rs`). Nothing else checks it. |
+| 88 Return without ship | Enforced when returning. |
+| 89 Same serial at two locations | A background scan every 6 hours logs it. Nothing else checks it. |
 | 90 Velocity | Checked at `serial_ship`. A warning, not a block: history row `AnomalyFlagged` and event `process.serial.flagged_anomaly`. |
 | 91 Mass pattern per LPN | Enforced at receive; uses Max Serials per LPN; overridable. |
 | 92 Reuse after disposed | Enforced at receive; hard block. |
@@ -527,5 +502,5 @@ The setting Block on Severity does not change any of these.
   Old serials are not rechecked.
 - Turning tracking on for a SKU that already has stock gives that stock no
   serials. A pick of that stock will then ask for a completed serial episode
-  and for serials that were never captured (`commit.rs:409-440`). Plan the
+  and for serials that were never captured. Plan the
   capture of serials for the stock on hand first.

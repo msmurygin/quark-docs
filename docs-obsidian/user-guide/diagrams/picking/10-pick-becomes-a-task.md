@@ -49,24 +49,6 @@ sequenceDiagram
 | `weight` | stock weight of the quantity (empty when no weight is known) | none |
 | `priority` | the order priority (1 to 99, default 50, smaller is sooner) | `Priority` |
 | `wave_id` | the active wave claim of the order, if any | none. Stored on the task. No dispatch rule reads it |
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Release sets `released_at`, then runs the allocation half | `crates/libs/wms-outbound/src/service/order/release.rs:173-290` |
-| Release again | `crates/libs/wms-outbound/src/service/order/release.rs:292-330` |
-| Allocation runs inside a savepoint | `crates/libs/wms-outbound/src/service/order/release.rs:354-380` |
-| Cartonization right after reserving | `crates/libs/wms-outbound/src/service/order/allocate.rs:398-406` |
-| Task generation only when the order is released | `crates/libs/wms-outbound/src/service/order/allocate.rs:408-440` |
-| Which cartonization outcomes are executable | `crates/libs/wms-outbound/src/cartonization/handoff.rs:27-67` |
-| The task draft, zone destination, weight | `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:21-85` |
-| Task created, pick set to `Released` | `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:88-146` |
-| One live task per source, advisory lock, reuse | `crates/libs/wms-tasks/src/service/draft.rs:185-238` |
-| Wave id read from the wave claim | `crates/libs/wms-outbound/src/waves/task_grouping.rs:9-19` |
-| Order priority range and default | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:5785` |
-| API method | `docs-obsidian/user-guide/api/openrpc.json` (`shipment_order_release`) |
-
 ## Related pages
 
 - [Releasing an order](../../reference/outbound/35-releasing-an-order.md)

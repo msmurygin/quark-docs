@@ -141,7 +141,7 @@ Receiving codes you will meet (`ReceiptValidationReturnCode`):
 - Received stock creates balances and a putaway need.
 - Closing seals the receipt and sends events to subscribers.
 
-- A manual line with no `Pack` takes the SKU's pack (F-20), the way lines made by receiving or by ASN load do. A `Pack` you choose is checked and kept. (Before F-20 a save without it was refused by the database.) Lines made by receiving or by ASN load take the pack from the SKU.
+- A manual line with no `Pack` takes the SKU's pack, the way lines made by receiving or by ASN load do. A `Pack` you choose is checked and kept. Lines made by receiving or by ASN load take the pack from the SKU.
 
 ## 2. Receipt policy (tolerances)
 
@@ -276,7 +276,7 @@ Dispositions of a damage record (`receipt_detail_damage.disposition`; empty = st
 
 The tab `Damage Records` (columns `ID`, `Line`, `Qty`, `Reason`, `Description`, `Reported At`, `Reported By`, `Severity`) is read-only.
 
-There is no web button and no RF screen for the dispositions. Nothing in the web metadata or in the RF client calls them. They are JSON-RPC methods only (`receipt_commands_rpc.rs`). Use the API (see `09-integrations-and-api.md`).
+There is no web button and no RF screen for the dispositions. Nothing in the web metadata or in the RF client calls them. They are JSON-RPC methods only. Use the API (see `09-integrations-and-api.md`).
 
 ### What you should see
 

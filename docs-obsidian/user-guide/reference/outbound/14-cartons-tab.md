@@ -9,7 +9,6 @@ The form is `shipment_order_cartons_form`. The data comes from the database view
 
 The view shows the **newest plan that has not been replaced**. A plan with the status `Stale` is shown too.
 A `Stale` plan is not an error. The floor keeps working by it: the boxes stand, the tasks are out. See the status words below.
-Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/014_the_tabs_show_the_plan_the_floor_works_by.sql`.
 
 ## Columns
 
@@ -28,7 +27,6 @@ Every column is read only.
 | `Pick lines` | `pick_lines` | Whole number | How many different pick lines are in the box. A box with eight equal mugs counts as one line. |
 
 The weight and the volume are shown in the display unit of the warehouse (the columns are marked as weight and volume).
-Source: `wms-meta-ui` migration 015 (the field list near `physical_class` and the column list for the form), and the view comments in `wms-app` migrations 013 and 014.
 
 ### Planned gross weight
 
@@ -44,7 +42,6 @@ The empty cell reads `? unknown`, and its hover text says: `The weight of at lea
 | `Stale` | `Stale` | The order was released and the data changed afterwards, so the plan no longer matches. The floor keeps working by this plan. The fix helps the next order. |
 
 A fourth stored value, `Superseded`, is never shown: it marks a plan that a newer plan replaced.
-Source: `wms-meta-ui` migration 017, `crates/services/web-ui-server/src/extensions/customization/shipment_order/cell_renderers.rs` (function `render_plan_status`), type `cartonization_plan_status` in `wms-app` migration 008.
 
 ## Related pages
 

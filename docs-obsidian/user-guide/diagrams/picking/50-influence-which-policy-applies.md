@@ -29,22 +29,6 @@ flowchart TD
 - A pallet freezes its revision when it is opened. A new revision does not change an open pallet.
 - A pick that is taken through `PICK01` always opens its pallet under `DISCRETE`, because that entry sends no area. `pick_drop_open` receives `work_area_code` only from the `Pick by Area` flow.
 - `Retire` is refused for `DISCRETE` and for any code an area uses.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Lookup of the area policy | `crates/libs/wms-lib-core/src/model/outbound/picking_policy.rs:600-650` |
-| Dispatch reads the policy of area and equipment | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:259-300` |
-| Cart start copies the policy | `crates/libs/wms-outbound/src/picking/commands/start.rs:179-200` and `:370-372` |
-| Copy shape | `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:25-48` |
-| Source proof: copy on a cart, `DISCRETE` otherwise | `crates/libs/wms-outbound/src/picking/confirmation/source_facts.rs:62-92` |
-| Pallet opens under the area policy or `DISCRETE` | `crates/libs/wms-outbound/src/picking/commands/drop_open.rs:113-143` and `:180-196` |
-| Pallet reads its frozen revision | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:178-200` |
-| Count flag reads the pallet's revision or the cart's copy | `crates/libs/wms-outbound/src/picking/emptied_location.rs:37-60` |
-| Shape rules of a policy | `crates/libs/wms-outbound/src/domain/picking_policy/aggregate.rs:195-262` |
-| `Pick by Area` sends the area, `PICK01` does not | `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/111_uc_pick_drop_area.sql` |
-
 ## Related pages
 
 - [Cart policy fields](51-influence-picking-policy.md)

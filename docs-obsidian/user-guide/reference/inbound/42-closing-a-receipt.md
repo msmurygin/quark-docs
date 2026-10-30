@@ -18,7 +18,7 @@ Use this page when receiving is finished. Closing seals the document. It cannot 
 4. Click `Close Receipt` in the window. Click `Not Now` to leave without closing.
 5. If the window now says `A supervisor must authorise this. Ask one to enter their username and password.`, the fields `Supervisor username` and `Supervisor password` appear. A supervisor types them on your screen. Click `Close Receipt` again.
 
-The window has no other fields. The screen sends the version of the receipt that you saw when you ticked it (`crates/services/web-ui-server/src/extensions/customization/receipt/lifecycle_action.rs:433-438`).
+The window has no other fields. The screen sends the version of the receipt that you saw when you ticked it.
 
 ## Discrepancy
 
@@ -28,14 +28,11 @@ The receipt has a discrepancy when:
 - the completion is `Over` or `Pending` and the lines expected some quantity.
 
 A receipt with no plan (blind receiving, returns) that is `Over`, and a receipt that is `Full`, close with no question.
-Source: `crates/libs/wms-inbound/src/repo/completion_compute.rs:236-245`.
 
 For a discrepancy two things must be true:
 
 1. The system setting `ALLOW_CLOSE_WITH_DISCREPANCY` is on. It is on in a new database (value `1`, `wms-app` migration `001_baseline.sql`). When it is off the close is refused for everyone (code 71, not overridable).
 2. Someone with the right agrees. Either the user who presses the button holds the right `receipt.override_close_discrepancy` (by default only `SUPERVISOR`), or a supervisor types a username and a password in the window. The supervisor's password is used once and is not stored.
-
-Source: `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:195-262`.
 
 ## What the screen says
 
@@ -57,7 +54,7 @@ After success the window closes and the list is read again.
 | Stock | Nothing changes. Stock was made when you received. |
 
 The summary also records who agreed to a discrepancy. See [Summary tab](13-summary-tab.md).
-Closing a receipt that is already `Closed` does nothing and gives no error (`crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:206-207`).
+Closing a receipt that is already `Closed` does nothing and gives no error.
 
 ## What can go wrong
 
@@ -74,9 +71,6 @@ Closing a receipt that is already `Closed` does nothing and gives no error (`cra
 
 Code 73 and code 77 cannot be overridden, not even by a supervisor.
 The messages with `{number}` use the receipt number in this window. The messages of [putting on hold](40-putting-a-receipt-on-hold.md) use the internal id.
-Sources: `close_receipt.rs:131-176`, `crates/services/web-ui-server/src/extensions/customization/receipt/error_message.rs:105-135`.
-
-> Not confirmed by code: the exact text the window shows for a version conflict (code 40). To verify: open the list in two browsers, change the receipt in one (put on hold), then press `Close Receipt` in the other.
 
 ## Related pages
 

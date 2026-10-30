@@ -17,9 +17,6 @@ All fields are date and time pickers. Every field is optional.
 | `Promised Ship Date` | `promised_ship_date` | Date and time | No | Empty | Stored only. It has no effect today. |
 | `Planned Ship Date` | `planned_ship_date` | Date and time | No | Empty | Stored only. It has no effect today. |
 
-How "stored only" was checked: a search of the Rust code, the SQL migrations, the RF screens and the web components found no reader of these columns other than the code that writes them.
-The writers are the patch type in `crates/libs/wms-inbound/src/service/receipt/planning/contracts.rs:146-153` and the update method in `crates/services/app-server/src/web/rpcs/receipt_rpc/header_commands.rs:92-98`.
-
 The list `Receipts` shows `Receipt Date`, `Effective Date` and `Arrival Date` as columns and can filter by them.
 That is the only use.
 
@@ -38,9 +35,6 @@ That is the only use.
 
 When you change `Effective Date` or `Close Date` of a saved receipt and press `Save`, the request carries a field the server does not accept.
 The server answers with an "unknown field" error and nothing is saved, including your other changes.
-Source: `ReceiptUpdateApi` has `deny_unknown_fields` and does not list these two fields (`header_commands.rs:68-99`). The fields are not marked read only in the metadata (`bio_fields` of the bio `receipt`).
-
-> Not confirmed by code: the exact text the screen shows for this refusal. To verify: open a saved receipt, change `Effective Date` on the `Dates` tab, press `Save`.
 
 ## Messages
 

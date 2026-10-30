@@ -26,22 +26,6 @@ flowchart TD
 - With a station, the goods go there and the router gets a hand-off when the pallet is closed or the cart is delivered. The packing step waits at the station for `Pack`.
 - The destination is frozen: on the cart at start, on the pallet at its first deposit. Edits afterwards apply to the next cart or pallet.
 - If nothing names a destination for a discrete pick, the deposit is refused: `this pick has no destination location — neither its owner nor its task names one`.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Owner column accepts only `Pickto`, `Stage`, `Door` | `crates/libs/wms-lib-sql/sql/wms-app/migrations/055_the_order_decides_where_a_carrier_is_delivered.sql:32-54` |
-| Chain: owner, then tasks | `crates/libs/wms-outbound/src/domain/pick_assignment/delivery.rs:13-39` |
-| Pallet destination and router | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:122-175` |
-| Cart: target choice and one location | `crates/libs/wms-outbound/src/picking/grouping/planned_target.rs:1-40` and `:140-160` |
-| Router: station of an area or of a location | `crates/libs/wms-outbound/src/flow/route.rs:18-45` |
-| One station for a location | `crates/libs/wms-lib-core/src/model/work_area.rs:294-322` |
-| Station of an area | `crates/libs/wms-lib-core/src/model/work_area.rs:253-270` |
-| Router for the cart asked only for `ConfirmAtLocation` | `crates/libs/wms-outbound/src/picking/commands/start.rs:205-218` |
-| Wording of the missing destination | `crates/libs/wms-lib-core/src/model/narration/mod.rs:2340-2341` |
-| Hand-off of a pallet or a cart's boxes | `crates/libs/wms-outbound/src/picking/commands/drop_close.rs:225-250` and `crates/libs/wms-outbound/src/picking/completion/hand_off.rs:1-70` |
-
 ## Related pages
 
 - [Drop-off of a pallet](23-drop-off-pallet.md)

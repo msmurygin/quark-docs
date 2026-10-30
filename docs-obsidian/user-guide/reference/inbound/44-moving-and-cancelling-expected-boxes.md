@@ -6,7 +6,7 @@ The two buttons are on the [Expected Boxes tab](16-expected-boxes-tab.md).
 ## Before you start
 
 - The receipt has planned boxes. They are made by the API method `receipt_create_case_level_asn`. The web screens do not create them.
-- You have the web action for the button and the API right. By default `Move Boxes` is for `ADMIN`, `MANAGER`, `SUPERVISOR` and `OPERATOR`. `Cancel Box` is for `ADMIN`, `MANAGER` and `SUPERVISOR` (`crates/services/app-server/src/web/rpcs/case_level_commands_rpc.rs:20-25`).
+- You have the web action for the button and the API right. By default `Move Boxes` is for `ADMIN`, `MANAGER`, `SUPERVISOR` and `OPERATOR`. `Cancel Box` is for `ADMIN`, `MANAGER` and `SUPERVISOR`.
 
 ## Moving boxes to another pallet
 
@@ -25,7 +25,7 @@ The two buttons are on the [Expected Boxes tab](16-expected-boxes-tab.md).
 | The list changed | `The box list has moved on — tick the pallet again and retry` |
 | Refused | `Boxes on {pallet} were not moved: {error}` |
 
-Reasons for a refusal (`crates/libs/wms-inbound/src/service/receipt/case_level/commands/replace_pallet.rs:106-231`):
+Reasons for a refusal:
 
 | `{error}` | Fix |
 |---|---|
@@ -49,7 +49,7 @@ Reasons for a refusal (`crates/libs/wms-inbound/src/service/receipt/case_level/c
 | The list changed | `The box list has moved on — tick the box again and retry` |
 | Refused | `Box {code} was not cancelled: {error}` |
 
-Reasons for a refusal (`cancel_planned_case.rs:77-140`):
+Reasons for a refusal:
 
 | `{error}` | Fix |
 |---|---|

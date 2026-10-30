@@ -29,8 +29,6 @@ The screen first asks the server for a dry run (`shipment_order_validate`). The 
 | Each line has the owner of the order | `line owner {x} differs from order owner {y}` (names the line) |
 | Each line's SKU is active and has the unit | `sku '{sku}' not found for owner {owner}`, `sku '{sku}' is inactive`, or `sku '{sku}' has no '{uom}' unit in its pack (pack_id {id})` (names the line) |
 
-Source: `crates/libs/wms-outbound/src/service/order/validate.rs:60-160`.
-
 A requested ship date in the past gives a **warning** (`requested ship date {date} is in the past`). A warning does not stop the release; the successful Release message includes it.
 
 ## What the screen says
@@ -48,8 +46,6 @@ A requested ship date in the past gives a **warning** (`requested ship date {dat
 | The order changed under you | `Order data was updated (now {status}) — the form has been refreshed, please retry` |
 | No order open | `Open an order first` |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/release_action.rs:55-190`, `current_order.rs:314-316`.
-
 If you see the conflict message, look at the new status and press `Release` again. The screen has already been repaired with the current version.
 
 ## What changes
@@ -65,8 +61,6 @@ If you see the conflict message, look at the new status and press `Release` agai
 If the reservation pass fails (for example the allocation policy is not set up), the release **still succeeds**. The failure is shown in the message. The lines stay `NotAllocated`, and you can press `Allocate` after you fix the policy.
 A shortage of stock is not a failure. The order launches and reads `Partially released` until stock arrives and you press `Allocate`.
 
-Source: `crates/libs/wms-outbound/src/service/order/release.rs:1-120`, `release.rs:150-260`.
-
 ## Releasing again
 
 On an order that reads `Partially released` the `Release` button works again. It means "hand out the work". The server runs the same reservation pass: it reserves what is still missing and makes tasks for every pick that has none. It does not set the launch mark again, does not copy the address again, and does not send a second event.
@@ -74,8 +68,6 @@ The message says `Order {number} released; allocated {a}, short {s}; {n} task(s)
 
 A fully `Released` order cannot be released again. The dry run refuses it: `only an unreleased order, or a released one with work not yet handed out, can be released (this one is Released)`.
 An order whose lines were all cancelled after the launch reads `New` and still has the launch mark. The button is grey. If the call is made anyway, the dry run refuses it: `every line is fully cancelled — nothing left to ship`.
-
-Source: `crates/libs/wms-outbound/src/domain/shipment_order/aggregate.rs:186-196`, `validate.rs:70-95`.
 
 ## Related pages
 

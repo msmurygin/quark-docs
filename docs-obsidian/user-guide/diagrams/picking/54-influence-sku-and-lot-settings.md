@@ -20,23 +20,6 @@ flowchart LR
 - **Serials.** If the SKU has serial tracking (`Continuous Serial Tracking`), the commit needs a completed pick serial episode. The number of serials follows the serial scope and the pack. Each scan is cut and checked by the SKU's parse mode, `Serial Length`, `Serial Mask Format` and `Serials per Barcode`. A serial must be active (or reserved for this order) and must match the lot, location and container of the pick. Without tracking, a serial scan is refused.
 - **Pick Episode Reassignment** (`Block`, `Handover`, `CancelAndRestart`; default `Block`). It decides what happens to the scanned serials when the holder would change: reassign, return to pool, reject or lease expiry. `Block` keeps the task with its holder. `Handover` gives the open scan to the new holder. `CancelAndRestart` cancels it and keeps the scanned items for audit. An `Abandoned` scan blocks every door until a supervisor closes it. The same rule applies when another operator claims the task from the pool and scans.
 - **Weights.** The weight of a task is the weight of its quantity from the SKU's pack items, or the SKU gross weight. An unknown weight is empty and always passes the lift test.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Instructions: three sources, acknowledgement | `crates/libs/wms-outbound/src/picking/instructions.rs:1-80` |
-| Instructions block the commit and the short | `crates/libs/wms-outbound/src/picking/commands/commit.rs:243-253`, `crates/libs/wms-outbound/src/picking/commands/short.rs:263-274` and the text at `crates/libs/wms-outbound/src/picking/error.rs:69-72` |
-| Shelf life boundary and refusal | `judge_pick_lot` in `crates/libs/wms-outbound/src/domain/pick_confirmation/evidence.rs`, over `lot_dating::judge` |
-| Shelf life read at commit | `prove_source` in `crates/libs/wms-outbound/src/picking/confirmation/at_commit.rs`, `crates/libs/wms-outbound/src/picking/confirmation/shelf_life.rs` |
-| Same boundary in allocation | `crates/libs/wms-outbound/src/allocation/trace.rs:885-948` |
-| Attributes shown on pick | `crates/libs/wms-outbound/src/picking/confirmation/source_facts.rs:186-250` |
-| Serial episode needed at commit | `crates/libs/wms-outbound/src/picking/commands/commit.rs:408-435` |
-| Serial scan checks | `crates/libs/wms-outbound/src/picking/commands/capture_serial.rs:95-260` |
-| Serial formats | `crates/libs/wms-serial/src/service/serial_policy.rs:355-380` and `:561-600` |
-| Holder change rule | `crates/libs/wms-outbound/src/picking/infrastructure/holder_change.rs:1-135` |
-| Weight of the task | `crates/libs/wms-lib-core/src/model/pack/weight.rs:245-320` and `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:52-85` |
-
 ## Related pages
 
 - [Source proof fields](57-influence-source-proof.md)

@@ -44,23 +44,6 @@ Reading notes.
 - `Blocks putting` (`block_inbound_flow`) is not read by route A. It is read by receiving and by moves. Route B reads it only to decide whether a code enforces at all.
 - The auto-release loop runs every 5 minutes.
 - Nothing allocates again when a hold ends. Somebody must press `Allocate` or `Release`, or a retry must fire.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Available quantity and held quantity in the view, `LEFT JOIN` on the code catalog, `active`, `block_outbound_flow` | `crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:77-114` |
-| Seed: `Damaged` blocks taking and not putting | `crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:67-70` |
-| Reserve re-check uses the same predicate | `crates/libs/wms-lib-core/src/model/inventory/inventory_hold.rs:223-232`, `crates/libs/wms-lib-core/src/model/inventory/inventory_hold.rs:399-418` |
-| Reserve step: held counts as available 0 | `crates/libs/wms-outbound/src/allocation/reserve.rs:168-183` |
-| Candidate read uses the view column `atp` | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:454-455` |
-| `enforce` and `overridable` are not part of that predicate | `crates/libs/wms-lib-core/src/model/inventory/inventory_hold.rs:381-394` |
-| Seeded hold codes | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:8227-8243` |
-| A hold row has exactly one of lot, location, LPN; default auto-release 36500 days | `crates/libs/wms-inventory/src/service/hold.rs:370-400` |
-| Auto-release loop, every 5 minutes | `crates/services/app-server/src/services/cleanup_tasks.rs:113`, `crates/services/app-server/src/services/cleanup_tasks.rs:458-485`, `crates/services/app-server/src/services/cleanup_tasks.rs:540-578` |
-| API: place and release holds (Admin, Manager) | `crates/services/app-server/src/web/rpcs/hold_rpc.rs:24-27` |
-| API: edit hold codes | `crates/services/app-server/src/web/rpcs/inventory_hold_code_rpc.rs:14` |
-
 ## 2. Route B: a location hold changes the location state
 
 **What this shows.** A hold on a location also changes the status of the location. Allocation reads only locations with status `Ok` and no flag.
@@ -92,19 +75,6 @@ Reading notes.
 - Only a location hold changes the location status. A hold on a lot or an LPN uses route A only.
 - A hold on a location of type `InTransit` is refused: `location {loc} holds only open pick pallets: it takes no location hold`.
 - `Release` of the hold recomputes the status again.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Recompute after place or release | `crates/libs/wms-inventory/src/service/hold.rs:216-245`, `crates/libs/wms-inventory/src/service/hold.rs:439-482` |
-| `Damage`, `Hold`, `Ok` from the enforcing codes | `crates/libs/wms-inventory/src/service/hold.rs:495-516` |
-| A code enforces if it blocks either direction; `active` lowers `enforce` | `crates/libs/wms-inventory/src/movement/hold_policy.rs:150-190`, `crates/libs/wms-inventory/src/movement/hold_policy.rs:209-221` |
-| Allocation filters `status = 'Ok'` and `loc_flag = 'None'` | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:457` |
-| `BlockSourceLocation` sets the flag | `crates/libs/wms-lib-core/src/model/location.rs:1239-1252` |
-| Location hold on an `InTransit` location is refused | `crates/libs/wms-inventory/src/service/hold.rs:278-298` |
-| Location flag values | `crates/libs/wms-lib-core/src/model/location.rs:248-254` |
-
 ## 3. A hold after the reservation
 
 **What this shows.** A reservation is not removed when a hold arrives later. The hold stops the pick at three later gates.
@@ -122,16 +92,6 @@ Reading notes.
 
 - Allocation does not look at an existing reservation again. The stock stays reserved for the order, but the picker cannot take it until the hold is released, or until somebody unallocates the pick.
 - The dispatch gate also checks the location: status `Ok` and flag `None`. It tolerates the flag `CycleCountActive` only for a picker who finishes work that was already started at that location.
-
-### Where it comes from
-
-| Gate | Code |
-|---|---|
-| Dispatch: location status and flag, then hold | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:156-176` |
-| Reason codes of the dispatch gate | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:44-62` |
-| Source confirmation refuses a held source | `crates/libs/wms-outbound/src/picking/confirmation/at_commit.rs:139-145`, `crates/libs/wms-outbound/src/domain/pick_confirmation/refusal.rs:71-91` |
-| Reserved move refuses a held source | `crates/libs/wms-inventory/src/picking/reserved_pick.rs:315-328` |
-
 ## Related pages
 
 - [Which stock a step may use](20-influence-policy-source.md)

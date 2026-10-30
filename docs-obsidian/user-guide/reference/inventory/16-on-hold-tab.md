@@ -7,7 +7,7 @@ The list is read only and has no toolbar. A click on a row does nothing. To plac
 
 ## Which rows are listed
 
-Every row for which at least one hold with `is_hold_on` applies. The test is wider than the test for ATP: a hold whose reason code does **not** block taking stock out still puts the row on this list, and the row keeps its full ATP (`crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:48-52`).
+Every row for which at least one hold with `is_hold_on` applies. The test is wider than the test for ATP: a hold whose reason code does **not** block taking stock out still puts the row on this list, and the row keeps its full ATP.
 
 ## Columns
 

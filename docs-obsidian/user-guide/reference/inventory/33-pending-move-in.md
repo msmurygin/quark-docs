@@ -29,8 +29,6 @@ All columns are read only. The list shows reservations of every status, newest e
 | `Res #` | `id` | Whole number | Number | No | The id of the reservation. |
 | `Source` | `source` | Text | Set | No | What made the reservation: `Putaway`, `Replenishment` or `Move`. |
 
-Sources: the table and view in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2742-2760` and `2799-2815`; the types at lines 668 and 685; the list in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`.
-
 ## Statuses
 
 | Status | Meaning |
@@ -44,9 +42,9 @@ Free space of a location is its capacity minus what is in it minus the cube and 
 
 ### Expires
 
-The time is `now + the time to live`. The time to live is taken from the first of these that is set: the owner setting `putaway_reservation_ttl_min`, the system setting `PUTAWAY_RESERVATION_TTL_MIN`, its default value (column comment in `001_baseline.sql:2769`). A sweeper moves an active reservation whose time has passed to `Expired` (`crates/libs/wms-inventory/src/putaway/sweeper.rs`). It is the only writer of `Expired`.
+The time is `now + the time to live`. The time to live is taken from the first of these that is set: the owner setting `putaway_reservation_ttl_min`, the system setting `PUTAWAY_RESERVATION_TTL_MIN`, its default value (column comment in `001_baseline.sql:2769`). A sweeper moves an active reservation whose time has passed to `Expired`. It is the only writer of `Expired`.
 
-The setting `PUTAWAY_RESERVATION_TTL_MIN` is seeded with `Value` 15 and `Default Value` 15 (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:9955`). So a new warehouse holds a reservation for 15 minutes unless the owner sets `putaway_reservation_ttl_min`. The sweeper runs every 5 minutes (`SWEEP_INTERVAL`, `crates/libs/wms-inventory/src/putaway/sweeper.rs:57`), so an expired reservation can show as `Active` for up to 5 minutes after its `Expires` time.
+The setting `PUTAWAY_RESERVATION_TTL_MIN` is seeded with `Value` 15 and `Default Value` 15. So a new warehouse holds a reservation for 15 minutes unless the owner sets `putaway_reservation_ttl_min`. The sweeper runs every 5 minutes, so an expired reservation can show as `Active` for up to 5 minutes after its `Expires` time.
 
 ## Toolbar button
 
@@ -54,7 +52,7 @@ The setting `PUTAWAY_RESERVATION_TTL_MIN` is seeded with `Value` 15 and `Default
 |---|---|---|
 | `Release` | One or more ticked rows (grey text `Select a reservation to release`) | Cancels the ticked reservations. |
 
-`Release` is the web action `putaway_release_reservation`. It calls the API method of the same name **once for each ticked row**, with a new idempotency key each time (`crates/services/web-ui-server/src/extensions/customization/putaway/release_reservation_action.rs`).
+`Release` is the web action `putaway_release_reservation`. It calls the API method of the same name **once for each ticked row**, with a new idempotency key each time.
 
 - The method cancels the row **and** the neighbour rows that share its group (an oversized load holds one row for each position). The whole group is released together.
 - Only `Active` rows are released. A row that is already `Consumed`, `Cancelled` or `Expired` is left as it is, and counts as "already gone". That is a normal answer, not an error.

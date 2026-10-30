@@ -31,8 +31,6 @@ This is the way to reduce a launched line. You cannot just retype a lower number
 
 If the server refuses, the window **stays open** with your numbers still typed, so you can correct them. After success the window closes, the lines grid is read again, the line is updated, the header status is updated, and the typed numbers are cleared (so they do not appear in the next line's window).
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/cancel_qty_action.rs:35-125`, `line_modal.rs`.
-
 ## What the command checks
 
 | Message | Meaning |
@@ -44,8 +42,6 @@ Source: `crates/services/web-ui-server/src/extensions/customization/shipment_ord
 | `quantity must be greater than zero` | The quantity is zero or negative. |
 | `cannot cancel {requested} — only {open} is still open` | You asked for more than is free to cancel. |
 | `version conflict on shipment_order_line {id}` | Somebody changed the line after you opened it. |
-
-Source: `crates/libs/wms-outbound/src/service/order_line/cancel_qty.rs:70-110`, `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:16-30,100-130`.
 
 ## What changes
 

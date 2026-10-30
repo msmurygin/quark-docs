@@ -39,12 +39,12 @@ The button `Reset` clears what you typed. `Cancel` closes the window.
 | `Major` | Goes to inspection, and the plate is held. | Crushed, Wet, Temperature breach, Broken seal, Contents damaged, Other |
 | `Total` | Written off — goes to the damage bay. | Contamination, Destroyed, Spoiled or expired, Missing or stolen, Other |
 
-The reasons are values of the code list `damage_reason`. The tag `severity` of each value decides the list (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`, code list 1002). `Other` has no severity and is offered for all.
+The reasons are values of the code list `damage_reason`. The tag `severity` of each value decides the list. `Other` has no severity and is offered for all.
 The texts under the buttons describe the **default** owner actions. The real effect is set by the owner (see below).
 
 ## Photos
 
-- Up to 6 photos for one report, each at most 10 MB. Allowed types: JPEG, PNG, HEIC (`crates/libs/wms-inbound/src/service/receipt/ports/photo_store.rs:47-84`).
+- Up to 6 photos for one report, each at most 10 MB. Allowed types: JPEG, PNG, HEIC.
 - The zone says `Click, or drop a photo here.` While a photo is sent it says `Sending the photo…`. At the limit it says `This report already holds {n} photos, which is all it can keep.`
 - When no photo storage is set up, the damage is still recorded: `damage photos are not available in this deployment — reporting the damage still works`.
 
@@ -66,10 +66,6 @@ Owner actions (code list `damage_action`):
 | `Hold` (default for `Major`) | An inventory hold with the code `Damaged` is put on the pallet of the line. If the line has no pallet nothing is held. |
 | `Reject` (default for `Total`) | `Qty Damaged` of the line grows by the quantity. The completion is recalculated. |
 | `WriteOff`, `RTV`, `Repurpose`, `Destroy` | **Not run.** The record is made and a warning is logged. The result says the action was `None`. |
-
-Source: `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:770-960`.
-
-> Not confirmed by code: that the stock of the damaged units is separated from good stock. The code records the damage and optionally holds or moves the whole pallet. It does not split the quantity. To verify: report 1 of 10 units as `Total` with `Reject`, and look at `Balances` for the line.
 
 ## The quantity limit
 

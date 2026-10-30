@@ -16,30 +16,26 @@ The form has a back arrow that returns to the lines list.
 | `Status` | `status` | Text | No | Read only. A new line is `NotAllocated`. | The status of the line. See [Order statuses](90-order-statuses-and-transitions.md). |
 | `Pick Instruction` | `pick_instruction` | Long text | No | Any text. Spaces at both ends are cut. Blank means none. | A one-off note for the picker. |
 
-Source: form `shipment_order_line_form` in `001_baseline.sql` and `wms-meta-ui` migration 082; table `shipment_order_line` in `wms-app` `001_baseline.sql`.
-
-> Not confirmed by code: which units the `UOM` drop-down offers. The drop-down has no list of its own in the form metadata that was read. To verify: open the card of a line whose SKU has two pack levels and open the drop-down.
-
 ## What each field affects
 
 ### SKU and UOM
 
 - When you add the line, the server finds the pack of the SKU and the size of the unit. It keeps that size on the line (`uom_factor`), so the quantity still means the same thing months later.
-- It also keeps the allocation policy of the SKU, and the version of that policy, on the line. This is the policy that Allocate uses for the line later (`crates/libs/wms-outbound/src/service/order_line/upsert.rs:105-108`).
-- Refused when the SKU does not exist for this owner (`sku '{sku}' not found for owner {owner}`), is inactive (`sku '{sku}' is inactive`), or has no such unit (`sku '{sku}' has no '{uom}' unit in its pack (pack_id {id})`) (`crates/libs/wms-outbound/src/service/shared/lookups.rs:65-92`).
-- Refused when neither the SKU nor its owner names an allocation policy: `sku '{sku}' (owner {owner}) has no allocation policy — neither the sku nor its owner names one; assign one before allocating` (`crates/libs/wms-outbound/src/allocation/policy.rs:112-123`).
-- Read only when the order is launched, and for a line that has a reservation (`crates/libs/wms-outbound/src/service/shared/mutability.rs:78-93`).
+- It also keeps the allocation policy of the SKU, and the version of that policy, on the line. This is the policy that Allocate uses for the line later.
+- Refused when the SKU does not exist for this owner (`sku '{sku}' not found for owner {owner}`), is inactive (`sku '{sku}' is inactive`), or has no such unit (`sku '{sku}' has no '{uom}' unit in its pack (pack_id {id})`).
+- Refused when neither the SKU nor its owner names an allocation policy: `sku '{sku}' (owner {owner}) has no allocation policy — neither the sku nor its owner names one; assign one before allocating`.
+- Read only when the order is launched, and for a line that has a reservation.
 
 ### Ordered
 
 - The quantity is in base units. The unit field says in which unit it was typed, not how the number is counted.
 - Stays editable while the order is working. The server uses one of two commands to change it. See [Changing a line quantity](34-changing-a-line-quantity.md).
-- Lower bound: not below what is already reserved plus what is cancelled. The message is `cannot reduce qty_ordered to {new} — {committed} is already committed — release the line's reservations first (Unallocate)` (`crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:22`, `crates/libs/wms-outbound/src/service/order_line/adjust_qty.rs:128-130`).
+- Lower bound: not below what is already reserved plus what is cancelled. The message is `cannot reduce qty_ordered to {new} — {committed} is already committed — release the line's reservations first (Unallocate)`.
 - The database refuses 0 or less (`chk_sol_qty_ordered`).
 
 ### Pick Instruction
 
-- Shown to the picker on the RF terminal before a pick can be committed. The picker must acknowledge it. The SKU card has a standing instruction too. Both are shown, SKU first, then the line (`crates/libs/wms-outbound/src/picking/instructions.rs:1-14`).
+- Shown to the picker on the RF terminal before a pick can be committed. The picker must acknowledge it. The SKU card has a standing instruction too. Both are shown, SKU first, then the line.
 - Blank is stored as none.
 
 ## Toolbar

@@ -16,9 +16,9 @@ Use this page to ask the system whether the document can be posted. `Validate` j
 
 ## What it checks
 
-For each line, in this order (`crates/libs/wms-inventory/src/service/inventory_adjustment/validate.rs`):
+For each line, in this order:
 
-1. **The stock rules**, the same that `Post` applies (`crates/libs/wms-inventory/src/stock_adjust/mod.rs:84-136`). See the table below.
+1. **The stock rules**, the same that `Post` applies. See the table below.
 2. **The reason of the line** (its own, or the document's): it must be on the list and active.
 3. **The direction**: a line that adds stock needs a reason that allows adding; a line that removes stock needs one that allows removing. A line whose change is 0 passes any reason.
 4. **The comment**: if the reason asks for a comment, the line or the document must have a non-blank one.

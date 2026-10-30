@@ -4,7 +4,7 @@ The tab `Serials` is the fourth tab of the [line card](21-line-detail-tab.md).
 It lists the serial numbers that were received on the line.
 The form is `receipt_detail_serials_form`. The data table is `inventory_balances_serial`, rows where `received_via` is the id of the line.
 
-The tab is shown only when the SKU of the line has **continuous serial tracking** switched on (`sku_serial_config.continuous_serial_tracking`). For other SKUs the tab is hidden (`crates/services/web-ui-server/src/extensions/customization/receipt/detail_render_action.rs:116-120`).
+The tab is shown only when the SKU of the line has **continuous serial tracking** switched on (`sku_serial_config.continuous_serial_tracking`). For other SKUs the tab is hidden.
 
 ## Columns
 

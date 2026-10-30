@@ -20,8 +20,6 @@ Use this page to add a new account. A new account can sign in, but it can do not
 7. Click `Save`. The message `User record created successfully` appears and the user shows in the list.
 8. Open the tab `Warehouses & Roles` and follow [Assigning a user to a warehouse](33-assigning-a-user-to-a-warehouse.md). The warehouse assignment can be added only after the user is saved.
 
-> Not confirmed by code: what the card fills in for `Language`, `Timezone`, `Date Format` and `Theme` on a new user, and what happens when `Password` is left empty. The database requires the four preferences. To verify: see the note on [User card, General tab](11-user-general-tab.md). Fill all of them and the password to be safe.
-
 ## What changes
 
 | What | Change |

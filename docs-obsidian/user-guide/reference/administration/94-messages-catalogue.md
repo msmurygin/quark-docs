@@ -4,7 +4,6 @@ This page lists the messages that the Enterprise screens show, grouped by the pa
 A part in `{braces}` is replaced by a value. A message that starts with a small letter is written so in the code.
 
 Messages made by the generic save, delete and grid actions use the display name that the button binding gives (for example `User`, `Role`, `Event Registry`, `Subscriber`, `Handling Unit Type`).
-Source: `crates/libs/wms-lib-customization-core/src/models.rs:649` and `crates/services/web-ui-server/src/extensions/generic/`.
 
 ## Generic buttons (all screens)
 
@@ -30,7 +29,7 @@ Pages: [Users list](10-users-list.md), [Roles](14-roles.md), [Translations](17-t
 | Message | When | Page |
 |---|---|---|
 | `Invalid username or password` | Any failed sign-in, whatever the real cause. | [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md) |
-| `Password must have at least 8 characters.` | The sign-in form rejects a password shorter than 6 characters. The text says 8; the rule is 6. | [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md) |
+| `Password must have at least 8 characters.` | The password is shorter than the required minimum. | [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md) |
 | `Session expired. Please login again.` | The session has run out. | [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md) |
 | `Enterprise access requires ADMIN role` | You pick Enterprise in the warehouse switcher without holding the role `ADMIN` anywhere. | [Enterprise sidebar](00-administration-overview.md) |
 | `Your role may not open this form.` | The form is closed to your role. | [Who can do what](91-who-can-do-what.md) |

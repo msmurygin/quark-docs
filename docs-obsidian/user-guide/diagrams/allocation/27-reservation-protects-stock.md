@@ -48,21 +48,6 @@ Reading notes.
 - To free a reservation, use `Unallocate`, delete the pick, cancel the order or short the pick (see [page 13](13-journey-unallocate-cancel.md) and [page 14](14-journey-top-up.md)). No inventory screen releases it.
 - A hold does not change `qty_allocated`. It makes the row unavailable for new allocation and stops the pick (see [page 24](24-influence-holds.md)).
 - The reservation is recorded twice: on the stock row and on the order line (`shipment_order_line.qty_allocated`). The `pick_detail` row keeps the position (lot, location, LPN) that was reserved.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Available quantity of the view | `crates/libs/wms-lib-sql/sql/wms-app/migrations/011_a_hold_says_what_it_forbids.sql:105-114` |
-| Accounting modes of a move | `crates/libs/wms-inventory/src/stock_move/accounting.rs:12-52` |
-| Generic move takes the free part | `crates/libs/wms-inventory/src/movement/move_lines.rs:100-190` |
-| Refusal texts of full move and container move | `crates/libs/wms-inventory/src/movement/types.rs:473-510` |
-| Refusal text of repack | `crates/libs/wms-inventory/src/error/container.rs:83-104` |
-| Adjustment floor | `crates/libs/wms-inventory/src/stock_adjust/plan.rs:112-123`, `crates/libs/wms-inventory/src/stock_adjust/mod.rs:91-100` |
-| Quarantine: proof of no reservation, partial quarantine | `crates/libs/wms-inventory/src/stock_move/accounting.rs:54-77`, `crates/libs/wms-inventory/src/picking/remediation.rs:1-20` |
-| Pick consumes its reservation: source must hold `qty` and `qty_allocated` | `crates/libs/wms-inventory/src/picking/reserved_pick.rs:306-314` |
-| Reserve writes `qty_allocated` on the balance and on the line | `crates/libs/wms-outbound/src/allocation/reserve.rs:186-205` |
-
 ## Related pages
 
 - [Holds and location state](24-influence-holds.md)

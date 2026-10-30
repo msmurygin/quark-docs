@@ -16,17 +16,8 @@ Sign in to the web UI and reach the main screen.
 
 ### Before you start
 
-- You need a user name and a password from the person who installed the tenant.
-- For a new tenant, the first administrator is created by an operator command, not by a screen.
-  The command is `app-server bootstrap-admin` and it needs three settings:
-  `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`
-  (`app-server/src/cli.rs`). Four more settings are optional:
-  `BOOTSTRAP_ADMIN_LOCALE` (default `en-US`), `BOOTSTRAP_ADMIN_DATE_FORMAT` (`yyyy-MM-dd`),
-  `BOOTSTRAP_ADMIN_TIMEZONE` (`UTC`), `BOOTSTRAP_ADMIN_MODE` (`light`).
-- That command works only when the tenant has **zero users**.
-  It needs at least one warehouse and the `ADMIN` role to exist
-  (`wms-lib-core/src/model/initial_admin.rs`). The new user gets the `ADMIN` role
-  in the first warehouse and signs in with the password you set.
+- You need a user name and a password from the person who prepared the tenant.
+- For a new tenant, the installer gives you the first administrator account. This guide starts after that account exists; installation commands and server settings belong in the deployment runbook.
 - Change the password after the first sign-in. Nothing forces you to do it.
 
 ### Steps
@@ -61,7 +52,7 @@ The sign-in form and user administration use the same eight-character minimum. P
 |---|---|---|
 | A password length message | The password field failed the form check. | Type a longer password. |
 | `Login failed.` | The server did not accept the credentials. | Check the user name and the password. |
-| Login is refused for an RF terminal only | The user has `RF device login` turned off (`rf_login = false`). The refusal looks the same as a wrong password. | Turn on `RF device login` for the user (see `02-users-roles-permissions.md`). |
+| Login is refused for an RF terminal only | The user has **RF device login** turned off. The refusal looks the same as a wrong password. | Turn on **RF device login** for the user; see [Users, Roles and Permissions](02-users-roles-permissions.md). |
 | Sign-in returns an error with no detail after a database reset | The session data was reset. | Ask the system administrator to restart the web service, then sign in again. |
 
 ### What this affects later
@@ -77,8 +68,8 @@ Understand which warehouse you work in, and when you are in Enterprise mode.
 
 ### Before you start
 
-- A user can have several warehouses. Each assignment has a role (see `02-users-roles-permissions.md`).
-- The assignment marked `Default` opens first (`is_default`).
+- A user can have several warehouses. Each assignment has a role; see [Users, Roles and Permissions](02-users-roles-permissions.md).
+- The assignment marked **Default** opens first.
 
 ### Steps
 
@@ -86,14 +77,11 @@ Understand which warehouse you work in, and when you are in Enterprise mode.
 2. To change the warehouse, click that button (tooltip `Switch warehouse`).
    A pop-up `Switch warehouse` opens. It has a search field and one row per warehouse (name, code and your role).
    Click a row.
-   The server route is `POST /warehouse/switch`.
-   It clears all form and navigation state and reloads the app
-   (`web-ui-server/src/routes/warehouse_handler.rs`).
+   The app clears the previous warehouse's open forms and reloads the workspace.
 3. To work on users, roles, translations and integration settings, switch to **Enterprise**.
    The Enterprise entry exists only for users who hold the `ADMIN` role in at least one warehouse.
 
-If you hold `ADMIN` in any warehouse, the first row of the pop-up is `Enterprise` (tag `admin`). If you hold no warehouse assignment, the pop-up says `No warehouses assigned`
-(`web-ui-server/src/components/partials/masthead.rs`, `application_menu.rs`).
+If you hold `ADMIN` in any warehouse, the first row of the pop-up is `Enterprise` (tag `admin`). If you hold no warehouse assignment, the pop-up says `No warehouses assigned`.
 
 ### What you should see
 
@@ -104,7 +92,7 @@ If you hold `ADMIN` in any warehouse, the first row of the pop-up is `Enterprise
 
 | Message | Meaning | Fix |
 |---|---|---|
-| The `Reports` page shows a banner instead of reports | In Enterprise mode the report data sets have no warehouse schema. | Switch to a real warehouse (`web-ui-server/.../reports_iframe.rs`, "enterprise context" case). |
+| The `Reports` page shows a banner instead of reports | In Enterprise mode the report data sets have no warehouse schema. | Switch to a real warehouse. |
 | You are in Enterprise mode but every screen is denied | Your role in the linked warehouse is not `ADMIN`. | Ask an administrator to give you `ADMIN` on a warehouse. |
 
 ### What this affects later
@@ -114,9 +102,7 @@ If you hold `ADMIN` in any warehouse, the first row of the pop-up is `Enterprise
 
 ## 3. Warehouse sidebar (menu 1, "Sidebar navigation")
 
-The tree below comes from the table `menu_items` of the meta-ui database after all migrations.
-Labels are the English labels. The order follows `sort_order`.
-Items with the same `sort_order` appear in the order the database returns them.
+The tree below follows the current English sidebar.
 
 ```
 Overview
@@ -205,52 +191,50 @@ Notes:
 - `Management & Control > Inventory > Replenishment` lists replenishments of pick locations. `Warehouse Configuration > Policies > Replenishment Policy` opens the urgency settings read by the planner; each pick location's `Min` and `Max` still decide when and how much to replenish.
 - `Overview > Dashboard` opens the home dashboard. The dashboard also remains the first tab in the top bar.
 
-The `dashboard` form is the home page. It is the default tab of the main work area (`tab_containers.default_tab_id` = tab `dashboard`), so it opens right after sign-in. The breadcrumb entry `Dashboard` brings you back to it and clears the other screens (`web-ui-server/src/services/viewport_service.rs`, `routes/breadcrumb_handler.rs`).
+The dashboard is the home page, so it opens right after sign-in. The breadcrumb entry **Dashboard** brings you back to it and clears the other screens.
 
 ### Menu item to screen
 
 | Menu path | Opens (form code) | Covered in |
 |---|---|---|
-| `Warehouse Configuration > Settings & Reference Data > Code List` | `code_list_list_form` | `11-faq.md`, `05-inbound-setup.md` |
-| `Warehouse Configuration > Reason Codes > Hold Codes` | `hold_code_list_form` | `05-inbound-setup.md` |
-| `Warehouse Configuration > Product Data > Owners` | `owner_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Warehouse Configuration > Topology > Locations` | `location_list_form` | `03-warehouse-structure.md` |
-| `Warehouse Configuration > Topology > Putaway Zones` | `putawayzone_list_form` | `03-warehouse-structure.md` |
-| `Warehouse Configuration > Topology > 3D Warehouse` | `warehouse_3d` (HTML page) | `03-warehouse-structure.md` |
-| `Warehouse Configuration > Work Areas & Equipment > Work Areas` | `work_area_list_form` | `03-warehouse-structure.md` |
-| `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | `equipment_profile_list_form` | `03-warehouse-structure.md` |
-| `Management & Control > Stations > Distribution Stations` | `distribution_station_list_form` | `06-outbound-setup.md` |
-| `Management & Control > Stations > Consolidation Stations` | `consolidation_station_list_form` | `06-outbound-setup.md` |
-| `Management & Control > Exceptions > Packing Exceptions` | `packing_exception_list_form` | `operator/10-packing-verify.md` |
-| `Management & Control > Execution Control > Order Control (Manual)` | `order_control_tabbed` | `operator/11-order-control-after-picking.md` |
-| `Warehouse Configuration > Settings & Reference Data > System Settings` | `sys_settings_list_form` | `10-checklist-go-live.md` |
-| `Warehouse Configuration > Dashboards > Board Settings` | `dashboard_setting_list_form` | `08-reports-and-dashboards.md` |
-| `Warehouse Configuration > Dashboards > Metric Thresholds` | `dashboard_threshold_list_form` | `08-reports-and-dashboards.md` |
-| `Warehouse Configuration > Product Data > Packs` | `pack_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Warehouse Configuration > Policies > Allocation Policy` | `allocation_policy_list_form` | `06-outbound-setup.md` |
-| `Warehouse Configuration > Policies > Putaway Policy` | `putaway_policy_list_form` | `05-inbound-setup.md` |
-| `Warehouse Configuration > Policies > Cartonization Policy` | `cartonization_policy_list_form` | `06-outbound-setup.md` |
-| `Warehouse Configuration > Policies > Lot Policy` | `lot_policy_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Warehouse Configuration > Policies > Receipt Policy` | `receipt_policy_list_form` | `05-inbound-setup.md` |
-| `Warehouse Configuration > Reason Codes > Pick Short Reasons` | `pick_short_reason_list_form` | `06-outbound-setup.md` |
-| `Warehouse Configuration > Policies > Picking Policies` | `picking_policy_list_form` | `06-outbound-setup.md` |
-| `Warehouse Configuration > Counting > Cycle Count Policies` | `inventory_count_policy_list_form` | `03-warehouse-structure.md` (short note) |
-| `Management & Control > Handling Units > Handling Unit Registry` | `handling_unit_registry_type_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Warehouse Configuration > Product Data > Barcode Formats` | `barcode_format_list_form` | `07-printing-and-labels.md` |
-| `Management & Control > Receiving > Receipts` | `receipt_list` | `05-inbound-setup.md` |
-| `Warehouse Configuration > Product Data > SKUs` | `sku_list` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Warehouse Configuration > Product Data > Attributes` | `attribute_def_list_form` | `04-owners-sku-uom-pack-hierarchy.md` |
-| `Management & Control > Orders & Waves > Orders` | `shipment_order_list` | `06-outbound-setup.md` |
-| `Management & Control > Inventory > ...` | inventory balances, holds, adjustments, counts, replenishments and pending move-in | `05-inbound-setup.md` (holds), `11-faq.md` |
-| `Overview > Reports` | reports catalogue | `08-reports-and-dashboards.md` |
-| `Management & Control > Execution Control > Task Board` | `task_board_list_form` | `06-outbound-setup.md` |
-| `Management & Control > Execution Control > Pick Assignments` | `pick_assignment_board_list_form` | `06-outbound-setup.md` |
-| `Management & Control > Exceptions > Pick Target Exceptions` | `pick_target_exception_list_form` | `06-outbound-setup.md` |
-| `Management & Control > Exceptions > Skip History` | `task_skip_board_list_form` | `06-outbound-setup.md` |
-| `Warehouse Configuration > Operator Permissions > Operators` | `operator_list_form` | `03-warehouse-structure.md` |
+| `Warehouse Configuration > Settings & Reference Data > Code List` | `code_list_list_form` | [FAQ](11-faq.md), [Inbound Setup](05-inbound-setup.md) |
+| `Warehouse Configuration > Reason Codes > Hold Codes` | `hold_code_list_form` | [Inbound Setup](05-inbound-setup.md) |
+| `Warehouse Configuration > Product Data > Owners` | `owner_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Warehouse Configuration > Topology > Locations` | `location_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Warehouse Configuration > Topology > Putaway Zones` | `putawayzone_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Warehouse Configuration > Topology > 3D Warehouse` | `warehouse_3d` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Warehouse Configuration > Work Areas & Equipment > Work Areas` | `work_area_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | `equipment_profile_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Management & Control > Stations > Distribution Stations` | `distribution_station_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Stations > Consolidation Stations` | `consolidation_station_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Exceptions > Packing Exceptions` | `packing_exception_list_form` | [Packing](../operator/10-packing-verify.md) |
+| `Management & Control > Execution Control > Order Control (Manual)` | `order_control_tabbed` | [Order Control](../operator/11-order-control-after-picking.md) |
+| `Warehouse Configuration > Settings & Reference Data > System Settings` | `sys_settings_list_form` | [Go-Live Checklist](10-checklist-go-live.md) |
+| `Warehouse Configuration > Dashboards > Board Settings` | `dashboard_setting_list_form` | [Reports and Dashboards](08-reports-and-dashboards.md) |
+| `Warehouse Configuration > Dashboards > Metric Thresholds` | `dashboard_threshold_list_form` | [Reports and Dashboards](08-reports-and-dashboards.md) |
+| `Warehouse Configuration > Product Data > Packs` | `pack_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Warehouse Configuration > Policies > Allocation Policy` | `allocation_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Warehouse Configuration > Policies > Putaway Policy` | `putaway_policy_list_form` | [Inbound Setup](05-inbound-setup.md) |
+| `Warehouse Configuration > Policies > Cartonization Policy` | `cartonization_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Warehouse Configuration > Policies > Lot Policy` | `lot_policy_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Warehouse Configuration > Policies > Receipt Policy` | `receipt_policy_list_form` | [Inbound Setup](05-inbound-setup.md) |
+| `Warehouse Configuration > Reason Codes > Pick Short Reasons` | `pick_short_reason_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Warehouse Configuration > Policies > Picking Policies` | `picking_policy_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Warehouse Configuration > Counting > Cycle Count Policies` | `inventory_count_policy_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
+| `Management & Control > Handling Units > Handling Unit Registry` | `handling_unit_registry_type_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Warehouse Configuration > Product Data > Barcode Formats` | `barcode_format_list_form` | [Printing and Labels](07-printing-and-labels.md) |
+| `Management & Control > Receiving > Receipts` | `receipt_list` | [Inbound Setup](05-inbound-setup.md) |
+| `Warehouse Configuration > Product Data > SKUs` | `sku_list` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Warehouse Configuration > Product Data > Attributes` | `attribute_def_list_form` | [Owners and Products](04-owners-sku-uom-pack-hierarchy.md) |
+| `Management & Control > Orders & Waves > Orders` | `shipment_order_list` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Inventory >...` | inventory balances, holds, adjustments, counts, replenishments and pending move-in | [Inbound Setup](05-inbound-setup.md), [FAQ](11-faq.md) |
+| `Overview > Reports` | reports catalogue | [Reports and Dashboards](08-reports-and-dashboards.md) |
+| `Management & Control > Execution Control > Task Board` | `task_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Execution Control > Pick Assignments` | `pick_assignment_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Exceptions > Pick Target Exceptions` | `pick_target_exception_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Management & Control > Exceptions > Skip History` | `task_skip_board_list_form` | [Outbound Setup](06-outbound-setup.md) |
+| `Warehouse Configuration > Operator Permissions > Operators` | `operator_list_form` | [Warehouse Structure](03-warehouse-structure.md) |
 
-Every form code in this table is traced in the migrations: menu item, then a menu-click event (`ui_event`), then a tab (`tab_items.target_form_id`), then the form (`form_base.code`). Only `Task Board`, `Skip History`, `Users`, `Roles`, `Audit Log`, `Permission Matrix` and `Translations` also have a direct `target_form_id` on the menu row.
-Items added after the first baseline (for example `Counts`, `Pick Assignments`, `Handling Unit Registry` and `Board Settings`) use the same navigation pattern.
 `Management & Control > Handling Units > Handling Unit Registry` opens the registry list.
 
 ![Warehouse sidebar with all top-level sections collapsed](../assets/screens/menu-navigation-collapsed.png)
@@ -310,7 +294,6 @@ Notes:
 | `Platform Tools > RF UI Designer` | RF UI Designer |
 | `Platform Tools > RPC Documentation` | RPC method reference |
 
-
 ## 5. Common screen types
 
 | Screen type | What it looks like | Typical buttons |
@@ -329,4 +312,4 @@ Rules that apply everywhere:
   `Someone changed this record after you opened it. Look at the current version and make your change again.`
   Refresh and repeat your change.
 
-The generic message for an empty required field is `<Field name> is required`, for example `Code is required`. The field name comes from the column name with the first letter in capitals and underscores turned into spaces (`web-ui-server/src/extensions/generic/validate_action.rs`, `resolve_required_message`). A form can set its own text per field (`<field>_required`). The message key `validation.required_field` ("Field {0} is required") exists only in the archived migrations. The current product does not use it.
+The generic message for an empty required field is **{Field name} is required**, for example **Code is required**. Some forms use a more specific message.

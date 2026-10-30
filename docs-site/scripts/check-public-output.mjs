@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 // Fail closed if author-only implementation evidence reaches the built site.
+// This is the publication equivalent of the repository grep review: it scans
+// every reader-visible HTML, search JSON, XML and text artifact after Docusaurus
+// has resolved Markdown links and removed author-only source material.
 import {readdirSync, readFileSync} from 'node:fs';
 import {relative, resolve} from 'node:path';
 import {PUBLIC_FORBIDDEN_PATTERNS} from '../src/build/public-guide-sanitize.mjs';

@@ -23,7 +23,7 @@ To restore access later, set `Status` back to `Active`.
 | Door | Effect |
 |---|---|
 | Web sign-in | Refused with `Invalid username or password`, after the password was checked. |
-| A person who is signed in now | The next request is refused. Open sessions end (`crates/libs/wms-lib-web/src/middleware/mw_auth.rs:617`). |
+| A person who is signed in now | The next request is refused. Open sessions end. |
 | API keys of the user | Refused. The keys are not revoked and work again when the status goes back to `Active`. A cache keeps an earlier answer for up to 30 seconds. |
 | Handheld | Refused, as for the web. |
 | Supervisor authorization | The user can no longer authorize actions. |

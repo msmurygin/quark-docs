@@ -1,13 +1,13 @@
 # By Container tab
 
 The `By Container` tab shows **one row for each container** (pallet, case, tote) with the total of the stock in it. Containers are drawn in parent and child order: a case that stands on a pallet is shown under the pallet and indented.
-The form is `inventory_balance_container_list`. The data object is `inventory_balance_by_container`, over the view of the same name. The list is read by `list_inventory_balance_by_container`, and the tree order comes from `get_container_hierarchy` (action `generic_flat_hierarchy`, `crates/services/web-ui-server/src/extensions/generic/tree_query_action.rs:315`).
+The form is `inventory_balance_container_list`. The data object is `inventory_balance_by_container`, over the view of the same name. The list is read by `list_inventory_balance_by_container`, and the tree order comes from `get_container_hierarchy`.
 
 The list is read only. A click on a row does nothing.
 
 ## Which containers are shown
 
-All containers except those with status `Disposed` or `Planned` (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2335-2362`). A container with no stock is shown with quantity 0.
+All containers except those with status `Disposed` or `Planned`. A container with no stock is shown with quantity 0.
 
 ## Columns
 
@@ -37,8 +37,6 @@ All containers except those with status `Disposed` or `Planned` (`crates/libs/wm
 
 - The view uses `On hold` for **any** hold that is on and has this container's code in `lpn`, whether or not the hold blocks anything.
 - The statuses `Disposed` and `Planned` never show, because those containers are left out.
-
-> Not confirmed by code: whether the child rows are added to the parent row's `Qty` when the screen draws the tree. The view groups by container only. To verify: open a pallet with a case on it that holds stock, and compare the pallet's `Qty` with the case's.
 
 ## Related pages
 

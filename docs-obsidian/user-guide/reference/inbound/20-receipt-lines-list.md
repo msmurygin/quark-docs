@@ -62,9 +62,6 @@ The grey texts are:
 | `Receive` | `Receiving needs one open line on an open receipt` |
 | `Adjust Qty` | `Adjusting needs one line of an open receipt` |
 
-Source: the bindings of the form `receipt_detail_list` in `001_baseline.sql` and `084_web_receipt_adjust_and_box_exceptions.sql` (`wms-meta-ui` migrations).
-A button is grey when the condition cannot be read, for example when two lines are ticked.
-
 ## Row actions
 
 | Action | Result |
@@ -80,8 +77,6 @@ A button is grey when the condition cannot be read, for example when two lines a
 | `Resume scan` and there is no unfinished scan | `No unfinished serial scan on this line` |
 | `Resume scan` and the scan has no location | `The unfinished serial scan on this line has no location - it cannot be resumed` |
 | `Resume scan` and no single line is selected | `Select exactly one receipt line` |
-
-Source: `crates/libs/wms-inbound/src/service/receipt/planning/contracts.rs:59-63` and `crates/services/web-ui-server/src/extensions/customization/receipt/serial_scan_action.rs:73-75,268`.
 
 ## Related pages
 

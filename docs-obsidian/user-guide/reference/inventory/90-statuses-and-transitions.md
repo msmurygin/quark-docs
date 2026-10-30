@@ -1,7 +1,6 @@
 # Statuses and transitions
 
 This page lists the statuses of the documents and records of the `Inventory` screens, and what moves each one to the next.
-The rules live in `crates/libs/wms-inventory/src/domain/inventory_adjustment/aggregate.rs`, `crates/libs/wms-inventory/src/domain/inventory_count/aggregate.rs` and the services next to them.
 
 ## Adjustment document
 
@@ -37,8 +36,6 @@ The database keeps the dates in step with the status (check `chk_inventory_adjus
 | Post | No | Yes, if no reason asks for approval | Yes | No |
 | Reverse | No | No | No | Yes, once |
 | Delete | Yes | Yes | Yes | No |
-
-Source: `aggregate.rs:30-90`, `crates/libs/wms-lib-core/src/model/inventory/inventory_adjustment.rs:223-336`.
 
 ### Adjustment line statuses
 

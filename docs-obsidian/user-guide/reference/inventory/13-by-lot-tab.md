@@ -25,8 +25,6 @@ The same list form is also used as the pick list for a lot: the field `Lot` of t
 | `Status` | `status` | Text | Text | No | Yes | `On hold` when any row of the lot is under a hold that blocks taking stock out. Otherwise `Active`. |
 | `Owner` | `owner_id` | Whole number | Number | Yes | No | Shown as the owner code. Hidden at first. |
 
-Source: view `inventory_balance_dating` (the wms-app migration `lot_dating`). Its `id`, `qty`, `locs`, `status`, `qty_allocated` and `atp` are computed as `inventory_balance_by_lot` computes them, and a test holds the two together. The dates come from the table `inventory_balances_lot`; the view also knows where each date came from (typed or worked out), which the API returns (`expiration_date_source` and the like) and the list does not show.
-
 ## What each column affects
 
 ### Status
@@ -37,8 +35,6 @@ Source: view `inventory_balance_dating` (the wms-app migration `lot_dating`). It
 ### Days left
 
 - It is a number of days. The code does not colour or limit anything with it. It counts from the warehouse day (`WAREHOUSE_TIMEZONE`), the same day receiving, allocation, picking and shipping judge on.
-
-> Not confirmed by code: whether the cell colours a lot that is near its expiry. To verify: open the tab with a lot that expires in less than 10 days.
 
 ## Related pages
 

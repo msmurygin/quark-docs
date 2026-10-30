@@ -9,7 +9,7 @@ An open episode blocks closing the receipt it belongs to (return code 73). See [
 
 ## Which episodes are listed
 
-Those with `closed_at` empty (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:5170-5195`). An episode with status `Committed`, `Cancelled` or `Abandoned` has a closing time and is not shown.
+Those with `closed_at` empty. An episode with status `Committed`, `Cancelled` or `Abandoned` has a closing time and is not shown.
 
 ## Columns
 
@@ -30,8 +30,6 @@ The view also holds `expected_qty`, `captured_qty`, `owner_id`, `idempotency_key
 ## Who can use it
 
 Reading: `ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR`, `VIEWER`. The tab is read only. See [Who can do what](91-who-can-do-what.md).
-
-> Not confirmed by code: what the meaning of `Document` is for operations other than `Receive`. The column `business_ref_id` is a number that each operation fills in its own way. To verify: start a serial capture on a move and read the value in this column.
 
 ## Related pages
 

@@ -13,42 +13,28 @@ updated: 2026-10-25
 A user can sign in only after an administrator creates the user.
 A user can work in a warehouse only after an administrator assigns that warehouse and a role.
 
-| Concept | Meaning | Where it is stored |
-|---|---|---|
-| User | A person or a system account. | `enterprise."user"` |
-| Role | A named set of permissions, for example `OPERATOR`. | `enterprise.role` |
-| Warehouse assignment | The link user + warehouse + role. One assignment per user per warehouse. | `enterprise.user_warehouse` |
-| Permission | A right on one resource. Four bits: read, write, delete, execute. | `enterprise.role_permission` |
-| Resource type | What the permission applies to: `api`, `server_action`, `menu_item`. | `role_permission.resource_type` |
+| Concept | Meaning |
+|---|---|
+| User | A person or a system account. |
+| Role | A named set of permissions, for example `OPERATOR`. |
+| Warehouse assignment | The warehouse a user can open and the role used there. |
+| Permission | A right to view data, change it, delete it or run an action. |
 
-Rules that come from the database:
+Important rules:
 
-- The user name is unique (`user_username_key`).
-- A user can have only one warehouse assignment per warehouse (`user_warehouse_user_id_warehouse_id_key`).
-- A user can have only one **default** assignment (`idx_user_warehouse_default`).
-- The role code is unique (`role_code_key`).
-- You cannot delete a role that a user still holds (`user_warehouse_role_id_fkey ... ON DELETE RESTRICT`).
-- You cannot set your own status to `Locked` or `Disabled`, or delete your own account.
-- Every active warehouse must keep at least one `ADMIN` whose status is `Active` or `Invited`. Disabling or deleting the last such administrator is refused, including a bulk delete.
+- Every login name and role code must be unique.
+- A user can have only one role assignment per warehouse and one default warehouse.
+- You cannot lock, disable or delete the account you are currently using.
+- Every active warehouse must keep at least one sign-in-capable `ADMIN`.
+- You cannot delete a role while users still hold it.
 
-How a request is checked:
-
-1. The server finds your role in the active warehouse.
-2. Users of type `Admin` or `Sys` skip permission checks. All other users are checked against `role_permission`.
-3. In Enterprise mode, only the `ADMIN` role is accepted.
-4. The default mode is `Enforce`. An operator can set the environment variable `RBAC_ENFORCEMENT_MODE=log_only` to log denials without blocking.
-
-What the user sees:
-
-- A sidebar item is not drawn when the role has no right for the menu item, or may not open its form (`web-ui-server/src/components/partials/body.rs`, `sidenav.rs`).
-- On the special "component" screens (for example allocation and putaway steps), a button whose command the role may not run is not drawn (`services/component/gate.rs`).
-- On ordinary screens the toolbar buttons stay visible (`components/partials/toolbar.rs` has no permission check). The click is denied by the server-action gate with `Forbidden("<handler name>")`.
+The active warehouse decides which role is used. Menus and actions that are not allowed for that role are hidden or refused. Use **Enterprise > Permission Matrix** to review the effective permissions instead of assuming that every deployment uses the same defaults.
 
 ## 2. Seeded roles
 
-The baseline creates six roles (`enterprise/migrations/001_baseline.sql`).
+The standard setup includes these roles:
 
-| Code | Name | System role | Description in the database |
+| Code | Name | Standard role | Purpose |
 |---|---|---|---|
 | `ADMIN` | Administrator | yes | Full access to all forms |
 | `MANAGER` | Warehouse Manager | yes | Config and operations access |
@@ -57,52 +43,16 @@ The baseline creates six roles (`enterprise/migrations/001_baseline.sql`).
 | `SUPERVISOR` | Supervisor | yes | Authorizes overrides (close-with-discrepancy etc.) |
 | `metadata_admin` | RF Metadata Admin | no | Can read AND write RF screen metadata |
 
-The server fills the permission rows at start-up (the **RBAC seeder**).
-It uses `ON CONFLICT DO NOTHING`, so your edits in the permission matrix are kept.
-The defaults for each API method are written in the code of that method (`roles = [...]`).
+Use the roles as a starting point:
 
-### What each role can do by default
+- `ADMIN` manages users, warehouses and access.
+- `MANAGER` manages warehouse configuration and operations.
+- `SUPERVISOR` handles operational exceptions and authorised overrides.
+- `OPERATOR` performs day-to-day warehouse work.
+- `VIEWER` has read-only access where it is granted.
+- `metadata_admin` is reserved for RF-screen administration.
 
-The table shows the defaults found in `app-server/src/web/rpcs/*.rs`.
-`Yes` means the role is in the default list of every create, update and delete method of that area.
-Edit the defaults in `Permission Matrix`.
-
-| Area | ADMIN | MANAGER | SUPERVISOR | OPERATOR | VIEWER |
-|---|---|---|---|---|---|
-| Users, roles, role permissions, API keys, user warehouses | Write | Read only (roles, user warehouses) | None | Read only (roles, user warehouses) | Read only (roles, user warehouses) |
-| Owners, owner config, addresses, bank accounts | Write | Write | Read (`get_owner` only) | Read | Read |
-| Locations (create, update, delete) | Write | Write | None | Write | Read |
-| Location generator (`gen_locs`) | Run | Run | None | None | None |
-| Putaway zones | Write | Write | None | Read | Read |
-| SKU (create, update, delete) | Write | Write | None | Write | Read |
-| SKU serial config | Write | Write | None | Read | Read |
-| Packs | Write | Write | None | Write (items) | Read |
-| Code values (code lists) | Write | Write | None | Read | Read |
-| System settings | Write | Write | None | Read | Read |
-| Putaway policy | Write | Write | Write | Read | Read |
-| Allocation policy | Write | Write | Write | Read | Read |
-| Cartonization, lot, receipt, replenishment policy | Write | Write | None | Read | Read |
-| Picking policy | Write | Write | Read | Read | Read |
-| Pick short reasons | Write | Write | Write | None | None |
-| Wave and wave policy (API) | Write | Write | Write (part) | None | None |
-| Work areas, operators, equipment profiles | Write | Write | None (equipment: read) | Read | Read |
-| Printers, printer assignments, label definitions and templates, report definitions | Write | Write | None | Read | Read |
-| Inventory adjustments | Write | Write | Write | None | Read |
-| Inventory counts | Write | Write | Write | Execute (part) | Read |
-| Receiving, order entry, allocation, task claim | Yes | Yes | Yes | Yes (see below) | No |
-
-Notes:
-
-- `OPERATOR` can create, update and delete **locations, SKUs and pack items** by default. Remove these rights in the matrix if your policy says only managers may do this.
-- `SUPERVISOR` is a **custom** role. Server actions that are not in its allow-list start closed (`default_server_action_grant`, last arm). Its API rights come from the code lists above and from migrations 224, 271, 279 and 287.
-- `SUPERVISOR` also holds these special rights by default: `receipt.override_close_discrepancy`, `receipt.override_qty_excess`, `receipt.override_qty_shortage` (seeded rows) and `pick_drop.close_foreign` (with `ADMIN` and `MANAGER`).
-- Only `ADMIN` holds `admin.rbac.reseed` by default.
-- `VIEWER` keeps read-only server actions: `generic_refresh`, `query_list_form`, `generic_rpc_query`, `generic_rpc_form_load`, `generic_tree_query`, `generic_toolbar_render`, `me`. It also runs `print_report`, `set_report_favorite` and `dashboard_snapshot_rpc`.
-- `OPERATOR` server actions: the generic save, new, delete and grid actions, `shipment_order_allocate`, `receipt_receive`, `receipt_capture_serial`, `receipt_resume_serials` and `generic_rpc_command` (see `seeder.rs`).
-- `SUPERVISOR` adds: `allocation_policy_duplicate`, `shipment_order_release`, `shipment_order_line_cancel_qty`, `shipment_order_unallocate`, `pick_detail_delete_selected`, `task_delete_confirm`.
-- Only `ADMIN` can open `Translations` (menu permission `9109`).
-
-Use `Enterprise > Permission Matrix` to review the effective API permissions for a role. Filter the matrix to the `API` resource type; deployment-specific permission changes take precedence over the defaults described here.
+Always review the effective rights in **Enterprise > Permission Matrix** before go-live. Filter by resource type and give each role only the access required for its job.
 
 ## 3. Create a user
 
@@ -112,7 +62,7 @@ Create a new user and set a password.
 
 ### Before you start
 
-- Role: `ADMIN` (the method `create_user` is `Execute` for `Admin` only).
+- Role: `ADMIN`.
 - You are in Enterprise mode.
 - You know the user name, e-mail and language of the person.
 
@@ -145,14 +95,14 @@ Form `enterprise_user_basic`. Labels are the English labels.
 | `Email` (required) | Contact address. | Text up to 120 characters. | `anna@example.com` |
 | `Employee ID` | Personnel number. | Text up to 50 characters. | `E-0042` |
 | `Language` | UI language. | Codes from the `locale` registry: `en`, `ru`, `kk`. | `en` |
-| `Password` | Initial password. The form hint says: "Leave empty to keep current". | Any text. The API requires it on create. | (secret) |
+| `Password` | Initial password. When editing, leave it empty to keep the current password. | At least 8 characters and your organisation's password rules. | (secret) |
 | `Type` (required) | Account type. | `User`, `Admin`, `Sys`, `Agent`. Only a superuser (`Admin` or `Sys`) can set a value other than `User`. | `User` |
 | `Status` (required) | Account status. | `Active`, `Invited`, `Locked`, `Disabled`. `Locked` and `Disabled` block sign-in, open sessions and API keys. `Active` and `Invited` are let in. | `Active` |
 | `Created` | Audit. Read-only. | Date and time. | |
 | `Last login` | Audit. Read-only. | Date and time. | |
 | `Failed attempts (24h)` | Audit. Read-only. | Whole number. | |
 | `Password age, days` | Audit. Read-only. Hint: "Days since the password was last changed". | Whole number. | |
-| `Timezone` | Used to show dates. | Values from the `TIMEZONE` code list (17 values in the enterprise database). | `Europe/Sofia` |
+| `Timezone` | Used to show dates. | A configured timezone. | `Europe/Sofia` |
 | `Date Format` | Date format. | Values from the `DATEFORMAT` code list (9 values). | `dd.MM.yyyy HH:mm:ss` |
 | `Theme` | Light or dark. | Values of `THEME` (2 values). | `dark` |
 | `API access` | May this user call the API with a key? | On or off. Default on. | on |
@@ -168,24 +118,21 @@ Form `enterprise_user_basic`. Labels are the English labels.
 
 | Message | Meaning | Fix |
 |---|---|---|
-| `UserAlreadyExists` (user name taken) | The user name is already in the database. | Choose another `Username`. |
-| `UserTypNotPermitted` | You tried to set `Type` to a value other than `User` without being a superuser. | Leave `Type` as `User`, or ask a superuser. |
-| `SuperuserAccountNotPermitted` | You tried to change, re-password or delete an `Admin` or `Sys` account without being a superuser. | Ask a superuser. |
-| `UserSelfLockoutNotPermitted` | You tried to lock, disable or delete the account you are currently using. | Use another `ADMIN` account to make the change. |
-| `LastActiveAdminNotPermitted` | The change would leave an active warehouse without a sign-in-capable `ADMIN`. | Assign or activate another `ADMIN` for every listed warehouse first. |
-| `Forbidden(...)` | Your role cannot run `create_user`. | Use an `ADMIN` account. |
-| `Field {0} is required` | A required field is empty. | Fill the field. |
+| The login already exists | Another user has the same login. | Choose another login. |
+| The selected account type is not permitted | You tried to create a privileged account without sufficient access. | Leave **Type** as **User**, or ask an authorised administrator. |
+| The account cannot be changed | Your account may not manage this privileged account. | Ask an authorised administrator. |
+| You cannot lock or delete your own account | The change would lock you out. | Use another `ADMIN` account to make the change. |
+| The last active administrator cannot be removed | The change would leave an active warehouse without an administrator who can sign in. | Assign or activate another `ADMIN` for every listed warehouse first. |
+| You do not have permission | Your role cannot create users. | Use an `ADMIN` account. |
+| A required field is empty | One or more required values are missing. | Fill every required field. |
 
 ### What this affects later
 
 - The user can sign in with the user name and password.
 - Without a warehouse assignment, the user has no data and no role (section 4).
 - `Language`, `Timezone` and `Date Format` set what the user sees.
-- The operator list in each warehouse is built from users (see `03-warehouse-structure.md`, section 7).
-
-The server has no password rule when you create a user or set a password (`UserBmc::create`, `update_pwd` in `wms-lib-core/src/model/user.rs`; RPCs `create_user` and `update_user`). Any text is stored, even an empty one on create.
-Only the sign-in form checks the length: at least 6 characters. A user with a shorter password is created but cannot sign in. Always set 8 or more characters.
-When you edit a user and leave the password field empty, the old password stays.
+- The operator list in each warehouse is built from eligible users. See [Warehouse Structure](03-warehouse-structure.md#7-operator-sync).
+- Changing the password ends the user's open sessions. When you edit a user and leave **Password** empty, the current password stays.
 
 ## 4. Assign a warehouse and a role
 
@@ -196,7 +143,7 @@ Give a user access to a warehouse with a role.
 ### Before you start
 
 - Role: `ADMIN`.
-- The user exists. The warehouse exists in `enterprise.warehouse`.
+- The user exists. The warehouse exists and is ready.
 
 ### Steps
 
@@ -230,17 +177,14 @@ Give a user access to a warehouse with a role.
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Duplicate key on `user_warehouse_user_id_warehouse_id_key` | The user already has this warehouse. | Edit the existing row. |
-| Duplicate key on `idx_user_warehouse_default` | Another row is already the default. | Turn off `Default` on the other row first. |
+| **Record already exists** | The user already has this warehouse. | Edit the existing row. |
+| The default warehouse cannot be saved | Another row is already the default. | Turn off **Default** on the other row first. |
 
 ### What this affects later
 
 - The role decides which menus, buttons and API methods the user can use in that warehouse.
 - A user with the `ADMIN` role in any warehouse can open Enterprise mode.
-- Changes to roles and permissions are shared between server copies through the table `enterprise.rbac_cache_epoch` (see `docs-obsidian/architecture/rbac-cache-invalidation.md`).
-
-The server does not show the constraint name. For a duplicate key on `user_warehouse` it answers `Record already exists` (HTTP 400, `wms-lib-web/src/error.rs`, code `23505`). The same text appears for a duplicate role code.
-A delete that a foreign key refuses (a role still held by a user) answers `Cannot delete: record is in use`.
+- Permission changes apply to subsequent actions. Ask affected users to refresh or sign in again if an open page still shows an old menu.
 
 ## 5. Create or edit a role
 
@@ -250,7 +194,7 @@ Create a custom role and set its permissions.
 
 ### Before you start
 
-- Role: `ADMIN` (create, update and delete role methods are `Admin` only).
+- Role: `ADMIN`.
 
 ### Steps
 
@@ -279,29 +223,28 @@ Form `enterprise_role_basic`.
 | `Code` (required) | Stable identity of the role. It cannot change after creation. | Unique text up to 50 characters. | `PICKER` |
 | `Name` (required) | Display name. | Text up to 200 characters. | `Picker` |
 | `Description` | Free text. | Text. | `Floor pickers` |
-| `Active` | Inactive roles are not used by the seeder. | On or off. | on |
+| `Active` | Whether the role can be assigned and used. | On or off. | on |
 
 List columns: `Code`, `Name`, `Description`, `Members`, `Resources`, `Active`, `System`. Buttons: `New Role`, `Refresh`.
 
 ### What you should see
 
 - The role shows in the list with `Members` = 0.
-- In the matrix, the seeder adds rows for the new role at the next server start. Rows that do not exist yet are created when you save the matrix (`batch_upsert_permission_matrix`).
+- The role appears as a column in the permission matrix after you refresh it.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Duplicate key `role_code_key` | The code exists. | Use another code. |
-| Delete refused (`user_warehouse_role_id_fkey`) | A user still holds the role. | Change the users to another role first. |
-| `Forbidden(...)` on a screen button | The server action is not granted to your role. | Grant it in the matrix. |
+| **Record already exists** | The code exists. | Use another code. |
+| **Cannot delete: record is in use** | A user still holds the role. | Change the users to another role first. |
+| **You do not have permission** | The action is not granted to your role. | Ask an administrator to review the role in the matrix. |
 
 ### What this affects later
 
-- A new custom role starts with **no** server-action rights, except the rights you give it.
+- Treat a new custom role as having no usable access until you configure and test it.
 - Every permission change is written to `Audit`.
-
-The flag `is_system` only shows a "system" badge in the role list (`web-ui-server/src/components/layout/cortive_role_list.rs`). No rule in code or in the database protects a system role from deletion. Only the foreign key `user_warehouse_role_id_fkey` blocks it, and only while a user still holds the role. Do not delete `ADMIN`, `MANAGER`, `OPERATOR`, `SUPERVISOR` or `VIEWER`.
+- Do not delete or repurpose the standard roles. Create a custom role when the standard responsibility does not fit.
 
 ## 6. Read the audit log
 
@@ -344,7 +287,7 @@ Create a key so another system can call the API as a user.
 
 ### Before you start
 
-- Role: `ADMIN` (the API key methods are `Admin` only).
+- Role: `ADMIN`.
 - The user has `API access` turned on.
 
 ### Steps
@@ -391,19 +334,19 @@ List columns: `Expires`, `Prefix`, `Status`, `Name`, `Revoked`, `Last Used`.
 - The external system acts with the role of the key owner. Use a user with a limited role.
 - Only a hash of the key is stored.
 
-The shared sign-in middleware (`wms-lib-web/src/middleware/mw_auth.rs`) reads the key from the header `Authorization: Bearer wms_live_sk_...`. It does this for every route that sits behind it. Without a key it falls back to the session cookie.
-
 ## 8. Roles and the warehouse operator list
 
 Users with a warehouse assignment, `RF device login` on and status `Active` become **operators** in that warehouse.
-A background job copies them every 5 minutes (`OPERATOR_SYNC_INTERVAL`). See `03-warehouse-structure.md`, section 7.
+The operator list is refreshed periodically. See [Warehouse Structure](03-warehouse-structure.md#7-operator-sync).
 
 ## 9. Passwords and sessions
 
-- Passwords are stored as hashes. The hashing code is in `wms-lib-auth/src/pwd`. API keys use Argon2id.
+- Passwords and API keys are stored in a one-way protected form.
 - Signing out ends the server session and clears the cookie.
-- The bootstrap administrator should change the password after the first sign-in. The column `must_rotate_password` exists, but no code reads it, and `bootstrap-admin` no longer sets it (`wms-lib-core/src/model/initial_admin.rs`). Nothing forces the change.
-- There is no password complexity rule. The only length check is on the sign-in form: 6 characters (section 3).
-- There is no lock-out. An account is never disabled after failed sign-ins.
-- A throttle slows guessing. After 10 failed attempts within 60 seconds for one user name, or from one client address, further attempts are refused with the same error as a wrong password. Every attempt renews the 60 seconds. The counters live in the memory of each server process (`wms-lib-auth/src/authentication/login_throttle.rs`).
-- The user card shows `failed_login_attempts` as a rolling 24-hour count. It starts again at 1 when the last failure is older than 24 hours, and it resets on a good sign-in. It never blocks a sign-in (`wms-lib-core/src/model/user.rs`, `record_login_failure`).
+- Change the initial administrator password after the first sign-in.
+- Passwords must contain at least 8 characters. Apply your organisation's stronger password policy as well.
+- Repeated failed sign-ins are temporarily slowed. The sign-in page deliberately does not reveal whether the user name or password was wrong.
+- The user card shows recent failed attempts for investigation. A successful sign-in resets the counter.
+- Changing a password ends the user's open sessions.
+
+See [Sign-in, passwords and sessions](../reference/administration/92-sign-in-passwords-and-sessions.md) for operator and support guidance.

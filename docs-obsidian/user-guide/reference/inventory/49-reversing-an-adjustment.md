@@ -21,8 +21,6 @@ Use this page to undo a posted adjustment. A posted document never changes. A **
 - One line for each line of the original that changed stock. The identity is the same. The **target is the quantity before** the original post, read from the ledger (`qty_before`).
 - The reversal sets the stock back to that quantity **whatever happened in between**. If the stock changed since the original post, the reversal overwrites those changes. Check the column `Effect` before you post it.
 
-Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/reverse.rs`, `crates/libs/wms-lib-sql/sql/wms-app/migrations/054_an_adjustment_is_reversed_by_another.sql`.
-
 ## What the screen says
 
 | Result | Message |

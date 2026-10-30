@@ -170,5 +170,3 @@ These are words in cells, not messages.
 - `order is locked by another operation (waited {ms}ms)`
 - `system error: {text}` (the operator cannot fix it; do not retry)
 - `{entity} id={id} not found`
-
-Source of the web messages: the files `crates/services/web-ui-server/src/extensions/customization/shipment_order/*.rs` and `.../customization/task/lifecycle_action.rs`. Source of the server messages: `crates/libs/wms-outbound/src` (see each page).

@@ -26,10 +26,9 @@ The guides are written for Obsidian and GitHub, so a few things are adapted
 | `00-README.md` of each part | The page behind the part title (`/docs/operator/`) |
 | `README.md` of the guide | Replaced by a short "Getting started" chooser. Its author notes (screenshot conventions, known quality gaps) are not published. |
 | `![alt](../assets/screens/x.png)` + italic caption | `<figure>` with a caption, click to zoom. "Focus:" is made bold. |
-| An image whose PNG does not exist yet | A dashed "Screenshot not available yet" box (see `assets/MISSING-SCREENSHOTS.md`) |
+| An image whose PNG does not exist yet | A dashed "Screenshot not available yet" box |
 | Links to `reference/*.md` | The API portal (`/api/#method_name`) |
 | `api/reference/**` (75k lines, generated) | Not rendered. The portal shows the same facts per method. |
-| `assets/MISSING-SCREENSHOTS.md` | Reachable by link, hidden from the sidebar |
 
 Files are plain Markdown, **not MDX** (`markdown.format: 'detect'`): braces
 and angle brackets in JSON examples are safe. Do not rely on JSX in guide pages.

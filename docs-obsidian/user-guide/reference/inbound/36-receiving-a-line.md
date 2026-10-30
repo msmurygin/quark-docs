@@ -33,8 +33,6 @@ It creates stock in the location you choose, and moves the line and the receipt 
 The buttons at the bottom are `Reset` (throws away what you typed and reads the line again), `Cancel`, `Receive & next` and `Receive`.
 `Receive` and `Receive & next` stay grey until quantity, location and, for `Existing`, the pallet and all required attributes are filled, the quantity is not a fraction of a pack, and the quantity is not above the limit the owner accepts.
 
-> Not confirmed by code: what the window does after a successful `Receive` (whether it stays open). The component code has no call that closes the window, shows the toast `Received.` and reads the line again, and `Receive` keeps the typed values while `Receive & next` clears them (`ui/wms-component/components/receive-line/ReceiveLine.tsx`, functions `settleAfter` and `receive`). To verify: receive 1 unit on a test line and note whether the window stays open and whether the quantity field is empty.
-
 ## The window in detail
 
 | Part | Label | What it does |
@@ -83,16 +81,13 @@ The supervisor needs the rights `receipt.override_qty_excess` or `receipt.overri
 
 ### Which line gets the goods
 
-The window sends the receipt, the SKU and the quantity. The server picks the target line from the SKU, the lot attributes, the pallet and the supplier lot (`crates/libs/wms-inbound/src/service/receipt/cascade_lookup.rs`, decision record `docs-obsidian/decisions/047-receipt-detail-cascade-lookup.md`).
-When no line matches, the policy `No SKU on ASN` decides: `Allow` makes a new line, `Warning` asks a question (code 24), `HardError` refuses (`crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:75-96`).
-A new line has `qty_expected` 0, so its goods count as `Over receipt` (`receive_against_asn.rs:753-822`).
-
-> Not confirmed by code: that the goods land on the line you ticked when the receipt has several lines of the same SKU. To verify: make a receipt with two lines of the same SKU, tick the second line, receive 1 unit, and look at `Qty Received` of both lines.
+The window sends the receipt, the SKU and the quantity. The server picks the target line from the SKU, the lot attributes, the pallet and the supplier lot.
+When no line matches, the policy `No SKU on ASN` decides: `Allow` makes a new line, `Warning` asks a question (code 24), `HardError` refuses.
+A new line has `qty_expected` 0, so its goods count as `Over receipt`.
 
 ## What can go wrong
 
 The checks run in this order: pallet rule (25), supplier lot (33), strict lot attributes (34), held location (76), temperature (50, 51), pack multiple (30), quantity (27, 28, 29), dates (45 to 49), shortage reason (43), serials (65 to 67), expected lot attributes (35 to 37), inventory holds.
-Source: `crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:10-24`.
 
 | Message | Code | Meaning | Fix |
 |---|---|---|---|

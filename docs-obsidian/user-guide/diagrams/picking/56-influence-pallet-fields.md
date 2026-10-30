@@ -24,21 +24,6 @@ flowchart LR
 ## Stored only. It has no effect today.
 
 - `Pallet Drop Suggestion` (`pallet_drop_suggestion`). A search of the Rust code finds it only in the policy model and in the code that copies a revision. No decision reads it.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Destination chain | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:122-140` |
-| First deposit: type check and `Pack` routing | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:60-120` |
-| Rule of the destination | `crates/libs/wms-outbound/src/domain/pick_drop/aggregate.rs:387-409` |
-| List read from the frozen revision | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:178-200` |
-| Check at close | `crates/libs/wms-outbound/src/picking/commands/drop_close.rs:170-200` and `crates/libs/wms-outbound/src/domain/pick_drop/aggregate.rs:437-484` |
-| Wording of the refusals | `crates/libs/wms-lib-core/src/model/narration/mod.rs:2335-2345` |
-| Count request after a full commit | `crates/libs/wms-outbound/src/picking/emptied_location.rs:1-90` |
-| List range and default | `crates/libs/wms-outbound/src/domain/picking_policy/aggregate.rs:35-60` and `:143-160` |
-| `pallet_drop_suggestion` appears only in the model and its copies | `crates/libs/wms-lib-core/src/model/outbound/work_area_picking_policy.rs:274` and `crates/libs/wms-outbound/src/service/picking_policy/lifecycle.rs:583` |
-
 ## Related pages
 
 - [Drop-off of a pallet](23-drop-off-pallet.md)

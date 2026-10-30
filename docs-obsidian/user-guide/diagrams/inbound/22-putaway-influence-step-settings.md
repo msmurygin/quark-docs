@@ -43,19 +43,6 @@ The seven pallet conditions and what each one reads:
 | `Rotation` | `sku.rotation` | passes |
 | `LotAttribute` (needs a code) | `lot_attributes` for the line's lot and the code | refuses |
 | `SkuAttribute` (needs a code) | `attribute_value` of the SKU for the code | refuses |
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Policy of a SKU, then the owner default | `crates/libs/wms-lib-core/src/model/sku.rs:867-885` |
-| One policy per pallet, both errors | `crates/libs/wms-inventory/src/putaway/policy.rs:20-60`, `:92-155` |
-| Steps read ordered by `sequence` | `crates/libs/wms-inventory/src/putaway/mod.rs:825-827` |
-| Guard rule | `crates/libs/wms-inventory/src/putaway/step.rs:382-388` |
-| Pallet conditions and the blank-value rule | `crates/libs/wms-inventory/src/putaway/product.rs:343-372`, `:411-495` |
-| Which property belongs to the pallet side | `crates/libs/wms-lib-core/src/model/policies/putaway_step_criterion.rs:248` |
-| Step status strings | `crates/libs/wms-inventory/src/putaway/mod.rs:937`, `:951`, `:973` |
-
 ## Diagram 2. Where does the step look?
 
 **What this shows:** how the scope, the zone or location on the step, the SKU preference and the temperature switch pick the search space.
@@ -85,19 +72,6 @@ flowchart LR
 | `step.scope = AssignedSlot` | Not implemented. | The whole policy is refused: `step uses scope=AssignedSlot, which this build cannot execute`. |
 | `step.respect_temperature` | Skip the step if the zone does not suit the pallet. For a named location the zone is the location's zone. | `skipped:temperature` |
 | `putawayzone.min_temperature`, `max_temperature`; `sku.min_temperature`, `max_temperature` | Ranges overlap when `zone_min <= sku_max` and `sku_min <= zone_max`. An empty bound is open. A line whose SKU did not load counts as fitting. Read only when the switch is on. | Same status. |
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Scope to search space | `crates/libs/wms-inventory/src/putaway/step.rs:517-565` |
-| `sku.putawayzone` and `sku.putaway_loc` | `crates/libs/wms-lib-core/src/model/sku.rs:979-1030` |
-| Statuses `skipped:no-zone`, `skipped:no-location` | `crates/libs/wms-inventory/src/putaway/mod.rs:967-980` |
-| Refusal of `AssignedSlot` | `crates/libs/wms-inventory/src/putaway/step.rs:184-260` |
-| Temperature overlap test | `crates/libs/wms-inventory/src/putaway/step.rs:438-475` |
-| Temperature for a zone scope, for a location scope | `crates/libs/wms-inventory/src/putaway/mod.rs:1014-1035`, `:1197-1225` |
-| Different zones for two SKUs are recorded in the trace | `crates/libs/wms-inventory/src/putaway/mod.rs:999-1001`, `:1177-1180`, `crates/libs/wms-inventory/src/putaway/trace.rs` |
-
 ## Diagram 3. Which locations are candidates, and in what order?
 
 **What this shows:** the fixed gate, the `Location` conditions and the order that decide which locations are looked at, and how many.
@@ -123,19 +97,6 @@ flowchart LR
 | Condition `Location status`, `Location flag` | Accepted only in forms that cannot remove an allowed location (`is Ok`, `is not Hold`; `is None`, `is not CycleCountActive`). They add no new filter. Any other form refuses the whole policy. | Policy error. |
 | `step.ordering = Route` | Order by `aisle`, then `bay`, then `level`, then `code`. `aisle` is text, so `A10` sorts before `A2`. It does not use `Route Sequence`. | The first location in this order that passes the checks wins. |
 | `step.ordering = NearestToSlot` | Not implemented. | The whole policy is refused. |
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Fixed gate SQL | `crates/libs/wms-lib-core/src/model/location.rs:2097-2183` |
-| Allowed destination types of a putaway | `crates/libs/wms-inventory/src/movement/validation.rs:135-148` |
-| Narrowing the type list; refusal texts | `crates/libs/wms-inventory/src/putaway/candidates.rs:140-175`, `:300-345`, `:400-440` |
-| Property to column in SQL | `crates/libs/wms-lib-core/src/model/location.rs:1685-1925` |
-| Order `aisle, bay, level, code` | `crates/libs/wms-lib-core/src/model/location.rs:418-423` |
-| `NearestToSlot` refused | `crates/libs/wms-inventory/src/putaway/candidates.rs:48-58` |
-| 20 per batch, 5 batches | `crates/libs/wms-inventory/src/putaway/candidates.rs:28-32` |
-
 ## Diagram 4. May this candidate be used? (occupancy and consolidate)
 
 **What this shows:** how the step's mode and occupancy switches compare the pallet with what stands in the location, and the codes they refuse with.
@@ -165,21 +126,9 @@ flowchart LR
 
 The three columns are written by one screen choice: `Any occupancy`, `Must be empty`, or `Allow mixing, with rules`.
 A pallet with two SKUs fails `mix_intent_sku` at every location, even an empty one, because the pallet alone makes two identities.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Three columns to one rule | `crates/libs/wms-inventory/src/putaway/predicate.rs:118-142` |
-| Occupancy rule, `same_key`, `require_empty` | `crates/libs/wms-inventory/src/putaway/predicate.rs:449-651` |
-| Consolidate rule | `crates/libs/wms-inventory/src/putaway/predicate.rs:764-850` |
-| Combinations refused at load | `crates/libs/wms-inventory/src/putaway/step.rs:184-260` |
-| Stock plus live reservations at a location | `crates/libs/wms-lib-core/src/model/inventory/inventory_balances.rs` (`committed_keys_at_location`) |
-| Trace statuses and tallies | `crates/libs/wms-inventory/src/putaway/trace.rs` |
-
 ## Stored only. It has no effect today.
 
-I searched the engine (`crates/libs/wms-inventory/src/putaway/**`) and the move (`crates/libs/wms-inventory/src/movement/**`) for these fields. Nothing reads them to decide a location.
+I searched the engine and the move for these fields. Nothing reads them to decide a location.
 
 | Field | Note |
 |---|---|
@@ -190,11 +139,6 @@ I searched the engine (`crates/libs/wms-inventory/src/putaway/**`) and the move 
 | `putaway_policy_detail.from_zone` and `from_location` when the guard is `None` | Ignored. |
 | `sku.putaway_class = NoMix` | Does nothing by itself. It matters only if a step has a `Putaway class` condition. |
 | Step scope `AssignedSlot` and ordering `NearestToSlot` | Can be stored through the API, but the engine refuses the policy that holds them. |
-
-## Not confirmed by code
-
-- Which of the conditions an administrator can set from the step editor and which only through the API. This page draws what the engine reads. To verify: open the step editor and compare the list.
-
 ## Related pages
 
 - [Putaway pipeline, step by step](21-putaway-engine-steps.md)

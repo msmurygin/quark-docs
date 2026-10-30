@@ -48,24 +48,6 @@ sequenceDiagram
 - The count is requested after the move. A refused count does not fail the clean-up (`Required` is off in the seeded reasons). The location then stays blocked until someone counts it.
 - The delivery to the worker is retried by the integration delivery (seeded subscriber `quark_outbound_execution`). Each step is safe to repeat.
 - `HoldInventory`, `HoldContainer` and `RequestSupervisorReview` can be stored on a reason but no code runs them. See [short reasons: what each setting changes](53-influence-short-reasons.md).
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| The whole `pick_short` transaction | `crates/libs/wms-outbound/src/picking/commands/short.rs:152-480` |
-| Quantity and reason checks | `crates/libs/wms-outbound/src/picking/commands/short.rs:538-575` |
-| Published reason and action rules | `crates/libs/wms-outbound/src/domain/pick_short_reason/aggregate.rs:30-160` |
-| Location flag from `BlockSourceLocation` | `crates/libs/wms-lib-core/src/model/location.rs:1239-1257` |
-| Event for the worker | `crates/libs/wms-outbound/src/picking/events.rs:12-110` |
-| Worker: delivery to the internal subscriber | `crates/services/app-server/src/services/integration_delivery.rs:528-545` |
-| Worker: the four steps in fixed order | `crates/libs/wms-outbound/src/picking/remediation.rs:1-30` and `:449-500` |
-| Which related picks are released and which are kept | `crates/libs/wms-outbound/src/picking/remediation.rs:246-345` |
-| Count request | `crates/libs/wms-outbound/src/picking/remediation.rs:499-540` |
-| Re-allocation | `crates/libs/wms-outbound/src/picking/remediation.rs:460-480` and `:559-590` |
-| Seeded reasons `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `crates/libs/wms-lib-sql/sql/wms-app/migrations/036_pick_short_reason.sql`, `crates/libs/wms-lib-sql/sql/wms-app/migrations/071_count_on_scan_and_putaway_exceptions.sql` |
-| RF screens | `crates/libs/wms-lib-sql/sql/rf-screens/094_uc_pick.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/113_rf_inputs_fit_the_server_limits.sql` |
-
 ## Related pages
 
 - [Short reasons: what each setting changes](53-influence-short-reasons.md)

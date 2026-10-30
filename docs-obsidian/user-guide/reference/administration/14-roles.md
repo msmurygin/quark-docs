@@ -26,7 +26,7 @@ A role that is not active is drawn dimmed.
 | `N members` | The number of **assignments** of the role: rows of `user_warehouse` with this role. One user with the role in two warehouses counts twice. |
 | `N resources` | The number of permission rows of the role that have at least one of the four bits on. |
 
-The counts come from the view `enterprise.role_with_counters` (`crates/libs/wms-lib-sql/sql/wms-enterprise/migrations/001_baseline.sql:805`).
+The counts come from the view `enterprise.role_with_counters`.
 The form also defines these columns, all read only: `Code`, `Name`, `Description`, `Active`, `System`, `Members`, `Resources`.
 
 | Button | What it does | Task page |
@@ -54,7 +54,7 @@ The column `is_system` (default off) has no field on the card. It is set only by
 | `Save` | Saves the role and refreshes the permission cache (`generic_save`, `rbac_cache_refresh`). |
 | `Delete` | Deletes the role, refreshes the cache and goes back (`generic_delete`, `rbac_cache_refresh`). |
 
-Why `Code` cannot change: `update_role` accepts only `name`, `description` and `is_active`, and refuses any other field (`crates/services/app-server/src/web/rpcs/role_rpc.rs:46`).
+Why `Code` cannot change: `update_role` accepts only `name`, `description` and `is_active`, and refuses any other field.
 
 ### The Members list
 
@@ -77,9 +77,6 @@ The form is `enterprise_role_members`. It is read only. One row for each assignm
 | `SUPERVISOR` | Supervisor | Authorizes overrides (close-with-discrepancy etc.) | Yes |
 | `metadata_admin` | RF Metadata Admin | Can read AND write RF screen metadata | No |
 
-Source: `crates/libs/wms-lib-sql/sql/wms-enterprise/migrations/001_baseline.sql:1417`.
-The default permissions of these roles are in [Who can do what](91-who-can-do-what.md).
-
 ## Rules
 
 | Rule | Where it comes from |
@@ -87,19 +84,16 @@ The default permissions of these roles are in [Who can do what](91-who-can-do-wh
 | A role that any user holds cannot be deleted. | The foreign key `user_warehouse.role_id` is `ON DELETE RESTRICT`. |
 | A role that appears in the audit log (as the role of a refused call) cannot be deleted either. | The foreign key `audit_log.role_id` has no `ON DELETE` rule (`001_baseline.sql:2125`). |
 | Deleting a role deletes its permission rows. | The foreign key `role_permission.role_id` is `ON DELETE CASCADE`. |
-| A new role has **no permissions**. | A missing permission row means "denied" (`crates/libs/wms-lib-auth/src/authorization/mod.rs`, function `is_invokable`). Give it rows in the [Permission matrix](16-permission-matrix.md). |
-| Saving or deleting a role clears the cached role and permission decisions. | `RoleBmc::after_mutation` (`crates/libs/wms-lib-core/src/model/role.rs:93`). |
-| A built-in role (`is_system = true`) cannot be renamed, deactivated or deleted. A bulk delete containing one is refused before any role is deleted. | `RoleBmc::ensure_update_allowed` and `RoleBmc::ensure_not_system` (`crates/libs/wms-lib-core/src/model/role.rs`). |
+| A new role has **no permissions**. | A missing permission row means "denied". Give it rows in the [Permission matrix](16-permission-matrix.md). |
+| Saving or deleting a role clears the cached role and permission decisions. | `RoleBmc::after_mutation`. |
+| A built-in role (`is_system = true`) cannot be renamed, deactivated or deleted. A bulk delete containing one is refused before any role is deleted. | `RoleBmc::ensure_update_allowed` and `RoleBmc::ensure_not_system`. |
 
 Each save writes an audit row of kind `role_mutation` (see [Audit log](15-audit-log.md)).
-
-> Not confirmed by code: the text shown when you delete a role that users still hold. The database refuses it with a foreign key error. To verify: assign a test role to a test user, then press `Delete` on the role.
 
 ## Who can use it
 
 The API methods `create_role`, `update_role` and `delete_role` are open to the default role `ADMIN`.
-`delete_many_role` is also open only to `ADMIN`. The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`
-(`crates/services/app-server/src/web/rpcs/role_rpc.rs:17`).
+`delete_many_role` is also open only to `ADMIN`. The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`.
 
 ## Related pages
 

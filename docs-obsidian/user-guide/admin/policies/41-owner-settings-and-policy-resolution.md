@@ -53,17 +53,14 @@ The owner level only works when the SKU column can be empty.
 |---|---|---|
 | `putaway_policy_id` | yes (nullable, no default) | owner default works |
 | `allocation_policy_id` | yes | owner default works |
-| `cartonization_policy_id` | yes (`wms-app/migrations/009_…sql` dropped `NOT NULL` and the default, and reset every value 1 to empty) | owner default works |
-| `receipt_policy_id` | **no**: `NOT NULL DEFAULT 1` (`wms-app/migrations/001_baseline.sql:2148`) | owner default **never used**. A new SKU gets policy id 1. |
+| `cartonization_policy_id` | yes | owner default works |
+| `receipt_policy_id` | **no**: `NOT NULL DEFAULT 1` | owner default **never used**. A new SKU gets policy id 1. |
 | `lot_policy_id` | **no**: `NOT NULL DEFAULT 1` (`001_baseline.sql:2149`) | owner default is not read at all |
 | `replenishment_policy_id` | **no**: `NOT NULL DEFAULT 1` (`001_baseline.sql:2145`) | owner default is not read at all |
 
 Also, the SKU screen marks `Receipt Policy`, `Allocation Policy`,
-`Replenishment Policy`, `Lot Policy` and `Cartonization Policy` as required fields
-(`wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:7370-7371`, `:7390`,
-`:7665-7666`). Only `Putaway Policy` is optional (`:7767`). The SKU update API
-can clear `putaway_policy_id` and `allocation_policy_id`
-(`services/app-server/src/web/rpcs/sku_rpc.rs`, "clear" list) but cannot clear the
+`Replenishment Policy`, `Lot Policy` and `Cartonization Policy` as required fields. Only `Putaway Policy` is optional (`:7767`). The SKU update API
+can clear `putaway_policy_id` and `allocation_policy_id` but cannot clear the
 others. In the web UI, treat every field marked as required as mandatory; only
 `Putaway Policy` is optional on this screen.
 
@@ -93,7 +90,7 @@ others. In the web UI, treat every field marked as required as mandatory; only
 | Lot capture at receive | lot policy | SKU only |
 | Putaway | putaway policy | SKU → owner; one policy per LPN |
 | Order line created | allocation policy | SKU → owner, **at that moment**. The policy id and version are frozen on the line. |
-| Allocation | the policy frozen on the line | each allocation run loads exactly that version (`wms-outbound/src/allocation/trace.rs:296-313`); each pick records policy id and version (`allocate.rs:536-537`) |
+| Allocation | the policy frozen on the line | each allocation run loads exactly that version; each pick records policy id and version |
 | Wave | wave policy | chosen by user or schedule |
 | Picking | picking policy | work area (+ equipment) → work area default → `DISCRETE` |
 | Cartonization | cartonization policy | SKU → owner; none = no carton plan |
@@ -105,7 +102,7 @@ others. In the web UI, treat every field marked as required as mandatory; only
 |---|---|
 | A SKU's policy id | Nothing is rewritten. Receive, putaway and cartonization read the new one on the next command. **Allocation:** only order lines created or changed afterwards use it; lines that already froze a policy keep it. |
 | An owner default | Same. It only matters for SKUs whose own column is empty. |
-| A policy's content (steps, flags) | Read live by receive. For allocation, a line froze the policy **version**: if the policy version changes later, allocation of that line is refused with `allocation policy '<code>' version mismatch for sku '<sku>': line froze version <a>, current version is <b>` (`allocation/policy.rs:209-215`); see file 11. See the policy's own page: [01](./01-putaway-policy-steps-and-criteria.md), [11](./11-allocation-policy-steps-and-criteria.md), [31](./31-cartonization-policy-settings.md). |
+| A policy's content (steps, flags) | Read live by receive. For allocation, a line froze the policy **version**: if the policy version changes later, allocation of that line is refused with `allocation policy '<code>' version mismatch for sku '<sku>': line froze version <a>, current version is <b>`; see file 11. See the policy's own page: [01](./01-putaway-policy-steps-and-criteria.md), [11](./11-allocation-policy-steps-and-criteria.md), [31](./31-cartonization-policy-settings.md). |
 | Deleting a policy | Refused if a SKU uses it, and refused if an owner uses it as a default (every `owner_config` policy link is `ON DELETE RESTRICT`, wms-app 108). The answer is `Cannot delete: record is in use`. Change the owner's default first, then delete the policy. (Before P-23 the receipt, allocation, cartonization, lot and replenishment defaults were emptied silently.) |
 
 ---
@@ -125,7 +122,7 @@ others. In the web UI, treat every field marked as required as mandatory; only
 | API-only fields | `default_rtv_loc`, `default_discard_loc`, `write_off_gl_account_hint`, `rtv_gl_account_hint`, `default_inventory_tracking_granularity`, `default_unplanned_case_on_asn` have no field on any tab. |
 | Database-only columns | `auto_generate_lpn_format`, `default_container_origin` exist in the table but are not in the Rust model, the SELECT, or any API. |
 
-How update works (`services/app-server/src/web/rpcs/owner_config_rpc.rs:46-98`):
+How update works:
 a field you do not send stays unchanged; a field you send as `null` is cleared (for
 the fields in the "clear" list); `putaway_reservation_ttl_min` follows the same
 rule. The three unit fields are checked: an unknown unit, or a unit of the wrong
@@ -137,7 +134,7 @@ default (section B.9) and every lookup in A.3 uses its built-in fallback.
 
 ## B.2 The seed
 
-Two rows are seeded (`wms-app/migrations/001_baseline.sql:8537-8541`) for owners
+Two rows are seeded for owners
 `OWNER001` (id 1, "Acme Distribution") and `OWNER002` (id 2, "Global Goods Inc"):
 
 | Column | Seed value |
@@ -159,14 +156,13 @@ Two rows are seeded (`wms-app/migrations/001_baseline.sql:8537-8541`) for owners
 The other seeded owners (suppliers, carriers, customers) have no `owner_config` row.
 
 The **dev seed** sets `default_putaway_policy_id` to the policy `STD` for every owner
-config row that has none (`wms-lib-sql/sql/dev_only/install-db/900-dev-seed.sql:1043-1046`).
+config row that has none.
 A production database does not get this.
 
 ## B.3 Tab `General` (owner master data)
 
 Table `owners`. No field here changes a policy. The owner `code` and `company` appear
-in quantity messages as `<code> (<company>)`
-(`validation_internal_helpers.rs:64-70`).
+in quantity messages as `<code> (<company>)`.
 
 | UI label | Column | Type | Note |
 |---|---|---|---|
@@ -178,7 +174,7 @@ in quantity messages as `<code> (<company>)`
 | `VAT` | `vat` | text 18 | display |
 | `Credit Limit` | `credit_limit` | number | **Stored only.** |
 | `Currency` | `currency_code` | text 3 | **Stored only.** |
-| `Locale` | `locale` | text 10 | used for the snapshot capture (`web-ui-server/src/services/snapshot/capture.rs:249`) |
+| `Locale` | `locale` | text 10 | used for the snapshot capture |
 | `Timezone` | `timezone` | text 50 | **Stored only.** |
 | `Parent Owner` | `parent_id` | owner id | **Stored only.** |
 
@@ -196,8 +192,7 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 #### `allow_mixed_lpn` - `Mixed LPN`
 - **Column and type**: boolean, schema default `false`. Seed `false`.
 - **Meaning**: may one LPN carry **more than one SKU** of this owner?
-- **Affects**: every landing of stock on an LPN: receive, move, putaway
-  (`wms-inventory/src/inventory_service.rs:1118-1170`). Refusal code 55:
+- **Affects**: every landing of stock on an LPN: receive, move, putaway. Refusal code 55:
   `<lpn> already holds SKU <list>; the owner does not allow another SKU (<sku>) on the same LPN`.
 - **Example**: LPN `P1` holds SKU A. The operator receives SKU B onto `P1`. Off: refused. On: allowed.
 - **Interactions**: the SKU flag `allow_multi_lot_on_lpn` (several lots of the same
@@ -210,8 +205,7 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 - **Column and type**: boolean, default `false`. Seed `false`.
 - **Meaning**: may one LPN carry goods of more than one **owner**?
 - **Affects**: **Stored only. It has no effect today.** Code 57
-  (`CommingledContainerNotAllowed`) is declared and a checker exists
-  (`wms-inventory/src/service/container/operations.rs:551-566`) but it never reads the
+  (`CommingledContainerNotAllowed`) is declared and a checker exists but it never reads the
   flag and nothing calls it.
 
 #### `allow_duplicate_lpn` - `Duplicate LPN`
@@ -219,8 +213,7 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 
 #### `allow_system_generated_lpn` - `System Generated LPN`
 - **Column and type**: boolean, schema default `false`. Seed `true`. **Stored only.**
-  LPN generation does not read it (`wms-inventory/src/service/container/operations.rs:448`
-  says the owner format is still to come).
+  LPN generation does not read it.
 
 #### `lpn_length`, `lpn_start_number`, `next_lpn_number`, `lpn_rollback_number` - `LPN Length`, `LPN Start #`, `Next LPN #`, `LPN Rollback #`
 - **Column and type**: integer / bigint, empty by default. **Stored only.** No code
@@ -238,13 +231,13 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 #### `default_putaway_policy_id` - `Putaway Policy`
 - **Column and type**: bigint → `putaway_policy.id`, `ON DELETE RESTRICT`. Empty by default. The dev seed fills it with `STD`.
 - **Meaning**: the putaway policy for this owner's SKUs with no putaway policy of their own.
-- **Affects**: putaway suggestion (A.1). If all SKUs on an LPN resolve to nothing: `no putaway policy on the SKU or the owner default`. If two SKUs resolve to different policies: `LPN spans SKUs with different putaway policies: <sku> (owner <id>, policy <id>), …`. A SKU that resolves to nothing is ignored when the others agree (`wms-inventory/src/putaway/policy.rs:96-125`).
+- **Affects**: putaway suggestion (A.1). If all SKUs on an LPN resolve to nothing: `no putaway policy on the SKU or the owner default`. If two SKUs resolve to different policies: `LPN spans SKUs with different putaway policies: <sku> (owner <id>, policy <id>), …`. A SKU that resolves to nothing is ignored when the others agree.
 - **When you change it**: affects the next suggestion. Reservations already made stay.
 
 #### `default_allocation_policy_id` - `Allocation Policy`
 - **Column and type**: bigint → `allocation_policy.id`, `ON DELETE RESTRICT` (wms-app 108). Seed `1` (both owners).
 - **Meaning**: allocation policy for SKUs with none of their own.
-- **Affects**: the policy chosen when an order line is created or changed (A.1). Extra refusals after the lookup: `allocation policy '<code>' is inactive — sku '<sku>' cannot allocate against a disabled policy; activate '<code>' or point the sku/owner at a different one`, and `allocation policy '<code>' has no active steps — …` (`wms-outbound/src/allocation/policy.rs:128-150`).
+- **Affects**: the policy chosen when an order line is created or changed (A.1). Extra refusals after the lookup: `allocation policy '<code>' is inactive — sku '<sku>' cannot allocate against a disabled policy; activate '<code>' or point the sku/owner at a different one`, and `allocation policy '<code>' has no active steps — …`.
 - **When you change it**: only order lines created or changed afterwards pick it up. Lines that already froze a policy keep it, and so do the picks already made.
 
 #### `default_cartonization_policy_id` - `Cartonization Policy`
@@ -265,7 +258,7 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 
 #### `track_inventory_by` - `Track By`
 - **Column and type**: text 20, schema default `Lot`. The list `TRACK_BY` offers `None`, `Lot`, `Serial`, `Batch`.
-- **Affects**: **Stored only. It has no effect today.** (The comment in `receipt_detail_case.rs:44` only names the convention.)
+- **Affects**: **Stored only. It has no effect today.**
 
 #### `auto_close_po` - `Auto Close PO`, `auto_close_asn` - `Auto Close ASN`, `roll_receipt` - `Roll Receipt`
 - **Column and type**: boolean, default `false`. **Stored only.** No process closes
@@ -318,8 +311,7 @@ not checked against the location table when you save.
 #### `weight_uom` - `Weight UOM`, `dimension_uom` - `Dimension UOM`, `cube_uom` - `Cube UOM`
 - **Column and type**: varchar(10). The dropdown lists units of the code list `UOM` of the right kind (weight, length, volume). Seed `KG`, `CM`, `M3`.
 - **Meaning**: the units this owner wants to **see**.
-- **Affects**: only the 3D warehouse view when it is opened for this owner
-  (`warehouse_3d_handler.rs:236-262`). Stored numbers and capacity arithmetic do not change (the code comment says so).
+- **Affects**: only the 3D warehouse view when it is opened for this owner. Stored numbers and capacity arithmetic do not change (the code comment says so).
 - **Refusals**: an unknown unit, or the wrong kind, is refused on save.
 - **Empty**: the warehouse's display unit is used.
 
@@ -328,7 +320,7 @@ not checked against the location table when you save.
 #### `auto_print_lpn_on_receive` - `Auto-Print LPN`
 - **Column and type**: boolean, not null, default `false`. Seed `false`.
 - **Meaning**: print an LPN label after a successful receive.
-- **Affects**: after the receive commits (ASN, blind, blind line, return, return line) (`inbound/shared/auto_print.rs:50-100`). Best effort: a missing printer or a render error is logged and never fails the receive. The printer comes from the printer assignment order in A.3. The label is the template `lpn_id_label`.
+- **Affects**: after the receive commits (ASN, blind, blind line, return, return line). Best effort: a missing printer or a render error is logged and never fails the receive. The printer comes from the printer assignment order in A.3. The label is the template `lpn_id_label`.
 - **When you change it**: only future receives.
 
 #### `hide_expected_qty_from_operator` - `Hide Expected Qty (Blind)`
@@ -352,10 +344,10 @@ not checked against the location table when you save.
 
 #### `write_off_gl_account_hint` - API only
 - **Column and type**: varchar(40), empty by default.
-- **Affects**: copied into the `damage.written_off` event as a hint for the ERP (`wms-inbound/.../damage/write_off_damage.rs:245`). No other effect.
+- **Affects**: copied into the `damage.written_off` event as a hint for the ERP. No other effect.
 
 #### `rtv_gl_account_hint` - API only
-- **Column and type**: varchar(40). Copied into the `damage.rtv_initiated` event (`move_damage_to_rtv.rs:209`).
+- **Column and type**: varchar(40). Copied into the `damage.rtv_initiated` event.
 
 #### `default_inventory_tracking_granularity` - API only
 - **Column and type**: enum `Aggregate`, `Pallet`, `Case`; empty by default.

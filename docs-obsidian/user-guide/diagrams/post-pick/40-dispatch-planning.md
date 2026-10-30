@@ -73,19 +73,6 @@ The API sequence is `dispatch_create` -> `dispatch_stop_add` -> `dispatch_add_or
 - The carrier, when present, must be a transporter. `Door` must name a `Door` location; `Preferred stage` must name a `Stage` location.
 - A cancelled or closed order cannot be added. The chosen stop must belong to the same Dispatch.
 - Review current versions after every mutation. A version conflict means another user changed the plan; refresh and decide again.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Dispatch create, stop, order and plan commands | `crates/libs/wms-outbound/src/service/dispatch/` |
-| Dispatch lifecycle rules | `crates/libs/wms-outbound/src/domain/dispatch/aggregate.rs` |
-| Unit intent and controlled reassignment | `crates/libs/wms-outbound/src/service/outbound_unit_assignment/` |
-| Staging assignment and confirmation | `crates/libs/wms-outbound/src/service/staging/` |
-| Load Plan generation and freeze | `crates/libs/wms-outbound/src/service/load_plan/` |
-| Whole-Load Goods Issue | `crates/libs/wms-outbound/src/service/load/ship.rs` |
-| Web Dispatch screens | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/20261015141436_dispatch_planning_screens.sql` |
-
 ## Related pages
 
 - [Outbound Setup](../../admin/06-outbound-setup.md#10-dispatch-loading-and-goods-issue)

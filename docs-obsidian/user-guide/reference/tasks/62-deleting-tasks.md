@@ -38,8 +38,6 @@ For each deleted task:
 - If it was the last task of an order, the launch mark of the order is cleared. The order goes back to `Allocated`. Press `Release` on the order to dispatch again.
 - If the order has other tasks in work, it stays released. Press `Allocate` on the order to give the pick a new task.
 
-Source: `crates/libs/wms-outbound/src/service/status_manager/delete_task.rs:1-50,100-190` and `crates/services/web-ui-server/src/extensions/customization/task/lifecycle_action.rs:48-100`.
-
 ## If a task is refused
 
 The reason of each refused task is the text of its refusal. These are the ones you can meet:
@@ -62,9 +60,7 @@ If a ticked key is not a number the toast reads `The task board has moved on —
 
 - The order status can change: `Released` or `PartiallyReleased` can fall back to `Allocated`. The order screen shows the new status.
 - The deleted task id is gone. [Skip History](40-skip-history.md) keeps its lines. They have no link to the task row.
-- The removed task is announced to subscribers as the event `bio.task.after_delete`. Source: comment in `task.rs:1736-1760`.
-
-> Not confirmed by code: which refusal a `Created` and escalated task gets. The status test is `status != Created`, so it should be deleted. To verify: escalate a task (refuse it 3 times on a test warehouse) and delete it.
+- The removed task is announced to subscribers as the event `bio.task.after_delete`.
 
 ## Related pages
 

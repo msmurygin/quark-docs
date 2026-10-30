@@ -31,8 +31,6 @@ All columns are read only. The columns `Mode`, `ID` and `Version` are hidden.
 | `Validation` | `error_message` | Text | The refusal stored by the last `Validate`. Empty when the line passed or was never validated. |
 | `Ledger` | `transaction_log_code` | Text, up to 20 characters | After posting: the code of the ledger row in [Transactions](32-transactions.md). Empty for a line that changed nothing. |
 
-Sources: the columns of the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/053_the_inventory_adjustment_document.sql:49-75`; the columns of the preview in `crates/libs/wms-inventory/src/service/inventory_adjustment/read.rs:111-146`; the list in `088_inventory_adjustment_screens.sql` (meta-ui).
-
 ## Line statuses
 
 | Status | Meaning |
@@ -43,7 +41,7 @@ Sources: the columns of the table in `crates/libs/wms-lib-sql/sql/wms-app/migrat
 | `Posted` | The post changed the stock. `Ledger` holds the ledger code. |
 | `NoChange` | The post found the stock already at the target and wrote nothing. |
 
-Any content change to the document (a line added, changed or removed, or a changed `Reason` or `Comment` saved on the header) puts every line back to `Pending` and clears `Validation` (`crates/libs/wms-lib-core/src/model/inventory/inventory_adjustment.rs:571-583`). Saving unchanged effective header values preserves the existing line verdicts.
+Any content change to the document (a line added, changed or removed, or a changed `Reason` or `Comment` saved on the header) puts every line back to `Pending` and clears `Validation`. Saving unchanged effective header values preserves the existing line verdicts.
 
 ## Mode
 
@@ -51,8 +49,6 @@ The mode is **not chosen by the user**. When a line is added, the system looks f
 
 - It exists: the mode is `Existing`. `Post` adjusts that row. If the stock has moved away by the time of the post, the line is refused with `INVENTORY_IDENTITY_GONE`. It is never recreated.
 - It does not exist: the mode is `CreateIfMissing`. `Post` creates the stock. This is for stock that was found and the system did not have.
-
-Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/add_line.rs:90-96`.
 
 ## Toolbar buttons
 

@@ -107,8 +107,6 @@ These come from the same commands and are shown on the terminal, not on the web 
 - `crates/libs/wms-outbound/src/service/status_manager/delete_task.rs`, `delete_tasks.rs`
 - `crates/libs/wms-lib-core/src/model/narration/mod.rs:2291-2323`
 
-> Not confirmed by code: that the web screens show the `{error}` text exactly as the command wrote it. The metadata puts `{error}` into the message. To verify: refuse each command on a test warehouse and compare the toast with this page.
-
 ## Related pages
 
 - [Return codes](92-return-codes.md)

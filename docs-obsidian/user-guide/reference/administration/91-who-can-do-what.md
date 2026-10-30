@@ -9,11 +9,11 @@ A button works only when all of these are open.
 
 | # | Gate | What decides | Refusal |
 |---|---|---|---|
-| 1 | **Enterprise mode** | You hold the role `ADMIN` on some warehouse. Under Enterprise the server accepts only this role (`role_resolver.rs:69`, `warehouse_handler.rs:67`). | `Enterprise access requires ADMIN role` |
+| 1 | **Enterprise mode** | You hold the role `ADMIN` on some warehouse. Under Enterprise the server accepts only this role. | `Enterprise access requires ADMIN role` |
 | 2 | **Sidebar item** | The `menu_item` row allows reading. No row means allowed. | The item is not drawn. |
 | 3 | **Form** | The `form` row allows any bit, or no role has a row for the form. | `Your role may not open this form.` |
-| 4 | **Web action** | The `server_action` row has **X** on for the role. A super-user who has **no role** in the scope is let through; a super-user who holds a role is checked by that role (`extensions/tx_helper.rs:1747`). | `Forbidden("{action}")` |
-| 5 | **API method** | The `api` row has **X** on. Super-users always skip this gate (`api_check.rs`, `check_api_call`, step 2). | HTTP 403 with the method name; the call is written to the [Audit log](15-audit-log.md) as `permission_denied`. |
+| 4 | **Web action** | The `server_action` row has **X** on for the role. A super-user who has **no role** in the scope is let through; a super-user who holds a role is checked by that role. | `Forbidden("{action}")` |
+| 5 | **API method** | The `api` row has **X** on. Super-users always skip this gate. | HTTP 403 with the method name; the call is written to the [Audit log](15-audit-log.md) as `permission_denied`. |
 
 Gate 1 means that, in practice, only a user with the role `ADMIN` ever sees these screens. The lists below name `MANAGER`, `OPERATOR` and `VIEWER` because the API methods are open to them if they call the API directly in a warehouse scope, for example with an API key.
 
@@ -24,7 +24,7 @@ A role with any other code starts with no permissions.
 
 ## Web actions (gate 4)
 
-The buttons on these screens use the generic web actions. Default grants (`crates/libs/wms-lib-auth/src/authorization/seeder.rs`, function `default_server_action_grant`):
+The buttons on these screens use the generic web actions. Default grants:
 
 | Web action | `ADMIN` | `MANAGER` | `SUPERVISOR` | `OPERATOR` | `VIEWER` |
 |---|---|---|---|---|---|
@@ -71,14 +71,12 @@ Other API methods near these screens, with no button:
 
 | API method | Default roles | What it does |
 |---|---|---|
-| `batch_update_role_permissions`, `list_role_permissions_tree` | A | Update permissions in bulk; read the permission tree of a role (`role_permission_rpc.rs:472`). |
-| `create_role_permission`, `update_role_permission`, `delete_role_permission`, `delete_many_role_permission` | A | Edit single permission rows (`role_rpc.rs:24`). |
-| `delete_many_role` | A, M | Delete several roles (`role_rpc.rs:22`). |
-| `me` | A, M, S, O, V | Read the signed-in user's own record (`user_rpc.rs:30`). |
-| `list_user_warehouses`, `get_warehouse_defaults` | A, M, O, V | Feed the warehouse switcher and defaults (`warehouse_rpc.rs`). |
-| `admin.rbac.reseed` (an administrative capability, not a method) | A | Rebuild the permission catalogue (`admin_capabilities.rs`). |
-
-Sources: the `declare_rpc_module!` blocks in `crates/services/app-server/src/web/rpcs/` (`user_rpc.rs`, `user_warehouse_rpc.rs`, `user_api_key_rpc.rs`, `role_rpc.rs`, `audit_log_rpc.rs`, `permission_matrix_rpc.rs`, `handling_unit_type_rpc.rs`, `event_registry_rpc.rs`, `integration_event_rpc.rs`, `integration_event_delivery_rpc.rs`).
+| `batch_update_role_permissions`, `list_role_permissions_tree` | A | Update permissions in bulk; read the permission tree of a role. |
+| `create_role_permission`, `update_role_permission`, `delete_role_permission`, `delete_many_role_permission` | A | Edit single permission rows. |
+| `delete_many_role` | A, M | Delete several roles. |
+| `me` | A, M, S, O, V | Read the signed-in user's own record. |
+| `list_user_warehouses`, `get_warehouse_defaults` | A, M, O, V | Feed the warehouse switcher and defaults. |
+| `admin.rbac.reseed` (an administrative capability, not a method) | A | Rebuild the permission catalogue. |
 
 ## Super-users
 
@@ -87,11 +85,9 @@ A super-user also needs the role `ADMIN` on a warehouse to open Enterprise from 
 
 ## Inconsistencies seen
 
-- `get_user`, `list_user` and `count_user` are open to `OPERATOR` and `VIEWER` but not to `SUPERVISOR` (`user_rpc.rs:38`). An operator who calls the API can read every user's login and email.
-- `delete_many_role` is open to `MANAGER`, but `delete_role` is not (`role_rpc.rs:21`).
+- `get_user`, `list_user` and `count_user` are open to `OPERATOR` and `VIEWER` but not to `SUPERVISOR`. An operator who calls the API can read every user's login and email.
+- `delete_many_role` is open to `MANAGER`, but `delete_role` is not.
 - `batch_upsert_permission_matrix` is open to `MANAGER`. A role may edit its own cells through the API. The web screen is closed to `MANAGER` only because Enterprise mode needs `ADMIN`.
-
-> Not confirmed by code: the exact refusal text a role sees on each button. To verify: on a test system, switch off **X** for `rbac_cache_refresh` for the role `ADMIN` in the Permission Matrix, press `Save` on a role card, and note the message. Switch the bit on again afterwards.
 
 ## Related pages
 

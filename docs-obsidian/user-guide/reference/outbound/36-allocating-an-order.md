@@ -28,7 +28,6 @@ You can allocate before the release, to hold stock. After the release it tops up
 | No order open | `Open an order first` |
 
 On an order that is already fully reserved the button is not an error. It answers `allocated 0, short 0`.
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/allocate_action.rs:55-160`, `crates/libs/wms-outbound/src/service/order/allocate.rs:310-320`.
 
 When another transaction holds a candidate stock row, the allocator does not wait on it. That quantity is `deferred`, not `short`, and the toast asks you to try again. A background retry may also run from the emitted contention event.
 
@@ -45,8 +44,6 @@ When another transaction holds a candidate stock row, the allocator does not wai
 | Order version | The header version does not change. The command only echoes it. |
 | Events | `process.order.line_allocated` for each line, and `process.order.line_allocation_short` when a line is short. |
 
-Source: `allocate.rs:1-100` (module comment), `crates/libs/wms-lib-core/src/model/integration/event_payloads/order.rs`.
-
 ## How a shortage behaves
 
 - A shortage never makes the command fail. The line stays `Not allocated` or `Partially allocated`, and the message shows `short`.
@@ -56,8 +53,6 @@ Source: `allocate.rs:1-100` (module comment), `crates/libs/wms-lib-core/src/mode
   - `allocation policy '{code}' has no active steps — ...`
   - `allocation policy '{code}' version mismatch for sku '{sku}': line froze version {a}, current version is {b}`
   Fix the policy on the allocation policy screen, then press `Allocate` again.
-
-Source: `crates/libs/wms-outbound/src/allocation/policy.rs:112-260`.
 
 ## Related pages
 

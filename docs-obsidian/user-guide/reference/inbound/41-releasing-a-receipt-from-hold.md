@@ -39,8 +39,6 @@ Each receipt is released on its own.
 The line status `InProgress` is set even when the receipt returns to `Open`.
 A released receipt with nothing received therefore has lines in status `In progress`.
 
-Source: `crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:281-299`, `crates/libs/wms-inbound/src/service/receipt/lifecycle/release_from_hold.rs:92-120`.
-
 ## What can go wrong
 
 | Message | Meaning | Fix |
@@ -50,7 +48,7 @@ Source: `crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:281-299`, `crat
 | `Receipt {id} is Closed — it cannot be released.` (also `Cancelled`) | The receipt is finished. | None possible. |
 
 The button `Release Hold` is active for any ticked receipt. It does not check the status.
-The code comments say that releasing a receipt that is not on hold does nothing. The code does not do that: the state machine refuses the call first (`crates/libs/wms-inbound/src/service/receipt/shared/receipt_locking.rs:95` and the `Open` row of `allowed_operations`, `state_machine.rs:71-94`).
+The code comments say that releasing a receipt that is not on hold does nothing. The code does not do that: the state machine refuses the call first.
 The number in the message is the internal id, not the receipt number.
 
 ## Related pages

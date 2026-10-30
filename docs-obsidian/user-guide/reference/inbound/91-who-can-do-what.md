@@ -48,11 +48,9 @@ Where "No" is shown because of the web action, the API would allow the role. For
 
 ## Inconsistencies seen
 
-- `OPERATOR` may add a line (`create_receipt_detail`) but may not save a change to it or delete it (`update_receipt_detail`, `delete_receipt_detail` are for `ADMIN` and `MANAGER` only in the code, `receipt_detail_rpc.rs`). Whether the web `Save` of a line is refused for `OPERATOR` was not run.
+- `OPERATOR` may add a line (`create_receipt_detail`) but may not save a change to it or delete it. Whether the web `Save` of a line is refused for `OPERATOR` was not run.
 - `Cancel Receipt`, `Adjust Qty`, `Move Boxes` and `Cancel Box` all use the one web action `generic_rpc_command`. For these, the API method decides, and the refusal is the method's own message.
 - `Close Receipt` is open to `OPERATOR` on the RF terminal and closed to `OPERATOR` on the web screen.
-
-> Not confirmed by code: the exact refusal text a role sees on each button. To verify: sign in as `OPERATOR` on a test warehouse and press `Put on Hold`, `Cancel Receipt`, `Close Receipt` in turn.
 
 ## Related pages
 

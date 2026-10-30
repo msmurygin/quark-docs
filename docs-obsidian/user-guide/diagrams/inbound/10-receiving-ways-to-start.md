@@ -32,22 +32,6 @@ Reading notes:
 - Events: blind and return publish `process.receipt.opened`. `create_receipt` publishes nothing. The case-level ASN publishes `process.receipt.case_level_loaded`.
 - A planned line carries only the plan. The command refuses a line that already has received, adjusted, rejected or damaged quantity, a completion other than `Pending`, an actual container, or a status other than `Open`.
 - A planned line may name the LPN the supplier announced (`expected_lpn`). The server then plans that container (or reuses this receipt's planned one) and binds the line to it.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| `create_receipt` is a generated create; `create_receipt_detail` adds a planned line | `crates/services/app-server/src/web/rpcs/receipt_rpc.rs:64-71`, `crates/services/app-server/src/web/rpcs/receipt_detail_rpc.rs:37-60` |
-| A planned line may not carry execution facts; `expected_lpn` plans a container | `crates/libs/wms-inbound/src/service/receipt/planning/add_receipt_line_plan.rs:66-222` |
-| Expected lot attributes of a line | `crates/services/app-server/src/web/rpcs/receipt_expected_lot_attributes_rpc.rs:13-22` |
-| Default status `Open`, `receipt_number` is a `varchar(10)` | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:4270-4290` |
-| Case-level ASN, steps | `crates/libs/wms-inbound/src/service/receipt/case_level/commands/create_case_level_asn.rs:230-317` |
-| Blind: validation, header insert, first line, first receive | `crates/libs/wms-inbound/src/service/receipt/receive/receive_blind.rs:100-340` |
-| Blind receipt number | `crates/libs/wms-inbound/src/service/receipt/receive/receive_blind.rs:452-458` |
-| Return: header `RMA-<rma>`, first line | `crates/libs/wms-inbound/src/service/receipt/receive/receive_return.rs:148-215` |
-| Open to InProgress at the first receive | `crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:364-385` |
-| `process.receipt.opened` | `crates/libs/wms-inbound/src/service/receipt/receive/receive_blind.rs:292`, `crates/libs/wms-inbound/src/service/receipt/receive/receive_return.rs:200` |
-
 ## What the operator does on the RF
 
 | Way | Screens | Source |
@@ -59,12 +43,6 @@ Reading notes:
 | Damaged goods received straight in | `RCDMG_RECV01`: a blind receive with damage information. Page 15. | `crates/libs/wms-lib-sql/sql/rf-screens/060_uc_dmg_receive.sql:40`, `:117` |
 
 The RF menu `RCM` has these entries: Receive Against ASN, Receive Case-Level, Receive Blind, Receive Return, Close Receipt, Receive Damaged and Resume Serial Capture. Admin, Manager and Supervisor also see Force-Close Episode. It has no entry for hold, release or cancel. Those are buttons of the web receipt list.
-
-## Not confirmed by code
-
-- Who writes `receipt_number` for `create_receipt` in the web screen. The API method takes `receipt_number` as a required text. To verify: open the "Create receipt" form and check where the number comes from.
-- That the web form uses `create_receipt` and `create_receipt_detail`. The methods exist and are routed. The form metadata is not read here.
-
 ## Related pages
 
 - [Reference: creating a receipt](../../reference/inbound/30-creating-a-receipt.md)

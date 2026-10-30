@@ -2,7 +2,6 @@
 
 A refused order command carries a **return code**. The web screens show the message. The API shows the code too.
 This page lists the codes that the order commands use. The order commands are `shipment_order_*`, `pick_detail_delete` and the line commands.
-Source: `crates/libs/wms-outbound/src/error.rs:88-130` (function `to_rf_envelope`).
 
 The codes are shared with the receiving commands. The other codes of [Inbound return codes](../inbound/92-return-codes.md) do not occur here.
 
@@ -19,8 +18,6 @@ Facts about all of them:
 
 - None of them can be overridden by a supervisor. The answer always says `is_overridable: false`. There is no override for releasing an invalid order.
 - Code 40 is the only one that carries data to repair the screen.
-
-> Not confirmed by code: the numbers 41, 42 and 44 as seen on the web screens. They are in the answer of the API. The web screens show only the message text. To verify: send `shipment_order_update` twice with one key and different data, and read the second answer (it should carry 42).
 
 ## Related pages
 

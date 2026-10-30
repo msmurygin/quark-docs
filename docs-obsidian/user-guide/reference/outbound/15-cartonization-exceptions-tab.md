@@ -23,10 +23,6 @@ Every column is read only. The list starts sorted by `Reason`, ascending.
 | `Detail` | `detail` | Text | A free text from the calculation. |
 | `Outcome` | `cartonization_outcome` | Text, shown as a cell | The same cell as the `Carton` column of the [Picks tab](12-picks-tab.md). |
 
-Source: form `shipment_order_cartonization_exc_form` in `001_baseline.sql`, and `wms-meta-ui` migrations 015 and 022. The view is in `wms-app` migrations 013, 014 and 015.
-
-> Not confirmed by code: what text the `Detail` column holds for each reason. The column is copied from the calculation result without any change on the screen. To verify: run an order with a SKU that has no dimensions and read the `Detail` cell.
-
 ## Reason
 
 The cell shows the name, the stored code in small type, and the place where the problem is cured.
@@ -41,7 +37,6 @@ The cell shows the name, the stored code in small type, and the place where the 
 | `SplitPrevented` | `Splitting not allowed` | `fix in the policy` | The whole line does not fit into one box, though it would fit split across several. Cured by a **setting**, not by a bigger box. |
 
 An unknown code is shown as the bare code.
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/cell_renderers.rs` (functions `cartonization_reason_words` and `render_cartonization_reason`) and the message keys in `wms-meta-ui` migration 015.
 
 ## Action
 
@@ -53,7 +48,6 @@ The action is the decision the policy made **at the time of the calculation**. I
 | `ShipAsIs` | `Let it ship as is` | The order ships, and the item goes outside any box. The `Outcome` is `SHIP AS IS`. |
 
 Under the words the cell shows `decided at {date and time}`. The policy can be edited after the calculation. Without the time, a policy that now says "ship as is" next to a row that says "stop" would look like a lie. The time turns the difference into an explanation.
-Source: `wms-meta-ui` migration 022, `wms-app` migration 015.
 
 ## Related pages
 

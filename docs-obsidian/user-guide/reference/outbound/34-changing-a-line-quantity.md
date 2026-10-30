@@ -16,7 +16,7 @@ Both places use the same rule. They pick the command by the state of the line.
 | The order is launched, **or** the line has a reservation | `shipment_order_line_adjust_qty` (changes the quantity only) | `ADMIN`, `MANAGER`, `SUPERVISOR` |
 | The order is `Closed` or `Cancelled` | Neither. The `Ordered` field is read only. | Nobody |
 
-The screen does not hide the field from an operator. The operator may type the number. If the second command is needed, the server refuses with a sentence that says to ask a supervisor. Hiding the field per role would be a weaker second copy of the server rule (`line_write_route.rs`, module comment).
+The screen does not hide the field from an operator. The operator may type the number. If the second command is needed, the server refuses with a sentence that says to ask a supervisor. Hiding the field per role would be a weaker second copy of the server rule.
 
 ## Steps
 
@@ -30,8 +30,6 @@ The screen does not hide the field from an operator. The operator may type the n
 - It cannot go below what is already committed: the reserved quantity plus the cancelled quantity. The message is `cannot reduce qty_ordered to {new} — {committed} is already committed — release the line's reservations first (Unallocate)`. To go lower, give the reservation back first. See [Unallocating an order](37-unallocating-an-order.md).
 - To take a part of the quantity away from a launched line **with a reason**, use `Cancel Qty` instead. See [Cancelling part of a line](39-cancelling-part-of-a-line.md).
 - Raising the quantity of a line that was fully cancelled brings the line back to `NotAllocated`. The program works the status out from the numbers.
-
-Source: `crates/libs/wms-outbound/src/service/order_line/adjust_qty.rs:1-135`, `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:22`.
 
 ## What the screen says
 
@@ -49,8 +47,6 @@ Source: `crates/libs/wms-outbound/src/service/order_line/adjust_qty.rs:1-135`, `
 | Grid | Not saved | `Nothing saved — line {id}: {reason}` |
 | Grid | Part saved | `Saved {n} line(s), {m} failed — line {id}: {reason}` |
 | Grid | Somebody else changed the same line | `the ordered quantity was {seen} when you started editing and is {stored} now — someone else changed it; your {typed} is still in the cell; press Save again to apply it, or Discard changes to drop it` |
-
-Source: `line_save_action.rs:300-395`, `line_write_route.rs:196-230`, `lines_grid_save.rs` (functions `summary` and `changed_elsewhere_message`).
 
 ## What changes
 

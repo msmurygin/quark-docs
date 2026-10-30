@@ -6,8 +6,6 @@ For the receiving codes see [Inbound: Return codes](../inbound/92-return-codes.m
 
 ## Return codes of adjustments and counts
 
-Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/error.rs:75-105` and `crates/libs/wms-inventory/src/service/inventory_count/error.rs:55-95`. Every other refusal has code 0 and a message.
-
 | Code | Class | Meaning | Where you meet it |
 |---|---|---|---|
 | 0 | Hard fail | A business refusal with a message. For counts the stable name is in `context.code`. For a refused post the lines are in `context.lines`. | Every task page. |
@@ -27,7 +25,7 @@ A refused line stores one of these in `error_code`, and the post names them in `
 
 ## Count codes
 
-Each count refusal names itself in `context.code`. Source: `crates/libs/wms-inventory/src/domain/inventory_count/aggregate.rs` (`CountRefusal`). Return code 70 is marked.
+Each count refusal names itself in `context.code`.
 
 | Code | Return code | Message | Meaning |
 |---|---|---|---|
@@ -77,7 +75,7 @@ A variance that the adjustment refuses is answered with `the variance cannot be 
 
 ## Move codes
 
-A refused move uses its own code space, 80 to 99, which **overlaps** the serial codes of the receiving section (80 `SerialNotFound` and so on). Read a code together with the method that answered. For `move_execute` (`crates/libs/wms-inventory/src/movement/types.rs:252-288`):
+A refused move uses its own code space, 80 to 99, which **overlaps** the serial codes of the receiving section (80 `SerialNotFound` and so on). Read a code together with the method that answered. For `move_execute`:
 
 | Code | Meaning | Overridable |
 |---|---|---|

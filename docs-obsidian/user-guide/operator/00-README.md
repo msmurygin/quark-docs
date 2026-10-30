@@ -1,9 +1,7 @@
 # RF Terminal Operator Guide
 
 This guide is for warehouse operators who use the RF terminal.
-It describes the screens exactly as they appear on the terminal.
-Screen texts come from the screen definitions in `crates/libs/wms-lib-sql/sql/rf-screens/`.
-Error texts come from the server code.
+It describes the screens and messages as they appear in the current product.
 
 ## What you will do
 
@@ -21,15 +19,31 @@ Use this page to find the right guide, learn the RF keys, and look up a term.
 | 06 | [Move](06-move.md) | Move stock from one location to another |
 | 07 | [Stock inquiry](07-inventory-inquiry.md) | Look up stock |
 | 08 | [Inventory count](08-inventory-count.md) | Count a location, or only an item in it |
-| 09 | [Picking](09-picking.md) | Pick orders (discrete pick, pick by area, carriers) |
+| 09 | [Picking](09-picking.md) | Pick orders onto a pallet, into order boxes on a cart, or from a paper list |
 | 10 | [Packing, verify and repack](10-packing-verify.md) | Check and close boxes at a pack station, or repack a pallet into cartons |
 | 11 | [Order control after picking](11-order-control-after-picking.md) | Check that every container of an order reached the control station |
 | 12 | [Troubleshooting and messages](12-troubleshooting-and-messages.md) | Understand a message |
 | 13 | [Replenish](13-replenish.md) | Bring stock from storage to a pick location that is running low |
+| 14 | [Batch picking and distribution station](14-batch-picking-and-distribution-station.md) | Collect a wave into shared totes, then sort it into order or store boxes |
 
 ## Processes without a guide yet
 
-The terminal also contains **Consolidation**, **Distribution Station**, **Stage** and **Loading**. Their step-by-step operator guides are still to be written. Follow your site's work instructions for those menu entries.
+The terminal also contains **Consolidation**, **Stage** and **Loading**. Their step-by-step operator guides are still to be written. Follow your site's work instructions for those menu entries.
+
+The terminal screen families around outbound work are:
+
+| Process | Screen family |
+|---|---|
+| Discrete pallet picking | `PICK01`–`PICK15` |
+| Cart picking into order boxes | `PKA00`–`PKA31`; box exceptions use `PKA50`–`PKA52` |
+| Summary step on a cart | `PKAA` and its related cart-route screens |
+| Batch picking and station sorting | `SPR00`–`SPR07`, then `STN01`–`STN62` |
+| Paper picking | Web workplace; no terminal screens by design |
+| Packing | `PACK` |
+| Consolidation | `CON` |
+| Order control | `CTL` |
+| Staging | `STG` |
+| Loading | `LOD` |
 
 > The workflows listed in this guide describe the documented operator tasks. Your RF menu follows the configuration of your installation; further workflow guides will be added as the documentation expands.
 
@@ -46,7 +60,7 @@ Every process guide has the same parts:
 
 In the steps, text in **bold** is exactly what the terminal shows.
 Text in `code format` is a key to press or a value to type or scan.
-A line that starts with `![...]` is a screen picture. When a picture has not been captured yet, the page shows a clearly labelled screenshot placeholder.
+A line that starts with `![...]` is a screen picture. Only verified English screenshots are published.
 
 Some messages contain a value from your system, such as a number or a code.
 In this guide the value is written in braces, for example `{location}`.
@@ -67,7 +81,7 @@ The status line says **Select function — Esc to change warehouse**.
 | `4` | **Packing** | 10 |
 | `5` | **Consolidation** | Not documented yet |
 | `6` | **Order Control** | 11 |
-| `7` | **Distribution Station** | Not documented yet |
+| `7` | **Distribution Station** | 14 |
 | `8` | **Stage** | Not documented yet |
 
 **Loading** is on the next menu page. Press `9` or `PgDn` to show it.
@@ -106,6 +120,7 @@ The submenus are listed below.
 | `2` | **Pick by Area** |
 | `3` | **Deliver Carrier** |
 | `4` | **Force-Close Episode (supervisor)** |
+| shown key | **Station Route** |
 
 > The key numbers follow the order of the items in the screen definition. If your terminal shows the items with other numbers, use the numbers on the terminal.
 
@@ -152,7 +167,7 @@ These fields are called auto-submit fields. A scan ends with `Enter`, so a scan 
 
 Some fields **remember your last value**. When you open the screen again, the field starts with the value you last sent from it in this sign-in session. The second line of a receipt then goes to the place where the first line went. The terminal shows the value before you type. Type over it to change it. The memory lives only in the terminal: it is not saved on disk, and a new sign-in starts empty. A send that the server refuses remembers nothing, and a field sent empty is forgotten. Today the field **To Loc** (**Loc** on case-level receiving) does this on the receiving line screens of **Receive Against ASN**, **Receive Blind**, **Receive Return** and **Receive Case-Level**.
 
-An empty input field on the main flows shows a short grey **hint** of what to scan or type, for example `Scan or type SKU` or `Scan staging location`. The hint is not a value: it disappears when you type, and an empty field stays empty. A hint longer than the field is cut with `…`. Choice fields, yes/no fields, read-only lines and the lot attribute fields show no hint (`placeholder`, `clients/rf-go/internal/screen/types.go`; seeded by `rf-screens` revisions of the login, receiving, putaway, move, inquiry, picking and counting screens).
+An empty input field on the main flows shows a short grey **hint** of what to scan or type, for example `Scan or type SKU` or `Scan staging location`. The hint is not a value: it disappears when you type, and an empty field stays empty. A hint longer than the field is cut with `…`. Choice fields, yes/no fields, read-only lines and the lot attribute fields show no hint.
 
 Some lines show a **colour**. The colour is a meaning, not a decoration: green means fine, yellow means look at it, red means an error, blue is a hint. For example, on **Receipt Summary** the line **Status** is green when the receipt is `Full` and yellow when it is `Over`, and the line **Serials** is yellow while serials are missing and green when all are collected.
 
@@ -195,11 +210,7 @@ Press the key shown for the choice. `Esc` goes back.
 - A **supervisor** is needed for: **Force-Close Episode (supervisor)**, a **Supervisor Override** screen, and **Supervisor Confirmation** screens.
 - Which user may use which function is set by your administrator.
 
-The code gives each role default permissions when a system is set up. An administrator can change them later, and a change is kept. So your system may differ from the defaults. For the Operator role the defaults are:
-
-- Allowed: receive against an ASN, blind receive, return receive, case-level receive, move cases to another pallet, adjust a received quantity, close a receipt (a close with a difference still needs a supervisor), pick, pack, count, stock inquiry.
-- Move stock and putaway: a fresh database gives the Operator role these two. Systems that were set up another way may give them to managers only. See guides 05 and 06.
-- Not allowed: cancel a planned case (supervisor), force-close a serial capture (supervisor), and the supervisor-only picking and counting commands.
+Your administrator controls the effective permissions for every role. The exact menu can therefore differ between warehouses. Supervisor-only actions are labelled in the terminal and require an authorised account.
 
 If you see **No permission: {screen}** or **No permission**, tell your supervisor which screen you were using and what you tried to do.
 

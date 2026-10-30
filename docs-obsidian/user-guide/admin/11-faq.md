@@ -13,7 +13,7 @@ Every answer points to the chapter with the full steps.
 ## Users and access
 
 **How do I stop a person who has left?**
-Set the user `Status` to `Locked` or `Disabled` and save. The person cannot sign in on the web or on a handheld, a session that is open ends on the next request, and the API keys of the user are refused (`wms-lib-auth/src/user_status.rs`, `wms-lib-web/src/middleware/mw_auth.rs`). An API key that was accepted a moment ago can work for up to 30 seconds more (cache). See `02-users-roles-permissions.md`.
+Set the user `Status` to `Locked` or `Disabled` and save. The person cannot sign in on the web or on a handheld, a session that is open ends on the next request, and the API keys of the user are refused. An API key that was accepted a moment ago can work for up to 30 seconds more (cache). See `02-users-roles-permissions.md`.
 
 **How do I reset a password?**
 Open `Enterprise > Users & Roles > Users`, open the user, fill `Password` on the tab `General`, click `Save`. An empty `Password` keeps the old one.

@@ -53,25 +53,6 @@ sequenceDiagram
 - The first deposit onto a pallet freezes the pallet destination. See [Drop-off of a pallet](23-drop-off-pallet.md).
 - After a full commit, if the policy revision frozen on the pallet has `Count an Emptied Location` and the location holds no stock, the commit publishes `process.inventory.count_requested`. The count is started later by a subscriber.
 - The task goes `Assigned` to `Completed` in the commit. No pick door writes `InProgress`.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Screen order and the payload of each call | `crates/libs/wms-lib-sql/sql/rf-screens/105_uc_pick_source_confirmation.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/101_uc_pick_drop_close.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/111_uc_pick_drop_area.sql` |
-| API methods and their classes | `crates/services/app-server/src/web/rpcs/pick_commands_rpc.rs:42-330` |
-| Open pallet, policy frozen on it | `crates/libs/wms-outbound/src/picking/commands/drop_open.rs:1-60` and `:90-260` |
-| Confirmation commands, episode, lock steps | `crates/libs/wms-outbound/src/picking/commands/confirm.rs:1-60` and `:380-440` |
-| Quantity must equal the full quantity | `crates/libs/wms-outbound/src/picking/commands/confirm.rs:683-708` |
-| What the plan asks | `crates/libs/wms-outbound/src/domain/pick_confirmation/plan.rs:141-300` |
-| Serial scan | `crates/libs/wms-outbound/src/picking/commands/capture_serial.rs:1-110` |
-| Commit steps | `crates/libs/wms-outbound/src/picking/commands/commit.rs:1-40` and `:125-380` |
-| Source proof, expiry, hold at commit | `crates/libs/wms-outbound/src/picking/confirmation/at_commit.rs:62-145` |
-| Instructions that must be accepted | `crates/libs/wms-outbound/src/picking/instructions.rs:18-80` |
-| Count request event code | `crates/libs/wms-inventory/src/service/inventory_count/request_location.rs:1-10` |
-| Count of an emptied location | `crates/libs/wms-outbound/src/picking/emptied_location.rs:37-90` |
-| Task goes `Assigned` to `Completed` | `crates/libs/wms-tasks/src/service/lifecycle.rs:166-216` |
-
 ## Related pages
 
 - [The cart route](21-rf-pick-cart-route.md)

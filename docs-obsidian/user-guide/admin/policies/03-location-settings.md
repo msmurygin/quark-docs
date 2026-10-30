@@ -21,8 +21,7 @@ Policy and step settings are in `01-putaway-policy-steps-and-criteria.md`.
   A list `Lot Commingle Rules` sits below the card (section 4).
 - Buttons on the list: `New`, `Delete`, `Refresh`, `Generate` (bulk wizard `Location Generator`).
 - Roles: `Admin`, `Manager` and `Operator` create, change and delete a location.
-  `Viewer` reads. `Generate` is for `Admin` and `Manager`. Lot mixing rules are for `Admin` and `Manager`
-  (`crates/services/app-server/src/web/rpcs/location_rpc.rs:18-27`, `loc_lot_commingle_rpc.rs:10-16`).
+  `Viewer` reads. `Generate` is for `Admin` and `Manager`. Lot mixing rules are for `Admin` and `Manager`.
 - Table: `location` (`BASELINE:2956`). `BASELINE` is `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`.
 - Paths to code start at `crates/libs/` unless they start with `crates/services/`.
   `location.rs` means `wms-lib-core/src/model/location.rs`.
@@ -54,14 +53,13 @@ Do not delete or rename the system locations. Zones point at `STAGE`, `PICKTO` a
 
 ## 1. Fixed gate: who can be a putaway candidate
 
-The putaway search reads only locations that pass all of these, whatever the policy says
-(`location.rs:2136-2143` for a zone, `:2185-2201` for one named location):
+The putaway search reads only locations that pass all of these, whatever the policy says:
 
 1. `Putaway Zone` equals the zone being searched.
 2. `Status` is `Ok`.
 3. `Flag` is `None`.
 4. `Discard LPN` is not on.
-5. `Type` is one of `Case`, `Pick`, `SpeedPick`, `Pnd`, `Sort`, `Other` (the destination types putaway may use: `wms-inventory/src/movement/validation.rs:135-148`).
+5. `Type` is one of `Case`, `Pick`, `SpeedPick`, `Pnd`, `Sort`, `Other`.
 
 Then the step's own conditions narrow the list, and each remaining location is checked one by one
 (`00-putaway-overview.md`, section 3).
@@ -83,7 +81,7 @@ Then the step's own conditions narrow the list, and each remaining location is c
 | When empty | Not allowed. |
 | If you change it | You cannot. The update API has no `code` field. Create a new location instead. |
 
-Delete rules (`location.rs:2258-2270`): a location is refused for delete while stock, a reservation, a pick, a task, a receipt line, a zone special location,
+Delete rules: a location is refused for delete while stock, a reservation, a pick, a task, a receipt line, a zone special location,
 a putaway step or a SKU preferred location points at it.
 Message: `Cannot delete location — referenced by 1 other record(s)`. The number is the count of locations you tried to delete, not the count of references.
 Lot rules of the location go with it (CASCADE).
@@ -100,14 +98,13 @@ The system location `INTRANSIT` cannot be changed or deleted:
 | Type and values | 18 values, in the next table. They come from the code list `LOCTYPE`. |
 | Default | Column default `None`. The form requires you to choose. **`None` is not a storage type.** Putaway and manual moves never land in it. |
 | What it does | It decides which movements may land here. |
-| Affects | Putaway candidate gate (section 1). Move destination check `validate_destination_authorization` (`validation.rs:222`). Allocation (`inventory_balance_atp.rs:343`). Counts (`inventory_count.rs:37`). Owner pick drop location (trigger), work area pack station (trigger). |
+| Affects | Putaway candidate gate (section 1). Move destination check `validate_destination_authorization`. Allocation. Counts. Owner pick drop location (trigger), work area pack station (trigger). |
 | Example | A pick face: `Pick`. A pallet rack bay: `Case` or `Pnd`. |
 | Interacts with | A step can narrow the type (`Location type` condition) but never widen it past the six allowed types. Only one `InTransit` location may exist (`uq_location_one_in_transit`). |
 | When empty | Not possible (NOT NULL, default `None`). |
 | If you change it | Next suggestion and next move only. Stock already in the location stays. A location that holds stock and becomes `QC` or `Damage` keeps it. |
 
-What each value allows. "Yes" means the type is in the list of allowed destination types for that kind of move
-(`validation.rs:135-197`).
+What each value allows. "Yes" means the type is in the list of allowed destination types for that kind of move.
 
 | Type | UI text | Putaway / correction | Manual / repack | Replenishment | Pick move | Move to QC | Damage | RTV | Release from QC |
 |---|---|---|---|---|---|---|---|---|---|
@@ -133,9 +130,9 @@ What each value allows. "Yes" means the type is in the list of allowed destinati
 Other facts about types:
 - "no" in a column means the move is refused with `destination loc_type X not authorized for source_type Y` (a supervisor can override this refusal).
   Other flows place stock in `Door`, `Stage`, `Destroy`, `Returns`, `Lost`, `Pack` by their own rules (for example short-pick remediation to the `Lost` place, pick drop to `Pickto`, `Stage` or `Door`, post-pick routing to `Pack`).
-- `InTransit`: no move takes stock out of it or puts stock into it: `location X holds only open pick pallets: nothing moves into it` (`validation.rs:202`, `types.rs:592`).
-- Allocation never picks stock from `InTransit` or `Pack` (`inventory_balance_atp.rs:343`). `Lost` is **not** excluded there. This is a known open point in the code comment. Stock booked to `Lost` can still be allocated.
-- Counts never include `Lost` or `InTransit` (`inventory_count.rs:37`).
+- `InTransit`: no move takes stock out of it or puts stock into it: `location X holds only open pick pallets: nothing moves into it`.
+- Allocation never picks stock from `InTransit` or `Pack`. `Lost` is **not** excluded there. This is a known open point in the code comment. Stock booked to `Lost` can still be allocated.
+- Counts never include `Lost` or `InTransit`.
 - The owner `Pick drop location` must be `Pickto`, `Stage` or `Door` (trigger `owners_picking_toloc_is_a_drop_location`, migration 055).
 - A work area pack station must be a `Pack` location (trigger `work_area_pack_station_is_a_pack_location`, migration 079).
 
@@ -148,9 +145,9 @@ Other facts about types:
 | Type and values | `None`, `CycleCountActive`, `SanitationActive`, `MaintenanceActive`, `ReceivingHoldoff`. Code list `LOCFLAG`. |
 | Default | `None`. |
 | What it does | A temporary operational block. It takes the location out of automatic work while it is set. |
-| Affects | Putaway candidate gate (flag must be `None`). Allocation (`inventory_balance_atp.rs:457`). Pick dispatch (`wms-outbound/src/picking/infrastructure/dispatch.rs:164-170`): a flagged location blocks a pick, except `CycleCountActive` when the caller allows a pick under a running count (`cycle_count_block_tolerated`). Count start (`location.rs:1239-1356`, `inventory_count.rs:502`): a count freezes `Ok` locations with flag `None` and sets `CycleCountActive`; it lifts only that value afterwards. |
+| Affects | Putaway candidate gate (flag must be `None`). Allocation. Pick dispatch: a flagged location blocks a pick, except `CycleCountActive` when the caller allows a pick under a running count (`cycle_count_block_tolerated`). Count start: a count freezes `Ok` locations with flag `None` and sets `CycleCountActive`; it lifts only that value afterwards. |
 | Example | Set `MaintenanceActive` while a beam is repaired. Putaway and allocation skip the bay. |
-| Interacts with | **A flag does not block a move.** Owner decision 2026-07-26 (`validation.rs:544-575, 603-634`). An operator can still move stock in or out. Only `Status` (holds) blocks moves. Do not trust the column comment `Move primitive U4/U5 require loc_flag=None` (`BASELINE` comment on `location.loc_flag`). It is out of date. |
+| Interacts with | **A flag does not block a move.** Owner decision 2026-07-26. An operator can still move stock in or out. Only `Status` (holds) blocks moves. Do not trust the column comment `Move primitive U4/U5 require loc_flag=None` (`BASELINE` comment on `location.loc_flag`). It is out of date. |
 | When empty | Not possible. NOT NULL. |
 | If you change it | Next suggestion, allocation and pick dispatch only. A cycle count sets and clears `CycleCountActive` itself. Do not clear it by hand during a count. |
 
@@ -164,10 +161,10 @@ Values: `None` nothing is wrong; `CycleCountActive` a count is running (set by t
 | Column | `location.status` (enum `loc_status`) |
 | Type and values | `Ok`, `Hold`, `Damage`. |
 | Default | `Ok`. |
-| What it does | It shows whether the location is on hold. It is **derived** from the active holds on the location. You cannot set it. The server ignores a value you send (`location_rpc.rs:42, 94`; the form field is disabled by `wms-meta-ui` migration 077). |
-| Affects | Putaway gate (must be `Ok`). Allocation (`l.status = 'Ok'`). Pick dispatch (`LocationBlocked`). Count freeze. The receive path reads it to derive a disposition. The move itself reads the covering **holds**, not this column (`validation.rs:548-635`). |
+| What it does | It shows whether the location is on hold. It is **derived** from the active holds on the location. You cannot set it. The server ignores a value you send. |
+| Affects | Putaway gate (must be `Ok`). Allocation (`l.status = 'Ok'`). Pick dispatch (`LocationBlocked`). Count freeze. The receive path reads it to derive a disposition. The move itself reads the covering **holds**, not this column. |
 | Example | Place a hold with code `Damaged` on `B-04-1`. The status becomes `Damage`. Release the hold: back to `Ok`. |
-| Interacts with | The rule (`wms-inventory/src/service/hold.rs:430-517`): any active hold with code `Damaged` gives `Damage`. Else any other active hold whose code **enforces** gives `Hold`. Holds whose code only informs (not enforcing) do nothing. No holds: `Ok`. |
+| Interacts with | The rule: any active hold with code `Damaged` gives `Damage`. Else any other active hold whose code **enforces** gives `Hold`. Holds whose code only informs (not enforcing) do nothing. No holds: `Ok`. |
 | When empty | Not possible. |
 | If you change it | Place or release a hold (`Sidebar > Management & Control > Inventory > Holds`, hold codes under `Sidebar > Warehouse Configuration > Reason Codes > Hold Codes`). |
 
@@ -175,9 +172,8 @@ What a hold does to moves:
 - A hold on the destination whose code blocks inbound flow stops the landing: `destination location blocked: active hold code=LocBlocked (id=12)`.
   A hold whose code only warns asks the operator to acknowledge it.
 - A hold on the source whose code blocks outbound flow stops the move: `source location blocked: active hold code=... (id=...)`.
-- The catalog says per code whether it blocks inbound, outbound or both. The `Damaged` code blocks outbound only, so a damage bay can receive damaged stock
-  (`validation.rs:581-602`).
-- Section holds for oversize goods use the code `LocBlocked` (`putaway/section_holds.rs`).
+- The catalog says per code whether it blocks inbound, outbound or both. The `Damaged` code blocks outbound only, so a damage bay can receive damaged stock.
+- Section holds for oversize goods use the code `LocBlocked`.
 
 ### 2.5 Processing Type
 
@@ -188,7 +184,7 @@ What a hold does to moves:
 | Type and values | `None`, `Pallet`, `Case`, `Piece`. |
 | Default | `None`. |
 | What it does | Says in what handling unit stock is processed here. |
-| Affects | Only the putaway condition `Processing type` (`candidates.rs:470-472`). Nothing else reads it. |
+| Affects | Only the putaway condition `Processing type`. Nothing else reads it. |
 | Example | `Pallet` for rack bays. A step: `Processing type is Pallet`. |
 | Interacts with | Nothing else. |
 | When empty | Not possible. |
@@ -203,7 +199,7 @@ What a hold does to moves:
 | Type and values | `None`, `NoPalletization`, `Asrs`, `CantileverRack`, `CartonFlow`, `DenseStorage`, `DoubleDeepRack`, `DriveInRack`, `DriveThroughRack`, `HorizontalCarousel`, `Other`, `PalletFlowRack`, `PalletCarousel`, `PushBackRack`, `SelectiveShelving`, `ShelvingStorage`, `WorkCenter`. |
 | Default | `None`. Seeds: `SelectiveShelving` for the rack locations. |
 | What it does | A label for the kind of storage equipment. It has no behaviour of its own. |
-| Affects | Putaway condition `Location category` (`candidates.rs:467-469`). Allocation step filter `location category` (`inventory_balance_atp.rs:366, 460`). |
+| Affects | Putaway condition `Location category`. Allocation step filter `location category`. |
 | Example | Small parts: `ShelvingStorage`. |
 | Interacts with | Nothing else. |
 | When empty | Not possible. |
@@ -218,7 +214,7 @@ What a hold does to moves:
 | Type and values | `A`, `B`, `C`. |
 | Default | `B`. |
 | What it does | Speed class of the place. A is fast. |
-| Affects | Putaway condition `Location ABC` (`candidates.rs:473-475`). Allocation step filter `location ABC` (`inventory_balance_atp.rs:367, 461`). |
+| Affects | Putaway condition `Location ABC`. Allocation step filter `location ABC`. |
 | Example | A pick face near the door: `A`. |
 | Interacts with | Pair it with the SKU `ABC Class` and the putaway condition `SKU ABC`. |
 | When empty | Not possible. Default `B`. |
@@ -233,7 +229,7 @@ What a hold does to moves:
 | Type and values | Whole number. Default 0. 0 is the floor. |
 | Default | 0. Seeds: 0 to 3. |
 | What it does | The shelf level. |
-| Affects | Putaway order: the third sort key (after aisle and bay) (`location.rs:420`). 3D page (filter and color by level). The generator sets it from the level range. |
+| Affects | Putaway order: the third sort key (after aisle and bay). 3D page (filter and color by level). The generator sets it from the level range. |
 | Example | A-01 level 0 comes before A-01 level 1. |
 | Interacts with | With `Aisle` and `Bay` (section 3). If aisle and bay are empty, the order is by level, then code. |
 | When empty | Not possible. |
@@ -263,8 +259,8 @@ What a hold does to moves:
 | Type and values | Text, up to 3 characters. NULL allowed. |
 | Default | NULL. Seeds: NULL. |
 | What it does | A control character for a printed location label. |
-| Affects | It is written once, when a location is created — with `New` or by the `Generate` wizard — and the system setting `CHECK_DIGIT_ENABLED` is on (`LocBmc::create` and `LocBmc::create_many_with_loc_generator`, `wms-lib-core/src/model/location.rs`). Nothing reads it afterwards. Stored only. It has no effect today. |
-| Example | `A-01-0` gives `G` (strip `-`; A=1, 0=27, 1=28, 0=27; 1x1 + 27x2 + 28x3 + 27x4 = 247; 247 mod 29 = 15; map index 16 = `G`; `wms-lib-core/src/model/location_check_digit.rs`). |
+| Affects | It is written once, when a location is created — with `New` or by the `Generate` wizard — and the system setting `CHECK_DIGIT_ENABLED` is on. Nothing reads it afterwards. Stored only. It has no effect today. |
+| Example | `A-01-0` gives `G`. |
 | Interacts with | `CHECK_DIGIT_ENABLED` (system setting, seed `true`, `BASELINE:9947`). Any text that means "on" works (`1`, `yes`, `on`, `true`). A location created by API with its own value keeps it. |
 | When empty | Allowed. |
 | If you change it | Nothing else changes. |
@@ -281,7 +277,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Type and values | Text, up to 10 characters. NOT NULL. |
 | Default | Empty text for `New`. The `Generate` wizard numbers its locations `0001`, `0002`, … in the order it makes them (section 5). Seeds: the rack locations use `A-04` style values; system locations use their code. |
 | What it does | The walking order of the warehouse for **picking**. Locations are ordered by this text. |
-| Affects | Allocation: candidates are ordered by `route_sequence`, then code, as plain text (`wms-outbound/src/allocation/select.rs:365-371`). Task claim: `ORDER BY priority, NULLIF(route_sequence,'')` blank last (`wms-lib-core/src/model/tasks/task.rs:635`). Pick route: blank last, then location code (`wms-outbound/src/domain/pick_assignment/route.rs:29-46`). Pick targets use the first route value. **Putaway does not read it.** |
+| Affects | Allocation: candidates are ordered by `route_sequence`, then code, as plain text. Task claim: `ORDER BY priority, NULLIF(route_sequence,'')` blank last. Pick route: blank last, then location code. Pick targets use the first route value. **Putaway does not read it.** |
 | Example | `0010`, `0020`, `0100`. Use fixed width with leading zeros. |
 | Interacts with | The sort is by text. `A-10` comes before `A-2`. In allocation an empty value sorts **first**. In task claim and pick routes an empty value sorts **last**. |
 | When empty | Empty is allowed. See above for the two behaviours. |
@@ -294,9 +290,9 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | UI label | `Mix SKU` (checkbox). Tab `General`. |
 | Column | `location.mix_sku` |
 | Type and values | true or false. |
-| Default | true (`DEFAULT_LOC_MIX_SKU`, `location.rs:38`). |
+| Default | true. |
 | What it does | Off: only one product can stand in the location. |
-| Affects | The landing check on every receive, move and putaway (`inventory_service.rs:999-1051`). Also a batch with two SKUs landing together (`:943-985`). Putaway refusal code `mix_sku`, text `Location L does not allow SKU mixing (incoming sku B, existing ["A"])`. Putaway condition `Mixed SKU` (location side). |
+| Affects | The landing check on every receive, move and putaway. Also a batch with two SKUs landing together (`:943-985`). Putaway refusal code `mix_sku`, text `Location L does not allow SKU mixing (incoming sku B, existing ["A"])`. Putaway condition `Mixed SKU` (location side). |
 | Example | Location `S-01` holds SKU A (qty 20). A pallet of SKU B is refused. |
 | Interacts with | The system looks at stock with `qty`, `qty_allocated` or `qty_picked` above 0 in that location. The same SKU code under another owner counts as another product. The check at landing looks at landed stock only, and a refusal there is final. Putaway suggestions also count the pallets **on their way** (active reservations): a location with `Mix SKU` off is not suggested to a pallet whose SKU differs from the stock there or from a pallet already directed there (rule `location_mix`, refusal `mix_sku`), even when the step has no mixing rule (P-18). The step rule `Mixed SKU = Not allowed` can still narrow further. It cannot allow what the location forbids. |
 | When empty | NULL is read as true. The column is NOT NULL, so it does not occur. |
@@ -309,9 +305,9 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | UI label | `Mix Lot` (checkbox). Tab `General`. |
 | Column | `location.mix_lot` |
 | Type and values | true or false. |
-| Default | true (`DEFAULT_LOC_MIX_LOT`, `location.rs:39`). |
+| Default | true. |
 | What it does | Off: only one lot can stand in the location. |
-| Affects | `inventory_service.rs:1054-1091`. Code `mix_lot`, text `Location L does not allow lot mixing (incoming lot Some("L2"), existing ["L1"])`. Putaway condition `Mixed lot`. Also: when this flag is off, the attribute rules of section 4 are skipped (`inventory_service.rs:1449-1453`). |
+| Affects | `inventory_service.rs:1054-1091`. Code `mix_lot`, text `Location L does not allow lot mixing (incoming lot Some("L2"), existing ["L1"])`. Putaway condition `Mixed lot`. Also: when this flag is off, the attribute rules of section 4 are skipped. |
 | Example | Location holds lot L1. A pallet of lot L2 is refused. |
 | Interacts with | At landing: counts stock with `qty` above 0 only; a pallet with no lot passes when the location holds exactly one lot. Putaway suggestions also count the lots on their way (rule `location_mix`, refusal `mix_lot`), so a second lot is not directed to a location with `Mix Lot` off (P-18). |
 | When empty | NULL is read as true. |
@@ -326,9 +322,9 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Type and values | true or false. |
 | Default | false. |
 | What it does | Stock that lands here loses its container (LPN) and stands loose. |
-| Affects | Receiving (`wms-inventory/src/deposit/deposit.rs:176`) and moves (`movement/service.rs:415-446`) drop the LPN. Putaway **never** offers such a location (gate, section 1). Allocation: a "whole pallet" rule skips loose stock (`allocation/select.rs:236, 705`). |
+| Affects | Receiving and moves drop the LPN. Putaway **never** offers such a location (gate, section 1). Allocation: a "whole pallet" rule skips loose stock. |
 | Example | A piece-pick shelf: on. Receiving a pallet to it puts pieces loose. |
-| Interacts with | The comment in `predicate.rs:197-218` says putaway does not exclude such locations. That is out of date. The candidate SQL excludes them (`location.rs:2143`). |
+| Interacts with | The comment in `predicate.rs:197-218` says putaway does not exclude such locations. That is out of date. The candidate SQL excludes them. |
 | When empty | Not possible. |
 | If you change it | Next landing only. |
 
@@ -341,7 +337,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Type and values | Text, up to 30 characters. NULL allowed. A blank means NULL. |
 | Default | NULL = the location is its own section. |
 | What it does | Groups positions with no beam between them, so one oversize object can stand across them. |
-| Affects | Only for SKUs with `Positions required` above 1. Putaway looks for a whole free section (`space.rs:1052-1089`, `location.rs:2315-2364`). The section size: widths **add**, depth and height take the **minimum**. After landing, the other positions are held with `LocBlocked` (`section_holds.rs`). 3D page shows the lock. |
+| Affects | Only for SKUs with `Positions required` above 1. Putaway looks for a whole free section. The section size: widths **add**, depth and height take the **minimum**. After landing, the other positions are held with `LocBlocked`. 3D page shows the lock. |
 | Example | Section `N1` has 3 positions of width 1200, length 1000, height 1500 each. A sofa 3200 x 900 x 1400 fits (width 3600). One of the 3 positions has a pallet in it: the section is not free. |
 | Interacts with | The size test uses the pallet base and height described on the pack, not the step switch. If the pack describes nothing, only the number of free positions is tested. Refusals: `section_none`, `section_not_free`, `section_too_small`. |
 | When empty | Each location is alone. An oversize SKU is refused everywhere with `section_none`. |
@@ -371,7 +367,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.length`, `location.width`, `location.height` |
 | Type and values | Decimal, 0 or more. Default 0. Millimetres. |
 | What it does | The size of the place. |
-| Affects | Putaway step switch `Pallet dimensions`: the pallet base must fit length x width (both ways round) and the pallet height must be at most the height (`space.rs:354-367, 875-918`). Section size for oversize goods (`location.rs:2326-2347`). 3D drawing (defaults 2 x 1 x 1.5 m when 0). |
+| Affects | Putaway step switch `Pallet dimensions`: the pallet base must fit length x width (both ways round) and the pallet height must be at most the height. Section size for oversize goods. 3D drawing (defaults 2 x 1 x 1.5 m when 0). |
 | Example | 2500 x 1200 x 1500. Pallet base 1200 x 800, height 1650: footprint fits, height does not. Refused: `loc_height: location 1500, pallet 1650`. |
 | Interacts with | A value of 0 means "not measured". With `Pallet dimensions` on, the trace says `loc_footprint:no_location_dims`, and the location is still offered. |
 | When empty | 0. |
@@ -385,7 +381,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.max_cube_capacity` |
 | Type and values | Decimal, 0 or more (CHECK `chk_location_cube_capacity`). Default 0. |
 | What it does | The volume the stock in the location may not exceed. |
-| Affects | Putaway switch `Cube` (`space.rs:761-767`). The move itself always checks it: `capacity exceeded (loc_cube): limit=L, attempted=A` (`validation.rs:960-968`). |
+| Affects | Putaway switch `Cube`. The move itself always checks it: `capacity exceeded (loc_cube): limit=L, attempted=A`. |
 | Example | Limit 4,500,000,000 mm³. Held 3,000,000,000. Pallet 1,800,000,000. Attempted 4,800,000,000. Refused. |
 | Interacts with | Volume of stock is `sum of SKU cube x quantity`. A SKU with cube 0 adds 0. Counts stock and active reservations. Skipped if the pallet is already in the location. |
 | When empty | 0 = no limit. Reported as `loc_cube:no_limit`. |
@@ -399,7 +395,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.max_weight_capacity` |
 | Type and values | Decimal, 0 or more (CHECK `chk_location_weight_capacity`). Default 0. Grams. |
 | What it does | The weight the stock may not exceed. |
-| Affects | Putaway switch `Weight` (`space.rs:754-760`). The move always checks it: `capacity exceeded (loc_weight)`. |
+| Affects | Putaway switch `Weight`. The move always checks it: `capacity exceeded (loc_weight)`. |
 | Example | Level 3 bay: 400,000 g (400 kg). Pallet 720,000 g. Refused: `loc_weight: limit 400000, attempted 720000`. |
 | Interacts with | If no weight is known for the pallet, the check is not run (`loc_weight:no_stock_weight`). |
 | When empty | 0 = no limit. Reported as `loc_weight:no_limit`. |
@@ -413,7 +409,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.footprint` |
 | Type and values | Whole number (smallint), 0 or more. Default 0. |
 | What it does | How many pallets stand on the floor of this place. |
-| Affects | Putaway switch `Stacking limit`: capacity = this x the stack limit (`space.rs:704-727`). |
+| Affects | Putaway switch `Stacking limit`: capacity = this x the stack limit. |
 | Example | 2 floor positions x stack limit 3 = 6 pallets. |
 | Interacts with | With `Stack limit`. If either is 0, the limit is 0, reported as `loc_positions:no_limit`. The move does not check it. |
 | When empty | 0 = not configured. |
@@ -441,7 +437,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.max_qty_capacity` |
 | Type and values | Decimal, 0 or more (CHECK `chk_location_max_qty_not_negative`). Default 0. |
 | What it does | How much stock a pick face holds before it is full. |
-| Affects | Putaway switch `Quantity` (`space.rs:732-742`). The move does not check it. |
+| Affects | Putaway switch `Quantity`. The move does not check it. |
 | Example | Limit 500 pieces. Holds 380. Arriving 150. Refused: `loc_qty: limit 500, attempted 530`. |
 | Interacts with | Plain sum of quantities in stored units, across all SKUs in the location. |
 | When empty | 0 = not configured. Reported as `loc_qty:no_limit`, not read as unlimited-by-choice. |
@@ -455,7 +451,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.x_coord`, `y_coord`, `z_coord` |
 | Type and values | Decimal, 0 or more. Default 0. Not in the warehouse length unit: the 3D page treats them as layout metres (`public/assets/js/warehouse-3d.js:171`). |
 | What it does | Where the place is on the 3D map. |
-| Affects | The 3D page. The **redirect**: when an operator cannot use the suggested location, the new suggestion is sorted by the straight-line distance from where the operator stands (`putaway/mod.rs:358-414`). A redirect over 30 units is logged as a last resort (`LONG_REDIRECT_DISTANCE`, `mod.rs:300`). Section member order (`container.rs:867`). |
+| Affects | The 3D page. The **redirect**: when an operator cannot use the suggested location, the new suggestion is sorted by the straight-line distance from where the operator stands. A redirect over 30 units is logged as a last resort. Section member order. |
 | Example | Operator at (10, 6, 0). Candidate A at (12, 6, 0) is 2 away and comes before B at (30, 6, 0). |
 | Interacts with | The ordinary `Pick route` ordering does not use coordinates. |
 | When empty | 0. All locations at 0 make a redirect no better than the code order. |
@@ -469,7 +465,7 @@ then move a pallet to that location by scanning only its code. If the move is ac
 | Column | `location.aisle` |
 | Type and values | Text, up to 10 characters. NOT NULL. Default empty. |
 | What it does | The aisle name. |
-| Affects | Putaway order: the first sort key (`location.rs:420`). 3D filters. |
+| Affects | Putaway order: the first sort key. 3D filters. |
 | Example | `A`, `B`. |
 | Interacts with | Text sort: `A10` comes before `A2`. Use fixed-width names such as `A02`, `A10`. The `Generate` wizard does **not** set aisle. Generated locations have an empty aisle, so putaway orders them by bay (0), then level, then code. |
 | When empty | Empty text sorts first. |
@@ -514,9 +510,9 @@ What `Allow Mix` does here:
 Read only. Every time somebody looked at the location, the latest first: its counts (not cancelled, once counted)
 and every answer to "is this location empty?" an operator gave there in passing — after a pick that emptied it,
 when the picking policy's `On an Emptied Location` is `Confirm`, or after a manual move that emptied it, when the
-owner's `Confirm Empty After Move` is on (count spec Appendix L, `docs/superpowers/specs/2026-10-04-inventory-count-design.md`) —
+owner's `Confirm Empty After Move` is on —
 and every report of stock the system does not show there (RF **Report Unexpected Stock**, Appendix M).
-Query `location_checks` (`crates/services/app-server/src/web/rpcs/inventory_count_rpc.rs`), list form `location_checks_list_form` (wms-meta-ui 151).
+Query `location_checks`, list form `location_checks_list_form` (wms-meta-ui 151).
 
 | Column | What it shows |
 |---|---|
@@ -546,8 +542,7 @@ Each generated location also gets, on its own:
 - `Route Sequence` — its number in generation order, zero-padded to one width: `0001`, `0002`, … A number given in `route_sequence` (API) is the first one (`0500` gives `0500`, `0501`, …); anything that is not a number refuses the run.
 - `Check Digit` — when `CHECK_DIGIT_ENABLED` is on, like `New` (2.10).
 
-It never sets `Bay`, `Pallet positions on floor`, `Stack limit`, `Max quantity`, `Section`, or coordinates
-(`wms-meta-ui` wizard payload: `web-ui-server/.../location/wizard_submit_action.rs:98-170`).
+It never sets `Bay`, `Pallet positions on floor`, `Stack limit`, `Max quantity`, `Section`, or coordinates.
 Set them afterwards, or the stacking and quantity checks report `no_limit`.
 A run is all or nothing: if any generated code already exists, nothing is created and the error lists the existing codes (the first 20, then how many more).
 

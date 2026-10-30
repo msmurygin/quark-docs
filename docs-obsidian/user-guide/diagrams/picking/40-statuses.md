@@ -91,31 +91,6 @@ stateDiagram-v2
 
 - `Resolving` is written and left inside one transaction. Nobody sees it on the list. `Reported` exists in the enum and nothing writes it.
 - `Resolved` and `Cancelled` are final.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Task statuses, `Cancelled` has no writer | `crates/libs/wms-lib-core/src/model/tasks/task.rs:39-56` |
-| `Created` on insert | `crates/libs/wms-tasks/src/service/draft.rs:241-262` |
-| `Created` to `Assigned` (dispatch, set claim, held task, reassign) | `crates/libs/wms-lib-core/src/model/tasks/task.rs:654-678`, `:820-860`, `:933-955`, `:1617-1647` |
-| `Assigned` to `InProgress` by the generic doors | `crates/libs/wms-tasks/src/service/lifecycle.rs:94-165`, `crates/libs/wms-tasks/src/domain/task/aggregate.rs:70-80` |
-| No pick door calls the start or progress doors | `crates/libs/wms-outbound/src/picking/commands/commit.rs:350-359`, `crates/libs/wms-outbound/src/picking/commands/short.rs:401-412` (only `complete`) |
-| `Completed` and `Shorted` | `crates/libs/wms-tasks/src/domain/task/aggregate.rs:120-165` and `crates/libs/wms-tasks/src/service/lifecycle.rs:166-216` |
-| Back to `Created` | `crates/libs/wms-lib-core/src/model/tasks/task.rs:1512-1575`, `:1685-1706`, `:858-890`, `:1904-1923` |
-| Task deleted | `crates/libs/wms-lib-core/src/model/tasks/task.rs:1797-1850` and `crates/libs/wms-outbound/src/service/status_manager/delete_task.rs:1-60` |
-| Pick statuses | `crates/libs/wms-lib-core/src/model/outbound/pick_detail.rs:25-42` |
-| `Allocated` to `Released` | `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:88-104` |
-| `Released` to `Allocated` | `crates/libs/wms-lib-core/src/model/outbound/pick_detail.rs:758-775` |
-| `Picked` and `Shorted` | `crates/libs/wms-outbound/src/picking/commands/commit.rs:324` and `crates/libs/wms-outbound/src/picking/commands/short.rs:380-395` |
-| Assignment statuses | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:27-47` |
-| `Building` on insert | `crates/libs/wms-lib-sql/sql/wms-app/migrations/050_pick_assignment.sql:28` |
-| `Ready`, `Picking`, `Delivering` | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:797-880` |
-| `Dissolved` | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:905-925` and `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:538-581` |
-| `Completed`, delivered but dissolved | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:755-790` |
-| Position statuses | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:49-60`, `:1150-1160`, `:1170-1200`, `:1210-1235`, `:1250-1270` |
-| Exception statuses | `crates/libs/wms-lib-core/src/model/outbound/pick_target_execution_exception.rs:38-53` and `:315-410` |
-
 ## Related pages
 
 - [Task statuses and transitions (reference)](../../reference/tasks/90-task-statuses-and-transitions.md)

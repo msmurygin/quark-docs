@@ -476,7 +476,7 @@ Rules before publish (`validate_draft`):
 - When a picker shorts a pick, the system runs the actions of the chosen reason: it can block the location, release reservations, move residual stock to the missing location, and try to allocate again.
 - Setting `TASK_SKIP_*` values (see `03-warehouse-structure.md`) control task skipping, not shorts.
 
-The order is fixed in code (`remediation.rs`):
+The order is fixed in code:
 
 1. In the short command itself: the found quantity is committed, the rest of that pick is released, and the source location is blocked. A remediation request is saved.
 2. A background worker then runs the remediation. It releases the related reservations. Picks that an operator is working on are left alone.
@@ -590,7 +590,7 @@ See `03-warehouse-structure.md`, section 6.
 
 - Closing a carton prints the shipping label and sets weights and a verdict.
 - Goods Issue is separate from carton close; use `Ship order` or the Load workflow in section 10.
-- The action `Repack` works on the RF terminal. The action is chosen once, when the packer opens the work, from what the unit is: a box off a cart is **verified**, a discrete pick pallet is **repacked** into output cartons (`resolve_packing_action`, `wms-outbound/src/packing/README.md`). There is nothing to set for it. Voiding an empty output carton and reopening a closed one have commands but no RF screen yet.
+- The action `Repack` works on the RF terminal. The action is chosen once, when the packer opens the work, from what the unit is: a box off a cart is **verified**, a discrete pick pallet is **repacked** into output cartons. There is nothing to set for it. Voiding an empty output carton and reopening a closed one have commands but no RF screen yet.
 
 There is no packing queue in the web UI. Migration 110 only adds one message word (`STATION_UNKNOWN`). The queue is the query `packing_queue_list`. The RF screen `PACK00` (`rf-screens/103_uc_pack_verify.sql`) reads it after the packer scans the station.
 

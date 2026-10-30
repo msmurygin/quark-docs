@@ -37,8 +37,6 @@ Use this page to change the reference data of a saved receipt: carrier, supplier
 | An "unknown field" refusal | You changed `Effective Date` or `Close Date`. | Undo the change in these two fields. |
 | `owners {id} not found` | A carrier or supplier of the wrong type. | Pick the right owner. |
 
-> Not confirmed by code: the exact text the screen shows for the "unknown field" refusal. To verify: change `Effective Date` on a saved receipt and press `Save`.
-
 ## Related pages
 
 - [Header tab](10-header-tab.md)

@@ -12,34 +12,29 @@ updated: 2026-10-10
 
 | Part | What it does | Web screen? |
 |---|---|---|
-| Label definitions | Name, size and DPI of a label. Point to a template. | Yes, in the label designer (see below). Also by API. |
-| Label templates | The layout (JSON). | Yes, in the label designer (see below). Also by API. |
-| Printer configurations | Network printers (host and port). | No. API only. |
-| Printer assignments | Which printer a user, zone, owner or warehouse uses. | A form `printer_assignments_list_form` exists, but no menu item or tab opens it. |
+| Label definitions | Name, size and DPI of a label. | Yes, in the label designer. |
+| Label templates | The label layout. | Yes, in the label designer. |
 | Zone printer settings | Default printers in a putaway zone. | Yes. `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`. |
-| Label renderer | A separate service that turns a template into ZPL. | Setting `LABEL_RENDERER_URL`. |
 | Barcode formats | Rules to read scanned barcodes (GS1 and others). | Yes. `Sidebar > Warehouse Configuration > Product Data > Barcode Formats`. |
 
 Labels are made in ZPL for Zebra printers. The server sends the ZPL to the printer's network port (default 9100).
 
-There is no web screen for printer configurations. Use the API methods (section 7).
-
-Label design has a web screen. Open `Sidebar > Overview > Reports`. If you pass the Studio-admin check, the page shows the buttons `Report designer` and `Label designer` above the frame. `Label designer` opens the designer of the report service (`/designer?surface=labels`). It reads and writes `label_definitions` and `label_templates`, the same tables the printing code uses. Users who are not Studio admins do not see these buttons.
+Your site installer connects the printer network and label renderer. Label design has a web screen: open `Sidebar > Overview > Reports`, then click **Label designer**. If the button is not available, ask an Enterprise administrator for label-designer access.
 
 ## 2. Seeded labels
 
-Table `label_definitions` (all active, DPI 203):
+The standard catalogue contains these active 203-DPI labels:
 
 | Code | Purpose | Category | Size (mm) | Used by |
 |---|---|---|---|---|
-| `pallet_label` | Pallet label | `pallet` | 100 x 150 | API `print_label`. |
-| `sku_label` | Item label | `sku` | 50 x 30 | API `print_label`. |
-| `location_label` | Location label | `location` | 70 x 40 | API `print_label`. |
+| `pallet_label` | Pallet label | `pallet` | 100 x 150 | Pallet identification. |
+| `sku_label` | Item label | `sku` | 50 x 30 | Item identification. |
+| `location_label` | Location label | `location` | 70 x 40 | Location identification. |
 | `lpn_id_label` | LPN identification label | `lpn` | 100 x 50 | Auto-print after a receive (`Auto-Print LPN`), and LPN print on the move path. |
 | `handling_unit_label` | `Handling unit label` | `custom` | 100 x 50 | Printed once for each registered handling unit. |
 | `shipping_label` | `Shipping label` | `shipping` | 100 x 150 | Printed when a pack carton is closed. |
 
-The code looks up a label by its **exact, case-sensitive code**. Do not rename the codes `lpn_id_label`, `handling_unit_label`, `shipping_label`. If the lookup fails, best-effort callers log it and print nothing.
+Label codes are exact and case-sensitive. Do not rename `lpn_id_label`, `handling_unit_label` or `shipping_label`; warehouse workflows use those codes when they request a label.
 
 Seeded templates: `pallet_100x150`, `sku_50x30`, `location_70x40`, `lpn_id_100x50`, `handling_unit_100x50`, `shipping_100x150` (status `applied`).
 
@@ -81,88 +76,13 @@ Set default printers for a zone and turn on automatic printing.
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Nothing prints | No printer is resolved. | Check the printer assignments (section 5). |
+| Nothing prints | The site could not select or reach a printer. | Check the saved printer name. If it is correct, ask the system administrator to check the printer connection. |
 
 ### What this affects later
 
-- These fields do not change where a label prints. A label printed at a place goes to the `Zone` printer assignment of that place first (section 5).
+- These values are part of the zone setup. The site's printer configuration decides how the saved names are mapped to physical printers.
 
-These zone fields are plain text. They are not linked to `printer_configurations`, and no printing code reads them. The printer is chosen only from `printer_assignments` (section 5). To make a zone use a printer, add a `Zone` assignment whose `Scope ID` is the zone id (`putawayzone.id`). The same holds for the fields `zone_code` and `is_default` of a printer configuration: they are stored, but the lookup does not use them. `Auto Print Addr Label` and `Auto Print Carton Label` are not read by any printing code either.
-
-## 4. Printer configurations (API)
-
-Table `printer_configurations`. Methods `create_printer_configuration`, `update_printer_configuration`, `list_printer_configuration` (create, update and delete: `ADMIN`, `MANAGER`; read: all roles).
-
-| Field | Meaning | Allowed values | Example |
-|---|---|---|---|
-| `code` | Key. | Text up to 50 characters. | `ZEBRA-01` |
-| `name` | Display name. | Text up to 200 characters. | `Dock printer` |
-| `printer_host` | Network address. | Text up to 200 characters. | `10.0.0.50` |
-| `printer_port` | TCP port. | Whole number. Default 9100. | 9100 |
-| `printer_model` | Model text. | Text. | `ZT411` |
-| `zone_code` | Zone text. | Text. | `RACK` |
-| `is_default` | Default printer. | true or false. | false |
-| `label_definition_id` | Label for this printer. | A label definition id. | |
-| `is_active` | In use. | true or false. | true |
-
-No printer is seeded.
-
-## 5. Printer assignments
-
-Rule for choosing a printer (`PrinterAssignmentBmc::resolve_for_scope_at`):
-
-1. Only active rows count.
-2. Order of scope: **Zone**, then **User**, then **Owner**, then **Warehouse**.
-3. Inside one scope, the lowest `priority` number wins (default 100).
-4. The zone tier is used only when the print has a location. Without a location the order is User, Owner, Warehouse.
-
-If no row matches, nothing is printed and the log says `NoPrinter`.
-
-Form `printer_assignments_list_form` (when reachable): columns `ID`, `Scope ID`, `Printer`, `Priority`, `Active`, `Scope`; buttons `New`, `Edit`, `Delete`, `Refresh`.
-
-Edit window `Edit Printer Assignment`:
-
-| Field | Meaning | Allowed values | Example |
-|---|---|---|---|
-| `Scope Type` (required) | Level. | `User`, `Zone`, `Owner`, `Warehouse`. | `Warehouse` |
-| `Scope ID` | Who the row applies to. Empty for `Warehouse`. | A user, zone or owner id. | |
-| `Printer` (required) | The printer configuration. | A printer id. | |
-| `Priority` (required) | "Lower wins; default 100." | Whole number. | 100 |
-| `Active` (required) | In use. | On or off. | on |
-
-Minimum for a working print: one `printer_configurations` row and one `Warehouse` assignment pointing to it.
-
-![printer_assignments_list_form - Printer Assignments](../assets/screens/printer-assignments-list-form.png)
-
-*Caption: the printer assignment list.*
-
-An administrator cannot reach this form in the UI today. No menu item, tab, navigation or button opens it. The code lists the form as a screen with no door (`surface_census.rs`). Until a door is added, manage assignments with the API (`printer_assignments_rpc.rs`).
-
-## 6. Label renderer
-
-- The setting `LABEL_RENDERER_URL` (seed `http://localhost:8086`) names the renderer service.
-- Open `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` to change it.
-- The server posts the template and data to the renderer and gets ZPL bytes back. A failed render sends nothing to the printer.
-
-| Failure stage (log token) | Meaning | Fix |
-|---|---|---|
-| `stage=render` | No ZPL: label not found, renderer unreachable, non-2xx answer, or unreadable body. | Check the label code and `LABEL_RENDERER_URL`. |
-| `stage=send` | The printer did not accept the bytes: unreachable host, connection or write timeout. | Check the printer address, port and network. |
-
-## 7. Label API methods
-
-| Method | Use |
-|---|---|
-| `generate_label_data` | Render data for a label code (preview). |
-| `print_label` | Returns ZPL bytes for a label code and data. |
-| `send_label_to_printer` | Sends a label to a printer host and port. |
-| `list_label_definition`, `update_label_definition` | Read or change definitions. The code cannot change. |
-| `list_label_template`, `update_label_template` | Read or change templates. The code cannot change. |
-| `print_lpn_label` | LPN label print. |
-
-Role: read for all roles; write for `ADMIN` and `MANAGER`.
-
-## 8. Barcode formats
+## 4. Barcode formats
 
 ### What you will do
 

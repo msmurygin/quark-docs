@@ -21,7 +21,7 @@ Typed values may be separated by commas, semicolons or spaces.
 
 ## Rules
 
-`inventory_count_add_locations` works under the lock of the count (`crates/libs/wms-inventory/src/service/inventory_count/add_locations.rs`):
+`inventory_count_add_locations` works under the lock of the count:
 
 1. At least one location or zone: `choose the locations or the zones to add`.
 2. The count must be `Open`: `the count is {status}, not open`.
@@ -30,7 +30,7 @@ Typed values may be separated by commas, semicolons or spaces.
 5. For a zone, only the locations that can be counted now are added. Busy ones (blocked, under another operation, counted elsewhere) are left out and named. A zone with nothing countable and no other locations chosen is refused: `nothing can be counted in zone(s) {zones}: every location is blocked or already being counted`.
 6. If everything chosen was already in the count: `already in this count: {codes}`.
 7. Each location added gets a task, is frozen (`Hard`) and has its stock read. The snapshot is what the counter is judged against.
-8. A location can be frozen only when its status is `Ok` and its flag is `None` (or already `CycleCountActive`). A location with the status `Hold` or `Damage`, or with the flag `SanitationActive`, `MaintenanceActive` or `ReceivingHoldoff`, refuses the command with `cannot be frozen for a count ...` (`crates/libs/wms-lib-core/src/model/location.rs:1259-1300`). A `Soft` count applies the same test but freezes nothing.
+8. A location can be frozen only when its status is `Ok` and its flag is `None` (or already `CycleCountActive`). A location with the status `Hold` or `Damage`, or with the flag `SanitationActive`, `MaintenanceActive` or `ReceivingHoldoff`, refuses the command with `cannot be frozen for a count ...`. A `Soft` count applies the same test but freezes nothing.
 
 Message on success: `{n} location(s) added to count {number}`. If some were left out: `; {m} passed over (busy or already in the count): {codes}` (the first 10 codes, then `and {k} more`). Failure: `Nothing was added: {error}`. If the count is not saved: `Save the count first`.
 

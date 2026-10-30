@@ -23,24 +23,6 @@ flowchart LR
 - **Picking To Location** of the zone of the source location becomes the `To Location` of the task **when the task is made**. The task keeps that value. A later edit of the zone does not change tasks that exist. The destination of a discrete pallet or a cart then goes through the chain in [page 58](58-influence-delivery-destination.md).
 - **Missing To Location** of the zone is read when a short with `RelocateResidualToMissing` and `Target Mode` = `ZoneMissingToLoc` runs. If the zone has none, that clean-up fails.
 - The type of a location matters for pallets: see [pallet fields](56-influence-pallet-fields.md).
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Pool order | `crates/libs/wms-lib-core/src/model/tasks/task.rs:630-641` |
-| Cart route order | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:26-47` |
-| Cart ranking by first location | `crates/libs/wms-outbound/src/picking/grouping/planned_target.rs:98-130` |
-| Lift test uses `Level` | `crates/libs/wms-lib-core/src/model/tasks/task.rs:1010-1027` |
-| Status, flag, hold at dispatch | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:158-174` |
-| A held task may finish under a count | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:76-100` |
-| Hold at commit | `crates/libs/wms-outbound/src/picking/confirmation/at_commit.rs:138-145` |
-| `Mix Lot` in the plan | `crates/libs/wms-outbound/src/picking/confirmation/source_facts.rs:121-130` and `crates/libs/wms-outbound/src/domain/pick_confirmation/plan.rs:255-262` |
-| Area of a task | `crates/libs/wms-lib-core/src/model/tasks/task.rs:999-1008` and `crates/libs/wms-lib-core/src/model/tasks/operator_task_permission.rs:155-182` |
-| Zone `Picking To Location` read at task creation | `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:52-85` and `crates/libs/wms-lib-core/src/model/putawayzone.rs:354-368` |
-| Task snapshot test leaves `to_location` out | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:208-217` |
-| Zone `Missing To Location` | `crates/libs/wms-outbound/src/picking/remediation.rs:419-447` and `crates/libs/wms-lib-core/src/model/putawayzone.rs:370-390` |
-
 ## Related pages
 
 - [SKU and lot settings](54-influence-sku-and-lot-settings.md)

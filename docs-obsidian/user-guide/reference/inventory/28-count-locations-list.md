@@ -25,8 +25,6 @@ All columns are read only.
 | `Version` | `version` | Whole number | No | The version of the counting. Sent by `Accept Variance`, `Recount` and `Remove Location`. |
 | `Recount Allowed` | `recount_allowed` | Yes or no | No | Computed: yes while `Attempt` is not above `Recounts per Location`. |
 
-Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/056_a_count_observes_the_stock.sql:62-92`; the rows in `crates/libs/wms-inventory/src/service/inventory_count/read.rs:63-127`.
-
 ## Location statuses
 
 | Status | Meaning |
@@ -49,7 +47,7 @@ A location can hold only one live row (`Open` or `Variance`) at a time, in the w
 | `Recount` | The ticked row is `Variance` and `Recount Allowed` is on (grey text `Tick a location with a variance and recounts left: the count allows no more`) | Sends the location to be counted again. | [Recounting a location](55-recounting-a-location.md) |
 | `Refresh` | Always | Reads the list again. | |
 
-Messages of the buttons (command bindings in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/093_inventory_count_screens.sql` and later):
+Messages of the buttons:
 
 | Button | Success | Failure |
 |---|---|---|

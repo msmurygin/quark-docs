@@ -30,7 +30,7 @@ A new role starts with **no rights at all**. You give it rights in the [Permissi
 | Caches | The cached role and permission decisions are cleared. |
 | The matrix | The new role gets a column. It has no rows yet; each cell you switch on creates a row. |
 
-When the app server starts (or the permission catalogue is reseeded), it writes permission rows for every **active role** (`crates/libs/wms-lib-auth/src/authorization/seeder.rs`). A role with a code other than the five built-in ones gets rows with all bits off. Until then a missing row means "denied". You switch on what you need.
+When the app server starts (or the permission catalogue is reseeded), it writes permission rows for every **active role**. A role with a code other than the five built-in ones gets rows with all bits off. Until then a missing row means "denied". You switch on what you need.
 
 ## What can go wrong
 

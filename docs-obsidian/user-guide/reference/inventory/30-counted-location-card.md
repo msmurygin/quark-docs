@@ -68,10 +68,6 @@ The column `Task` (`task_id`) is hidden.
 | `ExpectedButMissing` | The snapshot had this stock and the counter recorded none of it. |
 | `UnexpectedFound` | The counter recorded stock the snapshot did not have. |
 
-Sources: the tables in `crates/libs/wms-lib-sql/sql/wms-app/migrations/056_a_count_observes_the_stock.sql:122-142`, `060_a_counted_location_keeps_its_result_lines.sql`, `073_a_count_may_let_stock_move.sql`; the forms in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/104_inventory_count_location_card.sql` and `105_inventory_count_location_tabs.sql`.
-
-> Not confirmed by code: how the dates `Expires`, `Manufactured`, `Best By`, `Deliver By` are written in the cells (their format). They are typed as text in the list. To verify: open the card of a location counted with a dated lot.
-
 ## What it affects
 
 - The buttons change stock only through the adjustment that `Accept Variance` posts.

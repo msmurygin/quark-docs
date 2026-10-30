@@ -41,16 +41,16 @@ The list shows 20 rows per page. Rows can be ticked.
 
 ## What it affects
 
-- The values are the **expected** attributes of the line. The receive window shows them as the starting values of the lot fields (`crates/libs/wms-inbound/src/service/receipt/lot_attribute_prompt.rs`).
-- The receive command decides which line receives a scan from the SKU, the lot attributes, the pallet and the supplier lot of the scan. The first step compares the scanned attributes with the expected attributes of lines whose check mode is `Strict` (`crates/libs/wms-inbound/src/service/receipt/cascade_lookup.rs`, decision record `docs-obsidian/decisions/047-receipt-detail-cascade-lookup.md`).
+- The values are the **expected** attributes of the line. The receive window shows them as the starting values of the lot fields.
+- The receive command decides which line receives a scan from the SKU, the lot attributes, the pallet and the supplier lot of the scan. The first step compares the scanned attributes with the expected attributes of lines whose check mode is `Strict`.
 - The field `Lot Attr Check` of the line decides how a difference is judged. In the web screens that field is always `Disabled`, so the values are not checked there. See [Line detail tab](21-line-detail-tab.md).
   - `Advisory`: a difference is refused with code 36. A supervisor can allow it when the attribute is marked "override allowed".
   - `Strict`: a difference is refused with code 34 and nothing can allow it. The window shows the expected value and locks the field.
 
 ## Rules
 
-- Values can be added, changed and deleted only while the receipt is `Open` or `InProgress` (`crates/libs/wms-inbound/src/service/receipt/planning/contracts.rs:327-342`).
-- The attribute must belong to the lot policy of the SKU of the line and must be shown (`add_expected_lot_attribute.rs`).
+- Values can be added, changed and deleted only while the receipt is `Open` or `InProgress`.
+- The attribute must belong to the lot policy of the SKU of the line and must be shown.
 - A line can have one value for each attribute (unique key `uq_receipt_expected_lot_attrs_detail_policy`).
 - The line must be saved first.
 
@@ -65,10 +65,6 @@ The list shows 20 rows per page. Rows can be ticked.
 | The attribute already has a value on the line | `Duplicate entry on receipt_expected_lot_attributes (constraint ...)` |
 | The receipt is `OnHold`, `Closed` or `Cancelled` | `receipt {id} is {status} — cannot add expected lot attribute in its current lifecycle state` |
 | `New` on a line that is not saved | `Parent receipt_detail has no PK — save the detail first` |
-
-Sources: `crates/libs/wms-inbound/src/service/receipt/planning/add_expected_lot_attribute.rs`, `crates/services/web-ui-server/src/extensions/customization/receipt/lot_attr_new_action.rs`, the bindings of the button `rela_save` (`001_baseline.sql`, `wms-meta-ui`).
-
-> Not confirmed by code: the exact text for the duplicate key. To verify: add the same attribute twice to one line.
 
 ## Who can use it
 

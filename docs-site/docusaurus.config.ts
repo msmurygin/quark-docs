@@ -94,7 +94,6 @@ const config: Config = {
       name: isServer ? 'server' : 'client',
       buildDependencies: {
         guidePipeline: [path.resolve(__dirname, 'src/build/guide-markdown.ts'), path.resolve(__dirname, 'src/build/public-guide-sanitize.mjs')],
-        screenshotInventory: [path.resolve(guideDir, 'assets/MISSING-SCREENSHOTS.md')],
       },
     }})};
   }],

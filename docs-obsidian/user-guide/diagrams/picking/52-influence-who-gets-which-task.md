@@ -31,22 +31,6 @@ flowchart LR
 - **Allow Task Release** of the area is read when a pick is rejected on a cart, or when an API caller names the area. It is **not** read for a discrete reject on the RF, because `PICK11` sends no area. There `TASK_ALLOW_RELEASE_DEFAULT` decides. See [Task settings](55-influence-task-settings.md).
 - The operator must be an active operator. A user becomes one when `RF device login` is on, the status is `Active`, and the user is assigned to the warehouse. The sync runs every 5 minutes or by the `Sync` button.
 - The `Reassign` button of a supervisor does not check any of the rows above for the new holder. It checks only that the new holder is an active operator. See [page 30](30-task-return-paths.md).
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Reachable zones | `crates/libs/wms-lib-core/src/model/tasks/operator_task_permission.rs:144-182` |
-| `Pick Execution` gate | `crates/libs/wms-lib-core/src/model/tasks/operator_task_permission.rs:112-142` and `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:221-250` |
-| Default off | `crates/libs/wms-lib-sql/sql/wms-app/migrations/039_pick_cutover_hardening.sql:5` |
-| Pool filter, lift rule, order | `crates/libs/wms-lib-core/src/model/tasks/task.rs:618-650` and `:985-1027` |
-| Lift capacity from the profile | `crates/libs/wms-tasks/src/service/claim.rs:165-187` and `crates/libs/wms-lib-core/src/model/equipment_profile.rs:55-88` |
-| Concurrent limit is a `greater than 0` gate | `crates/libs/wms-tasks/src/service/candidate.rs:331-350`, limit used for other types at `crates/libs/wms-lib-core/src/model/tasks/task.rs:1287` |
-| Source rules and codes | `crates/libs/wms-outbound/src/picking/infrastructure/dispatch.rs:22-70` and `:115-206` |
-| Messages | `crates/libs/wms-tasks/src/error.rs:41-75` |
-| Reject reads the area from the assignment, `PICK11` sends no area | `crates/libs/wms-outbound/src/picking/commands/reject.rs:70-90` and `:140-165`, `crates/libs/wms-lib-sql/sql/rf-screens/113_rf_inputs_fit_the_server_limits.sql` |
-| Operator sync: who becomes an operator, and how often | `crates/libs/wms-lib-core/src/model/tasks/operator.rs:186-270` and `crates/services/app-server/src/services/cleanup_tasks.rs:150`, `:991-1010` |
-
 ## Related pages
 
 - [How an operator takes a task](11-operator-takes-a-task.md)

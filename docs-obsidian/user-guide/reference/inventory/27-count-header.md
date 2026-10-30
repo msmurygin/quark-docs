@@ -33,13 +33,11 @@ Hidden fields: `ID`, `Version` (the version of the count, sent by `Cancel Count`
 
 The form saves with `create_inventory_count`. The count that is made has `source_type` `User`, and `recount_by_other_counter` on (a recount is not counted by the person who counted the attempt before).
 
-Sources: the form in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/093_inventory_count_screens.sql`, `100_inventory_count_screen_review.sql`, `114_a_count_may_let_stock_move.sql`, `129_count_by_item.sql`; the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/056_a_count_observes_the_stock.sql`, `057`, `073`, `087`; the service in `crates/libs/wms-inventory/src/service/inventory_count/open.rs`.
-
 ## Type, mode, freeze, scope
 
 ### Type
 
-- **Only `Selective` and `Full` can be saved.** `Cycle` and `Event` are in the drop-down, but saving them is refused: `a Cycle count is made by its policy or event, not started by hand` (`open.rs:79-87`). Counts of these types are made by a cycle-count policy and by events.
+- **Only `Selective` and `Full` can be saved.** `Cycle` and `Event` are in the drop-down, but saving them is refused: `a Cycle count is made by its policy or event, not started by hand`. Counts of these types are made by a cycle-count policy and by events.
 - For a count started by hand `Selective` and `Full` work the same. The one difference: an **item** (SKUs, lots, LPNs) can be named only on a selective count (or a cycle count). Message: `only a selective or a cycle count is counted by item`.
 - An `Event` count is given to counters before the others (priority 10 against the default 50 in Task Manager).
 

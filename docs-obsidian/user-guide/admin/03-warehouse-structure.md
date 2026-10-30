@@ -11,68 +11,65 @@ updated: 2026-10-27
 This chapter covers the physical map of a warehouse:
 the warehouse itself, putaway zones, locations, work areas, equipment and operators.
 
-## 1. The warehouse record
+## 1. Create and activate a warehouse
 
 ### What you will do
 
-Understand what a warehouse is and what the web UI can and cannot do with it.
+Create a warehouse from the Enterprise workspace, check that its schema is ready, and activate it for operations.
 
 ### Before you start
 
-- A warehouse is a row in `enterprise.warehouse` plus one database schema (field `schema_name`, for example `wh1`).
-- The warehouse schema holds all warehouse data. It is built by running the `wms-app` migrations on that schema.
+- Sign in with an Enterprise administrator account.
+- Choose the permanent storage units for weight, length and volume. They cannot be changed later.
+- Choose a unique warehouse code and schema name. The schema name starts with a lowercase letter and then uses only lowercase letters, digits or underscores.
 
 ### Steps
 
-There is **no screen** that creates a warehouse.
-`Enterprise > Warehouses` lists configured warehouses but does not provision a new warehouse schema.
-The API has only `list_user_warehouses` and `get_warehouse_defaults` (read-only).
+1. Switch to **Enterprise**.
+2. Open `Sidebar > Warehouses`.
+3. Click **Add warehouse**.
+4. On **Create warehouse**, fill in **Code**, **Name** and **Schema name**.
+5. Choose **Storage weight unit**, **Storage length unit** and **Storage volume unit**.
+6. Click **Create**. The system creates the warehouse with a complete schema and leaves it inactive.
+7. In the list, wait for **Preparation status** to show **Ready**.
+8. Select the warehouse and click **Edit**.
+9. Review the name and preparation details, turn on **Active**, and click **Save**.
+10. Assign users and roles as described in [Users, roles and permissions](02-users-roles-permissions.md#4-assign-a-warehouse-and-a-role).
 
-To add a warehouse, the installer must:
+![Enterprise warehouse list with preparation status](../assets/screens/warehouse-admin-list.png)
 
-1. Create the schema in the tenant database.
-2. Run the `wms-app` migrations on the schema.
-3. Insert the row into `enterprise.warehouse`.
-4. Assign users and roles (see `02-users-roles-permissions.md`).
+*Warehouses. Focus: activate a warehouse only after Preparation status is Ready.*
 
-The design document `docs-obsidian/serial-numbers/SPEC_serial_numbers_full_cycle.md` (section 13.4) lists the same five actions.
+![Create warehouse window](../assets/screens/warehouse-admin-create.png)
 
-What the code gives you for steps 1 to 3:
-
-- The tenant manager (`services/tenant-manager/src/web/rpcs/tenant_rpc.rs`) creates a tenant database with the schema `wh1` and runs the enterprise and `wms-app` migrations. It does not insert a row into `enterprise.warehouse`.
-- `app-server bootstrap-admin` needs that row to exist already (`NoWarehouse` otherwise).
-- Only the development reset tool (`wms-dev-db`) creates the schemas `wh1` and `wh2` and the warehouse rows (`sql/dev_only/install-db/900-dev-seed.sql`).
-
-> Not confirmed by code: a supported production command or procedure that creates the first warehouse row or a further warehouse schema, and that makes the app-server know the new schema. To verify: ask the product owner for the install runbook. Then, on a test tenant, add a second warehouse by hand with steps 1 to 4 and check that it appears in the `Switch warehouse` pop-up.
+*Create warehouse. Focus: storage units and schema identity are permanent after creation.*
 
 ### Field reference
 
-Columns of `enterprise.warehouse` that matter to you:
+The creation window uses these fields:
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
 | `code` | Short code. | Text up to 20 characters. | `WH1` |
 | `name` | Display name. | Text up to 200 characters. | `Main Warehouse` |
-| `schema_name` | Database schema of the warehouse. | Text up to 50 characters. | `wh1` |
-| `is_active` | Is the warehouse in use? | true or false. | true |
-| `weight_uom` | Unit in which weights are stored. | Default `G`. | `G` |
-| `length_uom` | Unit in which lengths are stored. | Default `MM`. | `MM` |
-| `volume_uom` | Unit in which volumes are stored. | Default `MM3`. | `MM3` |
-| `weight_display_uom`, `length_display_uom`, `volume_display_uom` | Units shown on screens. | Optional. | `KG` |
-
-A trigger (`trg_warehouse_units_are_frozen`) blocks later changes of the stored units.
-A second trigger (`warehouse_defaults_seed_trg`) creates the row in `enterprise.warehouse_defaults` for a new warehouse.
+| `schema_name` | Internal schema identity created for this warehouse. | Up to 50 lowercase letters, digits or underscores; starts with a letter. | `wh1` |
+| `is_active` | Whether users may operate in the warehouse. | On or off; set in **Edit** after readiness is **Ready**. | On |
+| `weight_uom` | Unit in which weights are stored. | Choose from the list. | `G` |
+| `length_uom` | Unit in which lengths are stored. | Choose from the list. | `MM` |
+| `volume_uom` | Unit in which volumes are stored. | Choose from the list. | `MM3` |
 
 ### What you should see
 
-- After the installer finishes, the warehouse shows in the warehouse list of every assigned user.
+- **Preparation status** becomes **Ready** after creation.
+- After activation and user assignment, the warehouse appears in the warehouse switcher for those users.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
-| A user sees no warehouse after sign-in | The user has no row in `user_warehouse`. | Assign a warehouse (see `02-users-roles-permissions.md`, section 4). |
-| Stored unit cannot change | The trigger `trg_warehouse_units_are_frozen` refuses it. | Choose the stored units before the first stock. |
+| The warehouse cannot be activated | Its preparation status is not ready. | Read **Preparation details**, correct the cause, refresh, and activate only when it is ready. |
+| A user sees no warehouse after sign-in | The user is not assigned to it, or the warehouse is inactive. | Activate the warehouse and assign the user's warehouse role. |
+| A stored unit cannot be changed | Storage units are permanent after creation. | Create the warehouse with the correct units before loading data. |
 
 ### What this affects later
 
@@ -88,7 +85,7 @@ Choose the right location type for each location. The type controls what stock m
 
 Read the table. The values are the enum `loc_type`; the descriptions come from the `LOCTYPE` code list.
 
-| Value | UI description | What the code does with it |
+| Value | UI description | How the warehouse uses it |
 |---|---|---|
 | `None` | `0 - None` | No special meaning. |
 | `Other` | `Other` | Storage-like. Putaway, manual moves and pick moves may land here. |
@@ -108,24 +105,21 @@ Read the table. The values are the enum `loc_type`; the descriptions come from t
 | `Destroy` | `Destruction` | Destruction zone. |
 | `Returns` | `Customer returns` | Customer returns. |
 | `Lost` | `Lost` | Where missing stock is booked. |
-| `InTransit` | `In transit (open pick pallets)` | Holds open pick pallets. **Only one `InTransit` location can exist** (index `uq_location_one_in_transit`). |
-
-Sources in code: `allowed_dest_loc_types` in `wms-inventory/src/movement/validation.rs`; `PALLET_DROP_ADMISSIBLE` in `wms-outbound/src/domain/picking_policy/aggregate.rs`; the triggers `owners_picking_toloc_is_a_drop_location` and `work_area_pack_station_is_a_pack_location`.
+| `InTransit` | `In transit (open pick pallets)` | Holds open pick pallets. **Only one `InTransit` location can exist.** |
 
 The code also uses these location codes by name:
 
 - `DAMAGE` (returns booked as damaged),
 - `INTRANSIT` and `LOST` (stock adjustments).
 
-The baseline seeds them (`INTRANSIT` is seeded by wms-app migration 064). **Do not delete or rename them.**
+The initial warehouse includes them. **Do not delete or rename them.**
 
 The baseline also seeds the locations `UNKNOWN`, `DOCK`, `QC`, `RETURN`, `RTV`, `STAGE` and `PICKTO`. What depends on them:
 
-- `STAGE`, `PICKTO` and `LOST` are the defaults of every putaway zone (`inbound_loc`, `outbound_loc`, `picking_toloc`, `missing_toloc`). The zones `DOCK` and `RACK` use them. Foreign keys with `RESTRICT` stop you from deleting a location a zone uses.
-- `DOCK` is also the default zone of a new location (`location.putawayzone`), so the zone `DOCK` must exist too.
-- `QC`, `RETURN` and `RTV` are not named in the logic. They are only values you can set per owner (`default_qc_loc`, `default_returns_loc`, `default_rtv_loc`). "Move damage to RTV" takes the destination from the request, then the owner's `default_rtv_loc`, then `default_returns_loc` (`wms-inbound/src/service/receipt/damage/move_damage_to_rtv.rs`).
-- The 3D page draws `DAMAGE`, `DOCK`, `LOST`, `PICKTO`, `QC`, `RETURN`, `RTV`, `STAGE` and `UNKNOWN` as floor areas by code (`public/assets/js/warehouse-3d.js`).
-- No code reads `UNKNOWN` by name. Keep it anyway, as it is part of the baseline.
+- `STAGE`, `PICKTO` and `LOST` are used by the initial putaway zones for inbound, outbound, picking and missing-stock destinations. A location that is still used by a zone cannot be deleted.
+- `DOCK` is the default zone of a new location, so keep that zone available.
+- `QC`, `RETURN` and `RTV` can be selected as owner-specific destinations for quality control, customer returns and return to vendor.
+- The 3D page draws the special floor areas by their location codes. Keep `UNKNOWN` as part of the initial warehouse map even when your process does not use it directly.
 
 ### Steps
 
@@ -202,12 +196,12 @@ Form `location_edit_form` (tab `General`):
 | `Discard LPN` | Discard the container on arrival. | On or off. | off |
 | `Section` | Free grouping. | Text up to 30 characters. A blank clears it. | `North` |
 
-Tab `Dimensions` (`location_dimensions_form`): `Cube`, `Length`, `Width`, `Height`, `Max Cube Capacity`, `Max Weight Capacity`, `Pallet positions on floor`, `Stack limit`, `Max quantity`.
-All numbers must be zero or more. **Zero means "unlimited"** for capacity (`wms-inventory/src/movement/validation.rs`).
+Tab `Dimensions`: `Cube`, `Length`, `Width`, `Height`, `Max Cube Capacity`, `Max Weight Capacity`, `Pallet positions on floor`, `Stack limit`, `Max quantity`.
+All numbers must be zero or more. **Zero means "unlimited"** for capacity.
 
-Tab `Position` (`location_position_form`): `X Coord`, `Y Coord`, `Z Coord`, `Aisle`, `Bay`. All must be zero or more.
+Tab `Position`: `X Coord`, `Y Coord`, `Z Coord`, `Aisle`, `Bay`. All must be zero or more.
 
-Tab `Attributes` (`loc_attr_value_edit_form`): custom attributes. See `04-owners-sku-uom-pack-hierarchy.md`, section 8.
+Tab `Attributes`: custom attributes. See [Owners, SKUs, units and packs](04-owners-sku-uom-pack-hierarchy.md#8-custom-attributes).
 
 ### What you should see
 
@@ -218,11 +212,11 @@ Tab `Attributes` (`loc_attr_value_edit_form`): custom attributes. See `04-owners
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Duplicate key on `location_pkey` | The code exists. | Use another code. |
-| Foreign key `fk_location_putawayzone` | The zone does not exist. | Create the zone first (section 5). |
-| Check `chk_location_*` (negative number) | A dimension, capacity or coordinate is below zero. | Enter zero or more. |
-| Delete refused because of foreign keys | Stock, pending moves or owner settings refer to the location. | Empty and release the location first. |
-| `Status` cannot be edited | By design. The server ignores a value you send. | Use a hold (see `05-inbound-setup.md`). |
+| **Record already exists** | The code exists. | Use another code. |
+| The putaway zone is not found | The selected zone does not exist. | Create the zone first (section 5). |
+| A dimension, capacity or coordinate is below zero | The value is invalid. | Enter zero or more. |
+| The location is in use | Stock, pending moves or owner settings refer to the location. | Empty and release the location first. |
+| `Status` cannot be edited | Status is controlled by warehouse operations. | Use a hold; see [Inbound setup](05-inbound-setup.md). |
 
 ### What this affects later
 
@@ -294,8 +288,8 @@ Example: aisle 1 to 2, prefix `A`, level 1 to 3, position 1 to 10 gives `A01-01-
 
 - Same as section 3. All locations get the same type, zone and flags.
 
-The check digit is not computed for generated locations. Only `create_loc` computes it (when `CHECK_DIGIT_ENABLED` is on). `gen_locs` copies a value from the request, and the wizard has no field for it, so it stays empty (`app-server/src/web/rpcs/location_rpc.rs`).
-One existing code makes the whole run fail. All codes go into one `INSERT`, so nothing is created. The server answers `Record already exists`.
+The bulk generator does not calculate check digits. If your site scans location check digits, add them after generation.
+One existing code makes the whole run fail, so no location from that run is created. Change the prefix or range and try again.
 
 ## 5. Putaway zones
 
@@ -342,8 +336,8 @@ Tab `General` (`putawayzone_edit_form`):
 | `Replenishment Allowed` | For replenishment. | On or off. | off |
 | `Color` | Color on the 3D view and lists. | Color text. | `#D97B4A` |
 
-Tab `Capacity` (`putawayzone_settings_form`): `Max Cube`, `Max Weight`, `Max Cases Count`, `Min Temperature`, `Max Temperature`.
-Zero means no limit. The minimum temperature must not be above the maximum (`chk_putawayzone_temperature_order`).
+Tab `Capacity`: `Max Cube`, `Max Weight`, `Max Cases Count`, `Min Temperature`, `Max Temperature`.
+Zero means no limit. The minimum temperature must not be above the maximum.
 
 Tab `Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Default Report Printer`, `Auto Print Carton Label`.
 
@@ -351,7 +345,7 @@ Lot mixing rules per zone: list `Lot Commingle Rules` with `Attribute`, `Allow M
 
 `Replenishment Allowed` controls whether pick locations in this zone are eligible for min/max replenishment. `Replenishment Threshold` is stored and shown but is not read by the min/max planner; the planner uses each SKU pick location's `Min` and `Max`. The form disables the threshold while `Replenishment Allowed` is off.
 
-The zone lot mixing rules (`Lot Commingle Rules`) are enforced. When stock lands in a location (receipt, putaway or move), the server looks for a rule on the location first. If the location has none for that attribute, it uses the rule of the location's zone. If neither exists, mixing is allowed. When the rule has `Allow Mix` off, the lot's value of that attribute must match the lot already on the landing LPN, or the move is refused (`wms-inventory/src/inventory_service.rs`, `check_location_attribute_overrides`). The older note in `docs-obsidian/putaway_policy/README.md` that these rules have no reader is out of date.
+The zone lot mixing rules are enforced. When stock lands in a location, a location-specific rule takes priority; otherwise the zone rule is used. If neither exists, mixing is allowed. When **Allow Mix** is off, the lot attribute must match the stock already on the destination LPN or the move is refused.
 
 ### What you should see
 
@@ -470,7 +464,7 @@ System defaults used when the terminal names no work area (`System Settings`):
 |---|---|---|
 | `you have no right to take Pick tasks in any work area - ask a supervisor` | The operator has no `Task Permissions` row for the task type, or the equipment excludes every zone. | Add a task permission. |
 | `there are Pick tasks in your work areas, but every one is heavier than your equipment lifts (up to N at ground level) - they wait for other equipment` | The equipment profile is too weak for the pool. | Use other equipment or raise `Max weight`. |
-| Work area `Pack station` refused by trigger `work_area_pack_station_is_a_pack_location` | The location is not of type `Pack`. | Use a `Pack` location. |
+| Work area **Pack station** is refused | The location is not of type `Pack`. | Use a `Pack` location. |
 | The area cannot assign a control station because this warehouse checks orders at another station | A different control station is already used in the warehouse. | Select the station named in the message. |
 | Task cannot be released | `Allow Task Release` is off in the area. | A supervisor must use `Return to Pool` or `Reassign` on the task board. |
 | Delete of a work area refused | Zones or permissions refer to it (RESTRICT keys). | Remove those rows first. |
@@ -483,20 +477,20 @@ System defaults used when the terminal names no work area (`System Settings`):
 - Containers go through order control only when the area names a control station. A closed pick pallet going directly from picking also needs `Control` in the policy's **Pallet Drop Cell Types**; cartons produced by packing follow the area's station settings.
 - A supervisor works from `Management & Control > Execution Control > Task Board` (columns include `Assignee`, `Status`, `Lease Expires`, `Refusals`; buttons `Return to Pool`, `Reassign`, `Delete Task`).
 
-The rule is in `OperatorBmc::sync_from_enterprise` (`wms-lib-core/src/model/tasks/operator.rs`). A user becomes an active operator of a warehouse when all three are true: `rf_login = true`, `status = 'Active'`, and a row in `user_warehouse` for that warehouse. The role does not matter. The sync sets an operator inactive when one of the three stops being true.
+A user becomes an active operator of a warehouse when **RF device login** is on, the user status is **Active**, and the user has an assignment to that warehouse. The sync sets an operator inactive when one of these conditions stops being true.
 
 ## 7. Operator sync
 
-- A background job runs every 5 minutes (`OPERATOR_SYNC_INTERVAL = 300 s`).
+- The operator list refreshes automatically about every five minutes.
 - The `Sync` button on `Operators` runs the same job for the active warehouse at once.
 - You cannot create or delete an operator by hand. A person who leaves is set inactive by the next sync.
 
 ## 8. 3D warehouse
 
-`Sidebar > Warehouse Configuration > Topology > 3D Warehouse` opens an HTML page (`warehouse_3d`).
+`Sidebar > Warehouse Configuration > Topology > 3D Warehouse` opens the warehouse map.
 It draws locations from their coordinates (`X Coord`, `Y Coord`, `Z Coord`) and the zone color.
 
-The page is titled `Warehouse Topology`. Its controls (`web-ui-server/src/components/pages/warehouse_3d.rs`):
+The page is titled `Warehouse Topology`. Its controls are:
 
 - `Refresh` reloads the data.
 - `Color Mode`: `Zone`, `Status`, `Type`, `Aisle`, `Level`, `Occupancy`.

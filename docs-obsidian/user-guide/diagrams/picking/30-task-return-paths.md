@@ -25,27 +25,6 @@ flowchart LR
 - `Reassign` works on `Assigned` and `InProgress` tasks and on `Created` tasks that were escalated. It resets the refusal counter, clears the escalation and sets a new lease. The code checks only that the target is an **active operator**. It does not check the target's task rights, `Pick Execution`, zones or equipment.
 - The lease reaper does not take a task whose source refuses. A pick under `Block` with an open serial scan stays with its holder until the scan is finished or a supervisor closes it.
 - `Skip` on a cart moves the stop to the end of the route. It does not change the task, its lease or its status.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Operator return, area gate, escalation counter | `crates/libs/wms-tasks/src/service/release.rs:121-190` |
-| Generic skip refuses a pick | `crates/libs/wms-tasks/src/service/release.rs:66-77` and `:690-720` |
-| `pick_reject` | `crates/libs/wms-outbound/src/picking/commands/reject.rs:1-60` and `:130-200` |
-| Return to pool: SQL | `crates/libs/wms-lib-core/src/model/tasks/task.rs:1512-1575` |
-| Reassign: rules and SQL | `crates/libs/wms-tasks/src/service/release.rs:223-300` and `crates/libs/wms-lib-core/src/model/tasks/task.rs:1617-1647` |
-| Return to Pool by a supervisor | `crates/libs/wms-tasks/src/service/release.rs:304-370` and `crates/libs/wms-lib-core/src/model/tasks/task.rs:1685-1706` |
-| Source may refuse (serial rule, live cart) | `crates/libs/wms-outbound/src/picking/infrastructure/holder_change.rs:1-60` and `:90-135` |
-| Lease reaper | `crates/libs/wms-tasks/src/service/reap.rs:1-100` and `crates/libs/wms-lib-core/src/model/tasks/task.rs:1886-1923` |
-| Reaper and cart sweeper loop (60 s) | `crates/services/app-server/src/services/cleanup_tasks.rs:142` and `:908-965` |
-| Cart sweeper | `crates/libs/wms-outbound/src/picking/lease.rs:1-110` |
-| Who may dissolve and when | `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:520-581` |
-| Dissolve: holder, supervisor, sweeper | `crates/libs/wms-outbound/src/picking/commands/dissolve.rs:1-120` and `:505-520` |
-| Delete Task | `crates/libs/wms-outbound/src/service/status_manager/delete_task.rs:1-60` |
-| Skip on a cart | `crates/libs/wms-outbound/src/picking/commands/skip.rs:1-30` |
-| RF screens | `crates/libs/wms-lib-sql/sql/rf-screens/094_uc_pick.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/096_uc_pick_route.sql` |
-
 ## Related pages
 
 - [Task settings: lease, cooldown, escalation, release](55-influence-task-settings.md)

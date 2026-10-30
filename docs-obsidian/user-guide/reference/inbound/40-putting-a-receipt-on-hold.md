@@ -18,7 +18,7 @@ You can hold several receipts at once.
 5. Optional: type a `Comments` text. The hint says `Optional. Travels with the hold event.`
 6. Click `Put on Hold`. Click `Cancel` to close the window without holding.
 
-The seeded reasons that are active and enforce are: `PIHold`, `QcRequired`, `NewItem`, `QcQuarantine`, `Customs`, `CustomerReturn`, `Expired`, `Damaged`, `Rtv`, `Destroy`, `Lost`, `Other`, `LocBlocked` (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`, table `inventory_hold_code`). The list follows the order of the field `Rank`.
+The seeded reasons that are active and enforce are: `PIHold`, `QcRequired`, `NewItem`, `QcQuarantine`, `Customs`, `CustomerReturn`, `Expired`, `Damaged`, `Rtv`, `Destroy`, `Lost`, `Other`, `LocBlocked`. The list follows the order of the field `Rank`.
 
 ## What the screen says
 
@@ -49,8 +49,6 @@ While a receipt is on hold:
 - You cannot add or remove lines, move expected boxes to another pallet, or cancel an expected box. You can still edit header and line data.
 - You can release the hold, cancel the receipt or close it.
 
-Source: `crates/libs/wms-inbound/src/service/receipt/lifecycle/put_on_hold.rs`, `crates/services/web-ui-server/src/extensions/customization/receipt/lifecycle_action.rs:174-262`.
-
 ## What can go wrong
 
 | Message | Meaning | Fix |
@@ -61,7 +59,7 @@ Source: `crates/libs/wms-inbound/src/service/receipt/lifecycle/put_on_hold.rs`, 
 | `hold_reason_code '{code}' not found in inventory_hold_code` | The reason does not exist. | Pick a reason from the list. |
 | `Receipt {id} could not be put on hold: {error}` | A network or server problem. | Try again. |
 
-The number in these messages is the **internal id** of the receipt, not the receipt number. For example `Receipt 3 is OnHold` means the receipt with id 3 (`lifecycle_action.rs:200-243`).
+The number in these messages is the **internal id** of the receipt, not the receipt number. For example `Receipt 3 is OnHold` means the receipt with id 3.
 
 ## Related pages
 

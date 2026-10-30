@@ -15,38 +15,26 @@ Check that a new tenant has the minimum data to run the full path:
 
 ## 2. Before you start
 
-- The installer finished the platform part (section 3).
-- You can sign in as an administrator.
-- You read `00-README.md`, so you know what is not available.
+- You can sign in as an Enterprise administrator.
+- You know the permanent storage units for weight, length and volume.
+- You have the customer's approved warehouse map and master-data files.
+- You know which inbound, picking, packing and shipping paths the site will use.
 
-## 3. Platform part (done by the installer)
+## 3. Configuration and data checklist
 
-| # | Item | Check | Source |
-|---|---|---|---|
-| P1 | The databases are migrated (enterprise, app, meta-ui). | `app-server check-dependencies` prints `app-server dependencies are valid`. | `app-server/src/cli.rs` |
-| P2 | The configuration is valid. | `app-server check-config` prints `app-server configuration is valid`. | same |
-| P3 | At least one warehouse exists: a schema plus a row in `enterprise.warehouse`. | A user can see the warehouse after sign-in. | `03-warehouse-structure.md`, section 1 |
-| P4 | The RBAC seeder ran. | The `Permission Matrix` shows rows for all six roles. | `wms-lib-auth/src/authorization/seeder.rs` |
-| P5 | The first administrator exists. | You can sign in. | Section 6, finding F1. |
-| P6 | `REPORTS_SERVICE_URL` and `REPORTS_JWT_SECRET` (32 bytes or more) are set for the web UI. | `Sidebar > Overview > Reports` shows the catalogue. | `08-reports-and-dashboards.md` |
-| P7 | `LABEL_RENDERER_URL` points to the renderer. | A test label renders. | `07-printing-and-labels.md` |
-| P8 | The public WMS address uses HTTPS and the services run in production cookie mode. | App-server has `SERVICE_ENV=production`; web-ui-server has `UI_SERVICE_ENV=production`. A successful login returns `auth-token` and `wms-session-id` with `Secure; SameSite=Lax`. | `../reference/administration/92-sign-in-passwords-and-sessions.md` |
+Legend: **Included** = present in the initial setup. **Create** = you must create it. **N/A** = not available.
 
-## 4. Data checklist
-
-Legend: **Seeded** = the migration creates it. **Create** = you must create it. **N/A** = not available.
-
-### 4.1 People
+### 3.1 People
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 1 | Administrator, manager, supervisor, operators. | Create | `Enterprise > Users & Roles > Users` | `02-users-roles-permissions.md`, section 3. |
+| 1 | Administrator, manager, supervisor, operators. | Create | `Enterprise > Users & Roles > Users` | See [Create a user](02-users-roles-permissions.md#3-create-a-user). |
 | 2 | Warehouse and role for each user. | Create | tab `Warehouses & Roles` | One `Default` per user. |
 | 3 | Operators for the floor: `RF device login` on. | Create | user card | Operators come only from users with this switch on. |
-| 4 | Role rights reviewed. | Review | `Permission Matrix` | `OPERATOR` can edit locations, SKUs and pack items by default. |
+| 4 | Role rights reviewed. | Review | `Permission Matrix` | Give each role only the screens and actions it needs. Test with a separate operator account. |
 | 5 | A supervisor user for overrides. | Create | `SUPERVISOR` role | Close with discrepancy needs it. |
 
-### 4.2 Structure
+### 3.2 Structure
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -59,7 +47,7 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 12 | Equipment profiles (if lifts are used). | Create | `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | None is seeded. |
 | 13 | Operator task rights. | Create | `Warehouse Configuration > Operator Permissions > Operators` | One row per operator, task type and area. Without it: "you have no right to take Pick tasks ...". |
 
-### 4.3 Master data
+### 3.3 Master data
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -73,7 +61,7 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 21 | Serial config for serial SKUs. | Create | SKU tab `Serial Tracking` | Only when needed. |
 | 22 | Custom attributes. | Optional | `Attributes` | |
 
-### 4.4 Inbound
+### 3.4 Inbound
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -83,7 +71,7 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 26 | **Putaway policy with steps.** | Seeded policy `STD` has **no steps** | `Warehouse Configuration > Policies > Putaway Policy` | **You must add at least one step**, then set it as the owner default. |
 | 27 | Settings: `PUTAWAY_RESERVATION_TTL_MIN`, `ALLOW_CLOSE_WITH_DISCREPANCY`, `MOVE_HOLD_POLICY`. | Seeded | `System Settings` | |
 
-### 4.5 Outbound
+### 3.5 Outbound
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -95,7 +83,7 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
 | 34 | Manual wave. | None | `Management & Control > Orders & Waves > Waves` | Optional; use for grouped release. Wave-policy rules remain API-only. |
 
-### 4.6 Printing
+### 3.6 Printing
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -103,7 +91,7 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 36 | A printer configuration. | None | API | Needed to print. |
 | 37 | A `Warehouse` printer assignment. | None | API / form not in menu | Without it: no label prints. |
 
-### 4.7 Integration and reports
+### 3.7 Integration and reports
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
@@ -112,11 +100,25 @@ Legend: **Seeded** = the migration creates it. **Create** = you must create it. 
 | 40 | Report catalogue loaded. | Install step | report service | 16 reports. |
 | 41 | Dashboard rail. | Seeded row with empty rail | `Warehouse Configuration > Dashboards > Board Settings` | Pick six metrics. |
 
-### 4.8 Outbound departure and replenishment
+### 3.8 Load the customer's data
 
-Before go-live, verify one complete departure in the path you will operate: direct `Ship order`, or `Dispatches` -> `Load Plans` -> `Loads` / RF `Loading` -> Goods Issue. Confirm that operators understand that `Loaded` is not `Shipped` and that shipment deducts stock irreversibly. Also run `Replenish Now` for a pick location at or below `Min`, then complete its RF replenishment task. See `06-outbound-setup.md`, sections 10 and 11.
+Load production data only after the warehouse structure and policies are approved.
 
-## 5. Dry-run test (receive -> putaway -> pick -> pack -> ship)
+1. Load owners, suppliers, carriers and customers through the UI or an approved integration.
+2. Load the real location map, including zones, types, capacities and route sequence.
+3. Load packs, SKUs, barcodes, lot and serial settings, weights and dimensions.
+4. Load opening stock through a controlled receipt or an approved inventory adjustment. Do not write balances directly.
+5. Compare record counts and a sample of values with the customer's source files.
+6. Scan representative barcodes on the RF terminal before loading the full catalogue.
+7. Keep the import result and rejected-row list with the go-live record. Correct rejected data and rerun only those rows.
+
+See [Owners, SKU, units and packs](04-owners-sku-uom-pack-hierarchy.md), [Warehouse structure](03-warehouse-structure.md), [Inbound setup](05-inbound-setup.md), and [Integrations and API](09-integrations-and-api.md).
+
+### 3.9 Outbound departure and replenishment
+
+Before go-live, verify one complete departure in the path you will operate: direct `Ship order`, or `Dispatches` -> `Load Plans` -> `Loads` / RF `Loading` -> Goods Issue. Confirm that operators understand that `Loaded` is not `Shipped` and that shipment deducts stock irreversibly. Also run `Replenish Now` for a pick location at or below `Min`, then complete its RF replenishment task. See [Outbound setup](06-outbound-setup.md#10-dispatch-loading-and-goods-issue), sections 10 and 11.
+
+## 4. Dry-run test (receive -> putaway -> pick -> pack -> ship)
 
 ### Steps
 
@@ -141,23 +143,9 @@ Before go-live, verify one complete departure in the path you will operate: dire
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| No putaway suggestion. | Policy has no steps. | Section 4.4, item 26. |
+| No putaway suggestion. | Policy has no steps. | Section 3.4, item 26. |
 | Allocation reserves nothing. | No stock, or the policy steps do not match, or stock is held. | Check stock, steps and holds. |
 | Cartonization exceptions on the order. | SKU has no weight or size. | Fill weight and cube. |
 | "you have no right to take Pick tasks". | No task permission. | Item 13. |
 | No label. | No printer assignment or renderer. | Items 36 and 37. |
 | `Ship order` is refused. | Picking or packing is incomplete, the physical content changed, or the order belongs to a Load. | Finish the required work, refresh, or ship through the Load. |
-
-## 6. Findings about missing or unverified seeds
-
-| # | Finding | Evidence |
-|---|---|---|
-| F1 | Fixed (F-01, commit `29c0cd6d7`). `app-server bootstrap-admin` now creates the user through `UserBmc::create` and gives it the `ADMIN` role in the first warehouse. Before the fix the insert failed on every installation. | `wms-lib-core/src/model/initial_admin.rs`. |
-| F2 | There is no way in the web UI or API to create a warehouse. | `warehouse_rpc.rs` has two read methods. |
-| F3 | The `wms-app` baseline carries demo data (owners, 96 locations, one SKU, one pack). It lands in every new warehouse schema. | `wms-app/migrations/001_baseline.sql` (`INSERT INTO owners`, `location`, `sku`). |
-| F4 | The seeded putaway policy has no steps. | `putaway_policy_detail` has 0 rows after migration. |
-| F5 | No `Door`, `Pack`, work area, equipment profile, printer, wave policy or handling unit type is seeded. | Row counts after migration. |
-| F6 | The order type list cannot grow. | Only `get/list/count_order_type` exist. |
-| F7 | Fixed (F-03, commit `5cb291af1`). `Locked` and `Disabled` users cannot sign in, lose open sessions and cannot use API keys. | `wms-lib-auth/src/user_status.rs`, `wms-lib-web/src/middleware/mw_auth.rs`. |
-| F8 | Printer assignment form is not reachable from the menu. | No menu item or tab opens `printer_assignments_list_form`. |
-| F9 | The sign-in message says 8 characters, the rule says 6. | `http_params.rs`. |

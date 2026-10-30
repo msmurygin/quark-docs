@@ -24,8 +24,6 @@ The fields `Save` can send are `Type`, `Ship To`, `Carrier`, `Priority`, `Reques
 If you changed nothing that is on this list, `Save` does not call the server. It says `Nothing changed`.
 The fields `Owner`, `Order #`, `Status` and `Cancel Reason` are not on the list. Changing only one of them gives `Nothing changed`, and the change is not kept.
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/save_action.rs:204-250`.
-
 ## What the screen says
 
 | Result | Message |
@@ -43,8 +41,6 @@ Source: `crates/services/web-ui-server/src/extensions/customization/shipment_ord
 | Pick tasks | If `Priority` changed, every pick task of the order gets the new priority at once. |
 | Event | None for an order edit. |
 
-Source: `crates/libs/wms-outbound/src/service/order/update.rs:79-137`.
-
 ## What can go wrong
 
 | Message | Meaning | Fix |
@@ -56,8 +52,6 @@ Source: `crates/libs/wms-outbound/src/service/order/update.rs:79-137`.
 | `Save failed: version conflict on shipment_order {id}` | Somebody saved the order after you opened it. The error carries the current version and status. | Press `Refresh` or open the order again, and repeat your change. |
 
 Unlike `Release`, `Allocate` and `Unallocate`, `Save` does not repair its own copy after a version conflict. You must reopen the order.
-
-> Not confirmed by code: that `Save` really does not repair the version after a conflict. The code shows no repair step, but the refresh of the grid after the error may have the same effect. To verify: open the same order in two browsers, save a note in the first, then save a different note in the second, and press `Save` once more in the second.
 
 ## Related pages
 

@@ -28,8 +28,6 @@ Use this page to drop a whole order. Cancelling is final.
 | The order has no version on screen | `Reload the order before cancelling it` |
 | Refused | `Cancel failed: {error}` and the list is refreshed |
 
-Source: the button binding in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/067_current_form_rpc_command.sql:70-110` (typed action `generic_rpc_command`).
-
 ## What the command checks
 
 | Message | Meaning |
@@ -38,8 +36,6 @@ Source: the button binding in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migration
 | `cannot cancel an order in status {status}` | The order is `Closed` or `Cancelled`. |
 | `line {n} already has {qty} picked` | Something was picked. Cancel the rest of the work another way. |
 | `version conflict on shipment_order {id}` | Somebody changed the order after you opened it. Open it again. |
-
-Source: `crates/libs/wms-outbound/src/service/order/cancel.rs:75-100`, `crates/libs/wms-outbound/src/domain/shipment_order/aggregate.rs:206-232`.
 
 ## What changes
 
@@ -50,10 +46,6 @@ Source: `crates/libs/wms-outbound/src/service/order/cancel.rs:75-100`, `crates/l
 | Event | `process.order.cancelled` with the reason. |
 
 The reservations go **before** the status changes. Without that the reserved quantity of the stock would be stuck for ever: once the order is `Cancelled`, nothing can clear it.
-
-Source: `cancel.rs:1-30`, `crates/libs/wms-outbound/src/allocation/release.rs:225-250`.
-
-> Not confirmed by code: what happens to a pick task that a picker has already claimed when the whole order is cancelled. The release uses the scope `All`, which removes every live reservation, but the handling of a claimed task was not traced to the end. To verify: claim a task on the RF terminal without committing, cancel the order on the web, and refresh the RF terminal.
 
 ## Related pages
 

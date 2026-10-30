@@ -25,8 +25,6 @@ The check boxes are on, but no button of the list uses them.
 There is no delete button on the list and no status button.
 Release, Allocate, Cancel and the other order buttons are on the order screen.
 
-Source: form `shipment_order_list` and list properties in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql` (search `shipment_order_list`).
-
 ## Toolbar
 
 | Button | What it does |

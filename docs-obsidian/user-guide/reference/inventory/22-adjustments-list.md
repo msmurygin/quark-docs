@@ -37,8 +37,6 @@ All columns are read only. This list has no filters and no sort set in the metad
 | `Posted At` | `posted_at` | Date and time | Yes | When it was posted. |
 | `Version` | `version` | Whole number | Yes | The version counter of the document. See below. |
 
-Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/053_the_inventory_adjustment_document.sql:16-47`; the list in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/088_inventory_adjustment_screens.sql` and `089_inventory_adjustment_ordinary_forms.sql`.
-
 ### Version
 
 Every change of the document or of any of its lines raises the version by 1. `Approve`, `Post` and `Delete` send the version they saw. If the document changed in the meantime the server refuses with return code 40 and the screen shows the error. This is how the system stops you posting something you did not see.
@@ -62,8 +60,6 @@ Messages (from the command bindings in `088_inventory_adjustment_screens.sql` an
 | The list changed | `The list has moved on — tick the adjustment again and retry` |
 | Version unknown | `Tick the adjustment again: its version is unknown` |
 | Refused | `Adjustment {number} was not deleted: {error}` |
-
-> Not confirmed by code: that a number drawn by `New` and never saved is lost. The counter strategy is `rpc_key`; the document is created with the number the form showed. To verify: press `New`, leave without saving, press `New` again and compare the numbers.
 
 ## Who can use it
 

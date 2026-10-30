@@ -1,7 +1,6 @@
 # Task statuses and transitions
 
 This page lists the statuses of a task and of a pick assignment, and what moves them.
-The rules live in `crates/libs/wms-tasks/src/domain/task/aggregate.rs`, `crates/libs/wms-tasks/src/service/` and `crates/libs/wms-outbound/src/picking/`.
 
 ## Task statuses
 
@@ -13,8 +12,6 @@ The rules live in `crates/libs/wms-tasks/src/domain/task/aggregate.rs`, `crates/
 | `Completed` | Finished with the full quantity. Final. |
 | `Shorted` | Finished with less than the planned quantity. Final. |
 | `Cancelled` | Declared, but **nothing writes it**. A task whose pick is removed is deleted instead (owner ruling, 2026-09-04). You will not see this status. |
-
-Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:36-56`.
 
 ## Transitions
 
@@ -32,8 +29,6 @@ Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:36-56`.
 | `Created` | `Delete Task` | The row is deleted | [Deleting tasks](62-deleting-tasks.md) |
 | `Completed`, `Shorted` | Nothing | Nothing | |
 
-Sources: `aggregate.rs:60-200` (start, finish), `release.rs:93-180` (refuse, hand back), `release.rs:224-400` (reassign, return), `task.rs:1886-1923` (lease), `dissolve.rs` (dissolve).
-
 When a task goes back to the pool, `Qty Done` stays and `Version` goes up by one.
 The holder, the claim time, the start time and the lease are cleared.
 
@@ -48,8 +43,6 @@ The column `How Returned` on the [Task Board](10-task-board.md) holds one of fou
 | `Seized` | A supervisor: `Return to Pool` or `Dissolve` | The supervisor's text | No | No change | No |
 | `Expired` | The lease ran out | `auto-release (lease expired)` | No | No change | No |
 
-Source: `task.rs:1512-1575` (refused, handed back), `task.rs:1685-1708` (seized), `task.rs:1904-1923` (expired), `task.rs:854-885` (set release by dissolve), constraint `ck_task_return_kind` in `001_baseline.sql`.
-
 ## Numbers that decide what you see
 
 These are system settings. The values below are the defaults of a new database. An administrator can change them on the system settings screen.
@@ -62,11 +55,8 @@ These are system settings. The values below are the defaults of a new database. 
 | `TASK_MAX_CONCURRENT_DEFAULT` | 1 | Tasks one operator may hold at once when the terminal names no work area. |
 | `TASK_ALLOW_RELEASE_DEFAULT` | 1 | Whether an operator may refuse or hand back a task when the terminal names no work area. `0` forbids it. |
 
-Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql` (table `system_settings`, ids 1014 to 1018) and `crates/libs/wms-tasks/src/service/claim.rs:189-261`.
-A setting of zero or less for the lease, the cooldown or the escalation limit is ignored and the built-in default is used.
-
 A work area can also forbid returns (`allow_task_release` = off). Then both a refusal and a hand back are refused with `returning a task is not allowed in work area {area} — ask a supervisor to move it`.
-The supervisor's way out is `Return to Pool` or `Reassign`. Source: `crates/libs/wms-tasks/src/error.rs` (`ReleaseNotAllowed`).
+The supervisor's way out is `Return to Pool` or `Reassign`.
 
 ## Pick assignment statuses
 
@@ -80,7 +70,6 @@ The supervisor's way out is `Return to Pool` or `Reassign`. Source: `crates/libs
 | `Dissolved` | Ended without delivery. Final. |
 
 `Building`, `Ready`, `Picking` and `Delivering` are **live**: they hold an operator, a cart, cartons and picks.
-Source: `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:27-47`.
 
 | From | Action | To |
 |---|---|---|
@@ -91,9 +80,7 @@ Source: `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:27-47`.
 | `Delivering` | The holder delivers the cart (`PKA30`) | `Completed` |
 | `Completed`, `Dissolved` | Nothing | Nothing. `Dissolve` is refused with `PICK_ASSIGNMENT_NOT_LIVE`. |
 
-Source: `crates/libs/wms-outbound/src/picking/commands/dissolve.rs:1-90`, `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:538-581`.
-
-How the other statuses change (`crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs`):
+How the other statuses change:
 
 - `Building` becomes `Ready` in the same statement that binds the last `Open` position: no position is `Open` any more (`PickAssignmentBmc::record_position_change`, ruling R7).
 - After every route command (commit, short, skip, reject inside the assignment), the assignment becomes `Delivering` when no live member pick is `Released` any more. Otherwise a `Ready` assignment becomes `Picking`; a `Picking` one stays (`PickAssignmentBmc::record_route_change`, ruling R3). So a route whose last pick is committed or shorted goes straight to `Delivering`, also from `Ready`.

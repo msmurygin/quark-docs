@@ -41,20 +41,6 @@ Reading notes.
 - There is no rule that gives one order priority over another in `Allocate`. The command that takes the lock first gets the stock. Inside a wave, the member order decides (see [page 25](25-influence-wave-policy.md)).
 - The order type has the columns `requires_release` and `allows_partial_ship`. No code reads them. The column `auto_allocate_on_release` was dropped: release always allocates.
 - A shortage never blocks the release.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Status gate | `crates/libs/wms-outbound/src/service/order/allocate.rs:310-315` |
-| Tasks only when `released_at` is set | `crates/libs/wms-outbound/src/service/order/allocate.rs:407-437` |
-| Order priority goes to the task | `crates/libs/wms-outbound/src/service/order/allocate.rs:427-434` |
-| Wave policy reads priority, ship date, carrier | `crates/libs/wms-lib-core/src/model/outbound/wave_policy.rs:330-343` |
-| Ship-to must be a customer | `crates/libs/wms-outbound/src/service/shared/lookups.rs:105-115`, `crates/libs/wms-outbound/src/service/order/validate.rs:60-135` |
-| Order type: existence and active check at create and update | `crates/libs/wms-outbound/src/service/shared/lookups.rs:31-45`, `crates/libs/wms-outbound/src/service/order/create.rs:155`, `crates/libs/wms-outbound/src/service/order/update.rs:84-111` |
-| Order type columns; the dropped flag | `crates/libs/wms-lib-core/src/model/outbound/order_type.rs:18-30` |
-| `release` always allocates | `crates/libs/wms-outbound/src/service/order/release.rs:17-23` |
-
 ## 2. Facts of the line, the SKU and the pack
 
 **What this shows.** The quantity the line asks for, and which stock and which units are even considered.
@@ -85,19 +71,6 @@ Reading notes.
 - `sku.abc` is not read by allocation. The step field `Location ABC` filters the `abc` of the location.
 - The pack of the line is frozen at creation, but the ladder is read again at every allocation. That is intended in the code: an order keeps what it meant, and a new allocation uses what the pack offers now.
 - The line quantity is in base units. The field is documented in the order create command as `Quantity in BASE units`.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Open quantity | `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:69-71` |
-| Pack and owner match in the stock read | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:454-456` |
-| Pack and factor frozen on the line | `crates/libs/wms-outbound/src/service/shared/lookups.rs:56-95`, `crates/libs/wms-outbound/src/service/order/create.rs:246` |
-| Ladder read again at each allocation, active units only | `crates/libs/wms-outbound/src/allocation/plan.rs:36-47`, `crates/libs/wms-outbound/src/allocation/plan.rs:83-102` |
-| Quantity in base units | `crates/libs/wms-outbound/src/service/order/create.rs:48-51` |
-| `uom_factor` used at pick commit | `crates/libs/wms-outbound/src/picking/commands/commit.rs:426` |
-| SKU must be active and carry the UOM | `crates/libs/wms-outbound/src/service/shared/lookups.rs:56-95` |
-
 ## Related pages
 
 - [Where the policy of a line comes from](22-influence-policy-binding.md)

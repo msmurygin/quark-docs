@@ -54,20 +54,6 @@ flowchart LR
 - An order cannot use direct `Ship order` while it belongs to an active Load.
 - There is no generic shipment reversal. Use the immutable shipment history as the receipt and follow the site's controlled correction process.
 - Some implementation README files under the reserved `loading/` and `shipping/` directories still describe the original placeholder layout. The active implementation is under `service/load`, `service/load_plan`, `domain/load`, `domain/load_plan` and `domain/shipment_order/shipping.rs`.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Consolidation commands and queries | `crates/libs/wms-outbound/src/consolidation/` |
-| Staging assignment, confirmation and transfer | `crates/libs/wms-outbound/src/service/staging/` |
-| Dispatch lifecycle | `crates/libs/wms-outbound/src/service/dispatch/` |
-| Load Plan lifecycle | `crates/libs/wms-outbound/src/service/load_plan/`, `domain/load_plan/` |
-| Load review, confirmation, completion and shipment | `crates/libs/wms-outbound/src/service/load/` |
-| Direct order Goods Issue | `crates/libs/wms-outbound/src/domain/shipment_order/shipping.rs` |
-| RF Loading and shipment screens | `crates/libs/wms-lib-sql/sql/rf-screens/128_uc_loading.sql`, `129_uc_load_shipment.sql` |
-| Web screens | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/20261015141427_*` through `20261015141536_*` |
-
 ## Related pages
 
 - [Outbound Setup](../../admin/06-outbound-setup.md)

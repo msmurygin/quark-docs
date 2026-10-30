@@ -42,22 +42,6 @@ Reading notes.
 - An `EqPackPallet` step may still take part of a pallet. The rule filters the source row, not the amount taken.
 - A row that an earlier step of the same plan already used is reduced first. A pallet that was broken into by an earlier step no longer counts as a whole pallet.
 - The quantities in the example below are only for illustration. For a need of 250 and available quantities 100, 250, 300 and 800: `ExactFit` takes 250 from the row of 250. `BiggerFit` takes 250 from the row of 250. `BestFit` takes 250 from the row of 250. `HighToLow` takes 250 from the row of 800. `LowToHigh` takes 100, then 150 from the row of 250.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Order inside a step: LPN rule, quantity fit, sorts, greedy take | `crates/libs/wms-outbound/src/allocation/select.rs:162-216` |
-| LPN quantity rule | `crates/libs/wms-outbound/src/allocation/select.rs:258-275` |
-| Quantity fit filters | `crates/libs/wms-outbound/src/allocation/select.rs:296-316` |
-| Pallet quantity of the pack: the tallest unit above the base unit | `crates/libs/wms-outbound/src/allocation/trace.rs:466-469` |
-| Sort by location and by LPN quantity | `crates/libs/wms-outbound/src/allocation/select.rs:368-392` |
-| Sorts are stable and run from the last rank to the first | `crates/libs/wms-outbound/src/allocation/select.rs:181-196` |
-| Rows arrive ordered by stock row id | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:465` |
-| Refused sorts | `crates/libs/wms-outbound/src/allocation/step.rs:178-199` |
-| Quantity fit without `LpnQuantity` rank is refused | `crates/libs/wms-outbound/src/allocation/step.rs:129-139` |
-| Earlier steps of the same plan reduce the same row | `crates/libs/wms-outbound/src/allocation/trace.rs:583-590` |
-
 ## 2. From a draw to picks
 
 **What this shows.** The last setting decides how many `pick_detail` rows, and so how many tasks, one draw makes.
@@ -79,16 +63,6 @@ Reading notes.
 - When the setting is off and the step unit is the base unit, a draw of 3456 units makes 3456 picks. There is no limit in the code.
 - The label of the switch on the step card says `merged into one task line per location`. The code does not merge picks of different lots or LPNs. "On" means "one pick per stock row".
 - The pick keeps the policy id, policy version, step id and step version of the step that made it.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Cut a draw into pieces of one unit; no cut for on, `EqPackPallet`, unknown unit | `crates/libs/wms-outbound/src/allocation/trace.rs:853-878` |
-| Pick stores the policy and step it came from | `crates/libs/wms-outbound/src/allocation/reserve.rs:216-232` |
-| One task per pick | `crates/libs/wms-outbound/src/picking/infrastructure/tasks.rs:119-143` |
-| Default of the switch is on | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:1339` |
-
 ## Related pages
 
 - [Which stock a step may use](20-influence-policy-source.md)

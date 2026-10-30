@@ -27,8 +27,6 @@ Deleting is final. The receipt, its lines and its planned boxes are removed from
 - The status of the receipt does not matter. A receipt that is `Closed` or `Cancelled` can be deleted when nothing was received.
 - Stock does not change, because nothing was received.
 
-Source: `crates/libs/wms-lib-core/src/model/receipt/receipt.rs:871-973`.
-
 ## What can go wrong
 
 | Message | Meaning | Fix |
@@ -36,8 +34,6 @@ Source: `crates/libs/wms-lib-core/src/model/receipt/receipt.rs:871-973`.
 | `Cannot delete {number} — {qty} units have been received on its lines. Adjust qty to 0 or close the receipt instead.` | A line has received quantity. | Use [Adjusting received quantity](38-adjusting-received-quantity.md) to bring it to 0, or close the receipt. |
 | `Cannot delete {number} — box {code} {held_by}. Close the receipt instead.` | A planned box already has stock or a pending move. | Close the receipt. |
 | `receipt {id} not found` | The receipt is already gone. | Refresh the list. |
-
-> Not confirmed by code: the exact text the screen shows. To verify: receive 1 unit on a line of a test receipt, then tick the receipt and press `Delete`.
 
 ## Related pages
 

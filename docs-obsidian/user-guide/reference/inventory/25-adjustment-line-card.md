@@ -24,9 +24,7 @@ You get here by pressing `Add Line` or by clicking a row of the lines list.
 
 The fields `ID`, `Adjustment` and `Version` are hidden. They carry the line, its document and the version of the line.
 
-After the first save `Owner`, `SKU`, `Lot`, `Location`, `Container` and `Zone` become read only (`_code_readonly_hide_id`, `crates/services/web-ui-server/src/extensions/generic/code_readonly_render.rs:27-57`). Only `Target Quantity`, `Reason` and `Comment` can change. The identity of a saved line never changes: remove the line and add another.
-
-Sources: the form in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/089_inventory_adjustment_ordinary_forms.sql`; the line service in `crates/libs/wms-inventory/src/service/inventory_adjustment/add_line.rs` and `form.rs`.
+After the first save `Owner`, `SKU`, `Lot`, `Location`, `Container` and `Zone` become read only. Only `Target Quantity`, `Reason` and `Comment` can change. The identity of a saved line never changes: remove the line and add another.
 
 ## Toolbar buttons
 
@@ -55,8 +53,6 @@ Grey texts: `Save` and `From Stock`: `A posted adjustment cannot be changed`. `D
 - Stock that is already on the document is skipped.
 - Messages: success `Lines added from stock`; failure `No lines were added: {error}`.
 
-Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/generate_lines.rs`.
-
 ## Messages
 
 | Button | Success | Failure |
@@ -65,8 +61,6 @@ Source: `crates/libs/wms-inventory/src/service/inventory_adjustment/generate_lin
 | `Delete` without a saved line | | `Save the line first` |
 | `Delete` without version | | `Reopen the line: its version is unknown` |
 | `From Stock` without a document | | `Open the adjustment first` |
-
-> Not confirmed by code: what the form does when you try to clear the `Reason` or the `Comment` of a saved line. The save keeps the old value when the new one is empty (`form.rs:159-160`). To verify: edit a saved line, empty `Comment`, press `Save`, and read the line again.
 
 ## What it affects
 

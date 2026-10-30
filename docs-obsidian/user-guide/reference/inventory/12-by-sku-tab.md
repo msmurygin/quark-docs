@@ -20,8 +20,6 @@ The list is read only. A click on a row does nothing.
 | `Expected` | `qty_expected` | Decimal | Number | No | Yes | What is still expected on open receipt lines of this SKU and owner. |
 | `Owner` | `owner_id` | Whole number | Number | Yes | No | Shown as the owner code. Hidden at first; the quick filter works. |
 
-Source: view `inventory_balance_by_sku` in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2445-2462`.
-
 ## What each column affects
 
 ### Expected

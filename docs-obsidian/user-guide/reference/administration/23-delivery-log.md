@@ -37,16 +37,13 @@ The card shows the same fields, all read only, with no buttons:
 The columns `transmit_batch`, `last_attempt`, `next_attempt` and `response_body` are stored but not shown on this screen. `transmit_batch` and `response_body` have no writer in the code, so they stay empty.
 `last_error` for an HTTP failure holds `HTTP {code}: ` and the first 500 characters of the answer body.
 
-> Not confirmed by code: how you go back from the card to the list (the card has no toolbar). See [Event monitor](21-event-monitor.md).
-
 ## What it affects
 
 - Nothing by itself. The screen only reads.
 
 ## Who can use it
 
-`list_integration_event_delivery`, `get_integration_event_delivery` and `count_integration_event_delivery` are open to the default roles `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`
-(`crates/services/app-server/src/web/rpcs/integration_event_delivery_rpc.rs:7`). There is no method to change a delivery or to retry a failed one.
+`list_integration_event_delivery`, `get_integration_event_delivery` and `count_integration_event_delivery` are open to the default roles `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`. There is no method to change a delivery or to retry a failed one.
 In Enterprise only `ADMIN` reaches the screen.
 
 ## Related pages

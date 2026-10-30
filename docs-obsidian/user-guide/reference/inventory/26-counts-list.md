@@ -38,8 +38,6 @@ All columns are read only. This list has no filters and no sort set in the metad
 | `Cancelled At` | `cancelled_at` | Date and time | Yes | When it was cancelled. |
 | `Version` | `version` | Whole number | No | The version counter. It rises when the count is cancelled and each time a location is decided. |
 
-Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/056_a_count_observes_the_stock.sql:30-60`; the list in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/093_inventory_count_screens.sql`.
-
 ### Source
 
 | Value | Made by |
@@ -49,8 +47,6 @@ Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/056_a_coun
 | `Adjustment` | A posted adjustment whose reason asks for a count (`count after posting`). |
 | `PickToZero` | A pick that left its location empty, when the picking policy asks for a count. |
 | `PutawayDeviation` | A directed move that went to another location than the one suggested, after a supervisor accepted it. |
-
-Sources: `crates/libs/wms-lib-core/src/model/inventory/inventory_count_policy.rs:28`, `crates/libs/wms-inventory/src/service/inventory_adjustment/post.rs:43`, `crates/libs/wms-outbound/src/picking/emptied_location.rs:31`, `crates/libs/wms-inventory/src/movement/service.rs:76`.
 
 ## Toolbar buttons
 

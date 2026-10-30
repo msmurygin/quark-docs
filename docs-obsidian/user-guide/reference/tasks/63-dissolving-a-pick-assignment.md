@@ -34,8 +34,6 @@ A cart that still carries goods is delivered later with `pick_assignment_complet
 The command answers with the lists of released tasks, released positions, kept positions, boxes taken off, and whether the cart was freed.
 The web screen shows only the one-line message.
 
-Source: `crates/libs/wms-outbound/src/picking/commands/dissolve.rs:1-90,335-430`, `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs` (`plan_dissolve`).
-
 The returned tasks do not write lines in [Skip History](40-skip-history.md).
 
 ## If it is refused
@@ -57,8 +55,6 @@ The failure message is `Pick assignment {code} was not dissolved: {error}`. The 
 | `Say why the assignment is dissolved` | n/a | The window `Reason` is empty. |
 | `The board has moved on — tick the assignment again and retry` | n/a | The ticked row is not on the list any more. |
 | `Tick the assignment again: its version is unknown` | n/a | The version of the ticked row could not be read. |
-
-Sources: `crates/libs/wms-outbound/src/picking/commands/dissolve.rs:208-280` (envelopes), `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:429-508` (refusals), `crates/libs/wms-lib-core/src/model/narration/mod.rs:2291-2323` (English words), `086_the_supervisor_sees_and_dissolves_pick_assignments.sql:575-595` (messages of the web button).
 
 ## What it affects
 

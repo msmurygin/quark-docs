@@ -20,9 +20,6 @@ A button works only when both gates are open. `ADMIN` and `MANAGER` pass every g
 | `balance_move` | `Move` on the Move stock document | Yes (baseline grant) | Yes (baseline grant) | No |
 | `putaway_release_reservation` | `Release` on `Pending Move-In` | Yes (baseline grant) | No | No |
 
-Source: `crates/libs/wms-lib-auth/src/authorization/seeder.rs:35-200`; the baseline grants in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:19903,20015,20020`.
-Because `generic_rpc_command` is open to `OPERATOR` and `SUPERVISOR`, what stops them on the buttons below is the **API right**, not the web action.
-
 ## Screens and buttons
 
 `Yes` means both gates are open by default.
@@ -49,20 +46,18 @@ Because `generic_rpc_command` is open to `OPERATOR` and `SUPERVISOR`, what stops
 | Open Pending Move-In | `list_inventory_pending_move_in_ui` | Yes | Yes | Yes |
 | `Release` a reservation | `putaway_release_reservation` | Yes | No (web action) | No |
 
-Source of the API cells: the `declare_rpc_module!` lists in `crates/services/app-server/src/web/rpcs/inventory_rpc.rs`, `inventory_balance_serial_rpc.rs`, `hold_rpc.rs`, `inventory_adjustment_rpc.rs`, `inventory_count_rpc.rs`, `transaction_log_rpc.rs`, `move_command_rpc.rs`, `putaway_rpc.rs`; and the baseline grants of `OPERATOR` and `SUPERVISOR` in `001_baseline.sql:19866-20020`.
-
 ## How the cells were found
 
 | Cell | Source |
 |---|---|
 | `ADMIN`, `MANAGER` | The server action policy gives them every action (`default_server_action_grant`). The API lists name both of them for every method here. |
-| Adjustments and counts: `SUPERVISOR` yes, `OPERATOR` no | The module comments: drafting and posting adjustments and the decisions of a count are the supervisor's (`inventory_adjustment_rpc.rs:1-6`, `inventory_count_rpc.rs:1-14`). |
+| Adjustments and counts: `SUPERVISOR` yes, `OPERATOR` no | The module comments: drafting and posting adjustments and the decisions of a count are the supervisor's. |
 | `Approve`: `ADMIN`, `MANAGER` only | `inventory_adjustment_rpc.rs:44-45`: approval is its own grant. |
 | Baseline grants | The baseline file gives `OPERATOR` and `SUPERVISOR` rows for `move_execute`, `putaway_release_reservation` and a list of read methods. A method without a baseline row takes its default from the `declare_rpc_module!` list. |
 
 ## Inconsistencies seen
 
-- `move_execute` is listed for `ADMIN` and `MANAGER` only in its module (`move_command_rpc.rs:26`), yet the baseline grants it to `OPERATOR` and `SUPERVISOR`, and the web action `balance_move` is granted to them too. In practice `OPERATOR` can move stock on the web.
+- `move_execute` is listed for `ADMIN` and `MANAGER` only in its module, yet the baseline grants it to `OPERATOR` and `SUPERVISOR`, and the web action `balance_move` is granted to them too. In practice `OPERATOR` can move stock on the web.
 - `OPERATOR` and `SUPERVISOR` hold the web action `generic_save`, but `create_inventory_hold_row` is for `ADMIN` and `MANAGER` only, so `New Hold` is refused by the API.
 - `Count After Posting` is a button of a screen that `SUPERVISOR` reads, but only `ADMIN` and `MANAGER` may press it.
 

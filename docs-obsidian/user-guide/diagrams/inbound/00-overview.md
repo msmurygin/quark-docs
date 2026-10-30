@@ -25,15 +25,6 @@ Reading notes:
 - Putaway does not wait for the close and is not started by it. It starts when the operator scans the pallet LPN on `PUTW01`.
 - Putaway reads no receipt policy field. It reads the pallet, the SKU, the lot, the policy of putaway steps, and the locations.
 - The dotted line is an event. The code publishes it on close. The only reader found is the dock-to-stock KPI.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Putaway starts at the LPN scan | `crates/libs/wms-lib-sql/sql/rf-screens/093_uc_putaway.sql:100-149` |
-| Event published on close; its only reader | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:333-346`, `crates/libs/wms-inbound/src/service/receipt/kpi.rs:91` |
-| Putaway reads no receipt policy | `crates/libs/wms-inventory/src/putaway/mod.rs:793-905` |
-
 ## Pages
 
 | Page | Question it answers |

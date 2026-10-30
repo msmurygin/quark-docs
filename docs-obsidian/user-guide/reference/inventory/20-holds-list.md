@@ -19,7 +19,7 @@ The sidebar item is `inventory_hold_list_menu` (tab `tab_inventory_hold_list`).
 | Grid | One row for each hold that is on. |
 | Row click | Opens the [hold form](21-hold-form.md) for that hold (SelfSwap to `hold_form`). |
 
-A hold is released by the list's `Release` action, by the hold cascade of a stock move, by the write-off of damaged goods in receiving (`crates/libs/wms-inbound/src/service/receipt/damage/write_off_damage.rs:142`), or by the auto-release sweeper. See [Placing a hold](41-placing-a-hold.md).
+A hold is released by the list's `Release` action, by the hold cascade of a stock move, by the write-off of damaged goods in receiving, or by the auto-release sweeper. See [Placing a hold](41-placing-a-hold.md).
 
 ## Columns
 
@@ -36,8 +36,6 @@ All columns are read only. The list only has holds with `is_hold_on` true; a rel
 | `Auto-release` | `auto_release_date` | Date and time | Date | No | When the hold ends by itself. Empty means there is no schedule. |
 | `By` | `who_on` | Whole number, shown as a user name | Number | No | Who placed the hold. |
 | `Reason` | `comments` | Text | Text | No | The free text typed when the hold was placed. |
-
-Sources: view `inventory_hold_detail` in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2673-2698`; optional schedule migration `20261026110000_inventory_hold_has_an_optional_release_schedule.sql`; placement in `crates/libs/wms-inventory/src/service/hold.rs`.
 
 ## What each column affects
 

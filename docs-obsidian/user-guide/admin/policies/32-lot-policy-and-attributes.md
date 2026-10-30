@@ -14,10 +14,7 @@ Main menu: **Policy** > **Lot Policy**. Opening a policy shows one editor
 (a "Component" form) with blocks **General**, **Date attributes** and
 **Custom attributes**, and the buttons **Save** and **Refresh**. One Save
 writes the policy and every attribute together. The policy has a version
-number. A stale save is refused (optimistic lock,
-`wms-lib-core/src/model/policies/lot_policy/aggregate.rs:337-400`).
-Source of labels: `wms-lib-sql/sql/wms-meta-ui/migrations/041_lot_policy_is_one_component.sql:103-127`
-and `112_lot_policy_pick_metadata.sql`.
+number. A stale save is refused.
 
 Tables: `lot_policy` (one row per policy) and `lot_policy_attribute` (your own
 attributes, many per policy). The four dates are columns of `lot_policy`, not
@@ -36,9 +33,7 @@ rows of the attribute table.
   It has no effect today. The fallback cannot work anyway, because the SKU
   column is never empty.
 - `NOLOT` is a policy with no dates and no attributes. A SKU on `NOLOT` is not
-  free of lots. Every receive still resolves a lot number (`deposit.rs:710-780`;
-  the code treats every SKU as having a policy, because the column is not
-  null).
+  free of lots. Every receive still resolves a lot number.
 - When you change the SKU's policy, old lots keep the dates and attributes
   they already have. New receipts follow the new policy.
 
@@ -50,9 +45,7 @@ rows of the attribute table.
 - **Column**: `lot_policy.code`, varchar(10), unique, not null.
 - **Default**: none. Seed: `STD`, `NOLOT`.
 - **Meaning**: The short name.
-- **Affects**: Create refuses an empty code ("lot policy code cannot be empty",
-  `aggregate.rs:247`). The code is also read as a putaway criterion value
-  (`LotPolicyBmc::list_codes_by_ids`, `lot_policy.rs`).
+- **Affects**: Create refuses an empty code. The code is also read as a putaway criterion value.
 - **Example**: `COLOR`, `PHARMA`.
 - **Interactions**: A duplicate is refused.
 - **When empty**: Refused.
@@ -74,7 +67,7 @@ rows of the attribute table.
 - **Column**: `lot_policy.version`, int, not null, above 0 (wms-app migration 021).
 - **Default**: 1.
 - **Meaning**: Counter for the whole policy (root and attributes).
-- **Affects**: Optimistic lock on save (`aggregate.rs:337-400`).
+- **Affects**: Optimistic lock on save.
 - **If you change it**: Not editable.
 
 ### Lot creation (`lot_creation`)
@@ -96,7 +89,7 @@ rows of the attribute table.
   - `PerReceiveEvent`: every physical arrival makes its own lot, so stock from
     the two arrivals never merges.
 - **Interactions**: Lot numbers come from the warehouse `lot` counter,
-  10 characters at most (`deposit.rs:696-701`).
+  10 characters at most.
 - **When empty**: Not possible.
 - **If you change it**: Old lots stay as they are. Only new receives follow the
   new mode. Under `Existing`, finding several lots with the same attributes is
@@ -106,16 +99,16 @@ rows of the attribute table.
 #### Value `Existing` ("Reuse matching lot")
 
 Search for a lot of this SKU and owner with the same attributes. Use it. Make
-a new lot only if none matches (`deposit.rs:745-755`).
+a new lot only if none matches.
 
 #### Value `PerReceipt` ("One lot per receipt")
 
 Ask the receipt's own receive history for the lot of this SKU. Use it. If the
-receipt has none, make one (`deposit.rs:757-775`).
+receipt has none, make one.
 
 #### Value `PerReceiveEvent` ("One lot per receive event")
 
-Always make a new lot. Never search (`deposit.rs:776-784`).
+Always make a new lot. Never search.
 
 ## Part 2: The four dates (columns of `lot_policy`)
 
@@ -137,10 +130,9 @@ title is **Date attributes**, with column heads **Date**, **Show**,
 
 Dates are stored and shown as `YYYY-MM-DD`. When an operator types a date,
 these formats are accepted: ISO 8601, `YYYY-MM-DD`, `DD.MM.YYYY`, `DD/MM/YYYY`,
-`MM/DD/YYYY` (`wms_lib_utils::time::parse_lenient_date`, used at
-`lot_attribute_validation.rs:217-244`). The date rules at receiving (below) and
+`MM/DD/YYYY`. The date rules at receiving (below) and
 the shelf-life warning band read the same formats, through one function
-`parse_captured_date` (`validation_internal_helpers.rs:89`). Before the fix P-04
+`parse_captured_date`. Before the fix P-04
 (commit `d13642b77`) they read only `YYYY-MM-DD`, and an expired lot typed
 `01.01.2020` passed unchecked.
 
@@ -150,11 +142,9 @@ the shelf-life warning band read the same formats, through one function
 - **Default**: `false` for all four. Seed: `false`.
 - **Meaning**: Ask for this date when receiving.
 - **Affects**: `shown_attributes` makes a prompt for each shown date, after
-  the custom attributes (`lot_attribute_validation.rs:121-200`). The prompt
-  list drives the receive dialog and the RF capture screens
-  (`wms-inbound/.../lot_attribute_prompt.rs:100-110`). A date with Show off
-  gets no prompt. If a value is sent anyway and it parses, it is still saved
-  (`parse_date_from_map`, `lot_attribute_validation.rs:217-244`).
+  the custom attributes. The prompt
+  list drives the receive dialog and the RF capture screens. A date with Show off
+  gets no prompt. If a value is sent anyway and it parses, it is still saved.
 - **Example**: Expiration date Show on: the receiver is asked for it.
 - **Interactions**: Required needs Show. Show on pick needs Show.
 - **When empty**: n/a.
@@ -164,14 +154,14 @@ the shelf-life warning band read the same formats, through one function
 
 - **Column type**: boolean, not null. **Default**: `false`.
 - **Meaning**: Receiving cannot finish without this date.
-- **Affects**: `parse_date_from_map` (`lot_attribute_validation.rs:217-244`).
+- **Affects**: `parse_date_from_map`.
   Required and missing: error "<name> is required, but was not provided".
   Required and present but unreadable: a system error "Could not parse date for
   <name>". Optional and unreadable: ignored, the date is left empty and the
   receive goes on. The raw text stays in the lot's user attributes.
 - **Database rule**: `lot_policy_required_dates_are_shown` forbids Required
   without Show (wms-app migration 021). The editor says "<name> cannot be
-  required while it is hidden" (`aggregate.rs:166`).
+  required while it is hidden".
 - **Example**: Expiration required: a receive without it is refused.
 - **Expiration, derivable or not**: this check is about what was typed.
   Expiration required with no expiration typed is refused here, even when the
@@ -204,7 +194,7 @@ the shelf-life warning band read the same formats, through one function
   the confirmation plan.
 - **Database rules**: `chk_lot_policy_pick_dates_need_receipt`: needs Show.
   The editor says "<name> cannot be shown on pick while it is not captured on
-  receipt" (`aggregate.rs:226`).
+  receipt".
 - **Example**: Expiration date Show on pick: card says "Use by 2027-03-01".
 - **If you change it**: Applies to the next card shown.
 
@@ -215,15 +205,13 @@ the shelf-life warning band read the same formats, through one function
 - **Meaning**: How the picker proves the date on the goods.
 - **Affects**: `domain/pick_confirmation/plan.rs:141-155` (see the value table
   below).
-- **Database rule**: anything other than `NotVerifiable` needs Show on pick
-  (`chk_lot_policy_verified_dates_are_shown`; message "<name> cannot be
-  verified on pick while it is not shown on pick", `aggregate.rs:231`).
+- **Database rule**: anything other than `NotVerifiable` needs Show on pick.
 - **If you change it**: Applies to confirmations started afterwards.
 
 Screen captions of the four values: **Not verifiable**, **Visual**,
 **Barcode**, **Visual or barcode** (column head **Verification**).
 
-How the values act at the pick (`plan.rs:141-155, 221-229`). Only attributes
+How the values act at the pick. Only attributes
 that are shown on pick, that the reserved lot has a value for, and that pass
 this table are asked:
 
@@ -236,7 +224,7 @@ this table are asked:
 
 When the Picking policy's loose-lot confirmation is "confirm lot
 attributes" and no attribute is askable, the pick is refused as "not
-physically identifiable" (`NoVerifiableAttributes`, `plan.rs:~255`).
+physically identifiable".
 
 ## Part 3: Custom attributes (table `lot_policy_attribute`)
 
@@ -256,13 +244,11 @@ Switch Show off instead.
 - **Column**: `lot_policy_attribute.attrib_code`, varchar(20), not null.
 - **Default**: none. Seed: `COLOR`.
 - **Meaning**: The key of the attribute.
-- **Affects**: Save refuses empty or duplicate codes inside one policy
-  (`aggregate.rs:184-203`). The code is the key for `location_lot_commingle`
+- **Affects**: Save refuses empty or duplicate codes inside one policy. The code is the key for `location_lot_commingle`
   and `putawayzone_lot_commingle` rules.
 - **Example**: `COLOR`, `SIZE`, `BATCHNO`.
 - **Interactions**: Date names (`manufactured_date`, `expiration_date`,
-  `delivery_by_date`, `best_by_date`) are reserved for the four dates
-  (`lot_attribute_validation.rs:96-101`). Do not use them as codes.
+  `delivery_by_date`, `best_by_date`) are reserved for the four dates. Do not use them as codes.
 - **When empty**: Refused.
 - **If you change it**: Values stored under the old row keep their link
   (by row id).
@@ -273,8 +259,7 @@ Switch Show off instead.
 - **Column**: `lot_policy_attribute.descr`, varchar(50), null allowed.
 - **Default**: null. Seed: `Colour of the T-SHIRT`.
 - **Meaning**: A text for people. Also a fallback caption.
-- **Affects**: `LotPrompt.descr` in the lot template
-  (`transfer/attribute_template.rs:57-66`) and receive prompts. Not a
+- **Affects**: `LotPrompt.descr` in the lot template and receive prompts. Not a
   decision.
 - **When empty**: Allowed.
 - **If you change it**: Display only.
@@ -284,8 +269,7 @@ Switch Show off instead.
 - **Column**: `lot_policy_attribute.show`, boolean, not null, default `false`.
   Seed COLOR: `true`.
 - **Meaning**: Ask for it when receiving.
-- **Affects**: Only attributes with Show are asked and only they are checked
-  (`lot_attribute_validation.rs:135, 254`). A hidden attribute is ignored: a
+- **Affects**: Only attributes with Show are asked and only they are checked. A hidden attribute is ignored: a
   value sent for it is dropped.
 - **If you change it**: New receives only.
 
@@ -294,7 +278,7 @@ Switch Show off instead.
 - **Column**: `lot_policy_attribute.required`, boolean, not null, default
   `false`. Seed COLOR: `true`.
 - **Meaning**: Receiving cannot finish without a value.
-- **Affects**: `validate_required_lot_attributes` (`lot_attribute_validation.rs:248-275`):
+- **Affects**: `validate_required_lot_attributes`:
   missing gives "Attribute '<code>' is required but was not provided".
 - **Database rule**: `lot_policy_attribute_required_is_shown` (needs Show).
 - **Example**: COLOR required: receiving blue shirts without a colour fails.
@@ -318,10 +302,9 @@ Switch Show off instead.
   what the ASN said?
 - **Affects**: Only when the receipt line has `lot_attr_check_mode =
   Advisory`. A different value gives code 36 "LotAttributeMismatch" and it is
-  overridable only if this flag is on (`validation_lot_attrs.rs:50-100`). A
+  overridable only if this flag is on. A
   missing value gives code 35 and is never overridable. `Disabled` (the
-  default) skips the check. `Strict` is a hard-reject path handled elsewhere
-  (`validation_external_lot.rs`).
+  default) skips the check. `Strict` is a hard-reject path handled elsewhere.
 - **Example**: ASN says COLOR=RED, operator scans BLUE. Flag on: a supervisor
   can override. Flag off: refused.
 - **If you change it**: Next check only.
@@ -336,7 +319,7 @@ Switch Show off instead.
 - **Database rules**: `chk_lot_policy_attribute_pick_needs_receipt` and
   `chk_lot_policy_attribute_verified_is_shown`.
 - **Pick compare**: the picker's value and the lot's value are trimmed and
-  upper-cased before comparing (`plan.rs:~100-120`, `normalize_value`), so
+  upper-cased before comparing, so
   `red` and `RED` match.
 
 Limits to remember: `lot_attributes.attribute_value` is varchar(20) and
@@ -389,8 +372,7 @@ Auto-hold (not a refusal): if the expiration is inside a warning band, a
 `QcQuarantine` hold is put on the pallet. The band is `min_shelf_life_on_rec`
 x `owner_config.shelf_life_warning_multiplier_pct` percent (default 200,
 screen "Shelf-Life Warning Multiplier (%)"). 100 percent makes the band equal
-to the minimum, so it collapses (`validation_internal_helpers.rs:156-185`,
-`validation_holds.rs:70-80`).
+to the minimum, so it collapses.
 
 ### Dates after receiving: reserve, pick, ship
 
@@ -423,14 +405,12 @@ except where noted.
 ### Location: Mix lots
 
 - **Screen**: Locations > open a location > **Mix Lot**.
-- **Column**: `location.mix_lot`, boolean. In code `DEFAULT_LOC_MIX_LOT = true`
-  (`wms-lib-core/src/model/location.rs:39`).
+- **Column**: `location.mix_lot`, boolean. In code `DEFAULT_LOC_MIX_LOT = true`.
 - **Meaning**: May more than one lot sit in this location?
-- **Affects**: `check_lot_mixing` (`inventory_service.rs:1054`). If false, a
+- **Affects**: `check_lot_mixing`. If false, a
   conflicting lot is refused (`LotMixingNotAllowed`). Also
   `validate_multi_attributes` returns "no conflict" at once when the location
-  does not allow mixing, so the attribute rules below are skipped
-  (`inventory_service.rs:1450-1453`).
+  does not allow mixing, so the attribute rules below are skipped.
 - **When empty**: Treated as true.
 
 ### Location: attribute rule (`location_lot_commingle`)
@@ -441,7 +421,7 @@ except where noted.
   `attrib_code` (varchar(20)), `allow_mix` (boolean, default `true`).
 - **Meaning**: For this location and this custom attribute, may lots with
   different values be mixed on one LPN?
-- **Affects**: `check_location_attribute_overrides` (`inventory_service.rs:1495-1580`).
+- **Affects**: `check_location_attribute_overrides`.
   A location row wins outright over the zone row, even `allow_mix = true`
   (an exception to a zone ban). `allow_mix = false`: if the landing LPN already
   holds stock of another lot whose value for this attribute differs, the move
@@ -459,17 +439,16 @@ except where noted.
   **Attribute Code** and **Allow Mix**.
 - **Columns**: `putawayzone_lot_commingle.putawayzone_code`, `attrib_code`,
   `allow_mix` (default `true`).
-- **Affects**: Used only if the location has no row for that attribute
-  (`inventory_service.rs:1530-1550`).
+- **Affects**: Used only if the location has no row for that attribute.
 
 ### SKU: Allow multi-lot on LPN
 
 - **Screen**: API only (`create_sku`, `update_sku`, `create_sku_full`,
   `update_sku_full`); no SKU tab shows it.
 - **Column**: `sku.allow_multi_lot_on_lpn`, boolean, default `false`. The code
-  default is also `false` (`DEFAULT_ALLOW_MULTI_LOT_LPN`, `sku.rs:22`).
+  default is also `false`.
 - **Meaning**: May a second lot of this SKU join it on one LPN?
-- **Affects**: `validate_lpn_restrictions` (`inventory_service.rs:1195-1260`).
+- **Affects**: `validate_lpn_restrictions`.
   The SKUs already on the pallet answer for their own lots. If they say no
   and another lot is there, the move is refused with code 56.
 - **Interactions**: Only the same SKU's flag counts. A neighbour SKU that
@@ -482,8 +461,7 @@ except where noted.
 - **Column**: `sku.force_separate_lpn_per_lot`, boolean, not null, default
   `false` (`DEFAULT_FORCE_SEPARATE_LPN_PER_LOT`).
 - **Meaning**: This SKU demands its own LPN for every lot.
-- **Affects**: Same function, the arriving-goods side
-  (`inventory_service.rs:1239`). Combined with the resident flag by OR.
+- **Affects**: Same function, the arriving-goods side. Combined with the resident flag by OR.
 - **Interactions**: If this is true and Allow multi-lot is true, this wins
   (the safe side).
 - **When empty**: `false`.
@@ -493,7 +471,7 @@ except where noted.
 - **Screen**: Owner configuration > **Mixed LPN**.
 - **Column**: `owner_config.allow_mixed_lpn`, boolean, default `false`.
 - **Meaning**: May one LPN hold two SKUs of this owner?
-- **Affects**: `check_lpn_sku_mixing` (`inventory_service.rs:1107-1160`), code 55.
+- **Affects**: `check_lpn_sku_mixing`, code 55.
 - **When empty**: `false`.
 
 ## What happens to stock when you change a lot policy

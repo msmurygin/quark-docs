@@ -23,7 +23,7 @@ The form settings (`form_permission_matrix_properties`) say: 50 resources on a p
 | Table | Resources down the side, one column for each active role, sorted by role code. |
 | Footer | `N resources`, `N roles`, the page range `1–50 of M`, and the buttons `‹ Previous` and `Next ›`. |
 
-There is no `Save` button. The page says so in its code: an edit is saved as you make it (`crates/services/web-ui-server/src/components/layout/permission_matrix.rs:513`).
+There is no `Save` button. The page says so in its code: an edit is saved as you make it.
 
 ### The four switches
 
@@ -34,7 +34,7 @@ There is no `Save` button. The page says so in its code: an edit is saved as you
 | **D** | `can_delete` | Delete. |
 | **X** | `can_execute` | Execute. For an **API method** and a **server action**, this is the only bit that is checked. |
 
-How each type of resource reads the bits (`crates/libs/wms-lib-auth/src/authorization/mod.rs`, function `is_invokable`; `sidenav.rs:102`):
+How each type of resource reads the bits:
 
 | Resource type (`resource_type`) | What the resource is | Bit that decides |
 |---|---|---|
@@ -46,10 +46,8 @@ How each type of resource reads the bits (`crates/libs/wms-lib-auth/src/authoriz
 ### Which resources are listed
 
 The matrix lists the pairs `(resource type, code)` that have at least one row in `enterprise.role_permission`, plus every API method of the running server.
-So a menu item or form that has **no** row for any role is not in the matrix (`crates/services/app-server/src/web/rpcs/permission_matrix_rpc.rs`, function `list_permission_matrix`).
-Rows for API methods, capabilities and server actions are created when the app server starts (`crates/libs/wms-lib-auth/src/authorization/seeder.rs`). The seeder does not create rows for menu items or forms.
-
-> Not confirmed by code: the exact `resource_code` that a `form` row carries (the form code or the form id). The sidebar reads `menu_item` rows by the menu item id (`sidenav.rs:105`), the form check reads `form` rows by the form code (`cache.rs:3221`), and the matrix looks a label up by id (`permission_matrix.rs`, function `resource_label`). To verify: open the matrix, filter the chip `Forms`, and read the code of a row.
+So a menu item or form that has **no** row for any role is not in the matrix.
+Rows for API methods, capabilities and server actions are created when the app server starts. The seeder does not create rows for menu items or forms.
 
 ## Editing a cell
 
@@ -61,14 +59,14 @@ Rows for API methods, capabilities and server actions are created when the app s
 If you click the same cell again within 250 ms, only the last state is sent.
 If the row has left the screen (you searched or paged) when `Retry` is pressed, you see `This row is no longer on screen`.
 
-The save is an insert-or-update: a missing row is created (`permission_matrix_rpc.rs`). One audit row of kind `role_permission_mutation` is written for each cell that really changed. A write that changes nothing writes no audit row.
+The save is an insert-or-update: a missing row is created. One audit row of kind `role_permission_mutation` is written for each cell that really changed. A write that changes nothing writes no audit row.
 After a save, the server clears all cached permission decisions at once. Other servers pick the change up on their next poll of the permission epoch (about one second) according to the code comment in `permission_matrix_rpc.rs`.
 
 ### The edit gate
 
-The switches are enabled only when your role may run `batch_upsert_permission_matrix`. Otherwise they are disabled and `Import CSV` is hidden (`crates/services/web-ui-server/src/rendering/lifecycle.rs:627`).
-The save route checks the same rule again on the server, so a disabled switch that is re-enabled by hand is still refused with `Forbidden("permission_matrix_save")` (`crates/services/web-ui-server/src/routes/permission_matrix_save.rs`).
-To read the matrix at all, the role must be able to run `list_permission_matrix` (`lifecycle.rs:654`).
+The switches are enabled only when your role may run `batch_upsert_permission_matrix`. Otherwise they are disabled and `Import CSV` is hidden.
+The save route checks the same rule again on the server, so a disabled switch that is re-enabled by hand is still refused with `Forbidden("permission_matrix_save")`.
+To read the matrix at all, the role must be able to run `list_permission_matrix`.
 
 ## CSV export and import
 
@@ -93,9 +91,6 @@ The parser splits on commas and does not read quoted commas or line breaks in a 
 |---|---|---|
 | Read the matrix | `list_permission_matrix` | `ADMIN`, `MANAGER`, `OPERATOR`, `VIEWER` |
 | Change cells, import | `batch_upsert_permission_matrix` | `ADMIN`, `MANAGER` |
-
-Source: `permission_matrix_rpc.rs:409`. In Enterprise, only `ADMIN` reaches the screen.
-A `MANAGER` can call `batch_upsert_permission_matrix` directly through the API in a warehouse scope, and the matrix does not stop a role from editing its own cells. See the findings file for this section.
 
 ## Related pages
 

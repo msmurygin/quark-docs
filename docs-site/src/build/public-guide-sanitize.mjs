@@ -8,19 +8,148 @@
  * plugin, the API generator, and the unit tests.
  */
 
-const INTERNAL_PATH = /(?:^|[\s`('"/])(?:crates|clients|apps|services|ui\/src|app-server\/src|web-ui-server\/src|docs-obsidian|docs\/superpowers|\.claude|dev_only)\/|\bwms-[a-z0-9_-]+\/(?:src|migrations?|sql)\/|\b[A-Za-z0-9_.…*~-]+\.(?:rs|sql|go|tsx?|toml)(?::(?:~?\d+)(?:-\d+)?)?\b|(?:^|[\s`=('"/])\*\.(?:rs|sql|go|tsx?|toml)\b|\bBASELINE(?::\d+(?:-\d+)?)?\b|\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b|\bmigrations?\s+\d{1,4}\b|\bwms-app\s+\d{1,4}\b|\b(?:baseline|seed)\s+migration\b|\bdev(?:elopment)?\s+seed\b|\bcode comment\b|\b(?:grep|rg)\b[^\n]*|\b(?:I\s+)?search(?:ed|ing)?\s+(?:all\s+)?(?:the\s+)?(?:Rust\s+)?(?:code|crates|engine)\b|\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b|\bchecked by searching\b|#\[[A-Za-z_][^\]\n]*\]/i;
-const INTERNAL_PROCESS = /\bADR[-_ ]?\d+\b|\b(?:[A-Za-z][A-Za-z -]+\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?|\bowner decision\s+20\d{2}-\d{2}-\d{2}\b|\bspec\s*§|\bruling\s+[A-Z]\d+\b|\bDecisions Log\b|\bSlice\s*#\d+\b/i;
-const PRIVATE_HEADING = /^(?:\d+\.\s*)?(?:where it comes from|not confirmed(?: by code)?|findings|bugs, inconsistencies and items to verify|what to verify|the rule:\s*every arrow comes from code)$/i;
-const PRIVATE_QUOTE = /^(?:not confirmed(?: by code)?|to verify|label missing in English)\s*:/i;
+// Keep these checks separate. A previous single alternation contained an
+// unbounded filename token before a file-extension suffix. On large Markdown
+// table cells V8 could spend minutes backtracking through that alternative.
+// The bounded token below and the small independent expressions make every
+// scan linear in the customer prose size.
+const INTERNAL_PATH_PATTERNS = [
+  /(?:^|[\s`('"/])(?:crates|clients|apps|services|ui\/src|app-server\/src|web-ui-server\/src|docs-obsidian|docs\/superpowers|\.claude|dev_only)\//i,
+  /\bwms-[a-z0-9_-]+\/(?:src|migrations?|sql)\//i,
+  /\bBASELINE(?::\d+(?:-\d+)?)?\b|\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b|\bmigrations?\s+\d{1,4}\b|\bwms-app\s+\d{1,4}\b/i,
+  /\b(?:baseline|seed)\s+migration\b|\bdev(?:elopment)?\s+seed\b|\bcode comment\b/i,
+  /\b(?:grep|rg)\b[^\n]*/i,
+  /\b(?:I\s+)?search(?:ed|ing)?\s+(?:all\s+)?(?:the\s+)?(?:Rust\s+)?(?:code|crates|engine)\b/i,
+  /\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b|\bchecked by searching\b/i,
+  /#\[[A-Za-z_][^\]\n]*\]/i,
+];
+const INTERNAL_PROCESS_PATTERNS = [
+  /\b(?:commit|source revision|source sha)\s+[0-9a-f]{9,40}\b/i,
+  /\b(?:F|P)-\d{2}\b/,
+  /\bADR[-_ ]?\d+\b/i,
+  /\b(?:[A-Za-z][A-Za-z -]{0,100}\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?/i,
+  /\bowner decision\s+20\d{2}-\d{2}-\d{2}\b/i,
+  /\bspec\s*§/i,
+  /\bruling\s+[A-Z]\d+\b/i,
+  /\bDecisions Log\b/i,
+  /\bSlice\s*#\d+\b/i,
+];
+const PRIVATE_HEADING = /^(?:(?:\d+|[A-Z]\.\d+)\.?\s*)?(?:where it comes from|not confirmed(?: by code)?|findings|internal audit|known inconsistencies(?: on this page)?|known gaps.*|known problems.*|inconsistencies found.*|bugs, inconsistencies and items to verify|what to verify|what the code does not have|part 4:\s*names in code|keys read by the code but not seeded.*|the rule:\s*every arrow comes from code)$/i;
+const PRIVATE_QUOTE = /^(?:not confirmed(?: by code)?|(?:\*\*)?to verify(?:\*\*)?|label missing in English)\b\s*:*/i;
 const SOURCE_LABEL = /\b(?:source|sources|code proof|implementation evidence)\s*:/i;
-const AUTHOR_PROCESS = /\bnot confirmed(?: by code)?\b|\bto verify\s*:|\blabel missing in English\b|\bwhere it comes from\b|\bsee the findings file\b|\bhow [^.!?\n]* was checked\b|\ball statements come from (?:the )?code\b|\bthat is how (?:it|they) (?:is|are) written in the code\b|\bsome (?:of these )?texts contain Russian words\b|every (?:arrow|step).*(?:comes|was read) from (?:the )?code|where the code (?:says nothing|does not prove)|checked by searching (?:the )?code|code on the main branch|table that names the file and line|file and line (?:is|are|was|were|given)/i;
+const AUTHOR_PROCESS = /\bnot confirmed(?: by code)?\b|(?:^|[.(]\s*|\bsee\s+(?:the\s+)?["“])(?:\*\*)?to verify(?:\*\*)?\b|\blabel missing in English\b|\bwhere it comes from\b|\bsee the findings file\b|\bhow [^.!?\n]* was checked\b|\ball statements come from (?:the )?code\b|\bthat is how (?:it|they) (?:is|are) written in the code\b|\bsome (?:of these )?texts contain Russian words\b|every (?:arrow|step).*(?:comes|was read) from (?:the )?code|where the code (?:says nothing|does not prove)|checked by searching (?:the )?code|\b(?:(?:I|each(?: of these)?)\s+)?(?:(?:has|have|was|were|is|are)\s+)?searched\s+in\b|code on the main branch|table that names the file and line|file and line (?:is|are|was|were|given)/i;
+const AUTHOR_NOTE_LINE = /\bnot confirmed(?: by code)?\b|\bwhere it comes from\b|(?:^\s*[-*+]?\s*|\|\s*|[.(]\s*|\bsee\s+(?:the\s+)?["“])(?:\*\*)?to verify(?:\*\*)?\b/i;
+const RAW_MARKDOWN_REFERENCE = /\b(?:reference\/)?[A-Za-z0-9][A-Za-z0-9_/-]*\.md\b/gi;
+
+function publicGuideName(value) {
+  const path = String(value ?? '');
+  if (/^reference\/index\.md$/i.test(path)) return 'API reference';
+  const name = path.split('/').at(-1)?.replace(/\.md$/i, '').replace(/^\d+-/, '') ?? '';
+  if (/^(?:README|index)$/i.test(name)) return 'overview guide';
+  return `${name.replace(/[-_]+/g, ' ')} guide`;
+}
 
 function isPunctuationOnly(value) {
   return /^[\s.,;:!?()[\]{}'"`~*_\-–—/\\|]+$/.test(String(value ?? ''));
 }
 
 export function hasInternalEvidence(value) {
-  return INTERNAL_PATH.test(String(value ?? '')) || INTERNAL_PROCESS.test(String(value ?? ''));
+  const text = String(value ?? '');
+  return internalPathMatch(text) != null || internalProcessMatch(text) != null;
+}
+
+function earliestMatch(value, patterns) {
+  let earliest = null;
+  for (const pattern of patterns) {
+    const match = String(value ?? '').match(pattern);
+    if (match?.index == null) continue;
+    if (!earliest || match.index < earliest.index) earliest = match;
+  }
+  return earliest;
+}
+
+function internalPathMatch(value) {
+  const text = String(value ?? '');
+  const lower = text.toLowerCase();
+  const mayContainPath = [
+    'crates/', 'clients/', 'apps/', 'services/', 'ui/src/', 'app-server/src/',
+    'web-ui-server/src/', 'docs-obsidian/', 'docs/superpowers/', '.claude/',
+    'dev_only/', 'wms-', '.rs', '.sql', '.go', '.ts', '.tsx', '.toml',
+    'baseline', 'migration', 'seed', 'code comment', 'grep', 'rg', 'search', '#[',
+  ].some((marker) => lower.includes(marker));
+  if (!mayContainPath) return null;
+  const matches = [earliestMatch(text, INTERNAL_PATH_PATTERNS), sourceFilenameMatch(text)]
+    .filter((match) => match?.index != null)
+    .sort((a, b) => a.index - b.index);
+  return matches[0] ?? null;
+}
+
+function sourceFilenameMatch(value) {
+  const text = String(value ?? '');
+  const lower = text.toLowerCase();
+  const extensions = ['.toml', '.tsx', '.sql', '.rs', '.go', '.ts'];
+  const token = /[A-Za-z0-9_.…*~-]/;
+  let earliest = null;
+  for (const extension of extensions) {
+    let from = 0;
+    for (;;) {
+      const extensionAt = lower.indexOf(extension, from);
+      if (extensionAt < 0) break;
+      from = extensionAt + extension.length;
+      let start = extensionAt - 1;
+      while (start >= 0 && extensionAt - start <= 200 && token.test(text[start])) start--;
+      start++;
+      if (start === extensionAt || (start > 0 && token.test(text[start - 1]))) continue;
+      let end = extensionAt + extension.length;
+      if (text[end] === ':') {
+        let cursor = end + 1;
+        if (text[cursor] === '~') cursor++;
+        const digitsAt = cursor;
+        while (/\d/.test(text[cursor] ?? '')) cursor++;
+        if (cursor === digitsAt) continue;
+        if (text[cursor] === '-') {
+          cursor++;
+          const rangeAt = cursor;
+          while (/\d/.test(text[cursor] ?? '')) cursor++;
+          if (cursor === rangeAt) continue;
+        }
+        end = cursor;
+      }
+      if (/[A-Za-z0-9_]/.test(text[end] ?? '')) continue;
+      const match = [text.slice(start, end)];
+      match.index = start;
+      if (!earliest || start < earliest.index) earliest = match;
+      break;
+    }
+  }
+  return earliest;
+}
+
+function internalProcessMatch(value) {
+  const text = String(value ?? '');
+  const lower = text.toLowerCase();
+  if (!['commit ', 'source revision ', 'source sha ', 'f-', 'p-', 'adr-', 'adr_', 'adr ', 'spec 20', 'spec§', 'spec §', 'owner decision 20', 'ruling ', 'decisions log', 'slice #']
+    .some((marker) => lower.includes(marker))) return null;
+  return earliestMatch(text, INTERNAL_PROCESS_PATTERNS);
+}
+
+function authorProcessMatch(value) {
+  const text = String(value ?? '');
+  const lower = text.toLowerCase();
+  if (!['not confirmed', 'to verify', 'label missing', 'where it comes from', 'findings file',
+    'was checked', 'statements come from', 'written in the code', 'russian words',
+    'comes from code', 'comes from the code', 'read from code', 'read from the code',
+    'code says nothing', 'code does not prove', 'checked by searching', 'searched in',
+    'code on the main branch', 'file and line']
+    .some((marker) => lower.includes(marker))) return null;
+  return text.match(AUTHOR_PROCESS);
+}
+
+function evidenceMatch(value, includeAuthor = false) {
+  const matches = [internalPathMatch(value), internalProcessMatch(value), includeAuthor ? authorProcessMatch(value) : null]
+    .filter((match) => match?.index != null)
+    .sort((a, b) => a.index - b.index);
+  return matches[0] ?? null;
 }
 
 function nodeText(node) {
@@ -109,13 +238,14 @@ function stripEvidenceParentheticals(children, stats) {
   if (!Array.isArray(children) || children.length === 0) return;
   for (;;) {
     const joined = children.map((child) => nodeText(child)).join('');
-    const match = joined.match(INTERNAL_PATH) ?? joined.match(INTERNAL_PROCESS) ?? joined.match(AUTHOR_PROCESS);
+    const match = evidenceMatch(joined, true);
     if (!match || match.index == null) break;
     const span = findParenthetical(joined, match.index);
     if (!span) break;
 
     const [start, end] = span;
     removeTextSpan(children, start, end);
+    if (children.map((child) => nodeText(child)).join('') === joined) break;
     stats.inlineEvidence++;
   }
 
@@ -144,16 +274,19 @@ function stripEvidenceParentheticals(children, stats) {
   // as "Migration 026 changed the default." Remove that sentence only.
   for (;;) {
     const joined = children.map((child) => nodeText(child)).join('');
-    const match = joined.match(INTERNAL_PATH) ?? joined.match(INTERNAL_PROCESS);
+    const match = evidenceMatch(joined);
     if (!match || match.index == null) break;
     const [start, end] = sentenceAround(joined, match.index);
     removeTextSpan(children, start, end);
+    if (children.map((child) => nodeText(child)).join('') === joined) break;
     stats.inlineEvidence++;
   }
 
   for (const child of children) {
     if (child.type !== 'text') continue;
     child.value = String(child.value ?? '')
+      .replace(RAW_MARKDOWN_REFERENCE, publicGuideName)
+      .replace(/\benterprise\.warehouse\b/gi, 'warehouse settings')
       .replace(/\s+([,.;:!?])/g, '$1')
       .replace(/\(\s*\)/g, '')
       .replace(/[ \t]{2,}/g, ' ');
@@ -242,6 +375,11 @@ function startsPrivate(node) {
 }
 
 function sanitizeContainer(node, stats) {
+  if (typeof node.value === 'string') {
+    node.value = node.value
+      .replace(RAW_MARKDOWN_REFERENCE, publicGuideName)
+      .replace(/\benterprise\.warehouse\b/gi, 'warehouse settings');
+  }
   if (!Array.isArray(node.children)) return;
   removePrivateSections(node.children, stats);
   const out = [];
@@ -255,7 +393,7 @@ function sanitizeContainer(node, stats) {
       stripEvidenceParentheticals(child.children, stats);
     }
     sanitizeContainer(child, stats);
-    if (hasInternalEvidence(nodeText(child))) {
+    if (hasInternalEvidence(nodeText(child)) || authorProcessMatch(nodeText(child))) {
       // A remaining reference was not safely separable from its prose. Hide
       // the containing block rather than publish a broken partial sentence.
       stats.blocks++;
@@ -294,7 +432,7 @@ function rawTableCells(line) {
 
 function sanitizeRawTable(lines) {
   const rows = lines
-    .filter((line, index) => index < 2 || !/\bnot confirmed\b|\bto verify\s*:/i.test(line))
+    .filter((line, index) => index < 2 || !AUTHOR_NOTE_LINE.test(line))
     .map(rawTableCells);
   if (rows.length < 2) return null;
 
@@ -355,7 +493,7 @@ export function sanitizePublicMarkdownSource(value) {
       let hideContinuation = false;
       for (const line of blockLines) {
         if (/^\s*[-*+]\s+/.test(line)) {
-          hideContinuation = /\bnot confirmed\b|\bto verify\s*:|\bwhere it comes from\b/i.test(line);
+          hideContinuation = AUTHOR_NOTE_LINE.test(line);
           if (!hideContinuation) kept.push(line);
         } else if (!hideContinuation) {
           kept.push(line);
@@ -369,17 +507,24 @@ export function sanitizePublicMarkdownSource(value) {
     if (!block || /^\s*(?:source|sources|code proof|implementation evidence)\s*:/i.test(block)) continue;
     clean.push(block.replace(/Where it comes from/gi, 'Configuration'));
   }
-  return clean.join('\n\n');
+  return clean.join('\n\n')
+    // Docusaurus derives page descriptions before the remark tree pass. Make
+    // raw authoring filenames reader-friendly in link labels at this earlier
+    // boundary while preserving the real Markdown destination.
+    .replace(/\[((?:reference\/)?[A-Za-z0-9][A-Za-z0-9_/-]*\.md)\](\([^)]+\))/gi,
+      (_match, label, destination) => `[${publicGuideName(label)}]${destination}`);
 }
 
 function stripParentheticalStrings(value) {
   let text = String(value ?? '');
   for (;;) {
-    const match = text.match(INTERNAL_PATH) ?? text.match(INTERNAL_PROCESS) ?? text.match(AUTHOR_PROCESS);
+    const match = evidenceMatch(text, true);
     if (!match || match.index == null) break;
     const span = findParenthetical(text, match.index);
     if (!span) break;
-    text = `${text.slice(0, span[0])}${text.slice(span[1])}`;
+    const next = `${text.slice(0, span[0])}${text.slice(span[1])}`;
+    if (next === text) break;
+    text = next;
   }
   return text;
 }
@@ -387,13 +532,12 @@ function stripParentheticalStrings(value) {
 function stripEvidenceSentences(value) {
   let text = stripParentheticalStrings(value);
   for (;;) {
-    const matches = [text.match(INTERNAL_PATH), text.match(INTERNAL_PROCESS), text.match(AUTHOR_PROCESS)]
-      .filter((match) => match?.index != null)
-      .sort((a, b) => a.index - b.index);
-    const match = matches[0];
+    const match = evidenceMatch(text, true);
     if (!match) break;
     const [start, end] = sentenceAround(text, match.index);
-    text = `${text.slice(0, start)}${text.slice(end)}`;
+    const next = `${text.slice(0, start)}${text.slice(end)}`;
+    if (next === text) break;
+    text = next;
   }
   return text
     .replace(/[ \t]+([,.;:!?])/g, '$1')
@@ -418,6 +562,8 @@ export function sanitizePublicText(value) {
     .replace(/\bsup1\b/gi, 'example.supervisor')
     .replace(/\bop1\b/gi, 'example.operator')
     .replace(/\bwelcome1\b/gi, '<password>')
+    .replace(RAW_MARKDOWN_REFERENCE, publicGuideName)
+    .replace(/\benterprise\.warehouse\b/gi, 'warehouse settings')
     .trim();
   return text;
 }
@@ -432,6 +578,11 @@ export function sanitizePublicObject(value) {
 export const PUBLIC_FORBIDDEN_PATTERNS = [
   /Not confirmed(?: by code)?/i,
   /Where it comes from/i,
+  /<h[1-6][^>]*>[^<]*(?:Findings|Internal audit)[^<]*<\/h[1-6]>/i,
+  /\b(?:commit|source revision|source sha)\s+[0-9a-f]{9,40}\b/i,
+  /\b[A-Za-z0-9][A-Za-z0-9_-]*\.md\b/i,
+  /\bapp-server\s+check-(?:config|dependencies)\b/i,
+  /\benterprise\.warehouse\b/i,
   /(?:crates|clients|apps|ui\/src|app-server\/src|web-ui-server\/src|docs-obsidian|\.claude)\//i,
   /docs\/superpowers\//i,
   /\bwms-[a-z0-9_-]+\/(?:src|migrations?|sql)\//i,
@@ -440,19 +591,23 @@ export const PUBLIC_FORBIDDEN_PATTERNS = [
   /\bBASELINE(?::\d+(?:-\d+)?)?\b/i,
   /every arrow comes from (?:the )?code/i,
   /paths? to code start/i,
-  /\bTo verify\s*:/i,
+  /<(?:p|li|td|blockquote|strong)[^>]*>\s*(?:<[^>]+>\s*)*To verify\b/i,
+  /\(\s*(?:bug,\s*)?to verify\s*\)/i,
+  /\bSee (?:the )?["“]?To verify\b/i,
   /\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b/i,
   /\bmigrations?\s+\d{1,4}\b/i,
   /\bwms-app\s+\d{1,4}\b/i,
   /\bruling\s+[A-Z]\d+\b/i,
   /\b(?:[A-Za-z][A-Za-z -]+\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?/i,
   /\bowner decision\s+20\d{2}-\d{2}-\d{2}\b/i,
+  /\b(?:F|P)-\d{2}\b/,
   /\bcode comment\b/i,
   /\bdev(?:elopment)?\s+seed\b/i,
   /\b(?:I\s+)?search(?:ed|ing)?\s+(?:all\s+)?(?:the\s+)?(?:Rust\s+)?(?:code|crates|engine)\b/i,
   /\b(?:grep|rg)\b[^\n]*/i,
   /\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b/i,
   /\bchecked by searching\b/i,
+  /\b(?:(?:I|each(?: of these)?)\s+)?(?:(?:has|have|was|were|is|are)\s+)?searched\s+in\b/i,
   /\bLabel missing in English\b/i,
   /\bsee the findings file\b/i,
   /\bHow [^<>.!?\n]* was checked\b/i,

@@ -33,7 +33,7 @@ Other columns of `enterprise.user_warehouse` are `user_id` (the user of the card
 |---|---|
 | A user has at most one row for a given warehouse. | Unique key `user_warehouse_user_id_warehouse_id_key`. |
 | A user has at most **one** default warehouse. | Unique index `idx_user_warehouse_default` (one row with `is_default` for each user). |
-| After the row exists, you can change only `Role` and `Default`. To change the warehouse, remove the row and assign again. | `update_user_warehouse` accepts only these two fields (`crates/services/app-server/src/web/rpcs/user_warehouse_rpc.rs:38`). |
+| After the row exists, you can change only `Role` and `Default`. To change the warehouse, remove the row and assign again. | `update_user_warehouse` accepts only these two fields. |
 | A role that is in use cannot be deleted. | The foreign key from `user_warehouse.role_id` to `role` is `ON DELETE RESTRICT`. |
 | Deleting a user or a warehouse removes its assignments. | The foreign keys to `user` and `warehouse` are `ON DELETE CASCADE`. |
 
@@ -41,10 +41,10 @@ A duplicate is refused with `Duplicate entry on user_warehouse (constraint ...)`
 
 ## What it affects
 
-- **Which warehouses the switcher offers.** The list is read by `list_user_warehouses`. Only active warehouses are listed (`crates/libs/wms-lib-core/src/model/user_warehouse.rs`, method `list_for_user`).
+- **Which warehouses the switcher offers.** The list is read by `list_user_warehouses`. Only active warehouses are listed.
 - **The role in each warehouse.** Role resolution ignores a row whose role or warehouse is not active. A user with no usable role is refused by every API call.
-- **The warehouse that opens at sign-in.** The web sign-in uses the row marked `Default`; without one it uses the first row (`crates/services/web-ui-server/src/auth/session_init.rs:121`).
-- **Calls without a warehouse.** An API call that names no warehouse is accepted only when the user has exactly one default row. Otherwise it is refused as `warehouse_required` (`user_warehouse.rs`, function `select_access`).
+- **The warehouse that opens at sign-in.** The web sign-in uses the row marked `Default`; without one it uses the first row.
+- **Calls without a warehouse.** An API call that names no warehouse is accepted only when the user has exactly one default row. Otherwise it is refused as `warehouse_required`.
 - **Enterprise.** A row with the role `ADMIN` is what lets the user open [Enterprise](00-administration-overview.md).
 
 Each change writes an audit row of kind `user_warehouse_mutation` (see [Audit log](15-audit-log.md)) and clears the cached role decisions (the hook `after_mutation` of `UserWarehouseBmc`).
@@ -53,8 +53,7 @@ The cache of the web server is refreshed by the action `rbac_cache_refresh` that
 ## Who can use it
 
 The API methods `create_user_warehouse`, `update_user_warehouse` and `delete_user_warehouse` are open to the default role `ADMIN` only.
-`list_user_warehouse` and `count_user_warehouse` are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`
-(`crates/services/app-server/src/web/rpcs/user_warehouse_rpc.rs:19`).
+`list_user_warehouse` and `count_user_warehouse` are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`.
 
 ## Related pages
 

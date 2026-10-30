@@ -8,7 +8,7 @@ Read first what the registry really does: only the `Active` switch has an effect
 
 - You hold the role `ADMIN` and can open Enterprise.
 - You know the exact `Code`. A code you invent does not make the system write an event: the events are written by the program. The registry only lists them and, for `bio.*` codes, allows or stops them.
-- For a record-change event, the code is `bio.{table}.{operation}`, for example `bio.receipt.after_insert`. The table name and the operation (`after_insert`, `after_update`, `after_delete`) must match what the system builds (`crates/libs/wms-lib-core/src/model/base/crud_fns.rs:633`).
+- For a record-change event, the code is `bio.{table}.{operation}`, for example `bio.receipt.after_insert`. The table name and the operation (`after_insert`, `after_update`, `after_delete`) must match what the system builds.
 
 ## Steps: switch a record-change event on
 

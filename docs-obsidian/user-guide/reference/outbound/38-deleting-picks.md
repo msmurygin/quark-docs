@@ -28,8 +28,6 @@ For all picks at once see [Unallocating an order](37-unallocating-an-order.md).
 
 The screen calls the command once for each ticked row, and each call has its own key. A failed row does not stop the others. Only the **first** error is shown. After the run the selection is cleared, the grid is read again, and the status box of the header is updated.
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/pick_delete_action.rs:30-130`.
-
 ## What the command checks
 
 In this order:
@@ -38,8 +36,6 @@ In this order:
 2. The pick belongs to this order. Else `pick_detail {id} belongs to order {a}, not order {b}`.
 3. Nothing is picked: `pick_detail {id} already has {qty} picked — a started pick cannot be deleted; short it or cancel the pick itself (picking-phase operations)`.
 4. The task is not in work. A task that nobody has claimed (`Created`) does not protect the pick: it is deleted together with the pick. A task that is `Assigned` or later refuses. The text is `pick_detail {id} взята в работу (task {id} is in work) — снять её может только фаза отбора`. Part of this message is in Russian in the code. It means: the pick is taken into work, only the picking phase can release it.
-
-Source: `crates/libs/wms-outbound/src/service/order/delete_pick.rs:107-185`.
 
 ## What changes
 

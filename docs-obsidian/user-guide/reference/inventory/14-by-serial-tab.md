@@ -3,7 +3,7 @@
 The `By Serial` tab is the register of serial numbers. It shows **one row for each serial number** the warehouse knows, with its status and where it is.
 The form is `inventory_balance_serial_list`. The data object is `inventory_balance_serial`, over the table `inventory_balances_serial`. The list is read by `list_inventory_balance_serial`.
 
-The list is read only. The tab has no button to change a serial: serials change only through the receiving, move, pick and ship commands (`crates/services/app-server/src/web/rpcs/inventory_balance_serial_rpc.rs:1-12`).
+The list is read only. The tab has no button to change a serial: serials change only through the receiving, move, pick and ship commands.
 The same list form is the `Serials` tab of a receipt line. See [Line serials tab](../inbound/24-line-serials-tab.md).
 
 ## Columns
@@ -20,8 +20,6 @@ The same list form is the `Serials` tab of a receipt line. See [Line serials tab
 | `Status` | `status` | Text | Text | No | Yes | The status of the serial. See below. |
 | `Received` | `received_at` | Date and time | Date | No | Yes | When the serial was received. |
 
-Source: the table `inventory_balances_serial` and the view `serial_received_receipt` in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql` (lines 2554 and 5767). The lookup that turns `received_via` into a number is the formatter `fk:serial_received_receipt:receipt_number`.
-
 ## Serial statuses
 
 The column `status` holds one of these values (database type `serial_status`):
@@ -37,8 +35,6 @@ The column `status` holds one of these values (database type `serial_status`):
 | `Damaged` | Reported damaged. |
 | `Held` | Under a hold. |
 | `Disposed` | Written off. Final. |
-
-> Not confirmed by code: the exact moves between these statuses. They are decided by the serial commands (`serial_commands_rpc.rs`), which this section does not describe. To verify: read the serial tracking pages of the inbound section, then follow one serial from receipt to shipment on a test warehouse.
 
 ## Related pages
 

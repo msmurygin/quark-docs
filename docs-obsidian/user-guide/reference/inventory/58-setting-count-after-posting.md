@@ -28,7 +28,7 @@ Use this page to choose whether the locations changed by an adjustment are count
 
 Only the key `count_after_post` in the `metadata` of that value of the code list `inv_adjust_reason`. The other keys stay as they were. The change is a set, not a toggle.
 
-Later, when an adjustment with that reason is posted, each location of a changed line is named once, and the post sends the event `process.inventory.count_requested` with source `Adjustment`. An internal subscriber handles it (`count_requested_by_event`, `crates/libs/wms-inventory/src/service/inventory_count/request_location.rs`):
+Later, when an adjustment with that reason is posted, each location of a changed line is named once, and the post sends the event `process.inventory.count_requested` with source `Adjustment`. An internal subscriber handles it:
 
 - If a live row of another count already counts the location (`Open` or `Variance`), the request joins that count and nothing new is made.
 - Otherwise a count of type `Event` for that one location starts: `Blind`, recounted by another counter. The location goes to Task Manager ahead of the planned ones.

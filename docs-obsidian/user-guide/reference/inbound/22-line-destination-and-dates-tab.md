@@ -20,26 +20,24 @@ The form is `receipt_detail_destination_form`. The data table is `receipt_detail
 ### To Location and To Lot
 
 - A location that does not exist is refused by the database (`fk_receipt_detail_to_loc`, rule `ON DELETE RESTRICT`).
-- Every receive writes the location and the lot back to the line (`crates/libs/wms-inbound/src/service/receipt/receive/receive_line_finalizer.rs:192-199`). A planned value is therefore replaced at the first receive.
+- Every receive writes the location and the lot back to the line. A planned value is therefore replaced at the first receive.
 - The receive window does not read the planned location. Its default is the receiving location of the owner (`default_receiving_loc` in `Owners > WH Settings`).
 - The lot is chosen by the lot policy of the SKU when goods are received. A lot you type here is not used for that.
 - Before the first receive, no rule reads either value. Treat them as notes.
-- The tab `To Location` is read only for receipts of type `Sscc` and `CaseLevel` (`crates/services/web-ui-server/src/extensions/customization/receipt/detail_render_action.rs:93-98`).
+- The tab `To Location` is read only for receipts of type `Sscc` and `CaseLevel`.
 
 ### To LPN
 
-- Set by receiving. It shows the code of the pallet (container) that received goods went into (`receive_line_finalizer.rs:132`).
+- Set by receiving. It shows the code of the pallet (container) that received goods went into.
 - The planned pallet of the line is the field `LPN` on the [Detail tab](21-line-detail-tab.md).
 
 ### The four dates
 
 Stored only. They have no effect today.
-The date check at receiving reads the dates you scan as lot attributes (`expiration_date`, `manufactured_date`, `delivery_by_date`, `best_by_date`), not these planned dates (`crates/libs/wms-inbound/src/service/receipt/validation/rules/date_deviations.rs:40-125`).
-The planned dates are written only when a line is created by an unplanned receive (`receive_against_asn.rs:790-816`).
+The date check at receiving reads the dates you scan as lot attributes (`expiration_date`, `manufactured_date`, `delivery_by_date`, `best_by_date`), not these planned dates.
+The planned dates are written only when a line is created by an unplanned receive.
 
-The four fields are read only when the status of the line is `InProgress`, `OnHold`, `Closed` or `Cancelled` (`detail_render_action.rs:73-86`).
-
-> Not confirmed by code: whether the four date fields are really read only on this tab for a line that is `In progress`. The rule reads the field `status`, which is on the Detail tab and not on this tab. To verify: open a line with status `In progress`, open this tab, and try to type a date.
+The four fields are read only when the status of the line is `InProgress`, `OnHold`, `Closed` or `Cancelled`.
 
 ## Messages
 

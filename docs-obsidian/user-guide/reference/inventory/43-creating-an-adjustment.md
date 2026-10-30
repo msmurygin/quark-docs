@@ -26,8 +26,6 @@ Use this page to start a document that will correct stock. You make the header f
 | Number too long | `an adjustment number is at most 20 characters` |
 | `REVERSAL` chosen | `a reversal is made from the posted adjustment it reverses, not by hand` |
 
-> Not confirmed by code: how the window words the check on an empty `Reason`. To verify: press `Save` with an empty `Reason`.
-
 ## What changes
 
 | What | Change |

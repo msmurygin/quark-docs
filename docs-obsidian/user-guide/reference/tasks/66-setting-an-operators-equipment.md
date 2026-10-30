@@ -26,7 +26,6 @@ The operator row is updated. Only `Equipment Profile` is sent. Login, name and a
 | A profile with `max_weight` 0, or no profile | No lifting limit. |
 
 A task with no known weight passes any limit.
-Source: `TaskBmc::LIFTABLE_SQL` in `crates/libs/wms-lib-core/src/model/tasks/task.rs`, `crates/libs/wms-lib-core/src/model/equipment_profile.rs:55-90`.
 
 The value can be replaced later when the operator names a machine on the RF terminal. See [Operator card](51-operator-card.md#the-terminal-can-change-it-too).
 
@@ -36,8 +35,6 @@ The value can be replaced later when the operator names a machine on the RF term
 |---|---|
 | A refusal that names the profile (restrict key) | The profile does not exist or cannot be used. |
 | `Forbidden` for the method | Your role has no right to `update_operator`. |
-
-> Not confirmed by code: the exact text of both refusals. To verify: try to save as `SUPERVISOR` on a test warehouse. The profile is protected by a `RESTRICT` key (comment in `claim.rs:180`).
 
 ## Related pages
 

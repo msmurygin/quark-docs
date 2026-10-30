@@ -34,16 +34,6 @@ Reading notes:
 - The command checks happen in this order: lock the receipt row, compare the version (only for the commands that carry one), then check that the status allows the command.
 - Releasing a receipt that is `Open` or `InProgress` is refused with an "invalid state" error. It is not a silent no-op (see the findings file).
 - Putting a receipt on hold does not hold any stock. It changes the receipt and its lines only.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Aggregate transitions | `crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:139-184` (cancel), `:200-224` (close), `:237-252` (hold), `:281-299` (release), `:364-382` (first receive) |
-| Which commands each status allows | `crates/libs/wms-inbound/src/service/receipt/state_machine.rs:71-99` |
-| Lock, version, status order | `crates/libs/wms-inbound/src/service/receipt/shared/receipt_locking.rs:70-103` |
-| Status list | `crates/libs/wms-lib-core/src/model/receipt/receipt.rs:43` |
-
 ## Diagram 2. What hold and release change
 
 **What this shows:** the writes of `receipt_put_on_hold` and `receipt_release_from_hold`.
@@ -67,17 +57,6 @@ Reading notes:
 - After a release of an untouched receipt the header is `Open`, but its lines are `InProgress` (see the findings file).
 - There is no inventory hold in this flow. To hold stock, use the inventory hold function.
 - On the web, the receipt list calls these commands for each selected receipt with a new key each time. A failure on one receipt does not stop the others.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Put on hold | `crates/libs/wms-inbound/src/service/receipt/lifecycle/put_on_hold.rs:74-153` |
-| Release | `crates/libs/wms-inbound/src/service/receipt/lifecycle/release_from_hold.rs:69-132` |
-| Class `stateless_command` | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:227-262` |
-| Web batch release | `crates/services/web-ui-server/src/extensions/customization/receipt/lifecycle_action.rs:96-158` |
-| Web list actions for hold, cancel, close | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:5679-5684` |
-
 ## Diagram 3. When a receipt can be cancelled
 
 **What this shows:** the one rule for `receipt_cancel` and what it writes.
@@ -98,16 +77,6 @@ Reading notes:
 - `receipt_cancel` is a `stateful_command` on the receipt header. A stale version is refused with a version conflict (code 40) and the answer carries the current state.
 - `cancel_summary` holds the time, the reason, the user and the number of lines.
 - A receipt with received goods cannot be cancelled. The way out is to close it.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Command | `crates/libs/wms-inbound/src/service/receipt/lifecycle/cancel_receipt.rs:77-158` |
-| The all-Pending rule | `crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:154-170` |
-| Code 72 mapping | `crates/libs/wms-inbound/src/service/receipt/lifecycle/cancel_receipt.rs:164-187` |
-| Class and versioned entity | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:181-195` |
-
 ## Diagram 4. The gates of `receipt_close`
 
 **What this shows:** the checks of one close, in order. The first one that fails stops the close.
@@ -138,21 +107,6 @@ Reading notes:
 - `close_summary` records who authorised the discrepancy (`discrepancy_override`: code, user, grant id).
 - Nothing in the code reacts to `ready_for_putaway` except the dock-to-stock KPI. Closing a receipt does not create putaway work. Putaway starts when an operator scans the LPN (page 20).
 - A line with fewer serials than due makes the line and the header `Partial` (page 14), so it needs the same approval.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Whole command | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:99-355` |
-| Serial gate (`Open`, `InProgress`, `AwaitingConfirmation`, `Abandoned`) | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:124-162`, `crates/libs/wms-lib-core/src/model/serial_capture/episode.rs:844-859` |
-| Damage gate | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:164-181`, `crates/libs/wms-inbound/src/queries/receipt/blockers.rs:35-55` |
-| Discrepancy rule | `crates/libs/wms-inbound/src/repo/completion_compute.rs:236-245` |
-| Setting and approval | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:183-266` |
-| Writes and events | `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:268-346` |
-| RF close screens | `crates/libs/wms-lib-sql/sql/rf-screens/025_uc_receipt_close.sql:41-230` |
-| Class and versioned entity | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:198-218` |
-| Only reader of `ready_for_putaway` | `crates/libs/wms-inbound/src/service/receipt/kpi.rs:91`, `crates/libs/wms-lib-core/src/model/integration/integration_event.rs:181-204` |
-
 ## Diagram 5. How completion is decided
 
 **What this shows:** how the numbers on a line become `Pending`, `Partial`, `Full` or `Over`, and how lines become the header status.
@@ -179,14 +133,6 @@ Reading notes:
 - The header is grouped by SKU. A line received into two LPNs (a second synthetic line with expected 0) does not make the header `Over` when the sum matches.
 - For a serial SKU, a line is lowered from `Full` to `Partial` when the registered serials are fewer than due.
 - The values are stored on the line and on the header. The close recomputes them first.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Classification and header rule | `crates/libs/wms-inbound/src/repo/completion_compute.rs:28-121`, `:159-200` |
-| Serial coverage downgrade | `crates/libs/wms-inbound/src/repo/completion.rs:48-125`, `:257-287` |
-
 ## Diagram 6. Adjusting a received quantity
 
 **What this shows:** what `receipt_adjust_received_qty` does for a plus or a minus.
@@ -213,23 +159,6 @@ Reading notes:
 - The plus changes `qty_received` only. No stock is made (see the findings file).
 - The result holds the new line version and the new header version. A later close must use the new header version.
 - Operators with the floor roles may adjust. The reason, and the quantity left off the plan, meet the supervisor at close.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Command | `crates/libs/wms-inbound/src/service/receipt/receive/adjust_received_qty.rs:164-349` |
-| Preview and warning | `crates/libs/wms-inbound/src/service/receipt/receive/adjust_received_qty.rs:57-109` |
-| Reverse of stock and its blockers | `crates/libs/wms-inventory/src/inventory_service.rs:79-138`, `:2173-2260` |
-| Class, versioned entity and roles | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:46-55`, `:151-180` |
-| RF screens `RCADJ01`, `RCADJ02` | `crates/libs/wms-lib-sql/sql/rf-screens/027_uc_receipt_adjust.sql:1-198` |
-
-## Not confirmed by code
-
-- What a web user sees when they release a receipt that is not on hold. The command refuses; the web action collects the message with `operator_message`. To verify: select an open receipt and press Release.
-- Whether a form in the web UI lets a user cancel a receipt with a typed reason. The list action exists in the metadata (`receipt_cancel`); its dialog was not read.
-- The exact texts of codes 40, 71, 72, 73 and 77 on screen. To verify: the return code reference.
-
 ## Related pages
 
 - [Reference: receipt statuses and transitions](../../reference/inbound/90-receipt-statuses-and-transitions.md)

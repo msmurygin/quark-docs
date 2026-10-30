@@ -43,7 +43,6 @@ Table: `pick_assignment` (read through the view `pick_assignment_board`). All co
 | `Version` | `version` | Whole number | Yes | The change counter. `Dissolve` sends it back. |
 
 The view also has the completion time (`completed_at`), the policy grouping unit and the work area id. The list does not show them.
-Source: view `pick_assignment_board` in `crates/libs/wms-lib-sql/sql/wms-app/migrations/051_the_supervisor_sees_pick_assignments.sql:91-130`.
 
 ## Toolbar buttons
 
@@ -53,7 +52,6 @@ Source: view `pick_assignment_board` in `crates/libs/wms-lib-sql/sql/wms-app/mig
 | `Refresh` | Nothing | Reads the list again. | |
 
 The grey text of `Dissolve` is `Tick exactly one assignment in Building, Ready or Picking (a Delivering one is completed, not dissolved)`.
-Source: the binding `generic_disable_unless_field_in` in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/086_the_supervisor_sees_and_dissolves_pick_assignments.sql:561-564`.
 
 ## Row actions
 
@@ -82,8 +80,6 @@ Buttons: `Cancel` closes the window. `Dissolve` runs the command `pick_assignmen
 | `VIEWER` | Same as `OPERATOR` | No |
 
 The details are on [Who can do what](91-who-can-do-what.md).
-
-> Not confirmed by code: what an `OPERATOR` or `VIEWER` sees when they open this list. The menu and form defaults allow it. The read methods `pick_assignment_list`, `pick_assignment_board_get` and `pick_assignment_position_list` are for `ADMIN`, `MANAGER` and `SUPERVISOR` only. To verify: sign in as `OPERATOR` on a test warehouse and open `Pick Assignments`.
 
 ## What this screen affects
 

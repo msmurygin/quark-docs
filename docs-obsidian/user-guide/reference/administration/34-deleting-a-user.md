@@ -36,8 +36,6 @@ There is no confirmation window in the metadata of the button. The deletion happ
 
 Because every administrator action is written to the audit log with the actor, an account that has ever changed a user, a role or a permission cannot be deleted. The same holds for a role named in a refused call (`audit_log_role_id_fkey`).
 
-> Not confirmed by code: the text the screen shows for the foreign key error. To verify: create a test user, sign in as that user and make a call that is refused (so an audit row is written), then try to delete the test user.
-
 ## Related pages
 
 - [User card, General tab](11-user-general-tab.md)

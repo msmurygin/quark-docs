@@ -41,21 +41,6 @@ sequenceDiagram
 - Boxes with goods keep their stock and stand as separate roots at the delivery location. Empty boxes come off. The cart becomes `Empty` and can be used again.
 - The router hand-off exists only when the cart was routed at start: `Completion` = `ConfirmAtLocation` and the area has a pack station. A cart with `Complete` is never routed.
 - A repeat of the call answers `PICK_ASSIGNMENT_ALREADY_DELIVERED`.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Steps and lock order | `crates/libs/wms-outbound/src/picking/completion/confirm_at_location.rs:1-130` |
-| The rules and refusal codes | `crates/libs/wms-outbound/src/domain/pick_assignment/delivery.rs:40-250` |
-| Move or hold the cart | `crates/libs/wms-outbound/src/picking/carrier/relocate.rs` |
-| Unload at delivery | `crates/libs/wms-outbound/src/picking/carrier/unload.rs` |
-| Router hand-off | `crates/libs/wms-outbound/src/picking/completion/hand_off.rs:1-70` |
-| `Completed` and `delivered_at` | `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:755-790` |
-| Command | `crates/libs/wms-outbound/src/picking/commands/complete.rs:1-90` |
-| RF screens | `crates/libs/wms-lib-sql/sql/rf-screens/096_uc_pick_route.sql` |
-| API method | `docs-obsidian/user-guide/api/openrpc.json` (`pick_assignment_complete`) |
-
 ## Related pages
 
 - [Drop-off of a pallet](23-drop-off-pallet.md)

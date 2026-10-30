@@ -25,23 +25,6 @@ flowchart LR
 - **Target Binding** and **Deposit Mode** are checked by the shape rule only (`BeforeRoute` and `DirectToTarget` for a cart). The route guard for the deposit mode never fires after that. Which deposit a pick uses is decided by whether the pick belongs to a live assignment.
 - The delivery location itself does not come from the policy. It is the owner field `Delivery location (picker carrier)`, else the `To Location` of the tasks when they all agree. See [delivery location](58-influence-delivery-destination.md).
 - A cart that already started keeps its copy. New starts use the new revision.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Shape rules (`Order` and `PlannedTarget`) | `crates/libs/wms-outbound/src/domain/picking_policy/aggregate.rs:195-262` |
-| `Max Targets` range | `crates/libs/wms-outbound/src/domain/picking_policy/aggregate.rs:195-199` |
-| `Scan Carrier` answer | `crates/libs/wms-outbound/src/picking/commands/dispatch_next.rs:272-300` |
-| Start refuses a non-carrier policy, router for `ConfirmAtLocation` | `crates/libs/wms-outbound/src/picking/commands/start.rs:193-218` |
-| Capacity | `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:50-55` |
-| Free places after a full box | `crates/libs/wms-outbound/src/picking/target/close.rs:331-336` and `crates/libs/wms-outbound/src/domain/pick_assignment/tare.rs:200-212` |
-| Summary step rule | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:56-115` |
-| Start guard for `Target` | `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs:240-260` |
-| Delivery by `Completion` | `crates/libs/wms-outbound/src/domain/pick_assignment/delivery.rs:200-235` |
-| Deposit mode guard | `crates/libs/wms-outbound/src/domain/pick_assignment/route.rs:249-262` |
-| Retire is refused for `DISCRETE` and for codes areas use | `crates/libs/wms-outbound/src/service/picking_policy/lifecycle.rs:460-480` |
-
 ## Related pages
 
 - [Which policy is read](50-influence-which-policy-applies.md)

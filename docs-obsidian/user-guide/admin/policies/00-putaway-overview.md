@@ -14,10 +14,6 @@ This file explains how putaway works. The other three files list every setting:
 - `02-putaway-zone-settings.md` - the putaway zone and its lot mixing rules.
 - `03-location-settings.md` - the location and its lot mixing rules.
 
-Paths to code start at `crates/libs/` unless they start with `crates/services/`.
-`BASELINE` is `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`.
-Where docs in `docs-obsidian/putaway_policy/` and `docs-obsidian/architecture/putaway-step-screen.md` disagree with this guide, trust this guide. It follows the code.
-
 ## 1. What putaway decides
 
 Putaway answers one question: **"Where should this pallet go?"**
@@ -27,8 +23,7 @@ Putaway answers one question: **"Where should this pallet go?"**
 - Putaway never moves stock itself. The operator (or the RF screen) then runs a move to the suggested location.
 - The engine moves a whole container. It does not split a pallet.
 
-The engine is called by the RF screen `PUTW03` and by the API method `putaway_suggest_location`
-(`crates/services/app-server/src/web/rpcs/putaway_rpc.rs:42`; roles `Admin` and `Manager` in the method table).
+The engine is called by the RF screen `PUTW03` and by the API method `putaway_suggest_location`.
 The step editor uses a "dry run" that asks the same question and then throws the answer away.
 
 ## 2. The order the system works in
@@ -38,12 +33,12 @@ The code is `wms-inventory/src/putaway/mod.rs`, function `run_steps` (line 793).
 
 1. **The request is checked.** The container must exist, stand in a location and hold stock.
    Messages: `container N not found`, `container N has no current location to put away from`, `container N holds no stock to put away`.
-2. **The pallet is read once** (`load_pallet`, `mod.rs:1320`): its lines (owner, SKU, lot, quantity), total cube, total weight,
+2. **The pallet is read once**: its lines (owner, SKU, lot, quantity), total cube, total weight,
    number of stock-bearing containers, the largest `Positions required`, the lowest item `Stack limit`, and the pallet size from the pack.
-3. **One policy is chosen** (`policy.rs:132`). Each SKU uses its own `Putaway Policy`, or the owner default if it has none.
+3. **One policy is chosen**. Each SKU uses its own `Putaway Policy`, or the owner default if it has none.
    All SKUs on the pallet must give the same policy. If not: `LPN spans SKUs with different putaway policies: ...`.
    If no policy is found: `no putaway policy on the SKU or the owner default`.
-4. **The whole policy is checked** (`step.rs:184`, called at `mod.rs:860-881`). If one step cannot run, the **whole policy is refused**.
+4. **The whole policy is checked**. If one step cannot run, the **whole policy is refused**.
    The engine does not skip a bad step, because that would run a different policy than the one written.
    Examples: a step with `Assigned slot` or `Nearest to the assigned slot`; `Must be empty` with `Consolidate`; a condition with a value that does not exist.
 5. **Two timers are read:** the reservation time (`PUTAWAY_RESERVATION_TTL_MIN`, default 15 minutes) and the lock wait (5 seconds).
@@ -54,8 +49,8 @@ The code is `wms-inventory/src/putaway/mod.rs`, function `run_steps` (line 793).
    4. **Temperature** (only if the step switch is on). If the zone does not suit, `skipped:temperature`.
    5. **Candidates.** The system reads locations of the search space that pass the fixed gate
       (status `Ok`, flag `None`, not `Discard LPN`, an allowed type) and the step's `Location` conditions, in the step's order.
-      It reads **20 at a time, at most 5 times: 100 candidates per step** (`candidates.rs:28-32`).
-   6. **Four checks on each candidate, in this order** (`predicate.rs:1041`):
+      It reads **20 at a time, at most 5 times: 100 candidates per step**.
+   6. **Four checks on each candidate, in this order**:
       1. `mix_intent` - the step's occupancy rule (`Must be empty`, one SKU, one SKU and lot).
       2. `consolidate` - only for `Consolidate` steps.
       3. `capacity` - oversize sections, then the fit switches (cube, weight, pallet size, stack limit, quantity), then the zone case limit.
@@ -64,16 +59,14 @@ The code is `wms-inventory/src/putaway/mod.rs`, function `run_steps` (line 793).
    8. **Reserve.** The system locks that location (waits up to 5 seconds), asks all four checks **again**
       (another operator may have won), then writes the reservation. A pallet has at most one live reservation.
 7. **If no step gives a location**, the answer is "no location". The reason is `no_eligible_location`, or `pallet_already_reserved`
-   if another request holds the pallet's reservation right now (`command.rs:152-165`).
+   if another request holds the pallet's reservation right now.
 
 After the answer:
 
 8. **The reservation** is visible under `Sidebar > Management & Control > Inventory > Pending Move-In`. Other searches count its cube, weight and pallet position
-   as taken. It lasts `Putaway Reservation TTL (min)` of the owner, else `PUTAWAY_RESERVATION_TTL_MIN` (15). A sweeper runs every 5 minutes and frees expired ones
-   (`putaway/sweeper.rs`).
+   as taken. It lasts `Putaway Reservation TTL (min)` of the owner, else `PUTAWAY_RESERVATION_TTL_MIN` (15). A sweeper runs every 5 minutes and frees expired ones.
 9. **The move** is run with the reservation id. It is a "directed" move. The move checks again, **always**, these rules: destination type, holds on source and destination,
-   location and zone cube and weight, zone case count, `Mix SKU`, `Mix Lot` and the lot attribute rules
-   (`wms-inventory/src/movement/validation.rs`). It does **not** check the step's occupancy rules, `Stack limit`, `Max quantity` or pallet size.
+   location and zone cube and weight, zone case count, `Mix SKU`, `Mix Lot` and the lot attribute rules. It does **not** check the step's occupancy rules, `Stack limit`, `Max quantity` or pallet size.
    If the operator picks another place, a broken soft rule becomes a deviation that must be acknowledged (code 85).
    If the system setting `COUNT_ON_PUTAWAY_DEVIATION` is `1`, the destination is queued for a count.
 
@@ -244,7 +237,7 @@ Walk. Tote T1: 300 pieces of `SCREW-M6` (cube 600,000 mm³, weight 1,500 g). She
 
 What to watch:
 - **The `Quantity` check counts stock only.** It does not count pieces promised to another tote by a live reservation. Two totes asked one after the other
-  can both be sent to a shelf that holds 380 and together exceed 500. Cube, weight and pallet positions do count reservations. (`space.rs:732-742`; the reservation row has cube and weight but no quantity.)
+  can both be sent to a shelf that holds 380 and together exceed 500. Cube, weight and pallet positions do count reservations.
   The move does not check `Max quantity` either. Use a short reservation time on pick faces.
 - `Max Weight Capacity` is 0, so even if `Weight` were on it would not run.
 - Step 30 refuses nothing on weight if the pack has no weight: `loc_weight:no_stock_weight`.
@@ -277,7 +270,7 @@ Walk 1. Pallet P1: SKU `PEANUT`, lot `F-100`, `ALLERGEN = YES`.
 
 Walk 2. Pallet P2: SKU `RICE`, lot `F-200`, `ALLERGEN = NO`. `F-01-0` holds `RICE` lot `F-150`.
 - Step 10: the lot has `ALLERGEN = NO`, so the condition fails. Status `skipped:product:LotAttribute`.
-- Step 20: the SKU class matches. `F-01-0`: occupancy - two identities (`RICE/F-150`, `RICE/F-200`). Refused `mix_intent_sku_lot`.
+- Step 20: the SKU class matches. `F-01-0`: occupancy - two identities. Refused `mix_intent_sku_lot`.
   `F-01-1` is empty. Landing: `Mix SKU` off is fine (nothing else there). The zone rule `ALLERGEN` does not refuse because the pallet has one lot. **Wins: F-01-1.**
 
 Walk 3. Pallet P3: SKU `MIX1`, lot `F-300` (`ALLERGEN = YES`) and lot `F-301` (`ALLERGEN = NO`) on one pallet.
@@ -314,18 +307,18 @@ Open the policy and run `Dry run` on the LPN. Read the sentence for each step.
 These are real behaviours of the current code. File and line are given.
 
 1. **The step editor offers two values that do not work.** `Assigned slot` and `Nearest to the assigned slot` are shown switched off (`not implemented yet`),
-   but the API can still store them, and then the engine refuses the whole policy (`step.rs:234-257`).
-2. **`Pick route` does not use `Route Sequence`.** It orders by aisle, bay, level, code (`location.rs:420`). Aisle is text.
-3. **The step readback sentence ignores two fit switches** (`Stacking limit`, `Quantity`) and says "Checks nothing physical" when only those are on (`putaway_step_describe.rs:1047-1066`).
-4. **The `Temperature` label says "cover" and "location".** The code tests overlap of the **zone** range with the SKU range (`step.rs:458-469`). The dry run says "suit" and is right.
-5. **Turning `Cube` or `Weight` off in a step does not stop the move from checking them** (`movement/validation.rs:960-1000`). Putaway may offer a place the move then refuses.
-6. **`Quantity` ignores quantity promised by reservations.** Cube, weight and positions do not (`space.rs:732-742`).
-7. **Location `Mix SKU` and `Mix Lot` do not see reservations.** Only the step rule `Mixed SKU` / `Mixed lot` does (`inventory_service.rs:999-1091`, `predicate.rs:534-598`).
+   but the API can still store them, and then the engine refuses the whole policy.
+2. **`Pick route` does not use `Route Sequence`.** It orders by aisle, bay, level, code. Aisle is text.
+3. **The step readback sentence ignores two fit switches** (`Stacking limit`, `Quantity`) and says "Checks nothing physical" when only those are on.
+4. **The `Temperature` label says "cover" and "location".** The code tests overlap of the **zone** range with the SKU range. The dry run says "suit" and is right.
+5. **Turning `Cube` or `Weight` off in a step does not stop the move from checking them**. Putaway may offer a place the move then refuses.
+6. **`Quantity` ignores quantity promised by reservations.** Cube, weight and positions do not.
+7. **Location `Mix SKU` and `Mix Lot` do not see reservations.** Only the step rule `Mixed SKU` / `Mixed lot` does.
 8. **`Stored only` fields.** Zone: `Inbound Location`, `Outbound Location`, `RF Pick Strategy`, `Replenishment Allowed`, `Replenishment Threshold`, `Default Label Printer`,
    `Default Report Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`. Location: `Cube`, `Check Digit`. SKU `Putaway Class = NoMix` does nothing unless a step has a `Putaway class` condition.
-9. **Stale comments.** `predicate.rs:197-218` says putaway does not exclude `Discard LPN` locations, but the candidate SQL does (`location.rs:2143`).
-   The column comment on `location.loc_flag` says moves need flag `None`, but moves ignore flags (`validation.rs:544-575`).
-   `docs-obsidian/putaway_policy/README.md` says zone lot rules have no reader. They do (`inventory_service.rs:1537-1555`).
-10. **`Allocation` still allocates from `Lost` locations** (`inventory_balance_atp.rs:338-343`, open point in the code comment).
+9. **Stale comments.** `predicate.rs:197-218` says putaway does not exclude `Discard LPN` locations, but the candidate SQL does.
+   The column comment on `location.loc_flag` says moves need flag `None`, but moves ignore flags.
+   `docs-obsidian/putaway_policy/README.md` says zone lot rules have no reader. They do.
+10. **`Allocation` still allocates from `Lost` locations**.
 11. **`Generate` does not set aisle or bay**, so putaway order for generated locations is by level then code (`03-location-settings.md`, section 5).
 12. **Zone `Description` is never NULL,** so the step editor's zone list can show an empty name (`wms-meta-ui` baseline, `zones` source).

@@ -49,8 +49,6 @@ Clear the cell `Translation` and save. The slot becomes empty (not translated), 
 | Table `label` or `message_keys` | `default_text` holds the new English text (when you changed it). |
 | Screens | They show the new text, after the web server has reloaded its translations. |
 
-> Not confirmed by code: how soon the new text appears on the screens. See [Translations](17-translations.md). To verify: translate a caption, then open the screen as a user of that language.
-
 ## What can go wrong
 
 | Problem | Meaning | Fix |

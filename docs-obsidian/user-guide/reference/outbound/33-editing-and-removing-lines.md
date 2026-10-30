@@ -24,8 +24,6 @@ To change only the quantity of a line, also see [Changing a line quantity](34-ch
 | The order is launched, or the line is reserved, and you changed anything else | Refused: `Only the ordered quantity can change on this line — release its reservations first (Unallocate) to edit the rest` |
 | You changed nothing | `Nothing changed`. No command is called. |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/line_write_route.rs:128-175`.
-
 ## Removing a line
 
 1. Open the line card.
@@ -36,8 +34,6 @@ The button is grey when the order is launched or finished, or when the line has 
 
 Lines are **not renumbered** after a removal. `Line #` is an identifier that other systems may have quoted. A gap stays.
 Removing the only line that was not allocated can lift a `Partially allocated` order back to `Allocated`.
-
-Source: `line_save_action.rs:255-310`, `crates/libs/wms-outbound/src/service/order_line/remove.rs:44-105`, `status_render.rs:176-190`.
 
 ## What the screen says
 
@@ -58,8 +54,6 @@ Source: `line_save_action.rs:255-310`, `crates/libs/wms-outbound/src/service/ord
 | `'order line' can only be changed before the order is released ({why})` | The order is launched. | Use `Cancel Qty` to reduce a line. |
 | `version conflict on shipment_order_line {id}` | Somebody changed the line after you opened it. | Close the card and open the line again. |
 | `line {id} does not belong to order {id}` | The line is of another order. | Open the right order. |
-
-Source: `crates/libs/wms-outbound/src/service/shared/mutability.rs:78-93`.
 
 ## Related pages
 

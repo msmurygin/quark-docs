@@ -34,7 +34,6 @@ On success the window closes and the grid is read again. The message is `Task {c
 | `Version` | Up by one |
 
 The command writes your user as the one who changed the row. It writes no line in the audit log.
-Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:1617-1647` and `crates/libs/wms-tasks/src/service/release.rs:224-300`.
 
 For a pick with a serial scan already open, the rule of the SKU (`pick_episode_reassignment_mode`) decides what happens to the scanned units:
 
@@ -45,7 +44,6 @@ For a pick with a serial scan already open, the rule of the SKU (`pick_episode_r
 | `CancelAndRestart` | The scan is cancelled. The scanned units are kept for audit. The new operator starts the scan again. |
 
 An abandoned scan refuses the reassign whatever the rule is (`SERIAL_EPISODE_ABANDONED`).
-Source: `crates/libs/wms-outbound/src/picking/infrastructure/holder_change.rs:1-30,90-130`.
 
 ## If it is refused
 
@@ -64,16 +62,10 @@ The failure message is `Task {code} could not be reassigned: {error}`.
 | `Choose an operator to reassign the task to` | `Operator` is empty. | Choose one. |
 | `The task board has moved on — reselect the task and try again` | The ticked row is gone, or its version is not known. | Refresh and tick again. |
 
-Sources: `release.rs:224-300`, `crates/libs/wms-tasks/src/error.rs`, `crates/libs/wms-inventory/src/domain/inventory_count/aggregate.rs:329-341`, `063_task_reassign_uses_rpc_command.sql:25-70`.
-
-> Not confirmed by code: whether a reassign to the operator who already holds the task is refused. The code has no rule for it. To verify: reassign a task to its own holder on a test warehouse.
-
 ## What it affects
 
 - The old holder's terminal loses the task. The new holder finds it as their own open task.
 - Nothing checks the new operator's rights (`Task Permissions`) or equipment. A supervisor may give any active operator any task.
-
-> Not confirmed by code: that no check of rights happens. The reassign code path (`release.rs:224-300`) reads only the operator row and its `is_active` flag. To verify: reassign a `Pick` task to an operator who has no `Pick` right and try to continue it on the RF terminal.
 
 ## Related pages
 

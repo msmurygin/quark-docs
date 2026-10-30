@@ -5,7 +5,7 @@ It is the task board, narrowed to the tasks of this one order.
 A task is a unit of work for a picker. Allocation and release make the pick tasks.
 The form is `shipment_order_tasks_form`. The data comes from the database view `task_board` (data object `order_task`).
 
-The tab shows every column that the task board shows (checked by the test `crates/services/web-ui-server/tests/shipment_order_metadata.rs`, see `wms-meta-ui` migration 086).
+The tab shows every column that the task board shows.
 The grid has check boxes. Task-management buttons work on the ticked rows. Paper-pick buttons record the physical pick and place its pallet.
 
 ## Columns
@@ -43,10 +43,6 @@ The task columns are read only. The paper-pick input columns are editable and ar
 | `Version` | `version` | Whole number | No | The version the buttons send back. |
 | `Carton` | `cartonization_outcome` | Text, shown as a cell | Yes | The same cell as on the [Picks tab](12-picks-tab.md). |
 | `Pick Assignment` | `pick_assignment_code` | Text | Yes | The pick assignment the task belongs to. |
-
-Source: form `shipment_order_tasks_form` in `001_baseline.sql`, and `wms-meta-ui` migrations 027, 030 and 086. The task values are the types `task_status` and `task_type` and the constraint `ck_task_return_kind` in `wms-app` `001_baseline.sql`.
-
-> Not confirmed by code: the exact meaning of `Lease Expires`, `Available From`, `Refusals`, `How Returned` and `Pick Assignment`. The names are clear, but the rules behind them live in the task manager and were not read for this page. To verify: read `crates/libs/wms-tasks` and the Task Board pages when they are written.
 
 ## Toolbar
 

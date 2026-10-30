@@ -12,27 +12,25 @@ The form is `shipment_order_shipto_form`. The data table is `shipment_order`.
 | `Carrier` | `carrier_id` | Pick list of owners | No | An owner of type **Carrier** (form `owner_carrier_list_form`). Empty by default. | The company that carries the goods. |
 | `Cancel Reason` | `cancel_reason` | Text, up to 200 characters | Needed only for `Cancel` | Any text. Empty by default. | The reason you type before you press `Cancel`. |
 
-Source: form `shipment_order_shipto_form` in `001_baseline.sql`; column sizes in the table `shipment_order` of `wms-app` `001_baseline.sql`.
-
 ## What each field affects
 
 ### Ship To
 
-- The owner must be a customer. Any other type is refused: `ship_to owner {id} is not a customer (owner_type must be 'Cus')` (`crates/libs/wms-outbound/src/service/shared/lookups.rs:112`). The check runs at create, at update, and again at release.
-- `Release` copies the address of the customer into the order (`ship_to_snapshot`). After that a change of the customer card does not change the order. The shipping label reads this copy (`crates/libs/wms-outbound/src/packing/post_commit/print_label.rs:186-229`).
-- Read only after the order is launched (`crates/libs/wms-outbound/src/service/shared/mutability.rs:36-67`).
+- The owner must be a customer. Any other type is refused: `ship_to owner {id} is not a customer (owner_type must be 'Cus')`. The check runs at create, at update, and again at release.
+- `Release` copies the address of the customer into the order (`ship_to_snapshot`). After that a change of the customer card does not change the order. The shipping label reads this copy.
+- Read only after the order is launched.
 
 ### Carrier
 
 - Read only after the order is launched.
-- The wave policy can group orders by carrier (`crates/libs/wms-outbound/src/waves/policy.rs:431-435`). There is no web screen for waves.
+- The wave policy can group orders by carrier. There is no web screen for waves.
 - No rule on the order itself reads it.
 
 ### Cancel Reason
 
 - **Type the reason first, then press `Cancel`.** The button reads this field from the open form. It does not need a `Save` first.
 - The reason is required. Without it the button answers `Enter a cancel reason first — it is the record of why the order was dropped`.
-- `Save` does not write this field. Typing a reason and pressing `Save` alone keeps nothing (`save_action.rs:204-212` lists the seven fields `Save` can write, and `cancel_reason` is not one of them).
+- `Save` does not write this field. Typing a reason and pressing `Save` alone keeps nothing.
 - After the cancel the reason is stored in the order and sent in the event `process.order.cancelled`.
 
 ## Related pages

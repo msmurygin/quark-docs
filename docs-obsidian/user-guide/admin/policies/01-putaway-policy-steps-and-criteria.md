@@ -25,8 +25,7 @@ Location settings are in `03-location-settings.md`.
 - Units: the database stores weight in grams, length in millimetres and volume in cubic millimetres.
   The screens may show other units (for example kg). This is set per warehouse (`enterprise.warehouse`).
 - Roles: `Admin`, `Manager` and `Supervisor` can create, edit and delete policies and steps.
-  `Operator` and `Viewer` can read them. The dry run is for `Admin`, `Manager` and `Supervisor` only
-  (`crates/services/app-server/src/web/rpcs/putaway_policy_rpc.rs:69-93`).
+  `Operator` and `Viewer` can read them. The dry run is for `Admin`, `Manager` and `Supervisor` only.
 
 ## Contents
 
@@ -57,8 +56,8 @@ The table is `putaway_policy` (`BASELINE:3990`).
 | Affects | The policy list. The SKU form (`Putaway Policy`, tab Policies) and the owner form (`Putaway Policy`) pick a policy by code. |
 | Example | `PAL-FIFO` (8 characters). `PALLET-FIFO-2` is refused: 13 characters. |
 | Interacts with | A policy can be chosen on a SKU and as an owner default. The SKU wins (see `00-putaway-overview.md`). |
-| When empty | A new policy needs a code. Empty or spaces only is refused: `putaway policy code cannot be empty` (`wms-lib-core/src/model/policies/putaway_policy.rs`, `create_pipeline`). |
-| If you change it | You cannot change it. The code is read-only after creation. The public update command has no `code` field (`putaway_policy_rpc.rs:166`, struct `PutawayPolicyHeaderUpdate`). |
+| When empty | A new policy needs a code. Empty or spaces only is refused: `putaway policy code cannot be empty`. |
+| If you change it | You cannot change it. The code is read-only after creation. The public update command has no `code` field. |
 
 ### 1.2 Description
 
@@ -80,7 +79,7 @@ The table is `putaway_policy` (`BASELINE:3990`).
 | Field | Column | Meaning |
 |---|---|---|
 | `ID` | `putaway_policy.id` | Row number. Read-only. |
-| (hidden) `Version` | `putaway_policy.version`, default 1 | Lock number. The update command needs the version you read. If someone saved first, you get a version conflict (return code 40) and must reload. A reorder of steps also moves this number (`reorder.rs`). |
+| (hidden) `Version` | `putaway_policy.version`, default 1 | Lock number. The update command needs the version you read. If someone saved first, you get a version conflict (return code 40) and must reload. A reorder of steps also moves this number. |
 | (hidden) | `add_who`, `add_when`, `mod_who`, `mod_when` | Audit stamps. |
 
 ### 1.4 What happens when you delete a policy
@@ -99,8 +98,7 @@ The table is `putaway_policy` (`BASELINE:3990`).
 | `Putaway Policy` | SKU, tab Policies | `sku.putaway_policy_id` | Wins over the owner default. Empty = use the owner default. |
 | `Putaway Policy` | Owner, WH Settings (`owner_wh_policies_form`) | `owner_config.default_putaway_policy_id` | Used when the SKU has none. Empty = no default. |
 
-The rule is `COALESCE(sku.putaway_policy_id, owner_config.default_putaway_policy_id)`
-(`wms-lib-core/src/model/sku.rs:867-885`).
+The rule is `COALESCE(sku.putaway_policy_id, owner_config.default_putaway_policy_id)`.
 A pallet with SKUs from different policies is refused (see section 4.1).
 
 ---
@@ -114,14 +112,14 @@ The table is `putaway_policy_detail` (`BASELINE:4009`).
 
 A new step is live at once. It is added at the end. Message: `A new step is live at once and is tried after every rule above it.`
 A new step takes the column defaults: `Suitable`, `Zone from the SKU`, no guard, no conditions.
-That step already works as a very wide rule (`pipeline/add.rs`).
+That step already works as a very wide rule.
 
 ### 2.0 System fields of a step
 
 | Field | Column | Type and default | Meaning |
 |---|---|---|---|
-| Step number | `step_num` | Text, up to 5 characters. Unique in the policy. | Label shown as `Step N (S)`: N is the position, S is this number. The system gives it when you add the step. It is the spelling of the `sequence` (10, 20, 30...). You cannot change it. Sending one is refused: `Putaway step {id}: a step's number is assigned when the step is added and never ...` (`wms-lib-core/src/model/policies/putaway_policy_detail.rs:1000`). |
-| Order | `sequence` | Whole number, default 0. Unique in the policy. | The order of work. A new step gets the highest `sequence` + 10. Only the drag-and-drop reorder changes it (`reorder.rs`). The steps are read by `sequence`, never by `step_num` (`step_num` '10' sorts before '2'). |
+| Step number | `step_num` | Text, up to 5 characters. Unique in the policy. | Label shown as `Step N (S)`: N is the position, S is this number. The system gives it when you add the step. It is the spelling of the `sequence` (10, 20, 30...). You cannot change it. Sending one is refused: `Putaway step {id}: a step's number is assigned when the step is added and never ...`. |
+| Order | `sequence` | Whole number, default 0. Unique in the policy. | The order of work. A new step gets the highest `sequence` + 10. Only the drag-and-drop reorder changes it. The steps are read by `sequence`, never by `step_num` (`step_num` '10' sorts before '2'). |
 | (hidden) Version | `version` | Whole number, default 1. | Each step has its own lock number. Save and delete need the version you read. Two people can edit two different steps at the same time. |
 
 ### 2.1 Mode
@@ -133,7 +131,7 @@ That step already works as a very wide rule (`pipeline/add.rs`).
 | Type and values | `Suitable` or `Consolidate`. |
 | Default | Schema default `Suitable`. No steps are seeded in production. Dev seed uses `Suitable` (`dev_only/install-db/900-dev-seed.sql:1026`). |
 | What it does | `Suitable`: any location that passes all checks. `Consolidate`: only a location that already holds (or has a reservation for) at least one product of the pallet. A product is one pair owner + SKU. The lot does not count here. |
-| Affects | `PutawayCtx.consolidate` (`putaway/mod.rs:928`) and the rule `ConsolidateRule` (`predicate.rs:767-848`). It is the 2nd check on each candidate. |
+| Affects | `PutawayCtx.consolidate` and the rule `ConsolidateRule`. It is the 2nd check on each candidate. |
 | Example | Pallet of SKU W1. Location A-01-0 holds 5 cartons of W1. Location A-01-1 is empty. A `Consolidate` step offers A-01-0 and refuses A-01-1 with code `not_consolidatable` and the detail `location holds nothing (no stock, no inbound reservation) — a Consolidate step requires the sku to already be there`. |
 | Interacts with | `Must be empty` cannot be used with `Consolidate` (see 2.9). The mixing rules still apply on top: `Consolidate` plus `Mixed SKU = Not allowed` means "the same SKU only, and it must already be there". A location with a reservation for the same product counts as holding it. |
 | When empty | Not possible. The column is NOT NULL. |
@@ -146,7 +144,7 @@ Values:
 | `Suitable` | UI text `Any location with room`. |
 | `Consolidate` | UI text `A location already holding this item`. |
 
-Note: a pallet that stands in a location can match itself under `Consolidate` (`predicate.rs:754-763`).
+Note: a pallet that stands in a location can match itself under `Consolidate`.
 The engine does not skip the source location. Moving to the same place costs nothing.
 
 ### 2.2 Scope (where to look)
@@ -158,7 +156,7 @@ The engine does not skip the source location. Moving to the same place costs not
 | Type and values | `ZoneFromSku`, `ZoneFromStep`, `LocationFromStep`, `LocationFromSku`, `AssignedSlot`. |
 | Default | `ZoneFromSku`. |
 | What it does | It says which zone, or which single location, the step searches. |
-| Affects | `step::resolve_search_space` (`step.rs:517-564`), called at `putaway/mod.rs:956`. |
+| Affects | `step::resolve_search_space`, called at `putaway/mod.rs:956`. |
 | Example | `Zone named on this step` = BULK. Every candidate is a location of zone BULK. |
 | Interacts with | Needs an anchor for two values (Zone or Location below). Database CHECK `chk_putaway_step_scope_params` (`BASELINE:4039`). |
 | When empty | Not possible. NOT NULL. |
@@ -183,7 +181,7 @@ Values:
 - A SKU with no pick location skips the step (`skipped:no-slot`).
 - Typical use, with the condition `Pallet fullness` (section 3): step 1 `AssignedSlot` + `Pallet fullness is Partial` (a part pallet goes straight to picking), step 2 a zone step (the rest goes to storage).
 
-Known gap (`step.rs:496-516`): for a mixed pallet, `ZoneFromSku` and `LocationFromSku` use the first line only.
+Known gap: for a mixed pallet, `ZoneFromSku` and `LocationFromSku` use the first line only.
 If two SKUs name two zones, the second SKU goes to the first SKU's zone.
 The dry run and the trace record this (`zone_downgrade`, `location_downgrade`).
 
@@ -226,7 +224,7 @@ The dry run and the trace record this (`zone_downgrade`, `location_downgrade`).
 | Type and values | `None`, `FromZone`, `FromLocation`. |
 | Default | `None`. |
 | What it does | It says for which pallets the step applies at all, based on **where the pallet stands now**. If the guard does not match, the step is skipped. It is not a failure. |
-| Affects | `step::guard_allows` (`step.rs:382-388`) at `putaway/mod.rs:936`. Trace status `skipped:guard`. |
+| Affects | `step::guard_allows` at `putaway/mod.rs:936`. Trace status `skipped:guard`. |
 | Example | Guard `Stay in the source zone` with source zone `QC`. A pallet standing in `QC-01` uses the step. A pallet standing in `DOCK` skips it. |
 | Interacts with | Needs an anchor for two values (CHECK `chk_putaway_step_guard_params`, `BASELINE:4036`). The guard column compares only the current location or its zone. A NULL anchor never matches (it is treated as "applies to nothing", not "applies to all"). |
 | When empty | Not possible. NOT NULL. |
@@ -267,9 +265,9 @@ It only decides if the step runs. Do not read it as a travel limit on the destin
 | Type and values | `Route` or `NearestToSlot`. |
 | Default | `Route`. |
 | What it does | It sets the order in which candidate locations are tried. The first one that passes all checks is taken. |
-| Affects | `candidates::order_for` (`candidates.rs:48-58`), SQL `ORDER BY` in `wms-lib-core/src/model/location.rs:418-423`. |
+| Affects | `candidates::order_for`, SQL `ORDER BY` in `wms-lib-core/src/model/location.rs:418-423`. |
 | Example | Locations A-01-0, A-01-1, A-02-0. Route order tries A-01-0 first, then A-01-1, then A-02-0. |
-| Interacts with | A zone is not walked to the end. The system looks at at most 5 batches of 20 locations = **100 candidates** per step (`candidates.rs:28-32`). After that the step gives up and the next step runs. |
+| Interacts with | A zone is not walked to the end. The system looks at at most 5 batches of 20 locations = **100 candidates** per step. After that the step gives up and the next step runs. |
 | When empty | Not possible. NOT NULL. |
 | If you change it | Next suggestion only. |
 
@@ -289,10 +287,10 @@ Note: the caption `Pick route` may look like it uses the location setting `Route
 |---|---|
 | UI label | `Location occupancy` (hint: `what the location may already hold`). Three options: `Any occupancy`, `Must be empty`, `Allow mixing, with rules`. |
 | Columns | `allow_mixed_sku`, `allow_mixed_lot`, `require_empty` (all boolean, nullable) |
-| Type and values | The screen writes the three columns from one choice (`wms-lib-core/src/model/policies/putaway_occupancy.rs`). See the table below. |
+| Type and values | The screen writes the three columns from one choice. See the table below. |
 | Default | Column defaults: `allow_mixed_sku = true`, `allow_mixed_lot = true`, `require_empty = false` (`BASELINE:4026-4028`). This means "no opinion". |
 | What it does | It adds a step rule about what may already be in the location, on top of the location's own flags. |
-| Affects | `MixCheck::from_toggles` (`predicate.rs:129-142`) at `putaway/mod.rs:920`. Check `MixIntentRule` (`predicate.rs:451-651`) is the 1st check on each candidate. |
+| Affects | `MixCheck::from_toggles` at `putaway/mod.rs:920`. Check `MixIntentRule` is the 1st check on each candidate. |
 | Example | See the three options below. |
 | Interacts with | See 2.9, 2.10, 2.11 and the location flags `Mix SKU` and `Mix Lot` in `03-location-settings.md`. A step can only **narrow**. It can never allow a mix the location forbids. |
 | When empty | NULL, TRUE and "not set" all mean "no opinion" (`MixCheck::None`). The old NULL state was filled by migration 290. |
@@ -318,7 +316,7 @@ After you reopen the step it reads back as `Any occupancy`.
 | Type and values | true, false or NULL. Only `true` has a meaning. |
 | Default | false (schema). |
 | What it does | The location must hold no stock and no container, and no other pallet may have an active reservation for it. |
-| Affects | `MixIntentRule::require_empty` (`predicate.rs:602-650`). Uses `LocBmc::is_location_occupied` (`location.rs:2770`): stock with `qty`, `qty_allocated` or `qty_picked` above zero, or any container not disposed, makes the location occupied. An empty pallet still occupies. |
+| Affects | `MixIntentRule::require_empty`. Uses `LocBmc::is_location_occupied`: stock with `qty`, `qty_allocated` or `qty_picked` above zero, or any container not disposed, makes the location occupied. An empty pallet still occupies. |
 | Example | Location C-01-0 holds an empty pallet LPN. It is **not** empty. Code `mix_intent`, detail `step requires an empty location; occupied=true, inbound_reservations=0`. |
 | Interacts with | Cannot be combined with `Mixed SKU = Not allowed` or `Mixed lot = Not allowed` (database CHECK `chk_putaway_step_require_empty_no_mixing`). Cannot be combined with `Mode = Consolidate`. The pallet's own reservation does not count against the location. |
 | When empty | See 2.8. |
@@ -340,9 +338,9 @@ Refusals:
 | Type and values | NULL (`Any`), true (`Allowed`), false (`Not allowed`). |
 | Default | true. |
 | What it does | Only `false` has an effect. `Not allowed` means: after the pallet lands, the location may hold only one product (owner + SKU). |
-| Affects | `MixIntentRule::same_key` (`predicate.rs:534-598`). |
+| Affects | `MixIntentRule::same_key`. |
 | Example | Location S-01 holds SKU A. Pallet has SKU B. Result: refused with code `mix_intent_sku` and the detail `step allows no mixing beyond the same sku; location plus pallet would span 2 identities: owner 1/sku A, owner 1/sku B`. |
-| Interacts with | The "committed" stock of a location = present stock plus the contents of every pallet with an **active reservation** for it (`inventory_balances.rs:1718-1750`). A pallet with two SKUs fails at **every** location, even an empty one (the pallet alone makes 2 identities). Same SKU code under another owner counts as a different product. |
+| Interacts with | The "committed" stock of a location = present stock plus the contents of every pallet with an **active reservation** for it. A pallet with two SKUs fails at **every** location, even an empty one (the pallet alone makes 2 identities). Same SKU code under another owner counts as a different product. |
 | When empty | `Any`/NULL/true: no step rule. |
 | If you change it | Next suggestion only. Existing stock stays as it is, even if it is mixed. |
 
@@ -355,7 +353,7 @@ Refusals:
 | Type and values | NULL, true, false. |
 | Default | true. |
 | What it does | `Not allowed` (and `Mixed SKU = Not allowed`) means one SKU and one lot per location. |
-| Affects | `MixIntentRule::same_key` with the lot compared (`predicate.rs:469-472`). Code `mix_intent_sku_lot`. |
+| Affects | `MixIntentRule::same_key` with the lot compared. Code `mix_intent_sku_lot`. |
 | Example | Location holds SKU A lot L1. Pallet has SKU A lot L2. Refused with `step allows no mixing beyond the same sku and lot; location plus pallet would span 2 identities: owner 1/sku A/lot L1, owner 1/sku A/lot L2`. |
 | Interacts with | `Not allowed` is only valid when `Mixed SKU` is also `Not allowed` (CHECK `chk_putaway_step_mixing_executable`, `BASELINE:4037`). The engine cannot express "one lot across several SKUs". With `Mixed SKU = Not allowed` and `Mixed lot = Allowed`, the rule is "one SKU, lots may differ". |
 | When empty | NULL/true: lots may differ. |
@@ -364,7 +362,7 @@ Refusals:
 Refusals:
 - Save: `one lot per location needs one SKU per location`.
 - Screen hints: `decide Mixed SKU first — mixed lot has no meaning until then`; `one lot never spans several SKUs — with mixed SKUs allowed, lots cannot be kept apart`.
-- Engine (old rows): `step sets allow_mixed_lot=Some(false) with allow_mixed_sku=...: it asks for ONE LOT per location while permitting SEVERAL SKUs, and the engine has no such rule ...` (`step.rs:32-43`).
+- Engine (old rows): `step sets allow_mixed_lot=Some(false) with allow_mixed_sku=...: it asks for ONE LOT per location while permitting SEVERAL SKUs, and the engine has no such rule ...`.
 
 Offered choices:
 
@@ -383,35 +381,35 @@ Offered choices:
 | Type and values | true or false. |
 | Default | false. |
 | What it does | When on, the step is skipped if the zone it searches does not suit the temperature of every line on the pallet. |
-| Affects | `step::zone_suits_temperature` (`step.rs:438-469`) at `putaway/mod.rs:1014` (zone scope) and `:1197` (location scope). Trace status `skipped:temperature`. |
+| Affects | `step::zone_suits_temperature` at `putaway/mod.rs:1014` (zone scope) and `:1197` (location scope). Trace status `skipped:temperature`. |
 | Example | Zone COLD: min 2, max 8. SKU: min 0, max 4. They overlap (2..4), so the step runs. SKU: min 10, max 20: no overlap, so the step is skipped. |
 | Interacts with | Reads the **zone** columns `min_temperature` and `max_temperature` (`02-putaway-zone-settings.md`) and the SKU columns `min_temperature` and `max_temperature`. An empty bound means "no limit" on that side, for both the zone and the SKU. If all lines fit, the step runs; one bad line skips it. A line whose SKU did not load counts as fitting. |
 | When empty | Not possible (NOT NULL). |
 | If you change it | Next suggestion only. |
 
-Important: the test is **overlap**, not "cover". The check is `zone_min <= sku_max && sku_min <= zone_max` (`step.rs:458-469`).
+Important: the test is **overlap**, not "cover". The check is `zone_min <= sku_max && sku_min <= zone_max`.
 The screen label says "must cover" and the readback sentence says
 `The location's temperature range must cover the SKU's.`
 Both words are stronger than the code and both say "location" where the code reads the zone.
-The dry run says "suit" (`dry_run.rs:769-773`), which is correct.
+The dry run says "suit", which is correct.
 
 ### 2.13 Fit checks (five switches)
 
 The `Fit checks` row has five switches (hint: `refuse a candidate that cannot physically take it`).
-Each switch is one column. They are independent. The code reads all five together (`FitToggles`, `space.rs:496-549`).
-The checks run on each candidate as the 3rd check, rule `CapacityRule` (`predicate.rs:285-425`).
+Each switch is one column. They are independent. The code reads all five together.
+The checks run on each candidate as the 3rd check, rule `CapacityRule`.
 
 Common rules for all five:
 - A limit of `0` or NULL means "no limit set". The check is **not run**, and the location is still offered.
-  The system counts it in the trace as `checks not run` with the key `<limit>:no_limit` (`space.rs:1156-1195`).
+  The system counts it in the trace as `checks not run` with the key `<limit>:no_limit`.
   So an empty capacity does not block putaway, and does not protect the location either.
 - The system counts stock already there **plus** space promised by active reservations (not yet arrived).
   The pallet's own reservation is not counted twice.
-- If the pallet already stands in the candidate location, the check is skipped (`space.rs:670`).
+- If the pallet already stands in the candidate location, the check is skipped.
 - Oversize goods and held sections are refused before these switches, whatever you set (see 2.14).
 - Important: a cube or weight **limit** set on the location or the zone is always enforced, whatever the
   switches say. The move itself (`move_execute`) checks location and zone cube and weight, and the zone case
-  count, on every move (`wms-inventory/src/movement/validation.rs:920-1005`), so putaway checks them too and
+  count, on every move, so putaway checks them too and
   never offers a location the move would refuse (P-18). The `Cube` and `Weight` switches only decide whether
   a cube or weight check that **could not be made** (no limit set, or the pallet has no known weight) is
   reported in the trace.
@@ -457,7 +455,7 @@ Common rules for all five:
 | Type and values | true or false. |
 | Default | false. |
 | What it does | Checks that the pallet's footprint (length × width of the wooden base) fits the location's length × width, **in either direction**. Also checks the pallet's height against the location height. |
-| Affects | `space.rs:684-692`, `check_pallet_dims` (`space.rs:875-918`). Details: `loc_footprint: location 1200 × 800, pallet 1300 × 1100 (checked both orientations)` and `loc_height: location 1500, pallet 1800`. |
+| Affects | `space.rs:684-692`, `check_pallet_dims`. Details: `loc_footprint: location 1200 × 800, pallet 1300 × 1100 (checked both orientations)` and `loc_height: location 1500, pallet 1800`. |
 | Example | Location 2500 × 1200 mm, height 1500. Pallet base 1200 × 800, height 1650 (base 150 + 3 layers × 500). Footprint fits. Height 1650 is above 1500: refused. |
 | Interacts with | Pallet size comes from the pack: `pallet_wood_length`, `pallet_wood_width`, `pallet_wood_height`, `pallet_hi` and the height of the stacked unit. If the pack does not describe the pallet, the check is not run: `loc_footprint:no_product_dims` or `loc_height:no_product_dims`. If the location has no length/width/height (0), the trace says `no_location_dims`. A pallet exactly as tall as the location fits (`>` not `>=`). |
 | When empty | See above. |
@@ -498,17 +496,17 @@ Common rules for all five:
 These run on every candidate whatever the step says:
 - Oversize goods (`sku.positions_required` above 1) need a whole free **section** of positions.
   Refusal codes: `section_none` (location is in no section), `section_not_free`, `section_too_small`.
-  Detail: `needs N adjacent positions of one free section` (`space.rs:1052-1089`, `predicate.rs:312-340`).
+  Detail: `needs N adjacent positions of one free section`.
 - A location held for another pallet's oversize goods: code `section_promised`, detail
-  `held for goods spanning this section` (`predicate.rs:346-351`).
-- The zone case count (`putawayzone.max_cases_count`) when the pallet goes to another zone (`space.rs:794-821`).
+  `held for goods spanning this section`.
+- The zone case count (`putawayzone.max_cases_count`) when the pallet goes to another zone.
 - The location landing rules (the 4th check): see `03-location-settings.md`.
 
 ### 2.15 What the readback sentence says
 
 The step card shows a sentence, for example:
 `Takes locations of type Case or Pick, class A, ... in zone BULK. One SKU per location. Checks volume and weight. Candidates in warehouse route order.`
-Two gaps (found in code, `putaway_step_describe.rs:1047-1066`):
+Two gaps:
 - The sentence names only `volume`, `weight` and `pallet dimensions`.
   `Stacking limit` and `Quantity` are never named.
   If only those two are on, the sentence still says `Checks nothing physical — the pallet's size and weight are not compared with the location's capacity.`
@@ -529,7 +527,7 @@ The band shows `N of 16 properties used`.
 | About the **pallet** | `Product` and `Lot` | `Product` | Does the step apply to this pallet at all? If any line of the pallet fails any condition, the **whole step is skipped** (trace `skipped:product:<Property>`). |
 | About the **location** | `Location` | `Location` | Which locations of the search space are candidates? Other locations are never looked at. |
 
-The subject follows from the property. You do not choose it (`CriterionProperty::subject`, `putaway_step_criterion.rs:108-128`).
+The subject follows from the property. You do not choose it.
 
 ### 3.2 The columns every condition has
 
@@ -576,17 +574,16 @@ For all conditions:
 Code: `candidates.rs:400-543` (location side), `product.rs:207-278` (product side), `step.rs:325-362` (gate).
 
 A property whose stored subject is the wrong one (for example `Product` + `LocationType`) is refused when the policy loads:
-`step uses criterion=Product/LocationType, which this build cannot execute` (`step.rs:326-334`).
-`SkuAttribute` or `LocationAttribute` without a code: `step's Product/SkuAttribute criterion carries no attribute_code: ...` (`step.rs:105-110`).
+`step uses criterion=Product/LocationType, which this build cannot execute`.
+`SkuAttribute` or `LocationAttribute` without a code: `step's Product/SkuAttribute criterion carries no attribute_code: ...`.
 
 ### 3.4 Location conditions
 
-Each narrows the candidate list in SQL (`location.rs:1685-1925`), so a refused location is never evaluated.
+Each narrows the candidate list in SQL, so a refused location is never evaluated.
 The trace of a failed step (full detail) shows how many locations each property removed (`criteria_removed`).
 
 All location candidates must also pass the fixed gate, whatever the conditions say:
-`status = 'Ok'`, `loc_flag = 'None'`, `discard_lpn` not true, and the type in the allowed set
-(`location.rs:2140-2143`).
+`status = 'Ok'`, `loc_flag = 'None'`, `discard_lpn` not true, and the type in the allowed set.
 
 #### 3.4.1 Location type
 
@@ -595,7 +592,7 @@ All location candidates must also pass the fixed gate, whatever the conditions s
 | UI label | `Location type`. |
 | Column read | `location.loc_type`. |
 | Type and values | Labels of enum `loc_type`: `None`, `Other`, `Case`, `Pick`, `Pnd`, `Door`, `Pickto`, `Sort`, `SpeedPick`, `QC`, `Damage`, `Rtv`, `Destroy`, `Returns`, `Stage`, `Lost`, `InTransit`, `Pack`. Other spellings are refused when saved. |
-| Default | No condition. Without one, the step uses the **authorized set**: `Case`, `Pick`, `SpeedPick`, `Pnd`, `Sort`, `Other` (`movement/validation.rs:135-148`). |
+| Default | No condition. Without one, the step uses the **authorized set**: `Case`, `Pick`, `SpeedPick`, `Pnd`, `Sort`, `Other`. |
 | What it does | Narrows the types. A step may **narrow** the authorized set. It can never widen it. Types outside the set are dropped silently from `is`. |
 | Affects | `candidates.rs:107-177` and `:400-445`. SQL `l.loc_type = ANY(...)`. |
 | Example | `Location type is Pick or Case`: only pick faces and case locations. `is Door`: refused (see below). |
@@ -607,8 +604,8 @@ Refusals (when the policy loads, so the whole policy is refused):
 - `is` with only unauthorized types: `Putaway step restricts locations to [Door], and a putaway may not land in any of them. Authorized types are [Case, Pick, SpeedPick, Pnd, Sort, Other].`
 - `is not` that covers all six: `Putaway step excludes locations [Case, Pick, SpeedPick, Pnd, Sort, Other], and a putaway may not land anywhere else. Authorized types are [Case, Pick, SpeedPick, Pnd, Sort, Other].`
 - A value that is not a type: `Putaway step criterion 12 (Location/LocationType Include) names value 'Mezzanine', which does not exist: <detail>. The criterion is refused rather than ignored — ignoring it would widen the search past what the policy author wrote.`
-  The same shape is used for every property below. It is prefixed by `step <num> of policy <id>: ` (`mod.rs:869-874`).
-- At save: `'Mezzanine' is not a value a 'LocationType' criterion can match — every comparison the engine makes is exact and case-sensitive. 'LocationType' offers: 'None', 'Other', ...` (`putaway_step_criterion.rs:486-501`).
+  The same shape is used for every property below. It is prefixed by `step <num> of policy <id>: `.
+- At save: `'Mezzanine' is not a value a 'LocationType' criterion can match — every comparison the engine makes is exact and case-sensitive. 'LocationType' offers: 'None', 'Other', ...`.
 
 #### 3.4.2 Location status
 
@@ -710,7 +707,7 @@ Difference: the **location flag** looks at the location's setting. The **step sw
 
 #### 3.4.8 Mixed lot (location flag)
 
-Same as 3.4.7 for `location.mix_lot` (UI label `Mixed lot`, code `MixLot`, `candidates.rs:479-481`).
+Same as 3.4.7 for `location.mix_lot`.
 
 #### 3.4.9 Location attribute
 
@@ -721,7 +718,7 @@ Same as 3.4.7 for `location.mix_lot` (UI label `Mixed lot`, code `MixLot`, `cand
 | Type and values | Free text values. The attribute code comes from `Sidebar > Warehouse Configuration > Product Data > Attributes` definitions. |
 | Default | No condition. |
 | What it does | Keeps locations whose attribute value is (or is not) in the list. |
-| Affects | `candidates.rs:507-511`, SQL `EXISTS` (`location.rs:1860-1925`). |
+| Affects | `candidates.rs:507-511`, SQL `EXISTS`. |
 | Example | `Location attribute HAZMAT is not FLAMMABLE`. |
 | Interacts with | A location with **no value** for the code: `is` removes it; `is not` keeps it. Only Text definitions are offered. |
 | When empty | No condition. |
@@ -729,7 +726,7 @@ Same as 3.4.7 for `location.mix_lot` (UI label `Mixed lot`, code `MixLot`, `cand
 
 ### 3.5 Product and lot conditions
 
-These are checked once per step, before any location is read (`product.rs:343-370`).
+These are checked once per step, before any location is read.
 The rule is **any line fails = the step is skipped**. The pallet is one unit.
 
 How a missing value is read:
@@ -795,7 +792,7 @@ How a missing value is read:
 | What it does | The step applies only to SKUs with this class. |
 | Affects | `product.rs:353-355`. |
 | Example | `Putaway class is NoMix` with `Mixed SKU = Not allowed` sends no-mix SKUs to single-SKU locations. |
-| Interacts with | `NoMix` on the SKU does nothing by itself. No code stops mixing because of it. A `Putaway class` condition (or a move rule, which is deferred: `movement/validation.rs:8`) is the only reader. Add the condition and the mixing switch yourself. |
+| Interacts with | `NoMix` on the SKU does nothing by itself. No code stops mixing because of it. A `Putaway class` condition is the only reader. Add the condition and the mixing switch yourself. |
 | When empty | A SKU with an empty class does not refuse. |
 | If you change it | Next suggestion only. |
 
@@ -880,8 +877,6 @@ These are returned when the system cannot ask the question. They are not "no loc
 | `step <num> of policy <id>: <message>` | A condition names a value that does not exist (3.4.1). |
 | `suggest_location requires an open transaction ...` | Programming error. Report to support. |
 
-Sources: `policy.rs:19-41`, `step.rs:18-117`, `mod.rs:119-158`.
-
 ### 4.2 Why a location is refused (rejection codes)
 
 In the dry run and the trace, a step shows `Refused by: <code> on <count>, ...`.
@@ -918,8 +913,6 @@ Codes that stop the whole request (database or system trouble, not a property of
 The message is `<code> while evaluating <location> for step <num> of policy <id>: <detail>`.
 
 Rare codes that the putaway path cannot reach today: `lpn_owner_conflict`, `lpn_mix_sku`.
-
-Sources: `predicate.rs:285-1017`, `mod.rs:657-778`, `wms-inventory/src/inventory_service.rs:999-1280`, `wms-inventory/src/error/commingle.rs`.
 
 ### 4.3 Step status in the trace
 
@@ -975,12 +968,12 @@ Picker (`putaway_criterion_vocabulary`):
 
 | Setting | Where | Default | Effect |
 |---|---|---|---|
-| `PUTAWAY_RESERVATION_TTL_MIN` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (`system_settings`) | `15` (seed `BASELINE:9955`); code fallback 15 (`reserve.rs:22`) | Minutes a suggested location is held. After that a sweeper (every 5 minutes) frees it. |
+| `PUTAWAY_RESERVATION_TTL_MIN` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (`system_settings`) | `15` (seed `BASELINE:9955`); code fallback 15 | Minutes a suggested location is held. After that a sweeper (every 5 minutes) frees it. |
 | `Putaway Reservation TTL (min)` | Owner, WH Settings (`owner_config.putaway_reservation_ttl_min`) | blank = use the warehouse value | Overrides the system setting for that owner. Must be above 0. |
 | `PUTAWAY_LOCK_TIMEOUT_MS` | `system_settings` | Seeded `5000` (wms-app 091). Code default 5000 ms (`DEFAULT_LOCK_TIMEOUT_MS`) | How long one reservation waits for a busy location. A value of 0 or less is ignored (0 would mean "wait forever"). |
 | `COUNT_ON_PUTAWAY_DEVIATION` | `system_settings` (migration 071) | `0` | `1` = when an operator accepts a deviation (code 85) from the suggestion, the destination location is queued for a count. |
 
-Reservation order: owner TTL, then `PUTAWAY_RESERVATION_TTL_MIN`, then its default, then 15 (`reserve.rs:346-351`, `ttl_minutes`).
+Reservation order: owner TTL, then `PUTAWAY_RESERVATION_TTL_MIN`, then its default, then 15.
 
 ---
 
@@ -988,8 +981,7 @@ Reservation order: owner TTL, then `PUTAWAY_RESERVATION_TTL_MIN`, then its defau
 
 A step is marked `never runs` when an earlier step already takes everything it could take.
 The mark reads `closed by step N (S)`.
-The rule is on purpose cautious. It says "never runs" only when the settings prove it
-(`wms-lib-core/src/model/policies/putaway_step_shadow.rs:130-168`).
+The rule is on purpose cautious. It says "never runs" only when the settings prove it.
 The earlier step must, on every point, be at least as wide:
 
 | Point | Condition for "closed" |
@@ -1010,7 +1002,7 @@ Steps with `AssignedSlot`, `NearestToSlot` or a missing anchor are never marked.
 
 Panel `Dry run` (heading), field `LPN / container`, button `Evaluate`.
 Hint lines: `evaluates the whole policy, not just this step` and `evaluates the SAVED policy — an edit is previewed only after Save`.
-It runs the real engine on a real pallet and then **rolls back** (`putaway/command.rs`, `explain_location`). Nothing is reserved.
+It runs the real engine on a real pallet and then **rolls back**. Nothing is reserved.
 Role: `Admin`, `Manager`, `Supervisor`.
 
 Result columns: `Candidate location`, `Rule`, `Outcome`, `Detail`. Heading `On this pallet` lists the lines.

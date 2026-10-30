@@ -53,59 +53,58 @@ The form of the tab is `receipt_detail_fields_form`. The data table is `receipt_
 | `Lot Attr Check` | `lot_attr_check_mode` | Drop-down | Yes | `Lot attributes not validated` (`Disabled`, default), `Validate; supervisor override allowed` (`Advisory`), `ASN-pre-bound; hard reject on mismatch` (`Strict`). Read only. | How the lot attributes you scan are checked against the expected ones. |
 
 The labels of `Status`, `Completion`, `Target Disposition` and `Lot Attr Check` come from code lists (`receipt_status`, `receipt_completion`, `target_disposition`, `LOTATTRMODE`).
-The code list `LOTATTRMODE` and the lists of receipt type and hold codes are created by the development seed (`crates/libs/wms-lib-sql/sql/dev_only/install-db/900-dev-seed.sql`). A production tenant may use other words.
-Source of the layout: form `receipt_detail_fields_form` in `001_baseline.sql` (`wms-meta-ui`).
+The code list `LOTATTRMODE` and the lists of receipt type and hold codes are created by the development seed. A production tenant may use other words.
 
 ## What each field affects
 
 ### SKU
 
-- The SKU must exist for the owner of the receipt. Otherwise the line is refused with `SKU {code} not found for owner {id}` (`crates/libs/wms-lib-core/src/model/receipt/receipt_detail.rs:1117-1123`).
+- The SKU must exist for the owner of the receipt. Otherwise the line is refused with `SKU {code} not found for owner {id}`.
 - The SKU gives the pack, the unit, the lot policy and the serial settings used at receiving. It also gives the receipt policy (`Warehouse Configuration > Policies > Receipt Policy`) that judges quantity, pack multiples, dates and pallets.
-- After you pick a SKU the tab is redrawn and the description is read from the SKU master (`receipt_detail_enrich`, `crates/services/web-ui-server/src/extensions/customization/receipt/detail_enrich_action.rs`).
+- After you pick a SKU the tab is redrawn and the description is read from the SKU master.
 
 ### Barcode
 
 Stored only. It has no effect today.
-The database comment says the column is for audit: it keeps the raw scan when a SKU was found by a barcode (`crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql`, comment on `receipt_detail.barcode`).
+The database comment says the column is for audit: it keeps the raw scan when a SKU was found by a barcode.
 
 ### LPN
 
 - A line gets an expected LPN only through the API method `create_receipt_detail` (parameter `expected_lpn`) or a case-level ASN. There is no field to type it on this card.
-- The receive window offers this pallet as the target (`crates/libs/wms-inbound/src/service/receipt/expected_lpn.rs`). A scan of this LPN finds the line.
+- The receive window offers this pallet as the target. A scan of this LPN finds the line.
 
 ### Status
 
 - Set by the system. A line becomes `In progress` when goods are received. Hold, close and cancel of the receipt change every line that is not closed or cancelled. See [Receipt statuses and transitions](90-receipt-statuses-and-transitions.md).
-- The line gate of the buttons reads the status of the **receipt**, not of the line, for adding, editing and deleting (`crates/libs/wms-inbound/src/service/receipt/planning/contracts.rs:327-342`).
+- The line gate of the buttons reads the status of the **receipt**, not of the line, for adding, editing and deleting.
 
 ### Completion
 
-- Computed from the quantities: received + rejected + damaged against expected. `Pending` when nothing arrived, `Partial` when less, `Full` when equal, `Over` when more (`crates/libs/wms-inbound/src/repo/completion_compute.rs:39-49`).
-- A receipt can be cancelled only while every line is `Pending` (`aggregate.rs:139`).
+- Computed from the quantities: received + rejected + damaged against expected. `Pending` when nothing arrived, `Partial` when less, `Full` when equal, `Over` when more.
+- A receipt can be cancelled only while every line is `Pending`.
 
 ### Target Disposition and Hold Code
 
 Stored only. They have no effect today.
-Receiving fills them from the status of the location: a location with status `Damage` gives `Hold` and the hold code `Damaged` (`crates/libs/wms-inbound/src/service/receipt/receive/receive_against_asn.rs:748-753,783`). No other code reads them.
+Receiving fills them from the status of the location: a location with status `Damage` gives `Hold` and the hold code `Damaged`. No other code reads them.
 
 ### Pack and UOM
 
-- `Save` fills an empty `Pack` with the pack of the SKU, and an empty `UOM` with the base unit of that pack (the unit of the pack row that has no child), or the default unit of the SKU (`crates/services/web-ui-server/src/extensions/customization/receipt/pre_save_action.rs`).
+- `Save` fills an empty `Pack` with the pack of the SKU, and an empty `UOM` with the base unit of that pack (the unit of the pack row that has no child), or the default unit of the SKU.
   Because of this, a normal SKU never fails on an empty `Pack`.
-- A `UOM` that is not in the unit list is refused with `Code {code} not found` (`crates/libs/wms-lib-core/src/model/policies/uom_class.rs:70-76`).
+- A `UOM` that is not in the unit list is refused with `Code {code} not found`.
 - The receive window counts in the units of the pack of the SKU. It converts them to the base unit.
 
 ### Qty Expected
 
 - Saving a line with `Qty Expected` and `Qty Received` both empty or 0 is refused (see messages).
-- The expected quantity of all lines of one SKU is added up. The receiving checks (excess, shortage, completion) work on this sum (`crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs`).
-- The field is read only for receipts of type `Sscc` and `CaseLevel` (`detail_render_action.rs:93-98`).
+- The expected quantity of all lines of one SKU is added up. The receiving checks (excess, shortage, completion) work on this sum.
+- The field is read only for receipts of type `Sscc` and `CaseLevel`.
 
 ### Qty Received, Qty Rejected, Qty Damaged
 
 - Read only. `Qty Received` grows with `Receive` and changes with `Adjust Qty`.
-- `Qty Damaged` grows only when the owner action for the severity is `Reject` (`report_damage.rs`, function `handle_damage_action`).
+- `Qty Damaged` grows only when the owner action for the severity is `Reject`.
 - `Qty Rejected` is written only by the RF return flow. In the web screens it stays 0.
 
 ### Qty Adjusted
@@ -117,13 +116,12 @@ It is never written after the line is created. `Adjust Qty` changes `Qty Receive
 
 - The web screens cannot change it. A line made on the web has `Disabled`. Other values come only from the API.
 - `Strict`: the lot attributes you scan must equal the expected ones, or receiving is refused (code 34). `Advisory`: a difference is refused with code 36, which a supervisor can allow when the attribute allows overrides.
-  Sources: `crates/libs/wms-inbound/src/service/receipt/validation/validation_external_lot.rs:100-165` and `validation_lot_attrs.rs`.
 
 ## Rules for editing
 
 - These fields are read only at all times: `Line Number`, `Owner`, `Status`, `Receipt Type`, `Description`.
 - After goods are received, `PO` and `PO Detail` on the tab [Physical & PO](23-line-physical-and-po-tab.md) are read only.
-- `Save` of an **existing** line sends only the fields you changed. The server accepts only these fields for a line: `sku`, `barcode`, `qty_expected`, `uom`, `pack_id`, `to_loc`, `to_lot`, the four dates, `temperature`, `po_id`, `po_detail_id`, `reason_code`, `return_type`, `return_reason`, `rma`, `external_receipt_number`, `external_receipt_line_number`, `external_lot` (`crates/services/app-server/src/web/rpcs/receipt_detail_rpc.rs:121-153`).
+- `Save` of an **existing** line sends only the fields you changed. The server accepts only these fields for a line: `sku`, `barcode`, `qty_expected`, `uom`, `pack_id`, `to_loc`, `to_lot`, the four dates, `temperature`, `po_id`, `po_detail_id`, `reason_code`, `return_type`, `return_reason`, `rma`, `external_receipt_number`, `external_receipt_line_number`, `external_lot`.
 - A line of a `Closed` or `Cancelled` receipt cannot be saved. A line of a receipt on hold can be saved.
 
 ## Messages
@@ -139,8 +137,6 @@ It is never written after the line is created. `Adjust Qty` changes `Qty Receive
 | The unit is not in the unit list | `Code {code} not found` |
 | The receipt is `Closed`, `Cancelled` or `OnHold` when you add a line | `receipt {id} is {status} — cannot add receipt line in its current lifecycle state` |
 | The receipt is `Closed` or `Cancelled` when you edit a line | `receipt {id} is {status} — cannot edit receipt line in its current lifecycle state` |
-
-> Not confirmed by code: that a new line can be saved on a receipt in status `InProgress`. The `New` button copies the status of the receipt (`InProgress`) into the new line, and the server accepts a new line only with status `Open` (`crates/libs/wms-inbound/src/service/receipt/planning/add_receipt_line_plan.rs:143-171`, message `a planned line starts with nothing done — status cannot be set when planning (got InProgress)`). To verify: open a receipt that is `InProgress`, press `New` in the lines list, fill `SKU` and `Qty Expected`, press `Save`.
 
 ## Related pages
 

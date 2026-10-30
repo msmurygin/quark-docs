@@ -2,7 +2,7 @@
 
 The `Summary` tab shows the result values of the receipt.
 The form is `receipt_summary_form` ("Receipt Summary"). The data table is `receipt`.
-Every field is read only. The system writes all of them. `Close Summary` and `Cancel Summary` are JSON in the database. The screen and the Receipts list show them as compact JSON text (`BioValue::decode_from_server`, `crates/services/web-ui-server/src/db/bio/value.rs`). Before the fix F-05 (commit `49bbbf5f1`) the Receipts list answered HTTP 503 as soon as one receipt was closed or cancelled.
+Every field is read only. The system writes all of them. `Close Summary` and `Cancel Summary` are JSON in the database. The screen and the Receipts list show them as compact JSON text. Before the fix F-05 (commit `49bbbf5f1`) the Receipts list answered HTTP 503 as soon as one receipt was closed or cancelled.
 
 ## Fields
 
@@ -23,7 +23,7 @@ Every field is read only. The system writes all of them. `Close Summary` and `Ca
 
 ### Close Summary
 
-The summary is written by `Close Receipt` (`crates/libs/wms-inbound/src/repo/completion.rs:167-173`). It holds:
+The summary is written by `Close Receipt`. It holds:
 
 | Key | Meaning |
 |---|---|
@@ -36,7 +36,7 @@ The summary is written by `Close Receipt` (`crates/libs/wms-inbound/src/repo/com
 
 ### Cancel Summary
 
-The summary is written by `Cancel Receipt` (`crates/libs/wms-inbound/src/domain/receipt/aggregate.rs:168-173`). It holds `cancelled_at` (Unix time), `cancel_reason`, `user_id` and `details_count`.
+The summary is written by `Cancel Receipt`. It holds `cancelled_at` (Unix time), `cancel_reason`, `user_id` and `details_count`.
 
 ## Messages
 

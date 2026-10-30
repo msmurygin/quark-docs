@@ -31,26 +31,6 @@ Reading notes:
 - A rule can end in one of three ways. It passes, it refuses with no way round, or it refuses with an approval request (diagram 4).
 - Rule 12 does not refuse. It returns the holds to place after the stock is written (diagram 5).
 - A return line is checked only when its goods are put into stock (page 12).
-
-### Where it comes from
-
-| Rule | Source |
-|---|---|
-| Order of the rules | `crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:23-40`, `:201-320` |
-| 1 LPN | `crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:88-110` |
-| 2 External lot | `crates/libs/wms-inbound/src/service/receipt/validation/validation_external_lot.rs:1-70` |
-| 3 Strict attributes | `crates/libs/wms-inbound/src/service/receipt/validation/validation_external_lot.rs:75-167` |
-| 4 Held location | `crates/libs/wms-inbound/src/service/receipt/validation/rules/held_location.rs:75-165` |
-| 5 Temperature | `crates/libs/wms-inbound/src/service/receipt/validation/rules/temperature.rs:20-100` |
-| 6 Pack multiple | `crates/libs/wms-inbound/src/service/receipt/validation/rules/qty_pack_multiple.rs:25-124` |
-| 7 Quantity | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:118-232`, `:353-440` |
-| 8 Dates | `DateDeviationsRule` and `check_date_deviations` in `crates/libs/wms-inbound/src/service/receipt/validation/rules/date_deviations.rs`; the rules themselves are `lot_dating::judge_receipt` in `crates/libs/wms-inventory/src/domain/lot_dating/aggregate.rs` |
-| 9 Shortage reason | `crates/libs/wms-inbound/src/service/receipt/validation/rules/shortage_reason.rs:20-160` |
-| 10 Serials | `crates/libs/wms-inbound/src/service/receipt/validation/validation_serial.rs:10-166` |
-| 11 Expected attributes | `crates/libs/wms-inbound/src/service/receipt/validation/validation_lot_attrs.rs:15-124` |
-| 12 Auto holds | `crates/libs/wms-inbound/src/service/receipt/validation/validation_holds.rs:50-89` |
-| Code numbers | `crates/libs/wms-shared/src/validation_codes.rs:27-130` |
-
 ## Diagram 2. Receipt policy fields with three values
 
 **What this shows:** four receipt policy fields that take `Allow`, `Warning` or `HardError`, the question each one asks, and what each value does.
@@ -76,17 +56,6 @@ flowchart LR
 | `no_sku_on_asn` | No line of the receipt matches the SKU, lot attributes, LPN and external lot. `Allow` creates a synthetic line with expected 0. | 24 | `Warning` returns code 24 as approvable, but the check does not read the acknowledged codes. It is refused each time (see the findings file). |
 | `qty_pack_multiple_check` | The quantity typed is not a multiple of the largest pack level above 1 (the largest `base_qty` of the SKU's pack). Skipped if the SKU has no pack or no level above 1. | 30 | `Warning` makes the failure approvable, `HardError` not. |
 | `date_deviation_check` | The expiration date is not later than today plus `sku.min_shelf_life_on_rec` days, or is already past (code 45); the manufactured date is older than `sku.max_age_on_rec` days (46); the `delivery_by_date` is not later than today (47); the `best_by_date` is not later than today (48); the lot has no expiration although one is required (49). | 45 to 49 | Dates come from the lot attributes typed on the receive. A missing expiration, best-by or delivery-by is first worked out from the manufactured date and the SKU's `expire_days`, `best_by_days` and `deliver_by_days`; "today" is the warehouse day. `Allow` skips every date check. |
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Which policy: SKU, then owner default; error if none | `crates/libs/wms-inbound/src/service/receipt/validation/validation_service.rs:19-52` |
-| `receipt_without_lpn` | `crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:88-110` |
-| `no_sku_on_asn` | `crates/libs/wms-inbound/src/service/receipt/validation/validation_pipeline.rs:133-155`, `crates/libs/wms-inbound/src/service/receipt/receive/receive_against_asn.rs:253-275` |
-| `qty_pack_multiple_check` | `crates/libs/wms-inbound/src/service/receipt/validation/rules/qty_pack_multiple.rs:25-124` |
-| `date_deviation_check` | `DateDeviationsRule` and `check_date_deviations` in `crates/libs/wms-inbound/src/service/receipt/validation/rules/date_deviations.rs`; the rules themselves are `lot_dating::judge_receipt` in `crates/libs/wms-inventory/src/domain/lot_dating/aggregate.rs` |
-
 ## Diagram 3. The quantity decision
 
 **What this shows:** how `qty_validation` and the excess and shortage fields turn "expected 100, received so far 90, now 30" into a pass, an approval request, or a refusal.
@@ -117,17 +86,6 @@ Reading notes:
 
 - Codes 27 and 28 need a supervisor capability. See diagram 4.
 - The shortage reason must be an active value of the code list `shortage_reason`. Otherwise the receive is refused with code 43.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Totals, `None` turns it off, `Lot` | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:172-232`, `:234-330` |
-| Excess limits and verdict | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:96-170`, `:353-406` |
-| Shortage | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:407-445` |
-| Last open line only | `crates/libs/wms-inbound/src/service/receipt/validation/validation_qty.rs:40-65` |
-| Shortage reason list | `crates/libs/wms-inbound/src/service/receipt/validation/rules/shortage_reason.rs:20-80` |
-
 ## Diagram 4. Who may approve
 
 **What this shows:** what happens to a refusal that can be approved.
@@ -156,17 +114,6 @@ Reading notes:
 
 - A grant is made by `supervisor_override_grant`. It is single use, expires in minutes, and is bound to the operator, the pairs, and the receipt (code 71) or the line (codes 27, 28). An Admin or a Manager cannot authorize these three codes.
 - The RF screens offer an approval for only two codes: 28 on `RCASN01RSN` (the screen sends `acknowledged_overrides = [28]` with the reason) and 71 on `RCCLOSE_OVR` (a grant). For any other approvable refusal the RF shows the message and stays on the screen.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Decision order | `crates/libs/wms-inbound/src/service/receipt/validation/validation_outcome.rs:158-200`, `:253-366` |
-| Capabilities of the three codes; which codes are approvable | `crates/libs/wms-shared/src/validation_codes.rs:484-570`, `:690-705` |
-| Grant minting and binding | `crates/services/app-server/src/web/rpcs/override_grant_rpc.rs:97-125` |
-| Event `process.receipt.override_applied` | `crates/libs/wms-inbound/src/service/receipt/validation/validation_outcome.rs:368-415` |
-| RF: code 28 and close | `crates/libs/wms-lib-sql/sql/rf-screens/020_uc_asn_declarative.sql:563-656`, `crates/libs/wms-lib-sql/sql/rf-screens/025_uc_receipt_close.sql:259-320` |
-
 ## Diagram 5. SKU, owner and location fields that change a receive
 
 **What this shows:** the master data fields read by the rules 4, 5, 8, 10 and 12, and the visible result.
@@ -200,21 +147,9 @@ flowchart LR
 | `sku.warning_temperature_min`, `sku.warning_temperature_max` | A captured temperature outside this band gives a `QcQuarantine` hold. | `holds_applied` |
 
 Auto holds do not block the receive. A hold that cannot be placed refuses the whole receive (`HoldNotPlaced`).
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Temperature | `crates/libs/wms-inbound/src/service/receipt/validation/rules/temperature.rs:44-100` |
-| Dates | `check_date_deviations` in `crates/libs/wms-inbound/src/service/receipt/validation/rules/date_deviations.rs`, over `lot_dating::judge_receipt` |
-| Serials | `crates/libs/wms-inbound/src/service/receipt/validation/validation_serial.rs:10-166`, `crates/libs/wms-serial/src/service/serial_policy.rs:225-251`, `:611-640` |
-| Held location | `crates/libs/wms-inbound/src/service/receipt/validation/rules/held_location.rs:75-165` |
-| Auto holds | `crates/libs/wms-inbound/src/service/receipt/validation/validation_holds.rs:50-89`, `crates/libs/wms-inbound/src/service/receipt/validation/validation_internal_helpers.rs:117-214` |
-| A hold that cannot be placed | `crates/libs/wms-inbound/src/service/receipt/lifecycle/auto_holds.rs:14-50` |
-
 ## Stored only. It has no effect today.
 
-These receipt policy fields are stored and shown, but no receiving code reads them (searched in `crates/` and `clients/rf-go`).
+These receipt policy fields are stored and shown, but no receiving code reads them.
 
 | Field | Note |
 |---|---|
@@ -224,12 +159,6 @@ These receipt policy fields are stored and shown, but no receiving code reads th
 | `asn_po_qty_discrepancy` | Nothing reads it. |
 | `po_qty_validation`, `po_excess_message`, `po_excess_override`, `po_excess_override_percent`, `po_excess_error`, `po_excess_error_percent`, `po_shortage_message`, `po_shortage_override`, `po_shortage_override_percent` | The purchase order checks do not exist. |
 | `excess_message`, `shortage_message` | Only the policy form enables or disables them. The server does not read them. |
-
-## Not confirmed by code
-
-- How the web receive dialog (a Component) offers approvals for codes other than 28 and 71. The RF screens are read; the dialog metadata is not.
-- Whether the owner is warned when it has no `owner_config` row. The shelf-life multiplier then falls back to 200 in code.
-
 ## Related pages
 
 - [Policy reference: receipt policy settings](../../admin/policies/40-receipt-policy-settings.md)

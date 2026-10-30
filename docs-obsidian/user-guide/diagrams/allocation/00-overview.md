@@ -102,16 +102,6 @@ Fields that exist and can be edited, but that no allocation, release or wave cod
 | Pick short reason actions `HoldInventory`, `HoldContainer`, `RequestSupervisorReview`; field `supervisor_review` | No code runs these actions. No code reads the field | `crates/libs/wms-lib-core/src/model/outbound/pick_short_reason.rs:22-32`, `crates/libs/wms-outbound/src/domain/pick_short_reason/aggregate.rs:153-160` |
 | `sku.abc`, `sku.min_shelf_life_on_rec` | Not read by allocation. `Location ABC` of a step uses the ABC class of the location. (`sku.shelf_life` and `sku.expire_days` are read: the reserve limit and whether an expiration is required.) | `crates/libs/wms-outbound/src/allocation/trace.rs:904-950` |
 | `owner_config.default_lot_policy_id` | No code reads it | `crates/libs/wms-lib-core/src/model/owners/owner_config.rs:104` |
-
-## 6. Not confirmed by code
-
-| Point | To verify |
-|---|---|
-| Whether a step without `Location type` really reserves stock that sits in a `QC`, `Returns` or `Lost` location. The query does not exclude these types | Put 10 units in a `Returns` location with no hold. Run `shipment_order_allocate_preview` for that SKU. Look for the position |
-| Whether `Deactivate` of a policy makes the open lines fail with `version mismatch` | Create a line with a published policy, press `Deactivate`, press `Allocate`, read the message (see [page 22](22-influence-policy-binding.md)) |
-| Whether a date that the Lot Policy does not ask for stays empty on the lot | Receive a lot with `Show` off for the expiration date and look at the rotation order in the preview (see [page 23](23-influence-sku-lot-rotation.md)) |
-| The seeded pick short reasons and their action sets | Read the seed of `pick_short_reason_action` in the `wms-app` migrations (see [page 14](14-journey-top-up.md)) |
-
 ## Related pages
 
 - [Allocation overview (policy reference)](../../admin/policies/10-allocation-overview.md)

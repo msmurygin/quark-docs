@@ -28,17 +28,6 @@ Reading notes:
 - `receipt_report_damage` is not used by an RF screen. It is for the web damage dialog and for the API.
 - The RF screens do not send a destination for a move. The stock stays where the operator put it (`dest_loc` is empty in the receive path).
 - Only `Admin` and `Manager` may call `receipt_report_damage`, `receipt_write_off_damage`, `receipt_move_damage_to_rtv` and `receipt_set_damage_disposition`. The receives that carry `damage_info` are open to the floor roles for blind and return, and to `Admin` and `Manager` for the ASN receive.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| RF screens | `crates/libs/wms-lib-sql/sql/rf-screens/070_uc_asn_damage_hotkey.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/060_uc_dmg_receive.sql:40-117`, `crates/libs/wms-lib-sql/sql/rf-screens/050_uc_rtn_declarative.sql:122-261` |
-| The cascade into `ReportDamage` | `crates/libs/wms-inbound/src/service/receipt/damage/damage_info.rs:69-96` |
-| ASN, blind, blind line callers | `crates/libs/wms-inbound/src/service/receipt/receive/receive_against_asn.rs:508-522`, `crates/libs/wms-inbound/src/service/receipt/receive/receive_blind.rs:361`, `crates/libs/wms-inbound/src/service/receipt/receive/receive_blind_line.rs:307` |
-| Return caller (before the deposit) | `crates/libs/wms-inbound/src/service/receipt/receive/return_line_finalizer.rs:268-296` |
-| Method classes and roles | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:36-55`, `:263-345` |
-
 ## Diagram 2. Inside `receipt_report_damage`
 
 **What this shows:** what one damage report does, in order, and which table each step writes.
@@ -79,22 +68,6 @@ Reading notes:
 - The ceiling is "arrived on the line" minus "already reported". Arrived is `qty_received + qty_rejected + qty_damaged`, where the damaged part counts only reports that did not add themselves to the line.
 - The action is stored on the row (`applied_action`) so that later reports still count correctly when the owner changes the setting.
 - `vendor_responsibility` is only stored and sent in the data. No code branches on it.
-
-### Where it comes from
-
-| Step | Source |
-|---|---|
-| Whole command | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:167-387` |
-| Checks, reason list (step 5) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:173-200` |
-| Owner action (step 6) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:222`, `:966-998` |
-| Ceiling (step 7) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:241-261`, `:393-517` |
-| Photos and the insert (steps 8 and 9) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:267-295` |
-| The move (step 10) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:313`, `:929-964`, `crates/libs/wms-inbound/src/service/receipt/adapters/movement_damage_dispatcher.rs:30-80` |
-| The action (step 11) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:319-332`, `:789-875` |
-| Version bump and event (steps 12 and 13) | `crates/libs/wms-inbound/src/service/receipt/damage/report_damage.rs:345-377` |
-| Destination type per severity | `crates/libs/wms-lib-core/src/model/receipt_detail_damage.rs:113-120` |
-| Status allowed (`Open`, `InProgress`) | `crates/libs/wms-inbound/src/service/receipt/state_machine.rs:75-95` |
-
 ## Diagram 3. What the owner settings change
 
 **What this shows:** how severity and the owner damage settings decide what happens to the stock.
@@ -155,18 +128,6 @@ Reading notes:
 - The RTV destination is the typed location, or `owner_config.default_rtv_loc`, or `owner_config.default_returns_loc`. If none is set, the command is refused.
 - The write-off sends the GL hint from the request, or `owner_config.write_off_gl_account_hint`. The RTV sends `owner_config.rtv_gl_account_hint`. They go into the event only.
 - All three work after the receipt is closed. They do not use the receipt lock.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Close check counts empty dispositions | `crates/libs/wms-inbound/src/queries/receipt/blockers.rs:35-55`, `crates/libs/wms-inbound/src/service/receipt/lifecycle/close_receipt.rs:164-181` |
-| Write-off | `crates/libs/wms-inbound/src/service/receipt/damage/write_off_damage.rs:72-231` |
-| RTV | `crates/libs/wms-inbound/src/service/receipt/damage/move_damage_to_rtv.rs:1-285` |
-| Repurpose and Destroyed | `crates/libs/wms-inbound/src/service/receipt/damage/set_damage_disposition.rs:30-193` |
-| Classes and versioned entity | `crates/services/app-server/src/web/rpcs/receipt_commands_rpc.rs:283-345` |
-| Return code 77 name and number (`CannotCloseWithPendingDamage`) | `crates/libs/wms-shared/src/validation_codes.rs` |
-
 ## Related pages
 
 - [Operator guide: damage and receipt close](../../operator/04-damage-and-receipt-close.md)

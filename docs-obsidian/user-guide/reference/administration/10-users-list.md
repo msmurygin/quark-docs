@@ -22,7 +22,7 @@ the list `enterprise_users_list` in `slot_1` and the user card `enterprise_user_
 | Rows | One card for each user. |
 
 The search and the filters run in the browser, on the rows already loaded.
-The server does not know the filtered count (`crates/services/web-ui-server/src/components/layout/cortive_user_list.rs:227`).
+The server does not know the filtered count.
 
 ### What a row shows
 
@@ -36,7 +36,7 @@ The server does not know the filtered count (`crates/services/web-ui-server/src/
 
 `ROLE` and `WAREHOUSE` come from one warehouse only: the **default** warehouse of the user, or, when no default is marked, the one with the lowest warehouse id.
 A user with several warehouses shows only one of them.
-The data comes from the view `enterprise.user_list_card` (`crates/libs/wms-lib-sql/sql/wms-enterprise/migrations/001_baseline.sql:887`).
+The data comes from the view `enterprise.user_list_card`.
 
 The form itself also defines a table with these columns. They are the fields that the BIO `enterprise_user_list` reads.
 
@@ -69,8 +69,7 @@ There is no `Delete` button on the list. A user is deleted from the card: see [U
 ## Who can use it
 
 Only a user in Enterprise mode, so only a user with the role `ADMIN` on some warehouse.
-The API methods behind the screen are `list_user`, `get_user` and `count_user`. Their default roles are `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`
-(`crates/services/app-server/src/web/rpcs/user_rpc.rs:38`). The default role `SUPERVISOR` is not in that list.
+The API methods behind the screen are `list_user`, `get_user` and `count_user`. Their default roles are `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`. The default role `SUPERVISOR` is not in that list.
 See [Who can do what](91-who-can-do-what.md).
 
 ## What this screen affects

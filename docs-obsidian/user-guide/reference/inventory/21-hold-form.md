@@ -16,8 +16,6 @@ The title of the page is `Hold`. The only toolbar button is `Save`.
 | `Auto-release` | `auto_release_date` | Date and time | No | A local warehouse date and time, or empty. | Schedules the hold to end automatically. The browser sends the selected instant in UTC. Empty means the hold stays on until a release command. |
 | `Comments` | `comments` | Long text | No | Any text. | A note. |
 
-Sources: the form `hold_form` in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`; the column types in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:1992-2011` (the location column was widened to 20 by migration 089).
-
 The fields the form does **not** show are filled by the server when the hold is placed:
 
 | Column | Value |
@@ -30,7 +28,7 @@ The fields the form does **not** show are filled by the server when the hold is 
 
 ## Rules
 
-Saving a new hold calls `create_inventory_hold_row`, which checks, in this order (`crates/services/app-server/src/web/rpcs/hold_rpc.rs:139-190`):
+Saving a new hold calls `create_inventory_hold_row`, which checks, in this order:
 
 1. The reason code is not empty.
 2. The reason code exists in `inventory_hold_code`.
@@ -53,8 +51,6 @@ After the first save `Reason code`, `Lot`, `Location` and `Container (LPN)` are 
 | Location of pick pallets | `location {loc} holds only open pick pallets: it takes no location hold (hold the pallet by its LPN)` |
 | Nothing saved | `hold was not created` |
 | Saving an existing hold without changing `Comments` or `Auto-release` | `inventory hold update requires comments or auto_release_date` |
-
-> Not confirmed by code: how the window words an error from the server, and the text of the check on an empty `Reason code`. To verify: press `Save` with an empty form, and again with `Lot` and `Location` both filled, and read the message.
 
 The date-time picker displays the warehouse user's timezone and posts an RFC 3339 UTC instant. This avoids shifting the scheduled moment when the browser and server use different timezones.
 

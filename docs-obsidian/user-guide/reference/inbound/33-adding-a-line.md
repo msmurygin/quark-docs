@@ -43,8 +43,6 @@ Use this page to add an expected line (SKU and planned quantity) to a saved rece
 | `receipt {id} is {status} — cannot add receipt line in its current lifecycle state` | The receipt is `OnHold`, `Closed` or `Cancelled`. | Release the hold, or use another receipt. |
 | `a planned line starts with nothing done — status cannot be set when planning (got InProgress)` | See the note below. | |
 
-> Not confirmed by code: that adding a line to a receipt in status `InProgress` fails. The `New` button copies the status of the receipt into the new line (binding of the button `rcd_dn`, `parent_copy_fields` = `status`, `receipt_type`, `owner_id`). The server accepts a new line only with status `Open` (`crates/libs/wms-inbound/src/service/receipt/planning/add_receipt_line_plan.rs:143-171`). To verify: receive part of one line so the receipt is `InProgress`, press `New` in the lines list, fill `SKU` and `Qty Expected`, press `Save`. If the message above appears, a line can be added to a receipt in progress only through the API.
-
 ## Related pages
 
 - [Line detail tab](21-line-detail-tab.md)

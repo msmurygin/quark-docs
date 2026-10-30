@@ -64,8 +64,6 @@ If your session ends while you work, the terminal shows **Session expired. Pleas
 
 If the terminal cannot load your list of warehouses after sign-in, it does not stop. It opens **Main Menu** without a chosen warehouse. The server then uses your default warehouse, but only when exactly one warehouse is marked as your default. If none or more than one is marked, the server refuses your requests (code `warehouse_required`). In that case ask your administrator to set one default warehouse for you.
 
-> Not confirmed by code: the exact words the terminal shows when the server refuses a request with `warehouse_required`. To verify: sign in with a user that has no warehouse assigned (the same case as an empty warehouse list), press `1` on **Main Menu**, and read the status line.
-
 ## Related guides
 
 - [00 README](00-README.md) for the RF keys.

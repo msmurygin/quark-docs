@@ -44,20 +44,6 @@ Reading notes.
 - The retry has no order version in its request. It reads the lines as they are now. A line that has no open quantity is skipped.
 - The stock that the other transaction took is simply not there at the retry. The retry reserves what is left. If it is less than the need, the line stays short.
 - The same subscriber also listens to `process.order.line_allocation_short`. The only code that publishes this event is `short_pick`, and the code comment says it has no production caller yet. The real short-pick path is in section 2.
-
-### Where it comes from
-
-| Step in the diagram | Code |
-|---|---|
-| Container and balance locks use "skip locked"; both give `Contended` | `crates/libs/wms-outbound/src/allocation/reserve.rs:128-160` |
-| Deferred quantity is not counted as short | `crates/libs/wms-outbound/src/service/order/allocate.rs:554-557`, `crates/libs/wms-outbound/src/service/order/allocate.rs:667-669` |
-| Event is published only in the `Publish` mode | `crates/libs/wms-outbound/src/service/order/allocate.rs:638-655` |
-| Retry command, fails while quantity stays deferred | `crates/libs/wms-outbound/src/service/order/allocate.rs:233-265` |
-| Subscriber, 3 attempts, delay 15 s | `crates/libs/wms-lib-sql/sql/wms-enterprise/migrations/007_internal_outbound_execution_delivery.sql:25-37` |
-| Delivery worker calls the retry for the two order events | `crates/services/app-server/src/services/integration_delivery.rs:535-570` |
-| Delay doubles with each attempt, the third failure ends in `failed` | `crates/services/app-server/src/services/integration_delivery.rs:386-411`, `crates/services/app-server/src/services/integration_delivery.rs:414-417` |
-| `short_pick` is the only publisher of `line_allocation_short` | `crates/libs/wms-outbound/src/service/order/cancel_allocation.rs:337-352`, `crates/libs/wms-outbound/src/picking/confirmation/episode.rs:55-56` |
-
 ## 2. Short pick: release, quarantine, reserve again
 
 **What this shows.** The picker could not find the full quantity. The pick reason decides which of the follow-up actions run.
@@ -101,27 +87,6 @@ Reading notes.
 - `ReallocateReleasedDemand` has an order scope: `CurrentOrder`, `OrdersWithReleasedReservations` or `CurrentAndAffectedOrders` (also when the scope is empty). An order that is still short after it does not fail the follow-up: the short is its outcome.
 - `RelocateResidualToMissing` is accepted only together with `BlockSourceLocation` and `ReleaseRelatedReservations`, and only for the scope `EntireLocation`.
 - The actions `HoldInventory`, `HoldContainer` and `RequestSupervisorReview` are in the list of action types, but no code runs them. No code reads the field `supervisor_review`.
-
-### Where it comes from
-
-| Step in the diagram | Code |
-|---|---|
-| `pick_short` is a pick command | `crates/services/app-server/src/web/rpcs/pick_commands_rpc.rs:263` |
-| Published reason, `ReleaseCurrentRemainder` is required, other compatibility rules | `crates/libs/wms-outbound/src/domain/pick_short_reason/aggregate.rs:44-160` |
-| Found quantity moves, line `qty_allocated` goes down by the released quantity | `crates/libs/wms-outbound/src/picking/commands/short.rs:365-384` |
-| `BlockSourceLocation` sets the location flag | `crates/libs/wms-outbound/src/picking/commands/short.rs:391-401`, `crates/libs/wms-lib-core/src/model/location.rs:1239-1252` |
-| Event published | `crates/libs/wms-outbound/src/picking/commands/short.rs:470-475` |
-| Subscriber filter includes this event | `crates/libs/wms-lib-sql/sql/wms-enterprise/migrations/008_pick_discrepancy_remediation_event.sql:27` |
-| Remediation: release, quarantine, count, reallocate | `crates/libs/wms-outbound/src/picking/remediation.rs:152-244`, `crates/libs/wms-outbound/src/picking/remediation.rs:449-495` |
-| Scope of the release; only unstarted picks are freed | `crates/libs/wms-outbound/src/picking/remediation.rs:246-445` |
-| Order scope of the reallocation | `crates/libs/wms-outbound/src/picking/remediation.rs:559-578` |
-| Allocation skips a location with a flag | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:457` |
-| Action types without a runner | `crates/libs/wms-lib-core/src/model/outbound/pick_short_reason.rs:22-32` |
-
-## Not confirmed by code
-
-- Seeded pick short reasons and their action sets are described on [page 23 of the policy reference](../../admin/policies/23-pick-short-reasons.md). This page does not repeat them. To verify: read the seed of `pick_short_reason_action` in the `wms-app` migrations.
-
 ## Related pages
 
 - [Release and Allocate an order](10-journey-release.md)

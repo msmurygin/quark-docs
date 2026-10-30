@@ -34,8 +34,7 @@ Labels come from `wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`
 
 Many columns have **no screen field**. They are set only through the API:
 `create_sku`, `update_sku` (roles Admin, Manager, Operator),
-`create_sku_full`, `update_sku_full` (Admin, Manager)
-(`app-server/src/web/rpcs/sku_rpc.rs:19-25`). They are marked "API only"
+`create_sku_full`, `update_sku_full` (Admin, Manager). They are marked "API only"
 below.
 
 Units: weights are stored in the warehouse weight unit and lengths in the
@@ -96,18 +95,16 @@ default (`owner_config.default_*_policy_id`), else none.
 | Lot | `lot_policy_id` (**not null, default 1**) | `default_lot_policy_id` (no reader) | `deposit.rs:710` |
 | Replenishment | `replenishment_policy_id` (**not null, default 1**) | `default_replenishment_policy_id` (no reader) | none |
 
-Important: for Receipt, Lot and Replenishment the SKU column is `NOT NULL DEFAULT 1`
-(`wms-app/migrations/001_baseline.sql:2145,2148,2149`). The first step of the
+Important: for Receipt, Lot and Replenishment the SKU column is `NOT NULL DEFAULT 1`. The first step of the
 ladder is therefore never empty, and the owner default never gets a turn.
 For Allocation, Putaway and Cartonization the default was removed in later
 migrations (009 for cartonization) and the owner default works.
 
 On the SKU screen all six policy pickers are marked **required**
 (baseline form rows, `is_required = true`; for Putaway it is not required).
-A SKU created on the screen therefore always names its own policies. A SKU
-created through the API or import may leave the nullable ones empty. To verify
-on a live system: open a new SKU, leave **Cartonization Policy** empty and press
-Save. If it saves, the form rule is off in your build.
+A SKU created on the screen therefore always names its own policies. An
+approved import may leave nullable policy fields empty, so review imported
+SKUs before releasing warehouse work.
 
 ### Allocation Policy
 
@@ -115,7 +112,7 @@ Save. If it saves, the form rule is off in your build.
 - **Column**: `sku.allocation_policy_id`, bigint, null allowed, foreign key to
   `allocation_policy`, delete restricted. Default null.
 - **Meaning**: The reservation rules used for this SKU.
-- **Affects**: `resolve_allocation_policy` (`sku.rs:950`), used when an order
+- **Affects**: `resolve_allocation_policy`, used when an order
   is reserved. Details are in the allocation policy guide.
 - **Interactions**: Wins over `owner_config.default_allocation_policy_id`
   ("Allocation Policy" on the owner configuration).
@@ -128,7 +125,7 @@ Save. If it saves, the form rule is off in your build.
 
 - **Screen**: SKU > Policies > **Putaway Policy** (picker, not required).
 - **Column**: `sku.putaway_policy_id`, bigint, null allowed. Default null.
-- **Affects**: `resolve_putaway_policy` (`sku.rs:867`). A pallet carrying one
+- **Affects**: `resolve_putaway_policy`. A pallet carrying one
   configured SKU beside an unconfigured one does not report a conflicting
   policy nobody wrote.
 - **Interactions**: Wins over `owner_config.default_putaway_policy_id`.
@@ -172,8 +169,7 @@ effect today.
 - **Screen**: Basic > **Active** (checkbox, required).
 - **Column**: `sku.active`, boolean, not null, default `true`.
 - **Meaning**: Can this SKU be sold?
-- **Affects**: Only when an outbound order line is added
-  (`wms-outbound/src/service/shared/lookups.rs:72`): an inactive SKU gives
+- **Affects**: Only when an outbound order line is added: an inactive SKU gives
   "sku '<code>' is inactive". Receiving, putaway, counting and picking do not
   check it.
 - **Example**: Switch off SKU A. A new order line for A is refused. Stock of A
@@ -188,8 +184,7 @@ effect today.
   migration 044.
 - **Meaning**: A standing note shown on every pick of this SKU.
 - **Affects**: Shown on RF screen `PICKINS`. The picker must acknowledge it
-  before the pick commits (`wms-lib-core/src/model/sku.rs` field comment,
-  wms-app 044).
+  before the pick commits.
 - **Example**: "Wear gloves. Fragile glass."
 - **When empty**: Nothing is shown.
 - **If you change it**: Next pick shown.
@@ -209,8 +204,7 @@ effect today.
 - **Column**: `sku.abc`, enum `abc_speed_type` (`A`, `B`, `C`), null allowed;
   database default `B`.
 - **Meaning**: Movement speed class.
-- **Affects**: Only as a putaway step criterion "SKU ABC"
-  (`wms-inventory/src/putaway/product.rs:344`). A step may demand that the
+- **Affects**: Only as a putaway step criterion "SKU ABC". A step may demand that the
   SKU's class equals a given value.
 - **Example**: A step "ABC = A" sends fast movers only to the front zone.
 - **When empty**: A step that names a value does not match a SKU without one.
@@ -221,9 +215,8 @@ effect today.
 - **Screen**: Basic > **Class**, **SKU Group**.
 - **Column**: `sku.class` (varchar(20)), `sku.sku_group` (varchar(10)), both
   free text, null allowed.
-- **Affects**: Only as putaway criteria "SKU class" and "SKU group"
-  (`product.rs:347-352`). The criterion editor offers the values found in
-  your data (`putaway_step_criterion.rs:940`).
+- **Affects**: Only as putaway criteria "SKU class" and "SKU group". The criterion editor offers the values found in
+  your data.
 - **When empty**: Does not match a criterion that names a value.
 
 ### Putaway Class
@@ -232,7 +225,7 @@ effect today.
 - **Column**: `sku.putaway_class`, enum `putaway_class` (`None`, `NoMix`),
   null allowed, database default `None`.
 - **Meaning**: A product marking used by putaway rules.
-- **Affects**: Only as the criterion "Putaway class" (`product.rs:353-356`).
+- **Affects**: Only as the criterion "Putaway class".
   It does not itself forbid mixing; a step must test it.
 - **Value `None`**: no marking. **Value `NoMix`**: marks products that a step
   can keep away from mixed locations.
@@ -245,7 +238,7 @@ effect today.
 - **Screen**: Weight > **Gross Weight** (required on screen).
 - **Column**: `sku.gross_wgt`, double, not null, default 0, grams by default.
 - **Meaning**: Fallback weight of ONE base unit.
-- **Affects**: The one stock-weight formula (`wms-lib-core/src/model/pack/weight.rs:185-215`):
+- **Affects**: The one stock-weight formula:
   the weight of one unit is the weight of the **base pack item** if it is above
   0; else `sku.gross_wgt`; else unknown. That weight feeds capacity checks of
   a move, the weight of a pallet in putaway, location and zone fill, and the
@@ -266,7 +259,7 @@ effect today.
   default).
 - **Meaning**: Volume of ONE base unit.
 - **Affects**: `putaway/mod.rs:1480` (pallet cube = cube x quantity), move
-  capacity (`movement/validation.rs`), location and zone fill.
+  capacity, location and zone fill.
 - **Example**: Cube 1,000,000 mm³ x 50 units = 50,000,000 mm³ against a
   location's cube capacity.
 - **When empty**: 0 means unknown.
@@ -287,7 +280,7 @@ effect today.
 - **Screen**: Weight > **Stack limit**.
 - **Column**: `sku.stack_limit`, smallint, not null, default 0, at least 0.
 - **Meaning**: How many pallets high this item may be stacked.
-- **Affects**: Putaway (`putaway/mod.rs:1483`, `putaway/space.rs:149-154`).
+- **Affects**: Putaway.
   The engine takes the minimum of the SKU limits above 0 and the location's
   own limit. An item can lower a rack's limit, never raise it.
 - **Example**: SKU 2, rack 4: limit 2.
@@ -300,8 +293,7 @@ effect today.
 - **Column**: `sku.positions_required`, smallint, not null, default 1, at
   least 1.
 - **Meaning**: How many adjacent positions of one section the item takes.
-- **Affects**: Putaway (`putaway/mod.rs:1484`, `putaway/reserve.rs`,
-  `section_holds.rs`). The whole section must be free. A mixed pallet needs the
+- **Affects**: Putaway. The whole section must be free. A mixed pallet needs the
   maximum of its items.
 - **Example**: 3: three free neighbouring positions are needed.
 - **If you change it**: Next putaway suggestion.
@@ -316,7 +308,7 @@ effect today.
   allowed.
 - **Meaning**: The SKU's preferred zone and location.
 - **Affects**: Only putaway steps whose scope is "Zone from SKU" or "Location
-  from SKU" (`putaway/step.rs:530-556`, `sku.rs:979-1030`). Without such a
+  from SKU". Without such a
   step they do nothing. The first line of the pallet decides.
 - **When empty**: The step "does not apply" and the next step runs.
 - **If you change it**: Next putaway suggestion.
@@ -400,7 +392,7 @@ view stays for its other readers.
   `Fifo`, `Lifo`, `Fefo`.
 - **Column**: `sku.rotation`, enum `sku_rotation`, not null, default `Fifo`.
 - **Meaning**: Which stock is picked first.
-- **Affects**: Allocation sort (`wms-outbound/src/allocation/select.rs:323-360`).
+- **Affects**: Allocation sort.
   Also a putaway criterion "Rotation".
 - **Value `Fifo`**: oldest first, by the date that **Rotate By** names.
   **`Lifo`**: newest first. **`Fefo`**: earliest expiry first; it ignores
@@ -436,9 +428,7 @@ view stays for its other readers.
   an expired lot is refused with any value). Reservation: allocation takes
   only lots that expire after today + the larger of `shelf_life` and
   `min_shelf_life_on_pick`, so goods that could not ship in time are not
-  reserved. It is also shown in the Receive dialog
-  (`wms-inbound/src/service/receipt/receive_context.rs`,
-  `ui/wms-component/components/receive-line/Identity.tsx`).
+  reserved. It is also shown in the Receive dialog.
 - **Example**: 20 on 2026-10-10: a lot expiring 2026-10-30 is not fit to ship;
   one expiring 2026-10-31 is.
 - **When empty**: Read as 0: only a lot that expires today or earlier is
@@ -454,8 +444,7 @@ view stays for its other readers.
 - **Affects**: Three places, all with the boundary "expires after today +
   days". Allocation reserves only lots past the larger of this and
   `shelf_life`. The pick card, the pick commit and the short judge the reserved
-  lot again on the pick day (`picking/confirmation/shelf_life.rs`; refusal
-  `SOURCE_EXPIRED`), because a lot crosses the line as days pass. When the lot
+  lot again on the pick day, because a lot crosses the line as days pass. When the lot
   is expired or below the minimum, the short is allowed only with the reason
   `EXPIRED`, and `EXPIRED` is allowed only for such a lot. A lot with no
   expiration date is picked.
@@ -478,7 +467,7 @@ view stays for its other readers.
   `expire_days`. An expiration that is not later than today + this value is
   refused; an expired lot is refused the same way. Also the width of the QC
   warning band (see page 32; `evaluate_date_warning_band`). It is also shown
-  in the Receive dialog (`receive_context.rs`).
+  in the Receive dialog.
 - **Example**: 90 days, expiration in 60 days, policy `Error`: the receive is
   refused. Expiration exactly 90 days away: refused too; 91 days passes.
 - **When empty**: Read as 0.
@@ -528,7 +517,7 @@ view stays for its other readers.
 - **Column**: `sku.receipt_hold_code`, varchar(30), foreign key to
   `inventory_hold_code.code`, null allowed.
 - **Meaning**: Every receipt of this SKU is put on this hold.
-- **Affects**: `evaluate_sku_receipt_hold_code` (`validation_internal_helpers.rs:113-143`).
+- **Affects**: `evaluate_sku_receipt_hold_code`.
   The values empty, `None`, `Ok`, `NotHold` mean no hold. `NewItem` applies only
   to the first-ever receive of the SKU. Any other code is applied as the hold
   on the pallet or location.
@@ -558,7 +547,7 @@ view stays for its other readers.
   `TemperatureOutOfRange` (overridable). A null limit is not checked. The
   warning band is separate: a reading outside `[warning min, warning max]`
   puts a `QcQuarantine` hold on the pallet, but only if both warning limits are
-  set and a reading was taken (`validation_internal_helpers.rs:189-210`).
+  set and a reading was taken.
 - **Example**: Min 2, max 8, warning 3 to 7. Reading 8.5 is refused
   (overridable). Reading 7.5 passes but triggers a hold.
 - **If you change it**: Next receive.
@@ -586,13 +575,12 @@ Both are API only, default `false`. Read at `inventory_service.rs:1195-1260`.
 - **Column**: `sku.default_uom`, varchar(30), null allowed.
 - **Meaning**: The unit to use when none is given.
 - **Affects**: Validated on create and update: it must be an active code in
-  the `UOM` list, or the call fails (`sku.rs:660-668`, `policies/uom_class.rs:70-76`).
-  Used as the base unit in receiving (`wms-inbound/.../receive_line_resolver.rs:8-9,37`)
-  and deposit (`deposit.rs:208`). The code comment calls it a display hint
+  the `UOM` list, or the call fails.
+  Used as the base unit in receiving
+  and deposit. The code comment calls it a display hint
   for the base unit; the pack tiers decide quantities.
 - **UOM class**: each unit code has a class in table `uom_class`: `Handling`,
-  `Container`, `Weight`, `Length`, `Volume`, `Area`
-  (`uom_class.rs:20-48`). `Weight`, `Length`, `Volume` and `Area` are
+  `Container`, `Weight`, `Length`, `Volume`, `Area`. `Weight`, `Length`, `Volume` and `Area` are
   "measured" (kilograms, metres): quantities are weights or cuts, not whole
   pieces. Allocation step cards warn when a rule can never match a measured
   unit.
@@ -627,9 +615,7 @@ Both are API only, default `false`. Read at `inventory_service.rs:1195-1260`.
 - **Hazmat or dangerous goods.** The `sku` table has no such column. Keep it
   as a custom attribute: SKU > tab **Attributes** (tables `attribute_def` and
   `attribute_value`, entity type `sku`). A putaway step can then match on it
-  with the criterion "SKU attribute"
-  (`wms-inventory/src/putaway/mod.rs:1440-1455`,
-  `wms-lib-core/src/model/policies/putaway_step_criterion.rs:58`). No other
+  with the criterion "SKU attribute". No other
   process reads these attributes.
 - **A "lot tracked" or "expiry tracked" switch.** None exists. Lot behaviour
   comes from the Lot Policy (page 32). Expiry behaviour comes from the Lot
@@ -641,8 +627,7 @@ Both are API only, default `false`. Read at `inventory_service.rs:1195-1260`.
   (page 33).
 - **Catch weight and dual unit.** They are set on the pack item
   (`pack_item.is_catch_weight`, `is_dual_uom`), not on the SKU. The packing
-  rule says a catch-weight item makes the verdict "not comparable"
-  (`domain/packing_carton/aggregate.rs`). The packing contents query reads the
+  rule says a catch-weight item makes the verdict "not comparable". The packing contents query reads the
   flag from the SKU's active pack through `StockWeights`; one catch-weight
   level makes the package's nominal execution weight not comparable.
 - **Track inventory by.** `owner_config.track_inventory_by` (default `Lot`) is

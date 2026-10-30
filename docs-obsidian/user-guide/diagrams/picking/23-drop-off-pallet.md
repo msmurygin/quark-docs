@@ -45,23 +45,6 @@ sequenceDiagram
 - The location must also pass inventory's check: not blocked against outbound flow, status `Ok`, no flag.
 - A closed pallet of a cancelled order still closes. Its goods must leave `INTRANSIT`.
 - The router is asked only when the revision lists `Pack`. It routes only if exactly one distinct pack station answers for the destination. If areas disagree, the pallet is not routed.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Open pallet and the frozen revision | `crates/libs/wms-outbound/src/picking/commands/drop_open.rs:1-60` and `:113-143` |
-| Deposit onto the pallet, destination chain, router, freeze | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:1-120` |
-| Pallet types come from the frozen revision | `crates/libs/wms-outbound/src/picking/deposit/onto_pallet.rs:178-200` |
-| Refusal codes | `crates/libs/wms-outbound/src/domain/pick_drop/aggregate.rs:119-140` |
-| Rules of the destination | `crates/libs/wms-outbound/src/domain/pick_drop/aggregate.rs:387-409` |
-| Rules of the close | `crates/libs/wms-outbound/src/domain/pick_drop/aggregate.rs:437-484` |
-| The close, with the router hand-off | `crates/libs/wms-outbound/src/picking/commands/drop_close.rs:1-60` and `:160-260` |
-| Code of the right `pick_drop.close_foreign` | `crates/libs/wms-shared/src/validation_codes.rs:650-659` |
-| Right to close another operator's pallet | `crates/libs/wms-outbound/src/picking/infrastructure/authority.rs:12-24` |
-| Pallet statuses | `crates/libs/wms-lib-core/src/model/outbound/pick_drop.rs:39-46` |
-| RF screens | `crates/libs/wms-lib-sql/sql/rf-screens/101_uc_pick_drop_close.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/111_uc_pick_drop_area.sql` |
-
 ## Related pages
 
 - [Cart delivery](24-drop-off-cart.md)

@@ -33,9 +33,7 @@ From the card:
 - Edit: the table `receipt_detail` is updated with the fields you changed. The version of the line is not changed. Stock is not changed.
 - Delete: the line rows are removed. The expected lot attributes, damage records and pre-advised serials of the line are removed with them.
 - Several lines are deleted in one step. If one line is refused, none is deleted.
-- The command **does not check the received quantity** of the line. A web check that did this was removed from the screen (`wms-meta-ui` migration 065) and the command did not take it over (`crates/libs/wms-inbound/src/service/receipt/planning/delete_receipt_line.rs`).
-
-> Not confirmed by code: what stops the deletion of a line that has received goods. To verify: on a test receipt receive 1 unit on a line, then tick the line and press `Delete` as `ADMIN`. If the line is deleted, the received quantity is lost from the receipt. If a foreign key refuses it, note the message.
+- The command **does not check the received quantity** of the line. A web check that did this was removed from the screen (`wms-meta-ui` migration 065) and the command did not take it over.
 
 ## What can go wrong
 

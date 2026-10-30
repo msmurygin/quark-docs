@@ -25,8 +25,6 @@ It does not cancel the order.
 | The server refused | `Unallocate failed: {error}` |
 | No order open | `Open an order first` |
 
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/unallocate_action.rs:50-150`.
-
 ## What it does
 
 The command releases **every pick that is not in work**.
@@ -34,11 +32,9 @@ The command releases **every pick that is not in work**.
 - A pick that a picker already holds (its task is assigned or later) is **kept** and counted in the message. This is not an error. The command gives back what it can.
 - The released picks are **deleted**, not marked. The deleted picks give their quantity back to the lines and to the stock. The event `process.order.line_allocation_released` is the record.
 - Pick tasks that nobody has taken are deleted with their picks.
-- The cartonization plan describes work that is gone. When some picks remain, the plan the tab shows is declared `Stale`. When none remain, every plan of the order becomes history and leaves the screen, so the [Cartons tab](14-cartons-tab.md) is empty (`crates/libs/wms-outbound/src/cartonization/ensure.rs`, function `plan_lost_its_work`).
+- The cartonization plan describes work that is gone. When some picks remain, the plan the tab shows is declared `Stale`. When none remain, every plan of the order becomes history and leaves the screen, so the [Cartons tab](14-cartons-tab.md) is empty.
 - If **no live pick is left**, the launch mark is cleared too. The order returns to `New`, the version of the order goes up, and the next `Release` launches it again.
 - If some picks stay, the launch stands. The order reads `Partially released`.
-
-Source: `crates/libs/wms-outbound/src/service/order/cancel_allocation.rs:1-175`.
 
 ## What can go wrong
 

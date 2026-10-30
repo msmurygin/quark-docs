@@ -31,8 +31,6 @@ The toolbar has one button, `Refresh`. A click on a row opens the detail form (S
 | `Before` | `qty_before` | Decimal | None | The balance before the change. **Only adjustments fill it.** |
 | `After` | `qty_after` | Decimal | None | The balance after the change. **Only adjustments fill it.** |
 
-Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:6294-6325`; the entity in `crates/libs/wms-lib-core/src/model/transaction_log.rs`; the list in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`.
-
 ### Types
 
 | Type | Written by |
@@ -44,7 +42,7 @@ Sources: the table in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseli
 | `Transfer` | Transfers. |
 | `Adjust` | [Posting an adjustment](48-posting-an-adjustment.md): one row for each line that changed stock. |
 
-No business operation writes `Withdraw` or `Transfer` today. Both exist only as values of the type `TransactionType` (`crates/libs/wms-lib-core/src/model/transaction_log.rs:28-34`) and as filter values of the dashboard; a search of the Rust and SQL code finds no place that inserts them. Shipping confirmation, which would write `Withdraw`, is not built.
+No business operation writes `Withdraw` or `Transfer` today. Both exist only as values of the type `TransactionType` and as filter values of the dashboard; a search of the Rust and SQL code finds no place that inserts them. Shipping confirmation, which would write `Withdraw`, is not built.
 
 ## Detail form
 

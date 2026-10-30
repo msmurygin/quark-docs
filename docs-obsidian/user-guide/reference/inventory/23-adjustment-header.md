@@ -24,8 +24,6 @@ You get here by pressing `New` or by clicking a row of the [Adjustments list](22
 
 `Reason` and `Comment` can be edited only while the status is `Draft`, `Validated` or `Approved` (`generic_field_gate`). `Number`, `Status`, `Version` and the others never.
 
-Sources: the form in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/088_inventory_adjustment_screens.sql` and `089_inventory_adjustment_ordinary_forms.sql`; the document service in `crates/libs/wms-inventory/src/service/inventory_adjustment/`.
-
 ## Toolbar buttons
 
 | Button | Enabled when | What it does | Task page |
@@ -45,7 +43,7 @@ The grey texts are: `Validate`: `A posted adjustment cannot be validated again`.
 - When the header's reason asks for a comment, `Comment` must not be empty at `Save`: `reason {reason} requires a comment`. This is checked at `Save`, not only at `Validate`.
 - A hand-made document cannot use the reason `REVERSAL`: `a reversal is made from the posted adjustment it reverses, not by hand`. A reversal keeps its reason and no other document takes it: `a reversal keeps its reason, and no other adjustment takes it`.
 - The number may be at most 20 characters: `an adjustment number is at most 20 characters`.
-- **Changing `Reason` or `Comment` on a document that is `Validated` or `Approved` puts it back to `Draft`** and clears the verdicts of all lines. Saving the same effective values is a no-op: status, version, validation, approval and line verdicts stay as they were. (`crates/libs/wms-inventory/src/service/inventory_adjustment/update_header.rs`; adding, changing or removing a line is always a content change.)
+- **Changing `Reason` or `Comment` on a document that is `Validated` or `Approved` puts it back to `Draft`** and clears the verdicts of all lines. Saving the same effective values is a no-op: status, version, validation, approval and line verdicts stay as they were.
 - `Approve`, `Post` and `Delete` send the version of the header. A stale version is refused with return code 40.
 
 ## Messages after a button

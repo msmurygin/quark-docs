@@ -12,8 +12,6 @@ The form is `pick_assignment_board_shell_form` (kind Shell). It has two parts:
 The header is read by the method `pick_assignment_board_get`. The positions are read by `pick_assignment_position_list`, filtered by the assignment.
 The card has no toolbar of its own.
 
-> Not confirmed by code: how to go back from the card to the list. The shell has no back button in its metadata. To verify: open a row, then look for a breadcrumb or a back button on the page.
-
 ## Header
 
 Table: `pick_assignment` (view `pick_assignment_board`). All fields are read only.
@@ -61,10 +59,6 @@ Meaning of the values:
 | `Bound` | A box stands on it. |
 | `Closed` | The box was reported full, or delivered. The box stays on the cart until delivery. |
 | `Released` | The position was let go (dissolve). It is history. |
-
-Source: `crates/libs/wms-lib-core/src/model/outbound/pick_assignment.rs:49-70`, `crates/libs/wms-outbound/src/domain/pick_assignment/aggregate.rs` (the doc comments of `PlannedTarget` and `plan_dissolve`).
-
-> Not confirmed by code: whether any position with `Target Kind` = `ShipAsIs` exists today. The comment in `aggregate.rs:58-60` says it is never a target in slice 3, and `judge_position` handles it (`aggregate.rs:266`). To verify: look for `ShipAsIs` in the positions of a test warehouse.
 
 ## Who can use it
 

@@ -18,15 +18,11 @@ The fields are laid out in three columns.
 | `Requested Ship` | `requested_ship_date` | Date | No | Empty by default. | The date the customer wants the goods to leave. |
 | `Notes` | `notes` | Text | No | Empty by default. | A free note. |
 
-> Not confirmed by code: that an empty `Priority` on a new order becomes 50. The database column has the default 50 and the create command sends no value when the field is empty, but the insert code was not read to the end. To verify: create an order with an empty `Priority`, save, and read the `Priority` column in the orders list.
-
-Source: form `shipment_order_header_form` in `001_baseline.sql`; table `shipment_order` in `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql` (search `CREATE TABLE IF NOT EXISTS shipment_order (`).
-
 ## What each field affects
 
 ### Order #
 
-- The number is taken from the counter when you press `New`, before you type anything. If you leave the screen without saving, that number is lost. Gaps in the numbers are normal (`crates/libs/wms-outbound/src/service/order/create.rs:183-217`, `crates/services/web-ui-server/src/extensions/customization/shipment_order/save_action.rs:77`).
+- The number is taken from the counter when you press `New`, before you type anything. If you leave the screen without saving, that number is lost. Gaps in the numbers are normal.
 - It must be unique (`UNIQUE (order_number)`). A number made up by hand is refused.
 
 ### Status
@@ -35,27 +31,27 @@ Source: form `shipment_order_header_form` in `001_baseline.sql`; table `shipment
 
 ### Type
 
-- Frozen when the order is launched, and for ever after (`crates/libs/wms-outbound/src/service/shared/mutability.rs:36-67`). The screen greys the field too.
-- The command takes the **code** of the type, not its id. `Save` reads the code before it calls the command (`save_action.rs:116-142`).
-- An inactive type is refused: `order type '{code}' is inactive`. A missing one: `order type '{code}' not found` (`crates/libs/wms-outbound/src/service/shared/lookups.rs:38-44`).
+- Frozen when the order is launched, and for ever after. The screen greys the field too.
+- The command takes the **code** of the type, not its id. `Save` reads the code before it calls the command.
+- An inactive type is refused: `order type '{code}' is inactive`. A missing one: `order type '{code}' not found`.
 - The order type has two flags, `requires_release` and `allows_partial_ship`. They are not on this screen. Nothing in the Rust, SQL, Go or script code reads them. They are stored only.
 
 ### Owner
 
-- Chosen once. After the first save the field is not read only on the screen, but `Save` does not send it. A change of owner is ignored and `Save` answers `Nothing changed` when it is the only change (`save_action.rs:204-212`).
-- `Validate` and `Release` refuse a line whose owner differs from the owner of the order: `line owner {x} differs from order owner {y}` (`crates/libs/wms-outbound/src/service/order/validate.rs`).
+- Chosen once. After the first save the field is not read only on the screen, but `Save` does not send it. A change of owner is ignored and `Save` answers `Nothing changed` when it is the only change.
+- `Validate` and `Release` refuse a line whose owner differs from the owner of the order: `line owner {x} differs from order owner {y}`.
 
 ### Priority
 
-- Smaller is more urgent. It is given to the pick tasks when they are made (`crates/libs/wms-outbound/src/service/order/allocate.rs:424-436`).
-- When you change it on a saved order, the tasks of the order get the new priority at once (`crates/libs/wms-outbound/src/service/order/update.rs:133-137`).
-- The RF terminal ranks the next pick by order priority, then by `Requested Ship` (`crates/libs/wms-outbound/src/picking/grouping/planned_target.rs:105-114`).
+- Smaller is more urgent. It is given to the pick tasks when they are made.
+- When you change it on a saved order, the tasks of the order get the new priority at once.
+- The RF terminal ranks the next pick by order priority, then by `Requested Ship`.
 - Editable until the order is `Closed` or `Cancelled`.
 
 ### Requested Ship
 
-- Used as a tie-break when the RF terminal ranks the next pick (see above), and as a group key of the wave policy (`crates/libs/wms-outbound/src/waves/policy.rs:437`).
-- `Release` shows a warning, not an error, when the date is in the past: `requested ship date {date} is in the past` (`validate.rs:145-153`). The warning is appended to the successful release message (`release_action.rs`).
+- Used as a tie-break when the RF terminal ranks the next pick (see above), and as a group key of the wave policy.
+- `Release` shows a warning, not an error, when the date is in the past: `requested ship date {date} is in the past`. The warning is appended to the successful release message.
 - Editable until the order is `Closed` or `Cancelled`.
 
 ### Notes
@@ -75,7 +71,7 @@ Editable until the order is `Closed` or `Cancelled`.
 | `released_at` | Date and time | Set by the first release. See [Order statuses](90-order-statuses-and-transitions.md). |
 | `cancelled_at`, `cancel_reason` | Date and time, text up to 200 | Set by cancel. The reason is on the [Ship To tab](11-ship-to-tab.md). |
 | `closed_at`, `close_summary` | Date and time, JSON | Set by the API close. |
-| `ship_to_snapshot` | JSON | The address of the customer, frozen at release. The shipping label reads it (`crates/libs/wms-outbound/src/packing/post_commit/print_label.rs:186-229`). |
+| `ship_to_snapshot` | JSON | The address of the customer, frozen at release. The shipping label reads it. |
 
 ## Related pages
 

@@ -77,17 +77,6 @@ Supervisor screens (`Task Manager` group) call `task_force_release`, `task_reass
 - A box in a diagram is something the code does. A name in code font is a method, a table column, a status or a setting as the code or the screen spells it.
 - An arrow in a state diagram is drawn only when a statement in the code writes that change.
 - A setting appears in an influence diagram only if code reads it. Settings that are stored but not read are listed under "Stored only. It has no effect today." on the page that fits them.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| RF screens, newest seeded revisions | `crates/libs/wms-lib-sql/sql/rf-screens/094_uc_pick.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/095_uc_pick_assignment.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/096_uc_pick_route.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/098_uc_pick_carton_exceptions.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/101_uc_pick_drop_close.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/105_uc_pick_source_confirmation.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/110_uc_pick_aggregated_cart.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/111_uc_pick_drop_area.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/112_uc_pick_aggregated_cart_followups.sql`, `crates/libs/wms-lib-sql/sql/rf-screens/113_rf_inputs_fit_the_server_limits.sql` |
-| Pick methods and their classes | `crates/services/app-server/src/web/rpcs/pick_commands_rpc.rs`, `crates/services/app-server/src/web/rpcs/pick_assignment_rpc.rs` |
-| Task methods | `crates/services/app-server/src/web/rpcs/task_commands_rpc.rs`, `crates/services/app-server/src/web/rpcs/task_rpc.rs` |
-| Task Board rows | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:6153-6215` (view `task_board`) |
-| Method list | `docs-obsidian/user-guide/api/openrpc.json` |
-
 ## What is not drawn, and why
 
 - **Not confirmed by code: sorting, loading and shipping after a pick.** A pallet or a cart ends at its destination, and the goods can be handed to the Outbound Flow Router, which waits for `Pack` at a pack station. What happens at a sort or load step is not part of the picking code. To verify: read `crates/libs/wms-outbound/src/flow/` and the packing area.
@@ -95,7 +84,7 @@ Supervisor screens (`Task Manager` group) call `task_force_release`, `task_reass
 - **Dispatch strategies other than the fixed order.** The code has one fixed search order (held task, then the area, then every permitted area). A configurable strategy for the pool is not in code. To verify: read `crates/libs/wms-tasks/src/service/candidate.rs`.
 - **Task status `Cancelled`.** Declared, never written.
 - **Pick status `Cancelled`.** Declared, never written.
-- **`pick_reconciliation_report`.** A read-only report for `Admin`, `Manager` and `Supervisor` that lists drift between tasks and picks (`OrphanTask`, `MissingTask`, `DuplicateLiveTask`, `SourceOutcomeMissing`, `TaskOutcomeMissing`, `InvalidTaskState`, `SourceNotEligible`). It changes nothing and is not drawn. Source: `crates/libs/wms-outbound/src/picking/queries/reconcile.rs:1-60`.
+- **`pick_reconciliation_report`.** A read-only report for `Admin`, `Manager` and `Supervisor` that lists drift between tasks and picks (`OrphanTask`, `MissingTask`, `DuplicateLiveTask`, `SourceOutcomeMissing`, `TaskOutcomeMissing`, `InvalidTaskState`, `SourceNotEligible`). It changes nothing and is not drawn.
 
 ## Related pages
 

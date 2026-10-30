@@ -23,7 +23,7 @@ For each open order line, allocation answers four questions.
 | In which order do we take it? | The steps of the policy, then the sort ranks of each step, then the SKU rotation. |
 | How much do we take from each place? | A greedy pass: take as much as is available from the first place, then the next, until the need is covered. |
 
-The result is one **pick** (a `pick_detail` row) for each place taken. A pick says: this lot, this location, this LPN, this quantity, this unit of measure. The pick also remembers which policy version and which step created it (`wms-outbound/src/allocation/reserve.rs:216-232`).
+The result is one **pick** (a `pick_detail` row) for each place taken. A pick says: this lot, this location, this LPN, this quantity, this unit of measure. The pick also remembers which policy version and which step created it.
 
 Allocation does **not** decide:
 
@@ -45,32 +45,32 @@ Nothing allocates by itself when new stock arrives. If a line is short, somebody
 
 Both order buttons append `; deferred {d} (busy stock, try again)` when the allocator found stock but another transaction held its row lock. Deferred stock is reported separately from `short`.
 
-The unallocate button (`Unallocate`, API `shipment_order_cancel_allocation`) is the reverse. It deletes the picks whose task is still `Created` and gives the stock back. Picks whose task is already `Assigned` or later are kept (`wms-outbound/src/allocation/release.rs:143-246`).
+The unallocate button (`Unallocate`, API `shipment_order_cancel_allocation`) is the reverse. It deletes the picks whose task is still `Created` and gives the stock back. Picks whose task is already `Assigned` or later are kept.
 
-Roles (`shipment_order_commands_rpc.rs:46-59`): Allocate = Admin, Manager, Supervisor, Operator. Release = Admin, Manager, Supervisor. Preview, Unallocate = Admin, Manager.
+Roles: Allocate = Admin, Manager, Supervisor, Operator. Release = Admin, Manager, Supervisor. Preview, Unallocate = Admin, Manager.
 
 ## 3. Order of evaluation
 
 This is the exact order, line by line. A "line" is one shipment order line. Lines are handled in `line_no` order.
 
-1. **Gate on the order.** An order that is terminal (`Closed`, `Cancelled`) or `Picked` is refused with `cannot allocate an order in status {status}`. (`wms-outbound/src/service/order/allocate.rs:310-315`)
-2. **Need.** `need = qty_ordered - qty_cancelled - qty_allocated` (`wms-outbound/src/domain/shipment_order_line/aggregate.rs:69-71`). If the need is zero or less, the line is skipped without a message.
-3. **Policy.** Load the policy that the line froze when it was created (`trace.rs:299-313`). Checks, with the exact refusal text, are in the table in section 4.
-4. **SKU facts.** Read `rotation`, `rotate_by`, `min_shelf_life_on_pick`, `shelf_life` and `expire_days` of the SKU, and whether the lot policy requires an expiration (`trace.rs`, `lot_dating`).
-5. **Split by unit.** Take the pack of the line. Keep only the pack rungs that are active and have `base_qty > 0` **and** are named by an active step of the policy. Split the need over these rungs, biggest rung first, whole units only. The base rung (`base_qty = 1`) takes the rest, even a fraction (`wms-lib-core/src/model/pack/breakdown.rs:59-97`, `trace.rs:330-436`).
-6. **Walk the steps in `sequence` order** (`trace.rs:534`). For each step:
-   1. `need for this step = the share of its unit + whatever the earlier steps could not cover` (`trace.rs:535-536`). If this is zero, the step is skipped (verdict `NoQuantityForUom`).
+1. **Gate on the order.** An order that is terminal (`Closed`, `Cancelled`) or `Picked` is refused with `cannot allocate an order in status {status}`.
+2. **Need.** `need = qty_ordered - qty_cancelled - qty_allocated`. If the need is zero or less, the line is skipped without a message.
+3. **Policy.** Load the policy that the line froze when it was created. Checks, with the exact refusal text, are in the table in section 4.
+4. **SKU facts.** Read `rotation`, `rotate_by`, `min_shelf_life_on_pick`, `shelf_life` and `expire_days` of the SKU, and whether the lot policy requires an expiration.
+5. **Split by unit.** Take the pack of the line. Keep only the pack rungs that are active and have `base_qty > 0` **and** are named by an active step of the policy. Split the need over these rungs, biggest rung first, whole units only. The base rung (`base_qty = 1`) takes the rest, even a fraction.
+6. **Walk the steps in `sequence` order**. For each step:
+   1. `need for this step = the share of its unit + whatever the earlier steps could not cover`. If this is zero, the step is skipped (verdict `NoQuantityForUom`).
    2. Read the candidate stock for this step (section 5).
-   3. Subtract what earlier steps of this same plan already claimed from the same balance row (`trace.rs:585-590`). This stops one plan from using the same stock twice.
-   4. Filter by `LPN quantity`, then by `Quantity fit` (`select.rs:166-174`).
-   5. Sort by the sort ranks (`select.rs:181-196`).
-   6. Take greedily until the step need is covered (`select.rs:198-216`).
-   7. What is left over is carried to the next step (`trace.rs:673`).
-7. **Short.** What the last step could not cover (plus any part of the need that no pack rung could take) is the shortfall (`trace.rs:697`).
-8. **Reserve.** The plan is sorted by balance id. Each draw is reserved under locks: line first, then the LPN, then the balance row. The available quantity and the holds are checked again under the lock (`allocate.rs:515-558`, `reserve.rs:111-183`).
-9. **One retry.** If a draw lost a race (less stock than planned, or the row vanished), the line is planned once more without those rows, and the missing quantity is tried again (`allocate.rs:560-610`). A row that is locked by another transaction is **not** retried here. It is counted as "deferred", not as short.
-10. **Event and result.** One event `process.order.line_allocated` per line that had anything to do (`allocate.rs:612-636`).
-11. **After all lines:** the carton plan is built (cartonization), and, only if the order is already released, a task is created for every reserved pick that has no task yet (`allocate.rs:398-437`). Statuses of lines and order are recalculated.
+   3. Subtract what earlier steps of this same plan already claimed from the same balance row. This stops one plan from using the same stock twice.
+   4. Filter by `LPN quantity`, then by `Quantity fit`.
+   5. Sort by the sort ranks.
+   6. Take greedily until the step need is covered.
+   7. What is left over is carried to the next step.
+7. **Short.** What the last step could not cover (plus any part of the need that no pack rung could take) is the shortfall.
+8. **Reserve.** The plan is sorted by balance id. Each draw is reserved under locks: line first, then the LPN, then the balance row. The available quantity and the holds are checked again under the lock.
+9. **One retry.** If a draw lost a race (less stock than planned, or the row vanished), the line is planned once more without those rows, and the missing quantity is tried again. A row that is locked by another transaction is **not** retried here. It is counted as "deferred", not as short.
+10. **Event and result.** One event `process.order.line_allocated` per line that had anything to do.
+11. **After all lines:** the carton plan is built (cartonization), and, only if the order is already released, a task is created for every reserved pick that has no task yet. Statuses of lines and order are recalculated.
 
 ## 4. Policy checks and refusal texts
 
@@ -92,13 +92,13 @@ These are the messages a user can see on the order screen or in the API when the
 | Order is `Closed`, `Cancelled` or `Picked` | `cannot allocate an order in status {status}` | `allocate.rs:310-315` |
 | Stock was locked by someone else (retry job only) | `allocation still has {qty} units deferred by inventory lock contention` | `wms-outbound/src/error.rs:50` |
 
-Important behaviour: a **configuration fault stops the whole order**. If line 2 has a bad policy, line 1 is also not reserved, because the error ends the command and the transaction rolls back (`allocate.rs:67-79`). For **Release** it is different: the order still launches. The allocation part runs in a savepoint, fails alone, and the toast says `allocation failed: ...` (`release.rs:354-380`).
+Important behaviour: a **configuration fault stops the whole order**. If line 2 has a bad policy, line 1 is also not reserved, because the error ends the command and the transaction rolls back. For **Release** it is different: the order still launches. The allocation part runs in a savepoint, fails alone, and the toast says `allocation failed: ...`.
 
 A **shortage** never stops anything. It only makes the number `short` larger.
 
 ## 5. Which inventory is eligible
 
-Allocation reads the view `inventory_balance_atp` joined with the location and the lot (`wms-lib-core/src/model/inventory/inventory_balance_atp.rs:430-478`). A balance row is a candidate only if **all** of these are true. You cannot change them. The steps can only narrow the list further.
+Allocation reads the view `inventory_balance_atp` joined with the location and the lot. A balance row is a candidate only if **all** of these are true. You cannot change them. The steps can only narrow the list further.
 
 | # | Rule | Where it comes from |
 |---|---|---|
@@ -113,9 +113,9 @@ Allocation reads the view `inventory_balance_atp` joined with the location and t
 **Available quantity** is `qty - qty_allocated - qty_picked - (qty if a blocking hold covers the row)`, never below zero (`011_a_hold_says_what_it_forbids.sql:95-115`). Read it as follows.
 
 - A **hold** matches a balance row when the hold names the row's lot, **or** its location, **or** its LPN code (`011_...sql:95-115`). A hold has no quantity and no SKU. If it matches, the **whole row** counts as held. Holds on a lot block that lot in every location.
-- A hold counts only if its hold code is `active` and has `block_outbound_flow = true`. A code that is missing from the code list blocks too (safe default) (`inventory_hold.rs:227-231`). The flag `enforce` of the hold code is **not** read by allocation.
+- A hold counts only if its hold code is `active` and has `block_outbound_flow = true`. A code that is missing from the code list blocks too (safe default). The flag `enforce` of the hold code is **not** read by allocation.
 - Example: code `Damaged` was changed so that it forbids taking goods out, but not putting them in (`011_...sql:66-70`).
-- The hold is checked again at the moment of reserving, with a fresh read (`reserve.rs:163-183`).
+- The hold is checked again at the moment of reserving, with a fresh read.
 
 **Pick zones and reserve zones.** The engine has no setting "pick zone" or "reserve zone". The only tools are the step fields `Location type`, `Putaway zone`, `Location category` and `Location ABC`. The usual way is two steps:
 
@@ -139,31 +139,31 @@ Other stock facts the engine uses:
 ## 6. Partial allocation and backorder
 
 - **Partial allocation is always on.** There is no setting that forbids it. Allocation takes what exists. The line moves to `PartiallyAllocated`, the order too. The toast shows `short` greater than 0.
-- **No stock at all** is also not an error: `allocated 0, short {need}` (`allocate.rs:612-669`).
+- **No stock at all** is also not an error: `allocated 0, short {need}`.
 - **Backorder.** There is no separate backorder record. The open quantity stays on the line, and the next `Allocate` or `Release` tries again.
-- **Release with a shortage.** The order is released. Its status is `PartiallyReleased` until every live pick has a task (`release.rs:81-98`). `Release` can be pressed again on `PartiallyReleased`; it tops up the stock and hands out the missing tasks (`release.rs:296-310`).
-- **Order status path.** Line: `NotAllocated` -> `PartiallyAllocated` -> `Allocated` -> ... Order: `New` -> `PartiallyAllocated` -> `Allocated` -> `PartiallyReleased` -> `Released`. The statuses are calculated from the line numbers (`reserve.rs:235-239`), nobody sets them by hand.
+- **Release with a shortage.** The order is released. Its status is `PartiallyReleased` until every live pick has a task. `Release` can be pressed again on `PartiallyReleased`; it tops up the stock and hands out the missing tasks.
+- **Order status path.** Line: `NotAllocated` -> `PartiallyAllocated` -> `Allocated` -> ... Order: `New` -> `PartiallyAllocated` -> `Allocated` -> `PartiallyReleased` -> `Released`. The statuses are calculated from the line numbers, nobody sets them by hand.
 
 ## 7. Two orders competing for the same stock
 
-There is **no rule that gives one order priority** in allocation. The first command that locks the stock wins. The order priority field is not read by allocation (it is only copied to the task, `allocate.rs:427-434`).
+There is **no rule that gives one order priority** in allocation. The first command that locks the stock wins. The order priority field is not read by allocation.
 
 Details:
 
-- The two commands lock balance rows with "skip if locked" (`reserve.rs:139-154`). The second command does not wait. A locked row becomes **deferred** quantity, not shortage.
-- Deferred quantity raises the event `process.order.allocation_contention_deferred`. A background job then runs `RetryOrderAllocation` for that order. It tries up to 3 times, first after 15 seconds, then 30, then 60 (`integration_delivery.rs:414`, `wms-enterprise/migrations/007_internal_outbound_execution_delivery.sql:25-37`). If after the last try quantity is still locked, the job gives up and the event stays failed.
-- In a wave, the orders are released one at a time in the order of the wave member id (`wave.rs:627`, see page 12). The order added first gets its stock first.
+- The two commands lock balance rows with "skip if locked". The second command does not wait. A locked row becomes **deferred** quantity, not shortage.
+- Deferred quantity raises the event `process.order.allocation_contention_deferred`. A background job then runs `RetryOrderAllocation` for that order. It tries up to 3 times, first after 15 seconds, then 30, then 60. If after the last try quantity is still locked, the job gives up and the event stays failed.
+- In a wave, the orders are released one at a time in the order of the wave member id. The order added first gets its stock first.
 
 ## 8. Automatic top-up
 
-The internal subscriber `quark_outbound_execution` listens to two events and runs `RetryOrderAllocation` (`wms-enterprise/migrations/007_...sql:25-37`):
+The internal subscriber `quark_outbound_execution` listens to two events and runs `RetryOrderAllocation`:
 
 | Event | When it is raised | Effect |
 |---|---|---|
 | `process.order.allocation_contention_deferred` | A reserve found the row locked | Try again later (3 tries, 15 s, 30 s, 60 s) |
 | `process.order.line_allocation_short` | A pick was confirmed short | Allocate again for the same order, with the same frozen policy. The stock that was short is likely skipped, because the balance no longer shows it |
 
-Pick-discrepancy remediation can also call the same retry (`picking/remediation.rs:465`).
+Pick-discrepancy remediation can also call the same retry.
 
 ## 9. Worked examples
 
@@ -185,9 +185,9 @@ Line: 60 EA. Stock:
 | `Fefo` | any value | by expiration date: L-B (15 Nov), then L-A (30 Dec) | 40 from L-B/P-02, 20 from L-A/P-01 |
 | `Fifo` | `ExpDate` | by expiration date, oldest first | same as `Fefo` |
 
-Allocated 60, short 0. A lot with an empty date for the chosen column always goes **last**, also under `Lifo` (`select.rs:345-363`).
+Allocated 60, short 0. A lot with an empty date for the chosen column always goes **last**, also under `Lifo`.
 
-If the lot dates tie, the next sort rank decides. In `STD` the second rank is `Location`: the location with the smaller `route_sequence` comes first. `route_sequence` is compared as text, so `10` comes before `2` (`select.rs:365-372`).
+If the lot dates tie, the next sort rank decides. In `STD` the second rank is `Location`: the location with the smaller `route_sequence` comes first. `route_sequence` is compared as text, so `10` comes before `2`.
 
 ### 9.2 Minimum shelf life
 

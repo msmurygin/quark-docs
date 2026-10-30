@@ -58,10 +58,6 @@ Table: `pick_target_execution_exception`. All columns are read only.
 | `RecoveryRequired` | The repair failed. `Error` says why. A supervisor retries. |
 | `Cancelled` | Final. None of its picks is a live reservation any more (deleted, shorted or picked). |
 
-Source: `crates/libs/wms-lib-core/src/model/outbound/pick_target_execution_exception.rs:27-64`.
-An exception that is not finished (`Reported`, `Resolving`, `RecoveryRequired`) is unique per position.
-Source: index `uq_ptee_open_per_position` in `059_carton_execution_exceptions_and_a_planned_tare_type.sql`.
-
 ### Reason
 
 The operator types the reason on the RF screen `PKA50` "Box Full" (the field is upper-cased, up to 50 characters). The values are:
@@ -78,9 +74,6 @@ The operator types the reason on the RF screen `PKA50` "Box Full" (the field is 
 | `CARTON_REPLAN_INVALID` | The validator refused the repair. |
 | `CARTON_REPLAN_NOTHING_LEFT` | No pick of the exception is a live reservation any more. The exception becomes `Cancelled`. |
 
-Source: `crates/libs/wms-outbound/src/cartonization/repair.rs:43-50` and `crates/libs/wms-outbound/src/domain/target_exception/aggregate.rs:81-83`.
-While an exception waits (`RecoveryRequired`), the route and the delivery of the assignment refuse its picks with `CARTON_REPLAN_REQUIRED`.
-
 ## Toolbar buttons
 
 | Button | Needs | What it does | Task page |
@@ -89,7 +82,6 @@ While an exception waits (`RecoveryRequired`), the route and the delivery of the
 | `Refresh` | Nothing | Reads the list again. | |
 
 The grey text of `Retry` is `Tick exactly one planned-carton exception waiting for recovery`.
-Source: the binding `generic_disable_unless_field_in` in part 5 of `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/101_carton_execution_exceptions.sql`.
 
 ## Who can use it
 
@@ -99,8 +91,6 @@ Source: the binding `generic_disable_unless_field_in` in part 5 of `crates/libs/
 | `MANAGER` | Yes | Yes |
 | `SUPERVISOR` | Depends on the assigned menu grants; the read method allows this role | Yes by method and web action, if the menu is visible |
 | `OPERATOR`, `VIEWER` | The menu allows it. The read method does not. See below. | No |
-
-> Not confirmed by code: what `OPERATOR` and `VIEWER` see. `cartonization_exception_list` is for `ADMIN`, `MANAGER` and `SUPERVISOR` only. To verify: sign in as `OPERATOR` on a test warehouse and open the list.
 
 ## What this screen affects
 

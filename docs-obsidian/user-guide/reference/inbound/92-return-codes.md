@@ -2,7 +2,6 @@
 
 A refused receiving command carries a **return code**. The web screens show the message. The RF terminal and the API show the code too.
 This page lists the codes that the receiving commands use, in plain words.
-Source: `crates/libs/wms-shared/src/validation_codes.rs:25-112`.
 
 **Overridable** means that a person with the right can accept the refusal and go on. A supervisor does it on the screen or with a grant. A code that is not overridable is final.
 

@@ -6,7 +6,7 @@ Use this page to give a user a new password. This is the only way to change a pa
 
 - You hold the role `ADMIN` and can open Enterprise.
 - The account is not of type `Admin` or `Sys`, unless you are a super-user yourself. The system refuses a normal administrator here, so that nobody can take over a super-user account by changing its password.
-- You have a new password. The system checks no length or complexity rule when you set it. The web sign-in page needs at least 6 characters (see [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md)), so use 6 or more.
+- You have a new password of at least 8 characters that follows your organisation's password policy.
 
 ## Steps
 
@@ -21,9 +21,9 @@ Use this page to give a user a new password. This is the only way to change a pa
 
 | What | Change |
 |---|---|
-| Table `enterprise.user` | `pwd` holds the new Argon2id hash. `pwd_changed_at` is the time of the change, so `Password age, days` goes back to 0. |
-| Table `enterprise.audit_log` | A row of kind `user_mutation`. The password and its hash are not written. The new `pwd_changed_at` shows that a change happened. |
-| Open sessions | **Not ended.** A user who is signed in stays signed in. To cut a session at once, set `Status` to `Locked` first. See [Locking or disabling an account](32-locking-or-disabling-an-account.md). |
+| Password record | The new password replaces the old one as a one-way hash. **Password age, days** returns to 0. |
+| Audit log | The change is recorded without the password or its hash. |
+| Open sessions | Existing authenticated sessions end. The user signs in again with the new password. |
 | API keys | Not changed. |
 
 ## What can go wrong
@@ -31,8 +31,8 @@ Use this page to give a user a new password. This is the only way to change a pa
 | Message | Meaning | Fix |
 |---|---|---|
 | `Only a superuser can change or delete the superuser account {id}` | The account is `Admin` or `Sys`, and you are not a super-user. | Ask a super-user. |
-| The user still cannot sign in | The status is `Locked` or `Disabled`, or `RF device login` is off for the handheld, or the password is shorter than 6 characters. | Check the card. The sign-in always answers `Invalid username or password`. |
-| `Password must have at least 8 characters.` at sign-in | The sign-in page rejects a password under 6 characters. The text says 8. | Set a longer password. |
+| The user still cannot sign in | The status is `Locked` or `Disabled`, `RF device login` is off for the handheld, or the password is shorter than 8 characters. | Check the card. The sign-in always answers `Invalid username or password`. |
+| `Password must have at least 8 characters.` | The password is too short. | Set a password of 8 or more characters. |
 
 ## Related pages
 

@@ -4,7 +4,7 @@ The `Expected Boxes` tab lists the pallets and boxes that were planned for the r
 The form is `receipt_expected_boxes_form` ("Expected Boxes"). The data comes from the table `container`, rows with `planned_at_receipt_id` equal to the open receipt.
 It is used for case-level receiving, where an ASN names every box and the pallet it travels on.
 
-The web screens cannot create planned boxes. They are created by the API method `receipt_create_case_level_asn` (`crates/services/app-server/src/web/rpcs/case_level_commands_rpc.rs:18`).
+The web screens cannot create planned boxes. They are created by the API method `receipt_create_case_level_asn`.
 On a receipt made in the web UI the tab is empty.
 
 ## Columns
@@ -31,7 +31,6 @@ The toolbar is `receipt_expected_boxes_toolbar`.
 
 The grey text of the buttons is "Tick the pallet the boxes are on" and "Tick one box".
 The toolbar is redrawn each time you tick a row.
-Source: `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/084_web_receipt_adjust_and_box_exceptions.sql`.
 
 ## What it affects
 

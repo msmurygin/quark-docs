@@ -8,10 +8,10 @@ look for a switch that is not there.
 
 The code says the same. The database comment on the policy table reads:
 "Reserved identity placeholder. No executable replenishment strategy exists
-yet." (`wms-lib-sql/sql/wms-app/migrations/024_replenishment_placeholder_owns_legacy_details.sql`).
+yet.".
 The meta-ui migration 048 is titled "replenishment is an honest placeholder".
 The dashboard code says: "`replenishment_policy` is a placeholder, nothing
-defines one" (`wms-dashboard/src/domain/metric/board.rs:127`).
+defines one".
 
 How to read a card: **Screen** is the label and path. **Column** gives the type
 and range. **Affects** states what reads it. Paths are under `crates/libs`
@@ -41,9 +41,9 @@ unless noted.
 - **Screen**: Main menu **Policy** > **Replenishment Policy**. The list form
   `replenishment_policy_list_form` has create, list and delete. The edit form
   has one field: the code. Existing rows have no edit door because the code
-  is the only field and it cannot change (`wms-meta-ui/migrations/048_*.sql`).
+  is the only field and it cannot change.
 - **Columns**: `id` bigint, `code` varchar(10) not null (unique), plus audit
-  columns. Nothing else (`wms-app/migrations/001_baseline.sql:4772-4780`).
+  columns. Nothing else.
 - **Default**: no default. Seed: one row, `STD`, id 1 (baseline:8696-8698).
 - **Meaning**: An identity only. It names nothing executable.
 - **Affects**: Nothing reads it to make a decision. Search: `grep -rn
@@ -58,7 +58,7 @@ unless noted.
 - **RPCs**: `create_replenishment_policy` (Admin, Manager),
   `get_replenishment_policy`, `list_replenishment_policy`,
   `count_replenishment_policy` (Admin, Manager, Operator, Viewer), delete and
-  delete-many (Admin, Manager) (`app-server/src/web/rpcs/replenishment_policy_rpc.rs:5-14`).
+  delete-many (Admin, Manager).
 
 ### Replenishment policy detail (`replenishment_policy_detail`)
 
@@ -69,8 +69,7 @@ unless noted.
   executable step (table comment, wms-app migration 024).
 - **Affects**: Read-only RPCs only: `get_replenishment_policy_detail`,
   `list_replenishment_policy_detail`, `count_replenishment_policy_detail`.
-  No writer exists (`replenishment_policy.rs` states the table has no CRUD
-  macro "so there is no library-level write door"). Stored only. It has no
+  No writer exists. Stored only. It has no
   effect today.
 - **If you change it**: Cannot be changed through the API.
 
@@ -133,8 +132,8 @@ unless noted.
 - **Column**: `pack_item.replenish`, boolean, not null, default `false`
   (`001_baseline.sql:3623`).
 - **Affects**: Stored only. It has no effect today. Copied between pack
-  revisions (`wms-lib-core/src/model/pack/revision.rs:465`) and shown in the
-  pack hierarchy view (`hierarchy.rs:78`). No process reads it for a decision.
+  revisions and shown in the
+  pack hierarchy view. No process reads it for a decision.
 - **Example**: Tick `replenish` on the `CS` level. No case is moved on demand.
 - **If you change it**: Nothing.
 
@@ -144,17 +143,13 @@ unless noted.
 
 - **Screen**: None. Not offered on any RF screen or form. API only: the move
   command `move_execute` takes a context with `source_type` (JSON value
-  `replenishment`) (`wms-inventory/src/movement/types.rs:68`,
-  `source_type.rs:18-76,170`).
+  `replenishment`).
 - **What it is**: A label on a manual move. The source type is written to the
   transaction log (`transaction_log.source_type`). It supports the "category"
-  `Replenishment` for reports (`source_type.rs:89`).
+  `Replenishment` for reports.
 - **What it checks**: The destination location type must be `Pick`,
-  `SpeedPick` or `Pickto` (`movement/validation.rs:159-160`). A partial
-  quantity is not allowed: the whole stock record moves (`allows_partial_qty`
-  is false, `source_type.rs:104-118`). No hold is added or removed
-  (`side_effects.rs:395` test). It is a supported "phase 1" type
-  (`source_type.rs:141-156`).
+  `SpeedPick` or `Pickto`. A partial
+  quantity is not allowed: the whole stock record moves. No hold is added or removed. It is a supported "phase 1" type.
 - **What it does not do**: It does not look at levels, policies, zones or
   thresholds. It does not create tasks. It does not decide anything.
 - **To verify** (needs a running system): call `move_execute` with
@@ -165,8 +160,7 @@ unless noted.
 ### Move source type `LetDown`
 
 - **Screen**: None. API value `let_down`.
-- **What it does**: Nothing. The move is refused with `UnsupportedSourceType`
-  (`movement/validation.rs:176-190`, and `is_phase_1` is false). It is
+- **What it does**: Nothing. The move is refused with `UnsupportedSourceType`. It is
   listed so the name is reserved.
 - **To verify**: call `move_execute` with `source_type: "let_down"`. Expect the
   error `UnsupportedSourceType`.
@@ -175,24 +169,19 @@ unless noted.
 
 - **Screen**: None.
 - **What it is**: A value of the source list of `pending_move_in`: "Held by
-  replenishment for the pick face it is topping up"
-  (`wms-lib-core/src/model/inventory/pending_move_in.rs:43-44`).
+  replenishment for the pick face it is topping up".
 - **Affects**: Nothing writes it except tests. The only real writer of
-  pending move-ins is putaway (`putaway/sweeper.rs:83` states that
-  `Replenishment` and `Move` are "declared on the enum and unused").
+  pending move-ins is putaway.
 
 ### Task type `Replenish`
 
 - **Screen**: None. No form field lists task types with this value. The only
   form field that uses the word **Replenish** is the pack item checkbox in
   Part 3 (label id 1781, form `pack_item_basic_form`).
-- **Column**: enum value `Replenish` in the task type enum
-  (`wms-app/migrations/001_baseline.sql:1150`;
-  `wms-lib-core/src/model/tasks/task.rs:32`).
+- **Column**: enum value `Replenish` in the task type enum.
 - **What it does**: The generic task framework can hold a task of this type
-  and treats it as not source-owned (`wms-tasks/src/domain/task/aggregate.rs:52`).
-  Rights can be granted per work area for it (`NoWorkArea` message in
-  `wms-tasks/src/error.rs:575`).
+  and treats it as not source-owned.
+  Rights can be granted per work area for it.
 - **Affects**: **Nothing creates a task of this type.** Search: `grep -rn
   "TaskType::Replenish" crates --include=*.rs` returns only the enum,
   the aggregate's `match` and a test. The RF has no screen for it.

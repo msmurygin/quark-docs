@@ -32,17 +32,6 @@ Reading notes:
 - A limit of 0 (or empty) means "not set". The check is not run and the candidate is still offered. The trace reports it as `<limit>:no_limit`. It is not a refusal.
 - Missing data also skips a check and is reported: `no_product_dims` (the pack does not describe the pallet), `no_location_dims` (the location has no length, width or height), `no_stock_weight` (no weight known for the stock).
 - A free section means: every position has status `Ok`, flag `None`, no stock, no pallet standing in it and no live reservation of another pallet. Section width is the sum of the positions. Depth and height are the lowest value of the positions.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Order of the switches and the zone part | `crates/libs/wms-inventory/src/putaway/space.rs:640-835` |
-| Section test | `crates/libs/wms-inventory/src/putaway/space.rs:1052-1102`, `crates/libs/wms-lib-core/src/model/location.rs:2295-2365` |
-| Capacity rule, `section_promised` | `crates/libs/wms-inventory/src/putaway/predicate.rs:282-447` |
-| Limits of 0 are "not checked" | `crates/libs/wms-inventory/src/putaway/space.rs:1156-1195` |
-| Switches of a step | `crates/libs/wms-inventory/src/putaway/space.rs:496-545` |
-
 ## Diagram 2. Physical fit: pallet size, stacking, quantity
 
 **What this shows:** which fields feed the three physical switches.
@@ -70,17 +59,6 @@ flowchart LR
 | `location.footprint` ("Pallet positions on floor") and `location.stack_limit` | Limit = footprint x stack limit. Used = pallets standing plus pallets promised, then this one. | `loc_positions` |
 | `sku.stack_limit` | If it is above 0 and lower than the location's stack limit, it wins. If the location has stack limit 0, the SKU value is used. | `item_positions` |
 | `location.max_qty_capacity` | Limit for the quantity already there plus the quantity arriving. It does not count quantity promised by reservations. | `loc_qty` |
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Pallet size from packs | `crates/libs/wms-inventory/src/putaway/space.rs:287-340` |
-| Location size, either direction, height test | `crates/libs/wms-inventory/src/putaway/space.rs:218-286`, `:875-918` |
-| Stack limit choice | `crates/libs/wms-inventory/src/putaway/space.rs:704-727`, `:149-155` |
-| Quantity check | `crates/libs/wms-inventory/src/putaway/space.rs:732-742` |
-| What "used" contains | `crates/libs/wms-inventory/src/putaway/space.rs:920-1000` |
-
 ## Diagram 3. Weight, cube and zone limits
 
 **What this shows:** which fields feed the weight and cube checks, and the extra zone totals when the pallet changes zone.
@@ -111,20 +89,8 @@ flowchart LR
 | `putawayzone.max_weight`, `putawayzone.max_cube` | Zone totals. Used only when the destination zone differs from the zone where the pallet stands, and only with the matching switch on. | `zone_weight`, `zone_cube` |
 | `putawayzone.max_cases_count` | Number of stock-bearing containers in the pallet against the zone limit. Used only for a different zone. No switch turns it off. | `zone_cases_count` |
 
-The move itself checks location and zone weight and cube, and the zone case count, whatever the step switches say (`crates/libs/wms-inventory/src/movement/validation.rs:920-1000`).
+The move itself checks location and zone weight and cube, and the zone case count, whatever the step switches say.
 If a step switches `Cube` or `Weight` off, putaway can suggest a place that the move then refuses (the operator is asked for a supervisor, see [20-putaway-journey.md](20-putaway-journey.md)).
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Location weight and cube; zone part | `crates/libs/wms-inventory/src/putaway/space.rs:745-835` |
-| Zone totals and limits | `crates/libs/wms-inventory/src/putaway/space.rs:1104-1150` |
-| Pallet weight from SKU and pack | `crates/libs/wms-lib-core/src/model/pack/weight.rs:255-335` |
-| Pallet cube, quantity, stack limit, positions required | `crates/libs/wms-inventory/src/putaway/mod.rs:1449-1480` |
-| Number of stock-bearing containers | `crates/libs/wms-inventory/src/putaway/space.rs:56-82` |
-| Move checks the same limits | `crates/libs/wms-inventory/src/movement/validation.rs:920-1000` |
-
 ## Diagram 4. The landing rules (mixing)
 
 **What this shows:** the order in which the landing check looks at the location's flags, the lot rules and the pallet's own lots, and which field causes each refusal.
@@ -160,22 +126,6 @@ Reading notes:
 - Putaway compares the incoming SKUs and lots with what is already in the location. It does not compare the pallet's own mix with the location flags, so a pallet with two SKUs or two lots can be offered an empty location with `Mix SKU` or `Mix Lot` off. The move does make that comparison (`validate_batch_self_consistency`). In a directed move it comes back as a supervisor approval for `sku_mixing` or `lot_mixing`.
 - The step switches `Mixed SKU` and `Mixed lot` (diagram 4 of the other page) are a different check. They also see live reservations. The location flags here do not.
 - The owner setting `owner_config.allow_mixed_lpn` is not read by putaway. It applies when stock enters an existing pallet (`DepositInto`), and putaway relocates the whole pallet.
-
-### Where it comes from
-
-| Item | Source |
-|---|---|
-| Landing check called by putaway | `crates/libs/wms-inventory/src/putaway/predicate.rs:852-942` |
-| Order of the violations | `crates/libs/wms-inventory/src/inventory_service.rs:838-940` |
-| `mix_sku`, `mix_lot` | `crates/libs/wms-inventory/src/inventory_service.rs:999-1105` |
-| Lot attribute rules, location before zone | `crates/libs/wms-inventory/src/inventory_service.rs:1433-1610`, `:2512-2519` |
-| Compared with the pallet's other lots | `crates/libs/wms-inventory/src/inventory_service.rs:1613-1700`, `crates/libs/wms-lib-core/src/model/inventory/lot_attributes.rs:213-240` |
-| Lot policy of the SKU | `crates/libs/wms-inventory/src/inventory_service.rs:1705-1735` |
-| `lpn_multi_lot` | `crates/libs/wms-inventory/src/inventory_service.rs:1163-1290` |
-| Pallet's own mix is checked by the move, not by putaway | `crates/libs/wms-inventory/src/movement/validation.rs:788-835`, `crates/libs/wms-inventory/src/inventory_service.rs:943-985` |
-| Defaults | `crates/libs/wms-lib-core/src/model/location.rs:38-39`, `crates/libs/wms-lib-core/src/model/sku.rs:22`, `:35`, `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:2167`, `:2181` |
-| Code mapping to refusal strings | `crates/libs/wms-inventory/src/putaway/predicate.rs:944-985` |
-
 ## What putaway does not read
 
 | Area | Result |
@@ -187,18 +137,13 @@ Reading notes:
 
 ## Stored only. It has no effect today.
 
-These fields are stored and shown, but no code reads them to make a decision (searched in `crates/` and `clients/rf-go`).
+These fields are stored and shown, but no code reads them to make a decision.
 
 | Object | Fields |
 |---|---|
 | Putaway zone | `inbound_loc`, `outbound_loc`, `rf_pick_strategy`, `replenishment_allowed`, `replenishment_threshold`, `default_label_printer`, `default_report_printer`, `auto_print_addr_label`, `auto_print_carton_label` |
 | Location | `cube` (the location's own volume; the checks read `max_cube_capacity`), `check_digit` (written once when a location is created) |
 | Receipt policy | `receipt_without_po`, `receipt_without_asn`, `no_sku_on_po`, `asn_po_qty_discrepancy`, `po_qty_validation`, `excess_message`, `shortage_message` and the `po_*` fields. See [13-receive-checks-and-policy.md](13-receive-checks-and-policy.md). |
-
-## Not confirmed by code
-
-- Whether `location.footprint` is the field labelled "Pallet positions on floor" on every screen. The column name and the stack formula are in code. To verify: open a location card, tab Dimensions.
-
 ## Related pages
 
 - [Putaway pipeline, step by step](21-putaway-engine-steps.md)

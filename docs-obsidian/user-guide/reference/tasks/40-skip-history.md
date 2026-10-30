@@ -55,7 +55,6 @@ Table: `task_skip_event`. All columns are read only.
 
 The log has exactly one writer: the call that returns a task to the pool at the operator's request.
 It writes a line in the same statement that changes the task, so the log cannot miss a return that goes through this door.
-Source: `crates/libs/wms-lib-core/src/model/tasks/task.rs:1512-1575` (the only `INSERT INTO task_skip_event` in the code).
 
 These returns are **not** logged here:
 
@@ -67,11 +66,8 @@ These returns are **not** logged here:
 | A set of tasks handed back together by a holder | Not logged. |
 
 The line stays when the task is deleted. The table has no foreign key to `task` on purpose.
-Source: the test `the_trace_outlives_the_task_it_describes` in `crates/libs/wms-tasks/tests/lifecycle.rs:1578-1615`.
 
 No cleanup job for this table was found in the code or the migrations.
-
-> Not confirmed by code: that the lines are kept forever. The search of `crates` for `task_skip_event` found only the insert and the tests. To verify: ask the administrator whether a database job outside the product removes old lines.
 
 ## Who can use it
 

@@ -31,8 +31,6 @@ On success the screen shows `Line {line number} {sku}: {old quantity} → {new q
 | Events | An adjustment event with the old and new quantity, the reason and the user. |
 | `Qty Adjusted` | Not changed. That field stays 0. |
 
-Source: `crates/libs/wms-inbound/src/service/receipt/receive/adjust_received_qty.rs`. The stock is changed only when the difference is below zero.
-
 A correction that leaves the receipt off its plan is judged when the receipt is closed (see [Closing a receipt](42-closing-a-receipt.md)).
 
 ## What can go wrong

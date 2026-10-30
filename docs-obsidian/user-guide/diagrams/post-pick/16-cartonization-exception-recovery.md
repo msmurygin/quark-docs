@@ -43,22 +43,6 @@ sequenceDiagram
 - Retry is a stateless command for Admin, Manager and Supervisor. It does not change data. Fix the pack card or the policy first. With nothing changed, the same answer comes back.
 - The screen is Task Manager, "Pick Target Exceptions". The read RPC is `cartonization_exception_list`.
 - `Resolved` and `Cancelled` are final. A retry of a finished exception answers its stored result.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Two doors out of recovery | `crates/libs/wms-outbound/src/picking/target/recovery.rs:1` |
-| Hand-over steps | `crates/libs/wms-outbound/src/picking/target/recovery.rs:91` |
-| Retry steps | `crates/libs/wms-outbound/src/picking/target/recovery.rs:192` |
-| Nothing left gives `Cancelled` | `crates/libs/wms-outbound/src/domain/target_exception/aggregate.rs:83` |
-| The retry repeats the close's repair | `crates/libs/wms-outbound/src/picking/target/close.rs:612` |
-| Retry RPC and roles | `crates/services/app-server/src/web/rpcs/pick_assignment_rpc.rs:271` |
-| List RPC | `crates/services/app-server/src/web/rpcs/pick_assignment_rpc.rs:51` |
-| Hand-over RPC | `crates/services/app-server/src/web/rpcs/pick_assignment_rpc.rs:232` |
-| RF screen for the hand-over (`PKA52`) | `crates/libs/wms-lib-sql/sql/rf-screens/098_uc_pick_carton_exceptions.sql:19` |
-| Supervisor screen and Retry button | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/101_carton_execution_exceptions.sql:227` |
-
 ## Related pages
 
 - [Cartonization: how it works](../../admin/policies/30-cartonization-overview.md)

@@ -51,8 +51,6 @@ If you tick `Default` on a second row, the database refuses it (a user has at mo
 | `Cannot save: parent record not saved. Please save the parent first.` | The user card was never saved. | Save the `General` tab first. |
 | An API call from this user is refused as `warehouse_required` | The user has no default, or more than one. | Mark exactly one default. |
 
-> Not confirmed by code: whether a user who is signed in sees a new warehouse in the switcher without signing in again. The code shows that the list is read at sign-in (`session_init.rs`, `init_warehouse_session`) and that the switch uses the list stored in the session (`warehouse_handler.rs`). To verify: assign a second warehouse to a signed-in test user and open the switcher without signing out.
-
 ## Related pages
 
 - [User card, Warehouses & Roles tab](12-user-warehouses-and-roles-tab.md)

@@ -49,12 +49,7 @@ Remarks:
 - `Release` does not need a second right for the stock reservation it makes. The right to release covers it.
 - The reads for `VIEWER` come from the default roles of the read methods. The baseline seed block has no `VIEWER` rows for the order methods.
 
-
-> Not confirmed by code: the pick lists on the header and the line (owners, customers, order types, SKUs) need their own read rights. They are not listed above. To verify: sign in as an `OPERATOR`, press `New`, and open each pick list.
-
 ## The default roles of the methods in the code
-
-The code that declares the methods also lists default roles for each method (`crates/services/app-server/src/web/rpcs/shipment_order_commands_rpc.rs:46-58`). That list is **narrower** than the seed block for some methods:
 
 | Method | Code default roles | Baseline seed also grants |
 |---|---|---|
@@ -62,7 +57,7 @@ The code that declares the methods also lists default roles for each method (`cr
 | `shipment_order_validate` | `ADMIN`, `MANAGER` | `SUPERVISOR`, `OPERATOR` |
 | `shipment_order_close`, `shipment_order_cancel_allocation`, `pick_detail_delete`, `shipment_order_line_adjust_qty` | `ADMIN`, `MANAGER` | `SUPERVISOR` |
 
-The RBAC seeder at start-up only adds rows that are missing and never removes a row (`crates/services/app-server/src/app.rs:337-345`, the last argument `false`). So on a database built from the baseline the seed block wins, and this page is right. A **forced** reseed from the administrator API overwrites the rows that the system wrote with the code defaults (`seeder.rs`, `run_seeder_with_force`). After such a reseed the narrower code defaults apply.
+The RBAC seeder at start-up only adds rows that are missing and never removes a row. So on a database built from the baseline the seed block wins, and this page is right. A **forced** reseed from the administrator API overwrites the rows that the system wrote with the code defaults. After such a reseed the narrower code defaults apply.
 
 ## Related pages
 

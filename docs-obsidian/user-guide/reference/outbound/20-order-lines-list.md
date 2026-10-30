@@ -20,8 +20,6 @@ One column is editable in the grid: `Ordered`. Everything else is read only.
 | `SKU Description` | `sku_descr` | Text | No | The description of the SKU. No filter. |
 | `Allocated` | `qty_allocated` | Decimal | No | The quantity that is reserved. |
 
-Source: form `shipment_order_line_list` in `001_baseline.sql`; the view of the line status words in `wms-app` migration 018.
-
 ## Toolbar
 
 | Button | Code | What it does |
@@ -41,8 +39,6 @@ Type a new number in the cell. The cell is marked as changed. Nothing is written
 - The command depends on the line. A line that is open (the order is not launched and the line has no reservation) is written like a whole-line edit. A line that is launched or reserved is written by a second command that changes the quantity only, and that command needs the supervisor right. See [Changing a line quantity](34-changing-a-line-quantity.md).
 - When a colleague changed the same line while you were typing, the version is refreshed. If the stored number is still the one you saw, your number is applied. If it is different, nothing is written, your number stays in the cell, and the message names both numbers.
 - `Discard changes` says `Nothing to discard` when no cell is changed, and `Discarded changes on {n} line(s) — the grid shows what is stored` otherwise.
-
-Source: `crates/services/web-ui-server/src/extensions/customization/shipment_order/lines_grid_save.rs` (module comment, `summary`, `changed_elsewhere_message`), `lines_grid_discard.rs`.
 
 ## Messages of the grid `Save`
 

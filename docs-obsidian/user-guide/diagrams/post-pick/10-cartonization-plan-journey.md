@@ -55,27 +55,6 @@ sequenceDiagram
 | Tasks | Only picks whose outcome is `Planned`, `ShipAsIs` or `Bypassed` get a task. `Pending` and `Blocked` get none. Tasks are created only when the order is released. |
 
 Plans are also marked after other commands: `Unallocate` and `Delete Selected` (picks) call `plan_lost_its_work`, which sets the live plan to `Superseded` or `Stale`.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Release runs the same reserve body as Allocate | `crates/libs/wms-outbound/src/service/order/release.rs:371` |
-| Reserve calls cartonization, then makes tasks | `crates/libs/wms-outbound/src/service/order/allocate.rs:398` |
-| Tasks only when the order is released | `crates/libs/wms-outbound/src/service/order/allocate.rs:408` |
-| Only executable outcomes get tasks | `crates/libs/wms-outbound/src/service/order/allocate.rs:418` |
-| The result carries the plan or the error | `crates/libs/wms-outbound/src/service/order/allocate.rs:447` |
-| Savepoint wrapper, error becomes text | `crates/libs/wms-outbound/src/cartonization/ensure.rs:455` |
-| Failure does not cancel the reservation | `crates/libs/wms-outbound/src/cartonization/ensure.rs:507` |
-| Plan steps: read, solve, hash, validate, supersede, write | `crates/libs/wms-outbound/src/cartonization/ensure.rs:112` |
-| Same hash after release means no rewrite | `crates/libs/wms-outbound/src/cartonization/ensure.rs:194` |
-| Old plan becomes `Superseded` before the write | `crates/libs/wms-outbound/src/cartonization/ensure.rs:227` |
-| Unplaced units give `PlannedWithExceptions` | `crates/libs/wms-outbound/src/cartonization/write.rs:142` |
-| Bypassed picks get their outcome | `crates/libs/wms-outbound/src/cartonization/write.rs:217` |
-| Pick tasks per outcome | `crates/libs/wms-outbound/src/cartonization/handoff.rs:27` |
-| Reserved picks read (`Allocated`, `Released`) | `crates/libs/wms-outbound/src/cartonization/read_from_db.rs:140` |
-| Lost work marks the plan | `crates/libs/wms-outbound/src/cartonization/ensure.rs:322` |
-
 ## Related pages
 
 - [Cartonization policy: how it works](../../admin/policies/30-cartonization-overview.md)

@@ -54,13 +54,12 @@ An entry created from **New** is always saved as custom, so **Builtin** shows **
 
 Only two things in the code read the registry (searched in Rust, SQL, Go and TypeScript):
 
-1. **`Active` gates the record-change events.** When a record of a table is created, changed or deleted through the generic layer, the system builds the code `bio.{table}.{operation}` (for example `bio.receipt.after_insert`). It writes the event only if the registry holds a row with this code and `Active` is on. Otherwise nothing is written
-   (`crates/libs/wms-lib-core/src/model/base/crud_fns.rs:669` and `:704`).
+1. **`Active` gates the record-change events.** When a record of a table is created, changed or deleted through the generic layer, the system builds the code `bio.{table}.{operation}` (for example `bio.receipt.after_insert`). It writes the event only if the registry holds a row with this code and `Active` is on. Otherwise nothing is written.
    Several of the shipped `bio.*` rows are switched off (for example the three `bio.handling_unit_type.*` rows, `012_handling_unit_type.sql`).
 2. **The screen and the API list it.** `list_event_registry` and the other methods return the rows.
 
-The business events `process.*` (for example `process.receipt.closed`) are written by the business code. That code does not look at the registry. Switching `Active` off for such a row does not stop the event (`crates/libs/wms-lib-core/src/model/integration/event_publisher.rs`, `publish_typed_in_txn`).
-The code of a business event must still match a row, by agreement (`event_publisher.rs:23`), but nothing checks it.
+The business events `process.*` (for example `process.receipt.closed`) are written by the business code. That code does not look at the registry. Switching `Active` off for such a row does not stop the event.
+The code of a business event must still match a row, by agreement, but nothing checks it.
 
 The seeded rows come from the enterprise migrations. The list on your screen is the truth for your system.
 
@@ -71,7 +70,7 @@ The seeded rows come from the enterprise migrations. The list on your screen is 
 | `Code` is unique. | Unique key `event_registry_code_key`. A duplicate gives `Duplicate entry on event_registry (constraint ...)`. |
 | An administrator-created type is custom. | **Builtin** is read only and the create action always saves **No**. |
 | A built-in type cannot be deleted. | Delete returns `built-in event type '{code}' cannot be deleted`. |
-| After the first save only `Name`, `Description`, `Category` and `Active` can change. | `update_event_registry` accepts only these four fields (`crates/services/app-server/src/web/rpcs/event_registry_rpc.rs:24`). |
+| After the first save only `Name`, `Description`, `Category` and `Active` can change. | `update_event_registry` accepts only these four fields. |
 | Deleting a type deletes its bindings. | The foreign key `event_binding.event_id` is `ON DELETE CASCADE`. |
 
 Before deleting a custom type, confirm that its bindings are no longer needed. Deletion removes those bindings, but existing event and delivery history remains available.
@@ -79,7 +78,7 @@ Before deleting a custom type, confirm that its bindings are no longer needed. D
 ## Who can use it
 
 `create_event_registry`, `update_event_registry` and `delete_event_registry` are open to the default roles `ADMIN` and `MANAGER`.
-The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER` (`event_registry_rpc.rs:7`).
+The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`.
 In Enterprise only `ADMIN` reaches the screen.
 
 ## Related pages

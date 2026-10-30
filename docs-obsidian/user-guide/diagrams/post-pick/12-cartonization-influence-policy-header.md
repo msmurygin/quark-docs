@@ -35,25 +35,6 @@ Numbers: with the defaults (30, 50,000, 2,000,000) 12 units give a limit of 50,0
 - Settings on the carton rows and the pack item: see [13](13-cartonization-influence-cartons-and-pack-item.md).
 - Settings that are stored only: see [11](11-cartonization-influence-policy-and-pack-level.md).
 - `Version`: not a setting. Save sends the version you loaded. Another save in between is refused with a version conflict.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Blocks follow the split rule | `crates/libs/wms-outbound/src/cartonization/plan.rs:221` |
-| `Allow` makes one block per unit | `crates/libs/wms-outbound/src/cartonization/plan.rs:228` |
-| `Prevent` makes one block per pick | `crates/libs/wms-outbound/src/cartonization/plan.rs:231` |
-| `SplitPrevented` is chosen when each unit fits alone | `crates/libs/wms-outbound/src/cartonization/pack.rs:613` |
-| A pick with no placement becomes `Blocked` | `crates/libs/wms-lib-core/src/model/outbound/pick_detail.rs:474` |
-| The three iteration settings build the limit | `crates/libs/wms-outbound/src/cartonization/plan.rs:147` |
-| Limit formula and clamp | `crates/libs/wms-outbound/src/cartonization/budget.rs:44` |
-| Budget error text | `crates/libs/wms-outbound/src/error.rs:55` |
-| A solver error is returned as text, the reservation stays | `crates/libs/wms-outbound/src/cartonization/ensure.rs:507` |
-| Shrink pass: smallest box that holds the load | `crates/libs/wms-outbound/src/cartonization/pack.rs:843` |
-| Save refuses a goal other than `MinCartons` | `crates/libs/wms-lib-core/src/model/policies/cartonization_aggregate.rs:164` |
-| Save refuses `iterations_per_unit_sq` of 0 or less | `crates/libs/wms-lib-core/src/model/policies/cartonization_aggregate.rs:179` |
-| Save is a stateful command | `crates/services/app-server/src/web/rpcs/cartonization_policy_rpc.rs:103` |
-
 ## Related pages
 
 - [Cartonization policy settings](../../admin/policies/31-cartonization-policy-settings.md)

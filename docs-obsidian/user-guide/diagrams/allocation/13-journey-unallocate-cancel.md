@@ -47,21 +47,6 @@ Reading notes.
 - If some picks stay, the toast adds `N pick(s) in work kept`.
 - The statuses accepted by the button: `PartiallyAllocated`, `Allocated`, `PartiallyReleased`, `Released`. Any other status is refused as an invalid transition.
 - The freed stock is available again at once. Nothing allocates it again by itself. Somebody must press `Allocate` or `Release`.
-
-### Where it comes from
-
-| Step in the diagram | Code |
-|---|---|
-| Button calls `shipment_order_cancel_allocation` | `crates/services/web-ui-server/src/extensions/customization/shipment_order/unallocate_action.rs:47` |
-| Roles of the method: Admin, Manager | `crates/services/app-server/src/web/rpcs/shipment_order_commands_rpc.rs:55-56` |
-| Status gate | `crates/libs/wms-outbound/src/service/order/cancel_allocation.rs:123-134` |
-| Release with scope "skip in work" | `crates/libs/wms-outbound/src/service/order/cancel_allocation.rs:143-148` |
-| "In work" means task status is not `Created` | `crates/libs/wms-outbound/src/allocation/release.rs:145-147` |
-| Lock order and the loop that frees balance, deletes pick and task | `crates/libs/wms-outbound/src/allocation/release.rs:296-412`, `crates/libs/wms-outbound/src/allocation/release.rs:416-495` |
-| Event `process.order.line_allocation_released` | `crates/libs/wms-lib-core/src/model/integration/event_payloads/order.rs:238` |
-| Picks left, release marker cleared, status recomputed | `crates/libs/wms-outbound/src/service/order/cancel_allocation.rs:157-172` |
-| Toast text | `crates/services/web-ui-server/src/extensions/customization/shipment_order/unallocate_action.rs:113-127` |
-
 ## 2. Which action frees which reservation
 
 **What this shows.** The five actions that touch a reservation, and the rule each one applies.
@@ -91,22 +76,6 @@ Reading notes.
 - `Adjust qty` sets a new absolute quantity. It is refused below `allocated + cancelled`.
 - Removing a line, or changing a line through the editor, is allowed only while the order is in the `New` family without a release marker, and only if the line has no reserved quantity. The refusal text says: `release the reservation first (Unallocate or delete its picks)`.
 - Unallocating does not change the policy of a line. The line keeps the policy it froze when it was created or last saved (see [page 22](22-influence-policy-binding.md)).
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Delete one pick: order status, same order, nothing picked, task not in work | `crates/libs/wms-outbound/src/service/order/delete_pick.rs:121-188` |
-| Delete one pick: free balance and line, delete pick and task | `crates/libs/wms-outbound/src/allocation/release.rs:518-597` |
-| Cancel order: refused when a line has picked qty | `crates/libs/wms-outbound/src/domain/shipment_order/aggregate.rs:206-218` |
-| Cancel order: frees all live picks, scope "all" | `crates/libs/wms-outbound/src/service/order/cancel.rs:92-100` |
-| Scope "all" also removes tasks in work | `crates/libs/wms-outbound/src/allocation/release.rs:437-445` |
-| Live picks are the ones with status `Allocated` or `Released` | `crates/libs/wms-lib-core/src/model/outbound/pick_detail.rs:630-645` |
-| Open quantity for cancel | `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:59-63`, `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:110-123` |
-| Adjust qty floor | `crates/libs/wms-outbound/src/domain/shipment_order_line/aggregate.rs:192-204` |
-| Line is editable only in the New family, with no reservation | `crates/libs/wms-outbound/src/service/shared/mutability.rs:36-91` |
-| Remove line uses that gate | `crates/libs/wms-outbound/src/service/order_line/remove.rs:79` |
-
 ## Related pages
 
 - [Release and Allocate an order](10-journey-release.md)

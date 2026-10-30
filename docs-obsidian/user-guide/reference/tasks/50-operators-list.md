@@ -22,7 +22,6 @@ The menu item is `operator_menu`.
 | `Columns` | Shows or hides columns. |
 
 There is no `New` and no `Delete`. This is on purpose: a removed operator would come back with the next sync while the user still has RF login and the warehouse.
-Source: the header of `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/archive_pre_baseline_2026-09-23/600_operator_screen.sql` and `crates/services/web-ui-server/src/extensions/customization/operator/sync_action.rs:1-15`.
 
 ## Columns
 

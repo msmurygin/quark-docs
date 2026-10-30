@@ -67,25 +67,6 @@ Rules:
 - A void moves no stock. The obligation stays `Open`.
 - For a package under verification, the next `packing_work_open` makes a fresh package over the same box.
 - An output carton with picked goods inside cannot be voided: `packing_remove` takes the goods out first (`PACK_CARTON_CONTAINER_NOT_EMPTY`).
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Both are stateful commands on the carton version | `crates/services/app-server/src/web/rpcs/packing_rpc.rs:165` |
-| Reopen without a grant is refused with the pair | `crates/libs/wms-outbound/src/packing/commands/carton_reopen.rs:10` |
-| Grant must name that one pair | `crates/libs/wms-outbound/src/packing/commands/carton_reopen.rs:172` |
-| Reopen steps and locks | `crates/libs/wms-outbound/src/packing/commands/carton_reopen.rs:32` |
-| What a reopen decides | `crates/libs/wms-outbound/src/domain/packing_carton/aggregate.rs:439` |
-| Verify obligation goes back to `Open` | `crates/libs/wms-outbound/src/domain/packing_obligation/aggregate.rs:108` |
-| Router step withdrawn | `crates/libs/wms-outbound/src/packing/commands/carton_reopen.rs:234` |
-| No step exists after packing yet | `crates/libs/wms-outbound/src/flow/ports.rs:87` |
-| Pair code 122 | `crates/libs/wms-shared/src/validation_codes.rs:683` |
-| Mint a grant | `crates/services/app-server/src/web/rpcs/override_grant_rpc.rs:103` |
-| Void steps and locks | `crates/libs/wms-outbound/src/packing/commands/carton_void.rs:118` |
-| Output carton voided only empty | `crates/libs/wms-outbound/src/domain/packing_carton/aggregate.rs:385` |
-| Void and reopen have no RF screen | `crates/libs/wms-lib-sql/sql/rf-screens/103_uc_pack_verify.sql:32` |
-
 ## Related pages
 
 - [Packing: verify a box](30-packing-verify-journey.md)

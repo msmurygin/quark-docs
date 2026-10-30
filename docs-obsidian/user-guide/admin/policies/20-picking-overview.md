@@ -8,18 +8,32 @@ updated: 2026-10-10
 
 # Picking Overview
 
-This page explains what picking decides, in which order the system applies your settings, and how a pick task is built, handed out and finished. Two worked examples follow: a discrete pick and a cart (carrier) pick.
+This page explains what picking decides, in which order the system applies your settings, and how a pick task is built, handed out and finished. Two worked examples follow: a discrete pick and a cart pick.
 
 The settings themselves are in four sibling pages:
 
 | Page | What it lists |
 |---|---|
-| `21-picking-policy-settings.md` | Every field of a picking policy. |
-| `22-work-areas-equipment-and-permissions.md` | Work areas, pack stations, equipment, operator rights, task manager rules. |
-| `23-pick-short-reasons.md` | Short reasons and their actions. |
-| `24-inventory-count-policy.md` | Counts, cycle count policy, count triggers. |
+| [Picking policy settings](21-picking-policy-settings.md) | Every field of a picking policy. |
+| [Work areas, equipment and permissions](22-work-areas-equipment-and-permissions.md) | Work areas, pack stations, equipment, operator rights and task rules. |
+| [Pick short reasons](23-pick-short-reasons.md) | Short reasons and their actions. |
+| [Inventory count policy](24-inventory-count-policy.md) | Counts, cycle count policy and count triggers. |
 
-Paths in "Affects" lines are relative to `crates/libs/`.
+## The five warehouse work patterns
+
+The warehouse can execute released picking work in five patterns. They do not all come from the same setting.
+
+| Work pattern | How it is selected | Where the goods go |
+|---|---|---|
+| Discrete pick | **Discrete Pick**, or **Pick by Area** with a policy whose **Unit** is **Order** | One order's pick pallet. A large order may use several pallets. |
+| Cart picking into order boxes | **Pick by Area** with a policy whose **Unit** is **Planned target** | Each cart position holds the box of one order. |
+| Summary step on a cart | The same cart policy, with **Quantity** set to **Aggregated** | One source visit is divided between the order boxes that need the same item. |
+| Batch picking for a distribution station | A released wave assigned to a distribution station; the picker chooses **Station Route** | A shared tote first, then order or store boxes at the station. |
+| Paper picking | The operator records completed lines in the web task grid; there are intentionally no terminal screens | A pick pallet in transit until **Place Pallet**. |
+
+The picking policy directly chooses the first three shapes and their source proof, destination and exception behaviour. A station wave selects the fourth pattern, but its individual source stops still use the same source-confirmation and short rules. Paper picking is a different way to record the physical work; it does not create a third picking-policy shape.
+
+See [Picking](../../operator/09-picking.md) and [Batch picking and distribution station](../../operator/14-batch-picking-and-distribution-station.md) for the operator steps.
 
 ## 1. What picking decides
 
@@ -27,23 +41,23 @@ Picking answers these questions. Each question has an owner (the setting that an
 
 | Question | Answered by | Page |
 |---|---|---|
-| Which stock is reserved for a pick? | Allocation policy (not on these pages). | `06-outbound-setup.md` |
-| Which box does the pick go into? | Cartonization policy (not on these pages). | `06-outbound-setup.md` |
+| Which stock is reserved for a pick? | Allocation policy. | [Outbound setup](../06-outbound-setup.md) |
+| Which box does the pick go into? | Cartonization policy. | [Outbound setup](../06-outbound-setup.md) |
 | Is a task made for the pick? | The order is released, and the cartonization result is "ready". | section 3 |
-| Who may take the task? | Operator rights (`Task Permissions`), `Pick Execution`, work area zones. | `22` |
-| Which task comes first? | Order priority, then `Route Sequence` of the location. | `22`, section 8 |
-| Can this machine lift it? | Equipment `Max Weight` and `Weight Reduction per Level`, zone exclusions. | `22` |
-| One order onto a pallet, or several boxes on a cart? | The picking policy of the area for the operator's equipment. | `21` |
-| What must the operator prove at the shelf? | The five `Confirmation` fields. | `21`, section 7 |
-| Where do the goods go? | The pick pallet, or the box on the cart position. | `21` |
-| Where does the trip end? | `Completion`, the owner's delivery location, the pack station. | `21`, `22` |
-| What if the stock is not there? | The short reason the operator types. | `23` |
-| Is the location counted afterwards? | Count triggers. | `24` |
-| How long does the operator keep the task? | `TASK_LEASE_TTL_MIN`. | `22`, section 7 |
+| Who may take the task? | Operator rights, **Pick Execution** and work-area zones. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md) |
+| Which task comes first? | Order priority, then the location's **Route Sequence**. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md#8-the-claim-rules-in-the-order-the-system-applies-them) |
+| Can this machine lift it? | Equipment **Max Weight**, **Weight Reduction per Level** and zone exclusions. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md) |
+| One order onto a pallet, several boxes on a cart, or a summary step? | The picking policy of the area for the operator's equipment. | [Picking policy settings](21-picking-policy-settings.md) |
+| What must the operator prove at the shelf? | The five confirmation fields. | [Picking policy settings](21-picking-policy-settings.md#7-source-confirmation-fields) |
+| Where do the goods go? | The pick pallet, or the box on the cart position. | [Picking policy settings](21-picking-policy-settings.md) |
+| Where does the trip end? | **Completion**, the owner's delivery location and the pack station. | [Picking policy settings](21-picking-policy-settings.md), [work areas](22-work-areas-equipment-and-permissions.md) |
+| What if the stock is not there? | The short reason the operator enters. | [Pick short reasons](23-pick-short-reasons.md) |
+| Is the location counted afterwards? | Count triggers. | [Inventory count policy](24-inventory-count-policy.md) |
+| How long does the operator keep the task? | The task timeout configured for the warehouse. | [Work areas and permissions](22-work-areas-equipment-and-permissions.md) |
 
 ## 2. The order in which the system applies the rules
 
-When an operator asks for work, the system walks this list (`wms-outbound/src/picking/commands/dispatch_next.rs`, `wms-tasks/src/service/candidate.rs`). It stops at the first step that answers.
+When an operator asks for work, the system walks this list. It stops at the first step that answers.
 
 1. **Queue.** One request per operator at a time.
 2. **A live cart assignment** of the operator is continued.
@@ -72,9 +86,8 @@ When the operator then works the task, the system applies these rules in order:
 
 1. An order is allocated. Allocation reserves stock and writes pick lines (picks) with status `Allocated`.
 2. Cartonization plans the boxes. A pick gets an outcome: `Planned` (it goes into a planned carton), `ShipAsIs` (the factory package), `Bypassed` (no box planned), `Pending` or `Blocked`.
-3. The order is **released** (`Release` on the order). Release runs allocation again and then creates tasks (`wms-outbound/src/service/order/allocate.rs:420-436`). Only picks that are ready to execute get a task. A pick whose cartonization is `Pending` or `Blocked` gets none. If the order is not released, allocating makes no task.
-4. For each such pick the system makes one task of type `Pick` (`wms-outbound/src/picking/infrastructure/tasks.rs`):
-   - source: the pick (`pick_detail`);
+3. The order is **released** (`Release` on the order). Release runs allocation again and then creates tasks. Only picks that are ready to execute get a task. A pick whose cartonization is `Pending` or `Blocked` gets none. If the order is not released, allocating makes no task.
+4. For each such pick the system makes one task of type `Pick`:
    - `from_location`: the pick location; it decides the zone and so the work area;
    - `to_location`: the `Picking To Location` of the zone of the pick location (zone field);
    - owner, SKU, lot, unit, quantity, container;
@@ -82,12 +95,12 @@ When the operator then works the task, the system applies these rules in order:
    - priority: the priority of the order;
    - status `Created`, no operator.
    The pick becomes `Released` and carries the task id.
-5. The task has a snapshot of the pick. If the pick changes (another quantity, location or container) the task no longer matches and is refused at dispatch: `TASK_SNAPSHOT_MISMATCH`.
+5. The task keeps the pick details that were current when it was created. If the quantity, location or container changes before dispatch, the old task is not handed out; refresh the order work before trying again.
 6. A change of order priority is copied to the tasks that are still in the pool. Held tasks keep the priority the operator saw.
 
 ## 4. How a task is assigned
 
-See section 2, steps 8 to 13, and `22-work-areas-equipment-and-permissions.md`, section 8. The result: status `Assigned`, the operator's id, a lease of `TASK_LEASE_TTL_MIN` minutes (seed 15). Every scan and every commit renews the lease. A lease that ran out returns the task to the pool within about a minute (the reaper runs every 60 seconds).
+See section 2, steps 8 to 13, and [the task claim rules](22-work-areas-equipment-and-permissions.md#8-the-claim-rules-in-the-order-the-system-applies-them). The result is an assigned task for the operator. Every scan and every completed action renews its timeout. If the operator pauses too long, the task returns to the pool and must be requested again.
 
 For a cart the assignment takes **all tasks of its cartons in one step** or none. Two operators who start at once cannot get the same carton: the second is told `the selection changed while it was being taken: press again`.
 
@@ -182,7 +195,7 @@ What changes if you change a setting:
 6. Carrier types in `Handling Unit Registry` with `Positions`.
 7. Short reasons: check that `SHORT`, `LPN_NOT_FOUND` and `WRONG_LOCATION` are published and tell operators the codes.
 8. Count: decide whether you want `Count an Emptied Location`, a cycle policy, or the count action in short reasons.
-9. Test with one order before you widen the rights. There is a built-in gate view `pick_cutover_gate`; every value in it must be zero before you widen the rollout.
+9. Test the complete physical route with one order before you give the new work area to more operators. Confirm that the task, source checks, destination and follow-up process all behave as planned.
 
 ## 9. What happens to open work, in one table
 
@@ -201,5 +214,5 @@ What changes if you change a setting:
 2. `Max Concurrent Tasks` does not limit pickers (`22`, section 1).
 3. `Target Binding`, `Deposit Mode`, `Pallet Drop Suggestion` have no effect of their own (`21`).
 4. `Reserved LPN` = `Do not confirm` does not remove the LPN scan while `Loose Lot Source` = `Automatic` (`21`, section 7).
-5. The RF shows only `No eligible Pick work` when nothing can be handed out. The reason codes are only in the API answer (`diagnostics`).
+5. The RF shows **No eligible Pick work** when nothing can be handed out. Check the operator's work-area rights, equipment, task status, source holds and picking policy.
 6. The operator types the short reason code; the screen offers no list (`23`, section 2).

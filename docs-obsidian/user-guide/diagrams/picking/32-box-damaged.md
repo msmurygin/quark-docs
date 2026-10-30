@@ -34,17 +34,6 @@ sequenceDiagram
 - The picks keep their `carton_id`. Only the physical box of the position changes. The swap is written in `pick_position_container_replacement`.
 - A repeat with a new key on a position that already holds the scanned box after a replacement answers `already_replaced` and writes nothing.
 - The route status does not change. A replacement is not a route command.
-
-## Where it comes from
-
-| What | Source |
-|---|---|
-| Steps and lock order | `crates/libs/wms-outbound/src/picking/target/replace.rs:1-60` |
-| Replace rules | `crates/libs/wms-outbound/src/domain/pick_assignment/tare.rs:321-341` |
-| New box checks | `crates/libs/wms-outbound/src/picking/target/bind.rs:111-196` |
-| Command and result | `crates/libs/wms-outbound/src/picking/commands/replace_container.rs:1-79` |
-| RF screen `PKA51` | `crates/libs/wms-lib-sql/sql/rf-screens/098_uc_pick_carton_exceptions.sql` |
-
 ## Related pages
 
 - [Box full and target exceptions](31-box-full-and-target-exceptions.md)

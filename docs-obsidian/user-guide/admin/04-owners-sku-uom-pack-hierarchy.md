@@ -568,7 +568,7 @@ Turn on serial tracking for a SKU and describe the serial format.
 | `Industry Profile` | Hint for the profile. | `general`, `pharma`, `electronics`, `food`, `aerospace`. | `general` |
 | `Pick Episode Reassignment` (required) | What happens when a picker changes during a serial scan. | `Block`, `Handover`, `CancelAndRestart`. Default `Block`. | `Block` |
 
-Packing a serial-tracked SKU is refused today (`SERIAL_PACKING_NOT_SUPPORTED`, `wms-outbound/src/packing/README.md`).
+Packing a serial-tracked SKU is refused today.
 
 ### What you should see
 
@@ -767,7 +767,6 @@ When `Print Labels` is on, one detached post-commit run tries `handling_unit_lab
 | Register units | Individually coded `Empty` units are created at the chosen location. | They are not assigned to work and hold no stock. |
 | Scan a carrier for a pick assignment | An eligible empty unit is selected as the carrier. | Registration and asset ownership do not change. |
 | Bind a box to a pick position | An eligible empty unit is attached to that position and can receive picked goods. | Its type and asset owner do not change. |
-
 
 ### If something goes wrong
 

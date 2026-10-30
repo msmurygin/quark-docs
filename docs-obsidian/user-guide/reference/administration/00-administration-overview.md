@@ -10,8 +10,8 @@ It is different from the warehouse sidebar.
 3. The sidebar shows the current Enterprise sections. `Users & Roles`, `Integrations` and `Platform Tools` can be expanded.
 
 The switcher offers Enterprise **only** to a user who holds the role `ADMIN` on at least one warehouse.
-The switch is refused otherwise with `Enterprise access requires ADMIN role` (`crates/services/web-ui-server/src/routes/warehouse_handler.rs:67`).
-While you are in Enterprise, the server accepts only the role `ADMIN` for every check (`crates/services/web-ui-server/src/domain/warehouse.rs:40`, `crates/libs/wms-lib-auth/src/authorization/role_resolver.rs:69`).
+The switch is refused otherwise with `Enterprise access requires ADMIN role`.
+While you are in Enterprise, the server accepts only the role `ADMIN` for every check.
 A role named `MANAGER` or `SUPERVISOR` does not open Enterprise, even if an API list on these pages names it.
 
 > The user type `Admin` is not enough to open Enterprise from the switcher. The switcher looks for the **role** `ADMIN` on a warehouse (a `user_warehouse` row), not at the user type. See [User types and statuses](90-user-types-and-statuses.md).
@@ -50,12 +50,12 @@ by warehouse operations are also available under
 
 ## Which items you see
 
-The sidebar hides an item when either of these is true (`crates/services/web-ui-server/src/components/partials/sidenav.rs:91`):
+The sidebar hides an item when either of these is true:
 
 1. The role has a `menu_item` permission row for the item and its **R** (read) bit is off. No row at all means the item is shown.
-2. The form behind the item is closed to the role (`MetaCache::may_read_form`, `crates/services/web-ui-server/src/meta/cache.rs:3221`). A form is closed only when some role has a `form` row for it and this role has none, or has all four bits off.
+2. The form behind the item is closed to the role. A form is closed only when some role has a `form` row for it and this role has none, or has all four bits off.
 
-A hidden item also cannot be opened by its address (`navigation_handler.rs:54`).
+A hidden item also cannot be opened by its address.
 An administrator edits these rows in [Permission matrix](16-permission-matrix.md).
 
 ## What a button needs

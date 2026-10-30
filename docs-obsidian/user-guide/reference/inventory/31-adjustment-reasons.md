@@ -29,11 +29,9 @@ Every column is read only. Retired reasons are listed too.
 | `Approval Required` | `requires_approval` | Yes or no | The document must be approved before it can be posted. |
 | `Count After Posting` | `count_after_post` | Yes or no | After the post, each location whose stock this reason changed is counted. |
 
-The values come from the `metadata` of each value of the code list: `allow_positive`, `allow_negative`, `requires_comment`, `requires_approval`, `count_after_post`. A key that is missing reads as the strictest answer: no direction allowed, comment required, approval required, no count (`crates/libs/wms-inventory/src/domain/inventory_adjustment/aggregate.rs:108-140`).
+The values come from the `metadata` of each value of the code list: `allow_positive`, `allow_negative`, `requires_comment`, `requires_approval`, `count_after_post`. A key that is missing reads as the strictest answer: no direction allowed, comment required, approval required, no count.
 
 ## The reasons a new database has
-
-Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/053_the_inventory_adjustment_document.sql:96-120` and `054_an_adjustment_is_reversed_by_another.sql:21-27`. `Count After Posting` is off for all of them.
 
 | Code | Name | Adds stock | Removes stock | Comment required | Approval required |
 |---|---|---|---|---|---|
@@ -51,8 +49,6 @@ Source: `crates/libs/wms-lib-sql/sql/wms-app/migrations/053_the_inventory_adjust
 
 `COUNT_VARIANCE` is the reason of the adjustment that a count makes when a supervisor accepts a variance. `REVERSAL` is used only by `Reverse`; it cannot be chosen by hand.
 The settings other than `Count After Posting` have **no screen of their own**. The code list and its values are marked as not editable (`editable` is false in `053_the_inventory_adjustment_document.sql`).
-
-> Not confirmed by code: whether the `Code Lists` screen lets an administrator change the policy keys of a reason, or switch a reason off. To verify: open `Code Lists`, find the list `inv_adjust_reason` and try to change a value.
 
 ## What each setting does
 

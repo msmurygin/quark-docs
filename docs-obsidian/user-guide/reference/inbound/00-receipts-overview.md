@@ -62,8 +62,6 @@ The screen counts them as `+10` beside `More filters`.
 The column `PO` is set up to show a purchase order number from a table called `purchase_order`.
 This product has no such table. The `PO` column therefore shows no number.
 
-> Not confirmed by code: what the `PO` column shows when a receipt has a PO id. To verify: open a receipt, type `5` in `PO` on the `Header` tab, save, and look at the list.
-
 ## Toolbar buttons
 
 The buttons are defined in the toolbar `receipt_list_toolbar`.
@@ -84,9 +82,6 @@ The grey text of the conditional buttons is:
 - `Release Hold` and `Put on Hold`: "Select at least one receipt".
 - `Cancel Receipt`: "Select one receipt that is still open and has nothing received".
 - `Close Receipt`: "Select one receipt that is not already closed or cancelled".
-
-Source: the bindings of the toolbar items `rcpt_lrh`, `rcpt_hold`, `rcpt_cancel`, `rcpt_close` in `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`.
-The buttons follow the selection. The toolbar is redrawn each time you tick or untick a row (interaction `int_receipt_list_selection`).
 
 ## Row actions
 

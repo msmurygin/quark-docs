@@ -47,20 +47,6 @@ Reading notes.
 - A location type that is a hold-stage zone (`QC`, `Damage`, `Rtv`, `Destroy`, `Returns`, `Stage`, `Lost`), `InTransit` or `Pack` cannot be chosen in a step. The policy is refused at validation.
 - When a step has no `Location type`, protect stock in `QC`, `Returns`, `Lost` and other non-pick locations with a location hold. Held stock is removed from the available quantity. See [page 24](24-influence-holds.md).
 - The available quantity already takes holds out. See [page 24](24-influence-holds.md).
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Candidate read: owner, SKU, `atp`, pack, location status and flag, fixed types, step filters, shelf life | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:430-473` |
-| Fixed types `InTransit`, `Pack`, and the note about `Lost` | `crates/libs/wms-lib-core/src/model/inventory/inventory_balance_atp.rs:325-343` |
-| Step fields become criteria | `crates/libs/wms-outbound/src/allocation/trace.rs:558-567` |
-| Refused values: `allocation_type`, location types | `crates/libs/wms-outbound/src/allocation/step.rs:202-226`, `crates/libs/wms-outbound/src/allocation/step.rs:272-297` |
-| Only active steps are loaded | `crates/libs/wms-outbound/src/allocation/policy.rs:136-148` |
-| The whole policy is refused when one active step cannot run | `crates/libs/wms-outbound/src/allocation/policy.rs:150-156`, `crates/libs/wms-outbound/src/allocation/policy.rs:238-257` |
-| Screen labels | `crates/libs/wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql:21421-21430` |
-| Seeded policy `STD` and its one step | `crates/libs/wms-lib-sql/sql/wms-app/migrations/001_baseline.sql:7644-7652` |
-
 ## 2. Unit of measure and the carry between steps
 
 **What this shows.** The open quantity is split over the units of the pack that an active step names. Each step gets the share of its own unit plus what earlier steps could not cover.
@@ -103,20 +89,6 @@ Reading notes.
 - A step whose unit is not in the pack gets only the carry. A step with no share and no carry is skipped without a stock read.
 - A pack unit counts only if it is active and its `base_qty` is above 0.
 - A new line is refused if no active step names any unit of its pack: `allocation policy '{code}' has no executable step for sku '{sku}' pack hierarchy`.
-
-### Where it comes from
-
-| Rule | Code |
-|---|---|
-| Pack units: active, `base_qty` above 0, biggest first | `crates/libs/wms-outbound/src/allocation/plan.rs:83-102` |
-| Units named by steps; the split; the gap | `crates/libs/wms-outbound/src/allocation/trace.rs:330-436` |
-| Greedy split, base unit takes the rest | `crates/libs/wms-lib-core/src/model/pack/breakdown.rs:72-110` |
-| Step loop: share plus carry, skip when both are zero | `crates/libs/wms-outbound/src/allocation/trace.rs:534-553` |
-| `short` = gap + carry of the last step | `crates/libs/wms-outbound/src/allocation/trace.rs:693-698` |
-| Steps run in `sequence` order | `crates/libs/wms-lib-core/src/model/policies/allocation_policy.rs:1023-1040` |
-| New line needs a step for a unit of its pack | `crates/libs/wms-outbound/src/allocation/policy.rs:169-198` |
-| Message when the policy and the pack share no unit | `crates/libs/wms-outbound/src/allocation/trace.rs:726-761` |
-
 ## Related pages
 
 - [How the stock is chosen](21-influence-policy-selection.md)

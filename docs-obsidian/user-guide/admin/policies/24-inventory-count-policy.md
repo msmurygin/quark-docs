@@ -38,9 +38,9 @@ The RF path: `Inventory` menu, `Count Location`. Screens: `Count — Work Area` 
 | 7 | An order is cancelled while one of its picks had its source confirmed (location, item, LPN or lot scanned) | `COUNT_ON_PICK_CANCELLED` | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` (section 7a) | `PickCancelled` | `Event` |
 | 8 | An operator reports stock the system does not show (RF `Report Unexpected Stock`, or `F6` on an empty Stock Inquiry) | none — always | — | `UnexpectedInventory` | `Event` |
 
-How the event triggers work (3 to 8): the transaction that causes them writes the event `process.inventory.count_requested` into the outbox. It does not start the count. A background subscriber starts the count after the first transaction has committed (`wms-inventory/src/service/inventory_count/request_location.rs`). So a rolled-back pick, adjustment or putaway asks for nothing.
+How the event triggers work (3 to 8): the transaction that causes them writes the event `process.inventory.count_requested` into the outbox. It does not start the count. A background subscriber starts the count after the first transaction has committed. So a rolled-back pick, adjustment or putaway asks for nothing.
 
-Rules of an event count (`request_location.rs:96-135`):
+Rules of an event count:
 
 - It counts **one location**.
 - If a live task (`Open` or `Variance`) already counts the location, the request **joins** it. Nothing new is made.
@@ -57,7 +57,7 @@ These are fixed in code. There is nothing to switch.
 3. **Result types** per identity: `Match`, `QtyVariance` (both sides have stock, quantities differ), `ExpectedButMissing` (the system had stock, the counter saw none), `UnexpectedFound` (the counter saw stock the system did not have).
 4. **Zero is not counted.** The counter cannot enter a quantity of 0. "Nothing here" is the button `2 = Empty` (`confirm empty`). A location with no entries and no empty confirmation cannot be finished: `nothing was counted in A-01-01: record what is there, or confirm that it is empty`.
 5. **Never counted types:** `InTransit` (open pick pallets) and `Lost` (lost stock). A policy or a count that names them is refused: `location type InTransit is never counted`, `never counted (lost stock or open pick pallets): INTRANSIT`.
-6. **Who decides a difference:** `Accept Variance`, `Recount` and `Cancel Count` are for the roles `Admin`, `Manager`, `Supervisor` (`app-server/src/web/rpcs/inventory_count_rpc.rs`, the role list at the top). Counting itself (take, observe, complete, empty, leave) is also open to `Operator`. Reading counts and policies: `Admin`, `Manager`, `Supervisor`, `Viewer`.
+6. **Who decides a difference:** `Accept Variance`, `Recount` and `Cancel Count` are for the roles `Admin`, `Manager`, `Supervisor`. Counting itself (take, observe, complete, empty, leave) is also open to `Operator`. Reading counts and policies: `Admin`, `Manager`, `Supervisor`, `Viewer`.
 7. **Approval.** Accepting a difference makes an adjustment with the reason `COUNT_VARIANCE` and posts it in the same step. That reason needs no approval and no comment (section 6). If someone changed it to need approval, the accept is refused: `the COUNT_VARIANCE reason asks for approval, which a count cannot give; adjust this variance by hand`.
 8. **The accept can fail on reservations.** If the counted quantity is below what is reserved or picked at that balance: `balance 4412: the target is below what is reserved (allocated 5, picked 0)`. Nothing is written. Release the reservation or recount.
 9. **The accept can fail on moved stock** (Hard freeze): `the stock changed since it was counted (counted against 40, holds 38 now): count it again`. The task stays in `Variance`. Press `Recount`.
@@ -93,7 +93,7 @@ Menu path: `Sidebar > Warehouse Configuration > Counting > Cycle Count Policies`
 ### `Basis` (`basis`)
 
 - UI label: `Basis`. Dropdown. Enum `inventory_count_policy_basis`: `Locations` (default), `Items` (`Items — SKUs, wherever they lie`). Helper text: `Locations: the locations matching the zone, type, ABC and aisle below. Items: the SKUs of the class and group beside, counted wherever they lie.`
-- What it does: decides what the run looks for (`InventoryCountPolicyBasis`, `wms-lib-core/src/model/inventory/inventory_count_policy.rs`; `service/inventory_count_policy/run.rs`). A policy names the properties of its own basis only. Mixing them is refused: `a policy counts locations or items, not both: name the properties of its basis only` (code `COUNT_POLICY_MIXED_SCOPE`). The database check `chk_inventory_count_policy_scope` repeats the rule (wms-app 092).
+- What it does: decides what the run looks for. A policy names the properties of its own basis only. Mixing them is refused: `a policy counts locations or items, not both: name the properties of its basis only` (code `COUNT_POLICY_MIXED_SCOPE`). The database check `chk_inventory_count_policy_scope` repeats the rule (wms-app 092).
 - Open work: none. New policies start with `Locations`.
 
 ### `SKU ABC` (`sku_abc`) and `SKU group` (`sku_group`)
@@ -137,7 +137,7 @@ Menu path: `Sidebar > Warehouse Configuration > Counting > Cycle Count Policies`
 - UI label: `Mode` (required). Dropdown. Enum `inventory_count_mode`:
   - `Blind` (`Blind — the counter does not see the system quantity`). Default.
   - `Informed` (`Informed — the counter sees it`).
-- What it does: with `Blind` the system hides the expected quantities from the counter while the task is `Open` (`service/inventory_count/mod.rs`). With `Informed` the task answer carries `system_stock` on the **first** attempt while the task is counted: the location's stock now, line by line (SKU, lot, LPN, quantity), a soft count's changes since the snapshot included, and for a count by item only the item. A recount is blind whatever the mode. The RF screen `CNT02` shows it in the line `System` (inventory count spec section 8; `rf-screens/114_uc_inv_count_informed.sql`).
+- What it does: with `Blind` the system hides the expected quantities from the counter while the task is `Open`. With `Informed` the task answer carries `system_stock` on the **first** attempt while the task is counted: the location's stock now, line by line (SKU, lot, LPN, quantity), a soft count's changes since the snapshot included, and for a count by item only the item. A recount is blind whatever the mode. The RF screen `CNT02` shows it in the line `System` (inventory count spec section 8; `rf-screens/114_uc_inv_count_informed.sql`).
 - Interaction: the counts the policy makes copy it. A manual count has its own `Mode`.
 - Open work: only counts made after the change.
 
@@ -182,7 +182,7 @@ Menu path: `Sidebar > Warehouse Configuration > Counting > Cycle Count Policies`
 
 ### Scheduler and `Run Now`
 
-- The scheduler loop runs when the service starts and then every hour (`COUNT_POLICY_INTERVAL` in `cleanup_tasks.rs`). A new or re-activated policy runs within one hour. Several servers do not run one policy twice a day: a run locks the policy and skips it if it already ran on the warehouse day.
+- The scheduler loop runs when the service starts and then every hour. A new or re-activated policy runs within one hour. Several servers do not run one policy twice a day: a run locks the policy and skips it if it already ran on the warehouse day.
 - Each policy runs in its own transaction. If one fails (for example somebody froze a location between the read and the freeze), its day is not written and it tries again next hour.
 - `Run Now` runs one policy. It does not ask whether the policy already ran today. The message is `Count CNT-000012 started for 50 location(s) due under policy CC0007` or `Nothing is due under policy CC0007`. A failure is `The policy did not run: {error}`.
 - A run makes one count: type `Cycle`, source `Schedule`, source id the policy id, the policy's mode, freeze and recount limit, recount by another counter on, comment `Cycle count by policy CC0007 (every 14 days)`. For an `Items` policy the count is a **count by item** (`Scope` = `Only the item`): its `SKUs` are the due SKUs, and its locations are the countable locations that hold them. Locations that another count already holds are left out. The message is `Count CNT-000012 started for 5 item(s) due under policy CC0007, in 8 location(s)`. If nothing can be taken, no count and no number are made: `Nothing is due under policy CC0007`.
@@ -230,7 +230,7 @@ Other refusals when you start or edit a count:
 
 Menu path: `Sidebar > Warehouse Configuration > Reason Codes > Adjustment Reasons`. This is the list of reasons of inventory adjustments (code list `inv_adjust_reason`, id 1031). The list columns are `Code`, `Reason`, `Active`, `Adds Stock`, `Removes Stock`, `Comment Required`, `Approval Required`, `Count After Posting`.
 
-An accepted count difference uses the reason **`COUNT_VARIANCE`** (`service/inventory_count/accept.rs`). The adjustment has source `InventoryCount`. Each line: `target quantity` = what was counted, `expected quantity` = the snapshot. The adjustment is validated and posted in the same step. A count never asks the adjustment for approval.
+An accepted count difference uses the reason **`COUNT_VARIANCE`**. The adjustment has source `InventoryCount`. Each line: `target quantity` = what was counted, `expected quantity` = the snapshot. The adjustment is validated and posted in the same step. A count never asks the adjustment for approval.
 
 Seeded reasons (wms-app 053, 054):
 
@@ -255,7 +255,7 @@ Refusals of a line: `reason X is not on the adjustment reason list`, `reason X i
 ### `Count After Posting` (`count_after_post`)
 
 - UI label: `Count After Posting`. Buttons `Count After Posting`, `Do Not Count`, `Refresh`. Tick one reason first (`Tick one reason`).
-- Roles: `Admin`, `Manager` (`inventory_adjust_reason_set_count`, `inventory_adjustment_rpc.rs:44`).
+- Roles: `Admin`, `Manager`.
 - Store: key `count_after_post` in the `metadata` of the code list value. Absent means off. **No reason has it on at the start.**
 - What it does: after an adjustment with this reason is posted, each location whose stock it changed is counted (trigger 5). One request per location, each once.
 - An adjustment that a count made (source `InventoryCount`) never asks for a count. That is how a count ends.

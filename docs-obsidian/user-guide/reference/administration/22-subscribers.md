@@ -44,14 +44,14 @@ Click a row to open its card.
 | `Active` | `is_active` | Check box | No | On by default. | An inactive subscriber receives nothing. |
 
 Buttons: `Save` saves and goes back (`generic_save`). `Delete` deletes the subscriber and goes back (`generic_delete`).
-A new subscriber is always saved with `Active` on: the create call has no `is_active` field (`crates/libs/wms-lib-core/src/model/integration/integration_subscriber.rs`, `IntegrationSubscriberForCreate`). Switch it off after the first save if you need to.
+A new subscriber is always saved with `Active` on: the create call has no `is_active` field. Switch it off after the first save if you need to.
 
 The columns `description`, `webhook_headers`, `event_filter` and `warehouse_filter` have no field on the card.
 **A subscriber made on this screen has the filter `{"event_codes": ["*"]}`: it receives every event of every warehouse.** The screen cannot narrow it.
 
 ### What each `Delivery` value does
 
-The rules are in the delivery worker (`crates/services/app-server/src/services/integration_delivery.rs`).
+The rules are in the delivery worker.
 
 | Value | What the worker does |
 |---|---|
@@ -60,10 +60,6 @@ The rules are in the delivery worker (`crates/services/app-server/src/services/i
 | `queue` | Not handled. The delivery is marked `failed` with the error `unknown delivery method queue`. |
 | `internal` | Not in the drop-down. Used by two built-in subscribers that run work inside the system. See below. |
 
-> Not confirmed by code: which program reads the `pending` deliveries of a `poll` subscriber. The code read for this page has no API method or screen that does so. To verify: ask the team that integrates your system, or search the API catalogue for a method that lists deliveries.
-
-> Not confirmed by code: how the card shows a subscriber whose `Delivery` is `internal`, because that value is not in the drop-down list `DELIVERY_METHOD` (`poll`, `webhook`, `queue`). To verify: open the built-in subscriber `quark_outbound_execution` and read the `Delivery` field before you save anything.
-
 ### Retries
 
 A delivery is claimed only while its attempts are fewer than `Max Retries`. After a failed try:
@@ -71,8 +67,6 @@ A delivery is claimed only while its attempts are fewer than `Max Retries`. Afte
 - The attempts count goes up by one.
 - If attempts have reached `Max Retries`, the delivery becomes `failed` and is not tried again.
 - Otherwise it goes back to `pending`, and the next try waits `Retry Delay × 2^n` seconds, where `n` is the number of tries already made before this one (so the waits are 1, 2, 4, ... times the delay). The exponent stops growing at 20. A delay of 0 is treated as 1 second.
-
-(`integration_delivery.rs`, functions `claim_delivery`, `finish_delivery_failure`, `retry_backoff_seconds`.)
 
 With `Max Retries` at 0, no try is ever made: the delivery stays `pending` and the event stays `partial`.
 A try that started but did not finish keeps a lease of 60 seconds; after that another worker pass may take it again (`DELIVERY_LEASE_SEC`).
@@ -99,15 +93,12 @@ Two subscribers with `Delivery` `internal` are made by migrations. They run work
 | `quark_outbound_execution` | Retries order allocation and handles pick discrepancies. | `process.order.allocation_contention_deferred`, `process.order.line_allocation_short`, and the pick discrepancy event. |
 | `quark_inventory_count` | Starts counts requested by an event. | `process.inventory.count_requested` (`INVENTORY_COUNT_REQUESTED`). |
 
-Source: `wms-enterprise` migrations `007_internal_outbound_execution_delivery.sql` and `016_event_driven_inventory_count.sql`; handlers `deliver_internal` in `integration_delivery.rs`.
-Switching one off, or deleting it, stops that work. An internal subscriber with any other code is refused with `no internal handler registered for subscriber {code}`.
-
 ## Rules
 
 | Rule | Where it comes from |
 |---|---|
 | `Code` and `tenant_id` together are unique. | Key `integration_subscriber_code_tenant_id_key`. Because `tenant_id` is empty on this screen, the database does not treat two rows as equal: **two subscribers can have the same code** (the migration says so in `007_internal_outbound_execution_delivery.sql`). |
-| After the first save, `Name`, `Delivery`, `Webhook URL`, `Max Retries`, `Retry Delay` and `Active` can change. | `update_integration_subscriber` (`crates/services/app-server/src/web/rpcs/integration_event_rpc.rs:39`). Clearing `Webhook URL` is allowed. |
+| After the first save, `Name`, `Delivery`, `Webhook URL`, `Max Retries`, `Retry Delay` and `Active` can change. | `update_integration_subscriber`. Clearing `Webhook URL` is allowed. |
 | Deleting a subscriber deletes its delivery rows. | The foreign key `integration_event_delivery.subscriber_id` is `ON DELETE CASCADE`. |
 
 The address is not checked. The worker posts to any URL you enter, from the app server.
@@ -115,7 +106,7 @@ The address is not checked. The worker posts to any URL you enter, from the app 
 ## Who can use it
 
 `create_integration_subscriber`, `update_integration_subscriber` and `delete_integration_subscriber` are open to the default roles `ADMIN` and `MANAGER`.
-The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER` (`integration_event_rpc.rs:14`).
+The read methods are open to `ADMIN`, `MANAGER`, `OPERATOR` and `VIEWER`.
 In Enterprise only `ADMIN` reaches the screen.
 
 ## Related pages

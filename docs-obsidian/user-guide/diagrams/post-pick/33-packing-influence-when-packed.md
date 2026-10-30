@@ -34,28 +34,6 @@ flowchart TD
 - The RF screen adds "Order packed" to its message.
 - The order's own status does not change. The order statuses have no "packed" value, so `Picked` stays `Picked`.
 - A packed job refuses new work: `PACK_JOB_PACKED`. A reopen with a supervisor's grant takes it back to `Open`.
-
-## Not confirmed by code
-
-- Which user role or screen resolves a reported packing discrepancy. The exception has status `Open` or `Resolved`, but nothing in `crates/` writes `Resolved`. To verify: ask the owner how a reported discrepancy is cleared today.
-- There is no packing policy. A job is created with `policy_id` empty, an empty policy snapshot and release mode `PerUnit`, always.
-
-## Where it comes from
-
-| Claim | Source |
-|---|---|
-| Six conditions | `crates/libs/wms-outbound/src/domain/packing_job/aggregate.rs:84` |
-| Facts gathered and job marked `Packed` | `crates/libs/wms-outbound/src/packing/commands/readiness.rs:24` |
-| Packed on a yes | `crates/libs/wms-outbound/src/packing/commands/readiness.rs:61` |
-| Asked after a close | `crates/libs/wms-outbound/src/packing/commands/carton_close.rs:40` |
-| Asked after a source is completed | `crates/libs/wms-outbound/src/packing/commands/source_complete.rs:154` |
-| Only open and blocking exceptions count | `crates/libs/wms-outbound/src/domain/packing_job/postgres_repository.rs:58` |
-| Exception statuses (`Open`, `Resolved`) | `crates/libs/wms-lib-core/src/model/outbound/packing_exception.rs:35` |
-| Picks and their hand-off count | `crates/libs/wms-lib-core/src/model/outbound/packing_job.rs:216` |
-| No policy and `PerUnit` on a new job | `crates/libs/wms-outbound/src/packing/commands/work_open.rs:159` |
-| Order statuses have no "packed" | `crates/libs/wms-lib-core/src/model/outbound/shipment_order.rs:46` |
-| Packed job refuses new work | `crates/libs/wms-outbound/src/packing/commands/work_open.rs:147` |
-
 ## Related pages
 
 - [Packing: verify a box](30-packing-verify-journey.md)
