@@ -35,7 +35,7 @@ Create an order, allocate stock, and release it to the floor.
 - Role to release, cancel and cancel quantity: `ADMIN`, `MANAGER`, `SUPERVISOR` (the release band).
 - Role for `Allocate` and `Ship order`: `ADMIN`, `MANAGER`, `SUPERVISOR` or `OPERATOR`.
 - The owner, the ship-to partner and the SKUs exist, and stock is on hand.
-- The order type `SO` ("Standard Outbound") is seeded. **No screen or API creates order types.**
+- The standard order type `SO` ("Standard Outbound") is available by default.
 - An allocation policy is published (section 3).
 
 ### Steps
@@ -73,7 +73,7 @@ Tab `Header`:
 |---|---|---|---|
 | `Order #` | Number. Read-only. | Text. | `SO-0001` |
 | `Status` | Read-only. | See section 1. | `New` |
-| `Type` (required) | Order type. | An order type, seeded `SO`. | `SO` |
+| `Type` (required) | Order type. | A configured order type; `SO` is available by default. | `SO` |
 | `Owner` (required) | Owner of the goods. | An owner. | `OWNER001` |
 | `Priority` | Priority. | Whole number. Default 50. | 50 |
 | `Requested Ship` | Requested ship date. | Date. | |
@@ -86,7 +86,7 @@ The list also shows `SKU Description` and `Allocated`.
 
 Button `Cancel Qty` (window `Cancel Quantity`): `Quantity to cancel` (required; "The amount to REMOVE from the line, in base units - not the new total.") and `Reason` (required; "A reduced line without a reason is unauditable.").
 
-Order-type table: seeded `SO` = `Standard Outbound`.
+Default order type: `SO` = `Standard Outbound`.
 
 ### What you should see
 
@@ -121,7 +121,7 @@ Order-type table: seeded `SO` = `Standard Outbound`.
 - Goods Issue deducts picked stock, updates serials and counters, records shipment history, and publishes the departure as one command.
 - The statuses drive the task board and the reports.
 
-The shipment order list has no `Close` button. A complete-order Goods Issue closes the order automatically when no demand remains. The separate API method `shipment_order_close` remains an administrative lifecycle command for `ADMIN` and `MANAGER` after every line is terminal.
+The shipment order list has no `Close` button. A complete-order Goods Issue closes the order automatically when no demand remains. Administrators and managers can close an order separately only after every line has reached its final state.
 
 ## 3. Allocation policy
 
@@ -135,7 +135,7 @@ A policy has a life cycle: `Draft` -> `Published` -> `Retired`. A published poli
 ### Before you start
 
 - Role: `ADMIN`, `MANAGER` or `SUPERVISOR` (write steps).
-- Seeded policy `STD`: version 1, published, one step (`Firm`, `EA`, sort `LotRotation`).
+- Default policy `STD`: version 1, published, one step (`Firm`, `EA`, sort `LotRotation`).
 - Locations, zones and units exist.
 
 ### Steps
@@ -238,13 +238,13 @@ Group unreleased orders, review the complete composition and release the group t
 8. If some members were blocked or failed, correct their order data and click `Retry blocked`.
 9. Use `Cancel Wave` only while the wave is still unstarted (`Draft` or `Planned`).
 
-![Wave list with draft and active waves](../assets/screens/wave-list-form.png)
+![Wave list with the current status and reviewed version](../assets/screens/wave-list-form.png)
 
-*Wave list with current status and reviewed version. Focus: choose the wave whose composition or release result needs review; open its card for member counts and release progress.*
+*Wave list with current status and reviewed version. Focus: 1 creates a wave; 2 opens the wave whose composition or release result needs review.*
 
 ![Wave card composition and action toolbar](../assets/screens/wave-card-form.png)
 
-*Wave card with composition, progress and controlled actions. Focus: review every member outcome before retrying or cancelling.*
+*Wave card with composition, progress and controlled actions. Focus: 1 shows the wave state and release progress; 2 contains member counts and the controlled action toolbar.*
 
 ### Field reference
 
@@ -286,21 +286,21 @@ flowchart LR
 
 The diagram stops when the release generation settles. Picking status uses separate, complete work evidence: a non-station wave becomes `InProgress` when pick or task work exists, while a station wave waits until its first shared tote reaches the station. `Completed` requires all known work to be finished, no broken work links and every station position to be free. A `Blocked` member can be terminal only when it has explicitly zero work; a `Failed` member never proves completion.
 
-Wave policy has no web editor. The API methods `wave_policy_create`, `wave_policy_preview` and `wave_policy_build` create waves by rule. Its fields include:
+Wave policies are not configured in the web interface. Ask your system administrator to create the policy, preview its result and enable its scheduled or manual runs. The available settings include:
 
 | Field | Meaning | Allowed values |
 |---|---|---|
-| `code` | Key. | Text up to 30 characters. |
-| `eligible_statuses` | Order statuses taken into waves. | Default `New`, `PartiallyAllocated`, `Allocated`. |
-| `priority_from`, `priority_to` | Priority range. | Numbers. |
-| `requested_ship_days_ahead`, `include_undated` | Ship date window. | Number, true or false. |
-| `owner_id`, `carrier_id` | Limit to an owner or carrier. | Ids. |
-| `group_by_owner`, `group_by_carrier`, `group_by_requested_ship_date` | Group rules. | true or false. |
-| `max_orders` | Orders per wave. | Default 100. |
-| `max_lines` | Lines per wave. | Number or empty. |
-| `max_waves_per_run` | Waves per run. | Default 10. |
-| `schedule_interval_minutes`, `schedule_starts_at` | Recurring run. | Number, time. |
-| `auto_release` | Release waves automatically. | Default false (keeps Draft waves). |
+| `Code` | Policy key. | Text up to 30 characters. |
+| `Eligible statuses` | Order statuses taken into waves. | Default `New`, `PartiallyAllocated`, `Allocated`. |
+| `Priority range` | Lowest and highest order priority. | Numbers. |
+| `Requested ship window` | How many days ahead to include and whether undated orders qualify. | Number and yes or no. |
+| `Owner` / `Carrier` | Limit the policy to one owner or carrier. | A configured owner or carrier. |
+| `Group by` | Split the result by owner, carrier or requested ship date. | Any combination of the three options. |
+| `Maximum orders` | Orders per wave. | Default 100. |
+| `Maximum lines` | Lines per wave. | Number or empty. |
+| `Maximum waves per run` | Waves created in one run. | Default 10. |
+| `Schedule` | Interval and first run time. | Number of minutes and time. |
+| `Auto release` | Release created waves automatically. | Default no, which keeps waves in `Draft`. |
 
 ### What you should see
 
@@ -321,7 +321,7 @@ Wave policy has no web editor. The API methods `wave_policy_create`, `wave_polic
 
 - Release of a wave releases one order per transaction and preserves each order's result.
 
-No wave policy exists at the start. No migration or dev seed inserts into `wave_policy`.
+No wave policy exists until an administrator creates one.
 
 ## 5. Picking policy
 
@@ -330,7 +330,7 @@ No wave policy exists at the start. No migration or dev seed inserts into `wave_
 Define how pickers confirm and drop picks.
 
 A picking policy has revisions. Each code has revisions with a status: `Draft` -> `Published` -> `Retired`.
-The seeded policy is `DISCRETE` (revision 1, published): "One order, one root container: today's picking".
+The default policy is `DISCRETE` (revision 1, published): "One order, one root container: today's picking".
 
 ### Before you start
 
@@ -339,7 +339,7 @@ The seeded policy is `DISCRETE` (revision 1, published): "One order, one root co
 ### Steps
 
 1. Open `Sidebar > Warehouse Configuration > Policies > Picking Policies`.
-2. Click `New Draft`. Fill `Code` and `Description`. Click `Create Draft`. The server copies the latest revision of the code, or `DISCRETE` for a new code.
+2. Click `New Draft`. Fill `Code` and `Description`. Click `Create Draft`. The system copies the latest revision of that policy, or the `DISCRETE` defaults for a new code.
 3. Open the draft. Change the sections.
 4. Click `Save`.
 5. Click `Publish`.
@@ -356,27 +356,27 @@ The seeded policy is `DISCRETE` (revision 1, published): "One order, one root co
 
 ### Field reference
 
-| Field | Meaning | Allowed values (seed `DISCRETE`) |
+| Field | Meaning | Allowed values (default `DISCRETE`) |
 |---|---|---|
 | `Description` (required) | Free text. | Text. |
-| `Unit` (`grouping_unit`) | What is grouped in one task. | `Order` (one order per task), `PlannedTarget` (several targets per task). Seed `Order`. |
-| `Max Targets` | Targets per pass. | 1 to 99. Seed 1. |
-| `Carrier Required` | A cart must be used. | Yes or no. Seed no. |
-| `Target Binding` | When a target container is bound. | `Unbound`, `BeforeRoute`. Seed `Unbound`. |
-| `Quantity` | Quantity confirmation. | `PerPick`, `Aggregated`. Seed `PerPick`. |
-| `Target` | Target confirmation. | `ScanContainer`, `PositionNumber`. Seed `ScanContainer`. |
-| `Deposit Mode` | Where goods go. | `CollectToRoot`, `DirectToTarget`. Seed `CollectToRoot`. |
-| `Completion` | When a pick is complete. | `Complete`, `ConfirmAtLocation`. Seed `Complete`. |
+| `Unit` (`grouping_unit`) | What is grouped in one task. | `Order` (one order per task), `PlannedTarget` (several targets per task). Default `Order`. |
+| `Max Targets` | Targets per pass. | 1 to 99. Default 1. |
+| `Carrier Required` | A cart must be used. | Yes or no. Default no. |
+| `Target Binding` | When a target container is bound. | `Unbound`, `BeforeRoute`. Default `Unbound`. |
+| `Quantity` | Quantity confirmation. | `PerPick`, `Aggregated`. Default `PerPick`. |
+| `Target` | Target confirmation. | `ScanContainer`, `PositionNumber`. Default `ScanContainer`. |
+| `Deposit Mode` | Where goods go. | `CollectToRoot`, `DirectToTarget`. Default `CollectToRoot`. |
+| `Completion` | When a pick is complete. | `Complete`, `ConfirmAtLocation`. Default `Complete`. |
 | `Pallet Drop Suggestion` | Source of the suggested drop cell. | `OwnerThenTask`: the owner's picking drop location, else the order's task destination. |
-| `Pallet Drop Cell Types` | Types allowed for the drop cell. | At least one of `Door`, `Pickto`, `Sort`, `Stage`, `Pack`. Seed `Pickto`, `Sort`, `Stage`, `Door`. |
-| `Count an Emptied Location` | Ask for a count when a pick empties a location. | Yes or no. Seed no. |
-| `Source Location` | Proof at the source. | `DisplayOnly`, `Scan`. Seed `Scan`. |
-| `Item` | Proof of the item. | `DisplayOnly`, `Scan`. Seed `Scan`. |
-| `Reserved LPN` | Proof of the LPN. | `DoNotConfirm`, `ScanWhenPresent`. Seed `ScanWhenPresent`. |
-| `Loose Lot Source` | Proof of a lot in a loose location. | `NoConfirmation`, `Automatic`, `ScanInternalLot`, `ConfirmLotAttributes`, `ExclusiveLocation`. Seed `Automatic`. |
-| `Lot Attribute Capture` | How lot attributes are entered. | `ScanOnly`, `ScanOrManual`. Seed `ScanOrManual`. |
+| `Pallet Drop Cell Types` | Types allowed for the drop cell. | At least one of `Door`, `Pickto`, `Sort`, `Stage`, `Pack`. Default: `Pickto`, `Sort`, `Stage`, `Door`. |
+| `Count an Emptied Location` | Ask for a count when a pick empties a location. | Yes or no. Default no. |
+| `Source Location` | Proof at the source. | `DisplayOnly`, `Scan`. Default `Scan`. |
+| `Item` | Proof of the item. | `DisplayOnly`, `Scan`. Default `Scan`. |
+| `Reserved LPN` | Proof of the LPN. | `DoNotConfirm`, `ScanWhenPresent`. Default `ScanWhenPresent`. |
+| `Loose Lot Source` | Proof of a lot in a loose location. | `NoConfirmation`, `Automatic`, `ScanInternalLot`, `ConfirmLotAttributes`, `ExclusiveLocation`. Default `Automatic`. |
+| `Lot Attribute Capture` | How lot attributes are entered. | `ScanOnly`, `ScanOrManual`. Default `ScanOrManual`. |
 
-Rules (`PickingPolicyRefusal`):
+Validation messages:
 
 | Message | Meaning |
 |---|---|
@@ -415,7 +415,7 @@ Define what happens when a picker cannot find the full quantity.
 ### Before you start
 
 - Role: `ADMIN`, `MANAGER`, `SUPERVISOR` (write).
-- Seeded reasons: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` (revision 1, published). Each has six actions.
+- Reasons available by default: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` (revision 1, published). Each has six actions.
 
 ### Steps
 
@@ -474,9 +474,9 @@ Rules before publish (`validate_draft`):
 ### What this affects later
 
 - When a picker shorts a pick, the system runs the actions of the chosen reason: it can block the location, release reservations, move residual stock to the missing location, and try to allocate again.
-- Setting `TASK_SKIP_*` values (see `03-warehouse-structure.md`) control task skipping, not shorts.
+- Task-skipping settings are described in [Warehouse Structure](03-warehouse-structure.md); they do not control shorts.
 
-The order is fixed in code:
+The short workflow runs in this order:
 
 1. In the short command itself: the found quantity is committed, the rest of that pick is released, and the source location is blocked. A remediation request is saved.
 2. A background worker then runs the remediation. It releases the related reservations. Picks that an operator is working on are left alone.
@@ -495,7 +495,7 @@ Tell the system which boxes exist and how to plan an order into boxes.
 ### Before you start
 
 - Role: `ADMIN`, `MANAGER` (write).
-- Seeded policy `STD` ("Standard parcel") with three boxes `BOX-S`, `BOX-M`, `BOX-L`.
+- Default policy `STD` ("Standard parcel") with three boxes `BOX-S`, `BOX-M`, `BOX-L`.
 - Every item you want planned has weight and size in its pack (`Cartonize` on).
 
 ### Steps
@@ -517,11 +517,11 @@ Tell the system which boxes exist and how to plan an order into boxes.
 
 | Field | Meaning | Allowed values |
 |---|---|---|
-| `Pick splitting` | May one pick spread over several boxes? | `Prevent`, `Allow`. Seed `Prevent`. |
+| `Pick splitting` | May one pick spread over several boxes? | `Prevent`, `Allow`. Default `Prevent`. |
 | `Objective` | Goal. | `Minimum cartons` is the only one the engine solves (`cartonization_policy_objective_is_executable`). `Minimum unused volume`, `Fewest pick splits`, `Balanced weight` are listed but the engine does not solve them. |
 | `Solver` / `Algorithm` | Method. | `3D bin packing` / `Extreme points` (only values). |
-| `Iterations per unit²`, `Minimum iterations`, `Maximum iterations`, `Maximum candidates` | Search limits. | All above 0; maximum iterations not below minimum. Seed 30, 50000, 2000000, 2000. |
-| Exception causes | `No dimensions`, `No weight`, `No carton candidates`, `No carton fits`, `Weight exceeded`, `Split prevented`. | `Stop` (hold just this pick; planned cartons stand) or `Ship as is` (the pick travels with no carton named in advance). Seed: all `Stop`. |
+| `Iterations per unit²`, `Minimum iterations`, `Maximum iterations`, `Maximum candidates` | Search limits. | All above 0; maximum iterations not below minimum. Defaults: 30, 50000, 2000000, 2000. |
+| Exception causes | `No dimensions`, `No weight`, `No carton candidates`, `No carton fits`, `Weight exceeded`, `Split prevented`. | `Stop` (hold just this pick; planned cartons stand) or `Ship as is` (the pick travels with no carton named in advance). Default: all `Stop`. |
 | Carton: `Carton code`, `Name` | Identity. | Text. |
 | Carton: `Inner length`, `Inner width`, `Inner height` | Inner size. | Above 0 for an active carton. |
 | Carton: `Tare weight` | Empty box weight. | Above 0 and below the maximum when the maximum is set. |
@@ -568,11 +568,11 @@ Packing itself runs on the RF terminal. The web UI prepares the master data only
 2. Open `Sidebar > Warehouse Configuration > Work Areas & Equipment > Work Areas`. Open the area.
 3. In the field `Pack station`, pick the `Pack` location. Save.
 4. Make sure the picking policy of the area allows `Pack` in `Pallet Drop Cell Types` when pallets should go to the station.
-5. Make sure the label `shipping_label` exists (see `07-printing-and-labels.md`).
+5. Make sure the label `shipping_label` exists (see [Printing and Labels](07-printing-and-labels.md)).
 
 ### Field reference
 
-See `03-warehouse-structure.md`, section 6.
+See [Warehouse Structure — Work Areas, Equipment Profiles and Operators](03-warehouse-structure.md#6-work-areas-equipment-profiles-and-operators).
 
 ### What you should see
 
@@ -592,7 +592,7 @@ See `03-warehouse-structure.md`, section 6.
 - Goods Issue is separate from carton close; use `Ship order` or the Load workflow in section 10.
 - The action `Repack` works on the RF terminal. The action is chosen once, when the packer opens the work, from what the unit is: a box off a cart is **verified**, a discrete pick pallet is **repacked** into output cartons. There is nothing to set for it. Voiding an empty output carton and reopening a closed one have commands but no RF screen yet.
 
-There is no packing queue in the web UI. Migration 110 only adds one message word (`STATION_UNKNOWN`). The queue is the query `packing_queue_list`. The RF screen `PACK00` (`rf-screens/103_uc_pack_verify.sql`) reads it after the packer scans the station.
+There is no packing queue in the web UI. Packers open the packing flow on the RF terminal and scan their station; the terminal then offers the work available at that station.
 
 ## 9. Task Manager screens
 
@@ -602,7 +602,7 @@ There is no packing queue in the web UI. Migration 110 only adds one message wor
 | `Management & Control > Execution Control > Pick Assignments` | See carts in use. Button `Dissolve` (reason required): returns tasks to the pool and takes empty boxes off the cart. |
 | `Management & Control > Exceptions > Pick Target Exceptions` | See box-full problems. Button `Retry`. |
 | `Management & Control > Exceptions > Skip History` | See tasks refused or handed back. |
-| `Warehouse Configuration > Operator Permissions > Operators` | Operators (see `03-warehouse-structure.md`). |
+| `Warehouse Configuration > Operator Permissions > Operators` | Operators (see [Warehouse Structure](03-warehouse-structure.md)). |
 
 `Delete Task` removes every selected task nobody has taken yet, and returns its pick to reserve. An order with nothing in work goes back to `Allocated`. Press `Release` to dispatch again.
 
@@ -755,7 +755,7 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ### Before you start
 
-- The SKU has a pick location with `Min`, `Max` and a `Unit` (see `04-owners-sku-uom-pack-hierarchy.md`).
+- The SKU has a pick location with `Min`, `Max` and a `Unit` (see [Owners, SKUs, Units and Packs](04-owners-sku-uom-pack-hierarchy.md)).
 - The pick location's putaway zone has **Replenishment Allowed** switched on. Without it the zone's pick locations are never replenished.
 - Operators who replenish have the `Replenish` task right in a work area over the pick zone and the storage zones.
 - A serial-tracked SKU is not replenished in this version.
@@ -776,12 +776,12 @@ Keep the pick locations filled. A SKU's pick location (SKU card, tab `Pick Locat
 
 ![Replenishment list with an open urgent row](../assets/screens/replenishment-list-form.png)
 
-*Replenishment list. Focus: urgency, source, destination, quantity and current status of the open move.*
+*Replenishment list. 1 — run planning now; 2 — a real open move with its urgency, destination, SKU, lot, source, quantity and unit.*
 
 | Button | What it does |
 |---|---|
-| **Replenish Now** | Runs the planner at once (`replenishment_plan`). |
-| **Call Off** | Cancels the ticked open replenishment, on the version you see (`replenishment_cancel`). Its task leaves the pool. If it changed meanwhile: refresh and decide again. |
+| **Replenish Now** | Checks the pick locations and plans the moves that are needed now. |
+| **Call Off** | Cancels the ticked open replenishment. Its task leaves the pool. If it changed meanwhile: refresh and decide again. |
 | **Refresh** | Reloads the list. |
 
 ### How urgent: the replenishment policy
@@ -790,7 +790,7 @@ Every SKU has a replenishment policy (`STD` unless the SKU card names another). 
 
 ![Replenishment policy thresholds](../assets/screens/replenishment-policy-card-form.png)
 
-*Replenishment policy card. Focus: urgent and important reservation thresholds and the empty-location rule.*
+*Replenishment policy card. 1 — the reserved-stock thresholds for urgent and important work; 2 — whether an empty pick location is urgent.*
 
 | Setting | Default | Meaning |
 |---|---|---|
@@ -802,4 +802,4 @@ Otherwise urgency 3. A share counts only when something is reserved. The importa
 
 Example, 40 lie in the pick location, default rule: 40 reserved — 1; 10 reserved — 2; nothing reserved — 3; empty — 1.
 
-The operator's side is `operator/13-replenish.md`.
+For the RF steps, see [Replenish](../operator/13-replenish.md).
