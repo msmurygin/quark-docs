@@ -35,7 +35,7 @@ The document becomes `Validated` only if **every** line passes. Otherwise it is 
 | `BELOW_RESERVED_QTY` | `balance {id}: the target is below what is reserved (allocated {a}, picked {p})` | The target is lower than what orders have allocated or picked. |
 | `STOCK_CHANGED_SINCE_COUNT` | `the stock changed since it was counted (counted against {e}, holds {c} now): count it again` | A line made by a count: the stock moved after the count. |
 | `DUPLICATE_DOCUMENT_IDENTITY` | `the same identity is named by another line of the document` | Two lines name one stock. |
-| `SERIAL_TRACKED_NOT_SUPPORTED` | `serial-tracked SKU {sku}: adjustment does not support serials yet` | The SKU is tracked by serial number. Adjustments cannot change it. |
+| `SERIAL_TRACKED_NOT_SUPPORTED` | `serial-tracked SKU {sku}: the line must name the serials it changes` | Leave the target empty and enter the individual units under `Serials to Write Off` and `Serials to Add`. |
 | `LOT_UNKNOWN` | `lot {lot} does not exist for this owner and SKU` | A line that would create stock names a lot that does not exist. |
 | `LOCATION_REFUSES_STOCK` | `the location refuses this stock: {message}` | A line that would create stock: the location's rules (mixing of SKUs or lots) forbid it. |
 | `LOCATION_IN_TRANSIT` | `location {location} holds only open pick pallets: it is not adjusted` | The location of open pick pallets is never adjusted. |

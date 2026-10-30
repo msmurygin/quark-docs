@@ -5,17 +5,18 @@ Use this page to say which stock the adjustment changes and what it should hold.
 ## Before you start
 
 - The adjustment is saved and its status is `Draft`, `Validated` or `Approved`. A posted adjustment takes no lines.
-- You know, for each line, the owner, SKU, lot, location and container (if any), and the **quantity the stock should hold after posting**. The target is the final quantity, not the difference.
+- You know, for each line, the owner, SKU, lot, location and container (if any). For stock without serial tracking, you also know the **quantity the stock should hold after posting**. The target is the final quantity, not the difference.
 
 ## Steps
 
 1. Open the adjustment. Its lines are in the bottom part.
 2. Click `Add Line`. The [line card](25-adjustment-line-card.md) opens.
 3. Fill `Owner`, `SKU`, `Lot` and `Location`. Leave `Container` empty for loose stock.
-4. Type the `Target Quantity`. 0 is allowed and means "no stock here".
-5. If this line has a different reason from the document, choose it in `Reason (if not the document's)`. Add a `Comment` if the reason asks for one.
-6. Click `Save`. The card closes and the list shows the line.
-7. Repeat for the next line.
+4. For stock without serial tracking, type the `Target Quantity`. 0 is allowed and means "no stock here".
+5. For a serial-tracked SKU, leave `Target Quantity` empty. Enter the individual units under `Serials to Write Off` and `Serials to Add`; the system derives the target quantity from those serials.
+6. If this line has a different reason from the document, choose it in `Reason (if not the document's)`. Add a `Comment` if the reason asks for one.
+7. Click `Save`. The card closes and the list shows the line.
+8. Repeat for the next line.
 
 To fill the lines from the stock itself, use [Generating lines from stock](45-generating-lines-from-stock.md).
 

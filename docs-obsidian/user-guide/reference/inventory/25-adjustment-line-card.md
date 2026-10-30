@@ -15,7 +15,9 @@ You get here by pressing `Add Line` or by clicking a row of the lines list.
 | `Location` | `location` | Pick list of locations (form `location_list_form`), or typed. Up to 20 characters. | Yes | A location code. | Part of the identity. |
 | `Container` | `container_code` | Pick list of containers (form `inventory_balance_container_list`), or typed | No | A container code. Empty means loose stock. | Part of the identity. |
 | `Zone (From Stock only)` | `zone` | Pick list of put-away zones (form `putawayzone_list_form`), or typed | No | A zone code. Hint: `«From Stock» adds a line for every stock row these fields name; empty ones mean any.` | Used only by the button `From Stock`. |
-| `Target Quantity` | `target_qty` | Decimal | Yes | A number of 0 or more. Hint: `What the stock should hold after posting, not the difference.` | The quantity the position should hold after `Post`. |
+| `Target Quantity` | `target_qty` | Decimal | For stock without serial tracking | A number of 0 or more. For a serial-tracked SKU, leave it empty. | The quantity the position should hold after `Post`. On a serial-tracked line, the serial fields set it. |
+| `Serials to Write Off` | `serials_out` | Text area | For a serial-tracked decrease | One serial per line. Every serial must currently belong to this stock position. | Writes the named units off. |
+| `Serials to Add` | `serials_in` | Text area | For a serial-tracked increase | One serial per line. The serial may be new, shipped, disposed or missing. | Adds the named units to this stock position as active units. |
 | `Reason (if not the document's)` | `reason_code` | Drop-down (code list `inv_adjust_reason`) | No | Empty means the reason of the document. | A reason for this line only. |
 | `Comment` | `comment` | Text, up to 500 characters | Sometimes | Any text. | A note. A reason that asks for a comment is satisfied by the line's comment **or** the document's. |
 | `Line` | `line_no` | Whole number, read only | | Set by the system. | The number of the line. |
@@ -24,7 +26,7 @@ You get here by pressing `Add Line` or by clicking a row of the lines list.
 
 The fields `ID`, `Adjustment` and `Version` are hidden. They carry the line, its document and the version of the line.
 
-After the first save `Owner`, `SKU`, `Lot`, `Location`, `Container` and `Zone` become read only. Only `Target Quantity`, `Reason` and `Comment` can change. The identity of a saved line never changes: remove the line and add another.
+After the first save `Owner`, `SKU`, `Lot`, `Location`, `Container` and `Zone` become read only. Only `Target Quantity`, the two serial fields, `Reason` and `Comment` can change. The identity of a saved line never changes: remove the line and add another.
 
 ## Toolbar buttons
 
@@ -40,7 +42,8 @@ Grey texts: `Save` and `From Stock`: `A posted adjustment cannot be changed`. `D
 
 - `Owner`, `SKU`, `Lot` and `Location` must be filled. Message: `line {n}: SKU, unit, lot and location are all required`.
 - The owner must exist: `no owner {code}`. The owner must have the SKU: `owner {code} has no SKU {sku}`. The SKU must have a default unit: `SKU {sku} has no default unit; name the unit`. The container must exist: `no container {code}`.
-- The target must be a finite number of 0 or more: `target quantity {n} is not a non-negative number`.
+- Stock without serial tracking needs a finite target of 0 or more: `target quantity {n} is not a non-negative number` or `the target quantity is required`.
+- A serial-tracked line leaves the target empty and names the units it changes, one per line. The system derives the target from the serials written off and added.
 - The same stock may be on a document only once: `line {n}: the same stock is already on this adjustment`.
 - A reason chosen for the line must be usable: `reason {reason} is not on the adjustment reason list` or `reason {reason} is retired`.
 - A new line is saved at the end. The document goes back to `Draft`.

@@ -34,6 +34,8 @@ The three container modes:
 
 A new code is made each time you press `regenerate`. After a label was printed for a code, `regenerate` asks for confirmation, because the printed label would no longer match.
 
+The generated code is not a registered LPN until `Move` succeeds. A label printed for a regenerated, cancelled or failed move must be destroyed or removed from the physical container.
+
 ## Rules the screen checks first
 
 The checks run in this order. The first one that fails stops the move and shows its message.
@@ -93,7 +95,7 @@ A refusal that cannot be overridden shows `Move failed: {message}`. The message 
 
 ## Who can use it
 
-`ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR`. The web action `balance_move` and the API right `move_execute` are both granted to `OPERATOR` and `SUPERVISOR` by the database baseline, although the method's own default list is `ADMIN` and `MANAGER` only. See [Who can do what](91-who-can-do-what.md). `VIEWER` cannot move.
+`ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR` can perform the basic move. Generating, previewing and printing a new LPN requires `ADMIN` or `MANAGER`. `VIEWER` cannot move.
 
 ## Related pages
 

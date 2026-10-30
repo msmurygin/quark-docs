@@ -5,6 +5,7 @@ Use this page to move stock from one location to another, to repack it into a ne
 ## Before you start
 
 - You are `ADMIN`, `MANAGER`, `SUPERVISOR` or `OPERATOR`. `VIEWER` cannot move stock.
+- You are `ADMIN` or `MANAGER` if the move must generate, preview or print a new LPN.
 - You know the position: location, SKU, lot and container.
 - You know where it goes.
 
@@ -15,11 +16,13 @@ Use this page to move stock from one location to another, to repack it into a ne
 3. Click the row. The [Move stock document](17-move-stock-document.md) opens.
 4. Choose what to do with the container:
    - **Move the stock and keep the container.** Leave the mode on `Keep`. Pick the destination `Location`. It must differ from the source.
-   - **Repack into a new container.** Press `New LPN`. A code appears. Pick the destination `Location` (it may be the same one). Press the printer button if you need the label first.
+   - **Repack into a new container.** As an administrator or manager, press `New LPN`. A code appears. Pick the destination `Location` (it may be the same one). Preview or print the label if needed.
    - **Merge into a container that stands somewhere.** Press `Existing`. Pick the container. Leave `Location` empty.
 5. The document starts `Move quantity` at the maximum it can move: quantity minus allocated and picked units. Type a smaller number for a partial move. A hold does not lower this maximum because a supervisor may authorise it at the next step.
 6. If you want to, type a `Reason`.
 7. Press `Move`.
+
+The generated code is registered only after `Move` succeeds. If you cancel, the move fails or you regenerate the code, destroy or remove any label printed with the unused code.
 
 To leave without moving, press `Cancel` or the back arrow.
 
