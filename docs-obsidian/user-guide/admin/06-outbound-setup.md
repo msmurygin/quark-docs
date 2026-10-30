@@ -3,7 +3,7 @@ title: "Administrator Guide - Outbound Setup"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-10-30
 ---
 
 # Outbound Setup
@@ -650,10 +650,6 @@ sequenceDiagram
 4. Click `Confirm — ship and deduct stock`.
 5. Open the `Fulfilment — base quantities` and `Shipments — base quantities` tabs to check the shipped base quantities and Goods Issue receipt.
 
-![Direct shipment confirmation for one order](../assets/screens/shipment-order-ship-review-modal.png)
-
-*Irreversible direct Goods Issue review. Focus: confirm the reviewed order, status and version before stock is deducted.*
-
 Direct `Ship order` ships the order's currently ready picked content after handoff. For each line, remaining effective demand is ordered minus cancelled minus already shipped. If some demand is not ready, the Goods Issue can be partial and the order stays open; later ready content can ship in another direct Goods Issue or through a Load. Every root included in the direct shipment must first be placed at its destination; stock on an open pallet in transit is not ready. The physical content must belong only to this order. A pallet shared by several orders, an order in a frozen Load Plan, or an order in an active Load must use the Load path.
 
 ```mermaid
@@ -669,40 +665,47 @@ flowchart TD
     H -->|No| J[Order closes]
 ```
 
-### Plan a Load
+### Plan a dispatch and its Load
+
+The dispatch card is the working screen for the whole journey. Its header keeps the Dispatch, Load Plan and Load states together, while the tabs separate route planning, physical units, load planning, loading, shipment and history.
 
 1. Open `Sidebar > Management & Control > Shipping > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
-2. Open `Sidebar > Management & Control > Shipping > Dispatches`. Click `New Dispatch`, enter the dispatch reference, optionally choose a carrier and `Door`, then click `Create`.
-3. Open the dispatch. Enter `New stop sequence` and `New stop destination`, then click `Add Stop`. Choose `Order to add`, its now-persisted `Delivery stop`, and optional `Preferred stage`, then click `Add Order`.
-4. Review `Stops` and `Orders`, then click `Plan Dispatch`.
-5. Open `Sidebar > Management & Control > Shipping > Load Plans`. Click `New Load Plan`, choose the planned dispatch and `Loading order`, then click `Create`.
-6. Open the plan and click `Generate stop order`. Click `Review composition`; check all stops, selected units, invalid units and unplanned units.
-7. Click `Freeze reviewed composition`. Freeze is a planning commitment, not loading or shipment.
-8. Back on the plan, click `Open Load`, choose an unused active transport, click `Review selected transport`, then `Confirm — open Load`.
+2. Open `Sidebar > Management & Control > Shipping > Dispatches`. Click `New Dispatch`, enter the optional external reference, carrier and door, then click `Create`.
+3. Open the dispatch and stay on `Stops & orders`. Click `Add stop…`, choose the end of the route or a gap between existing stops, and enter the destination. Stop numbers use gaps of 10 so an early route can be adjusted without renumbering every stop.
+4. Click `Add order…` and assign each order to its delivery stop and preferred Stage location. Check the stop, order, stage and readiness columns before planning.
+5. If the truck and door are already known, use `More > Transport unit…` and `More > Door…`. A registered transport unit is required before loading starts. The door is optional: choose it now or when the truck arrives, or leave it unset when the site does not use door assignments.
+6. Click `Plan dispatch…`. The lifecycle bar moves from `Dispatch: draft` to `Dispatch: planned`.
+7. Open `Load plan` and click `Create load plan…`. Choose the loading-order rule, build the sequence and review the stops and physical units.
+8. Freeze the reviewed plan. Freeze commits the planned composition and order; it does not load or ship stock.
+9. Open the Load from the frozen plan. Confirm or choose the registered transport unit; choose the door only when it is known or required. The dispatch card now exposes the same Load under `Loading`.
 
 Opening the Load assigns its permanent number in the form `LD` plus eight digits, for example `LD00000042`. Use that number to find the Load in the list, identify its card and scan it on the RF terminal. Loads created before this numbering change keep their existing `LOAD-...` codes; do not relabel historical work.
 
-![Dispatch card with stops and assigned orders](../assets/screens/dispatch-card-form.png)
+![Light-theme dispatch card with route stops, lifecycle and Shipping tabs](../assets/screens/shipping-dispatch-stops.jpg)
 
-*Dispatch card before planning. Focus: every order belongs to the intended stop and no route row is missing.*
+*The dispatch card before planning. The lifecycle shows what comes next; `Stops & orders` keeps the route, Stage assignment and readiness in one table.*
 
-![Load Plan card with reviewed composition](../assets/screens/load-plan-card-form.png)
+![Light-theme Load plan tab before a plan is created](../assets/screens/shipping-load-plan.jpg)
 
-*Load Plan composition review. Focus: selected and outside-plan unit counts, stop order and the Freeze action.*
+*`Load plan` is part of the dispatch card. Create it only after the route is planned, then build, review and freeze the sequence.*
 
 Loading-order choices are `Last delivery stop first`, `First delivery stop first`, `Any stop group`, `Manual unit order`, and `Any eligible unit (no stop priority)`. Use the review screen to resolve invalid or unplanned units before Freeze.
 
+The header shows the dispatch `Departure` when a planned route time is present. Each stop owns its own arrival and departure schedule, and the `ETA · status` column keeps that timing beside the destination. Treat the schedule as a route fact: changing a planned route returns it to Draft and invalidates the working Load Plan. Once Stage, Freeze or Load commitment has started, ordinary route edits are blocked. Before Freeze, an urgent stop can be appended to the end of a staged route; it cannot be inserted into the middle.
+
 ### Load and ship in the web UI
 
-1. Open `Sidebar > Management & Control > Shipping > Loads`, open the Load, and click `Composition and progress`.
-2. On an `Open` Load, click `Confirm transport / start`. Enter the bound transport reference, click `Review entered scan`, review the saved decision, then click `Confirm loading action`.
-3. For each unit, click `Review root LPN`, enter the physical root LPN, and review its location, quantity and next sequence. Physically load it, then click `Confirm loading action`.
-4. When `Remaining units` is 0, click `Complete loading (not ship)` and confirm. The status becomes `Loaded`; stock has not left yet.
-5. Click `Ship whole Load / deduct stock`. Verify the reviewed Load, transport and complete counts, then click `Confirm shipment / deduct stock`.
+1. Open the dispatch and select `Loading`.
+2. On an `Open` Load, click `Scan truck…`. Enter the registered transport reference, review the truck and door decision, then click `Start loading`.
+3. For each physical unit, click `Load LPN…`, scan or enter its root LPN, and review its location, quantity and next sequence. Physically load it, then click `Confirm in trailer`.
+4. When every planned unit is loaded, click `Complete load`. Review the complete counts, then click `Complete`. The status becomes `Loaded`; stock has not left yet.
+5. Open `Shipment` and click `Ship…`. Review the Load, transport, orders, unit counts and readiness checks, then click `Ship · write off stock`.
 
-![Load card composition and loading progress](../assets/screens/load-card-form.png)
+Before shipment, use `Physical unload…` to record a unit removed from the trailer. Use `Cancel load…` only after every loaded unit has been physically removed and acknowledged.
 
-*Open Load before physical loading. Focus: planned units and required, loaded and remaining counts stay separate.*
+![Light-theme Loading tab before a Load has been opened](../assets/screens/shipping-loading.jpg)
+
+*The `Loading` tab stays empty until a frozen plan opens a Load. Once opened, it shows the transport, planned units and required, loaded and remaining counts.*
 
 ### Load and ship on the RF terminal
 
@@ -726,8 +729,12 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 
 - Load states progress through `Open`, `Loading`, `Loaded` and `Shipped`.
 - A newly opened Load has a read-only `LD########` number in the list, card breadcrumb and composition header.
-- `Composition and progress` keeps planned and actual loading facts separate.
+- `Loading` keeps planned and actual loading facts separate.
 - Goods Issue records shipment history, deducts picked stock, updates serials and order counters, and marks the Load and Dispatch shipped in one transaction.
+
+![Light-theme Shipment tab with the Goods Issue readiness checks](../assets/screens/shipping-goods-issue.jpg)
+
+*The `Shipment` tab explains every prerequisite before enabling `Ship…`. Shipment writes one receipt per order. The final transaction rechecks physical contents and outbound holds; the action separately requires shipment permission.*
 
 ### If something goes wrong
 
@@ -741,8 +748,8 @@ Loading-order choices are `Last delivery stop first`, `First delivery stop first
 | The unit is out of sequence (`LD_WRONG_LOAD_SEQUENCE`) | Leave it unloaded. Load the current stop group or explicitly planned unit first; do not change the plan merely to bypass the refusal. |
 | The unit is already loaded (`LD_ALREADY_LOADED`) | Do not confirm it again. Review the current Load's composition, progress and unload history before continuing. |
 | The unit belongs to another Load (`LD_IN_ANOTHER_LOAD`) | Stop loading it. Ask a supervisor or support to identify the active Load and reconcile the physical unit before either Load continues. |
-| A unit was confirmed loaded by mistake | Before shipment, use `Acknowledge physical unload` in the Load view, or `Loading > Unload / Cancel (Supervisor)` on RF. Scan the removed root and enter a reason. This preserves history and does not move stock. |
-| The Load must be cancelled | Physically unload and acknowledge every unit first, then use `Cancel empty Load`. |
+| A unit was confirmed loaded by mistake | Before shipment, use `Physical unload…` on the dispatch `Loading` tab, or `Loading > Unload / Cancel (Supervisor)` on RF. Scan the removed root and enter a reason. This preserves history and does not move stock. |
+| The Load must be cancelled | Physically unload and acknowledge every unit first, then use `Cancel load…`. |
 | Shipment is already committed | Do not repeat or reverse it from a generic status control. Use the immutable `Shipments` record as the receipt and follow the site's controlled correction process. |
 
 Loading refusal text can be translated or reworded. Support tools and API clients should route on the stable `LD_...` code returned with the refusal, not on its English text.
