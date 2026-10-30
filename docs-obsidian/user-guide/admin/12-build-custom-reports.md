@@ -23,7 +23,9 @@ The designer keeps the report definition, data and document layout on one screen
 - Decide who will use the report, what one row means and which filters are needed.
 - Start with a small result set. A report query must be read-only.
 
-![Reports catalogue with the Report designer and Create report controls](../assets/screens/reports.png)
+![Custom report catalogue with the Create report action](../assets/screens/report-catalogue-custom.jpg)
+
+*Filter the catalogue to `Custom` to review reports built for your operation. Select `Create report` to start the report shell.*
 
 ## Know the designer workspace
 
@@ -54,8 +56,8 @@ flowchart LR
 
 ## 1. Create the report shell
 
-1. Click **Report designer** above the report catalogue.
-2. Click **New report** if the designer opened an existing report.
+1. Click **Create report** in the report catalogue.
+2. If the designer is already open on another report, click **New report** instead.
 3. Enter a clear **Report name**.
 4. Enter a stable **Report code**, for example `sku_catalogue`.
 5. Edit the starter template if needed.
@@ -63,6 +65,8 @@ flowchart LR
 7. Click **Create report**.
 
 After creation, the **Parameters**, **Datasets** and **Properties** tabs become available.
+
+The designer may show an empty document for a moment while it renders the starter template. Wait for the preview before continuing. Creating the shell does not run a warehouse query; data is added in **Datasets**.
 
 The report code cannot be changed later. It is used by catalogue links and report access rules. To use another code, create a new report and remove the old one after the replacement has been tested.
 
