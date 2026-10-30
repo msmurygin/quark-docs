@@ -24,6 +24,10 @@ The upper and lower areas have separate toolbars. Check which area you are worki
 
 See [Interface overview](../../admin/01-interface-overview.md#5-record-and-document-screens) for the common header-and-lines pattern.
 
+![Order document with separate header and line toolbars](../../assets/screens/interface-order-detail.png)
+
+*Caption: the order screen. Focus: the upper toolbar changes the order; the lower toolbar changes its lines.*
+
 ## Order tabs
 
 | Tab | What it holds | Details |

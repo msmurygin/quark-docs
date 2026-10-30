@@ -22,6 +22,10 @@ If the list is empty or an expected order is missing, confirm the warehouse code
 
 See [Interface overview](../../admin/01-interface-overview.md#4-list-screens) for the common list controls.
 
+![Orders list with filters, columns and saved views](../../assets/screens/interface-order-list.png)
+
+*Caption: the Orders list. Focus: More filters, Columns and Views control what the table shows; select an order row to open it.*
+
 ## Toolbar
 
 | Button | What it does |
