@@ -229,26 +229,21 @@ Group unreleased orders, review the complete composition and release the group t
 ### Steps
 
 1. Open `Sidebar > Management & Control > Orders & Waves > Waves`.
-2. Click `New Wave`, enter `Wave code`, and click `Create`.
-3. Open the wave and click `Composition and progress`.
-4. Click `Add Order`, choose `Unreleased Order`, optionally enter `Membership sequence` and `Member priority`, then click `Review` and `Confirm Draft edit`.
-5. Repeat for the orders in this wave. Use `Remove Order` to correct the draft.
-6. Optional: click `Station`, select the `Sort` station, then review and confirm the draft edit.
-7. Review the complete member list, then click `Release` and `Confirm Wave action`.
-8. If some members were blocked or failed, correct their order data and click `Retry blocked`.
-9. Use `Cancel Wave` only while the wave is still unstarted (`Draft` or `Planned`).
-
-![Wave list with the current status and reviewed version](../assets/screens/wave-list-form.png)
-
-*Wave list with current status and reviewed version. Focus: 1 creates a wave; 2 opens the wave whose composition or release result needs review.*
-
-![Wave card composition and action toolbar](../assets/screens/wave-card-form.png)
-
-*Wave card with composition, progress and controlled actions. Focus: 1 shows the wave state and release progress; 2 contains member counts and the controlled action toolbar.*
+2. Click `New Wave`, review the generated `Wave code`, and click `Create`.
+3. Open the wave. The header shows `Release at`, the order count, completed pick tasks and when release started. Use the `Orders` tab to review the composition.
+4. Choose `Add order…`, select an order that is not released and is not in another wave, then set its optional `Sequence` and `Priority`.
+5. Repeat until all intended orders are visible. To correct the draft, select one order and choose `Remove order…`.
+6. Optional: choose `Station…` and select the `Put wall` in the `Sort station` window. Leave it empty when the wave does not use a sort station. Station capacity is checked when release starts.
+7. Optional: choose `Release time…` and enter a future time. The wave remains editable in `Draft` until the system releases it. Leave the field empty to release manually.
+8. For a manual release, choose `Release…`. Check the station and order count in the confirmation, then confirm.
+9. If an order becomes `Blocked` or `Failed`, correct the reported cause. Choose `Retry blocked…` to try all such orders again. While the wave is `Released`, you can instead select and remove one problem order. Release it separately or add it to another wave only if the order itself is still unreleased; if the order launched but its reservation failed, correct the allocation cause and use retry.
+10. Choose `Cancel wave…` only before protected member work starts. Cancellation is final; create a new wave if those orders must be released later.
 
 ### Field reference
 
-The wave card shows `Status`, `Release generation`, station, member counts and the release result of every order. Wave statuses are `Draft`, `Planned`, `Released`, `InProgress`, `Completed`, `Cancelled`. There is no `Releasing` wave status. After you confirm `Release`, the wave is `Planned` while its order rows move through the release queue. When no order is `Pending` or `Processing`, the wave becomes `Released`; picking can later move it to `InProgress` and `Completed`.
+The wave card has two tabs. `Orders` shows `Order`, `Customer`, `Ship by`, `Priority`, `Lines`, `Status in wave`, `Attempts`, `Picks`, `Reason` and `Dispatch`. `Audit` shows when the wave was created, released, completed or cancelled and who performed the action.
+
+Wave statuses are `Draft`, `Planned`, `Released`, `In progress`, `Completed`, `Cancelled`. There is no separate `Releasing` status. After you confirm release, the wave is `Planned` while its order rows move through the release queue. When no order is `Pending` or `Processing`, the wave becomes `Released`; picking can later move it to `In progress` and `Completed`. `Completed` means the wave's known picking work is complete; it does not wait for shipping.
 
 Each order in the wave has its own status:
 
@@ -262,11 +257,11 @@ Each order in the wave has its own status:
 | `Failed` | The release attempt ended with an operational failure. | Read the saved detail, confirm the cause is resolved, then use `Retry blocked`. |
 | `Skipped` | The order was already released, so the wave did not repeat release. | Review the order's current work; no retry is required. |
 
-The current web screen enables `Retry blocked` only when the wave is `Released`; after you click it, the review proceeds only when at least one member is `Blocked` or `Failed`. The API also accepts the retry while the wave is `InProgress` or `Completed`, but the web button does not expose those two states yet. `Cancel Wave` is limited to `Draft` or `Planned` before any member reaches `Processing`, `Released` or `Skipped`; the confirmation does not ask for a reason.
+`Retry blocked…` is available in `Released`, `In progress` and `Completed`. It queues only `Blocked` and `Failed` orders; it does not duplicate work that already launched successfully. In `Released`, you can instead select and remove one `Blocked` or `Failed` order at a time. `Cancel wave…` is limited to `Draft` or `Planned` before any member reaches `Processing`, `Released` or `Skipped`.
 
 ```mermaid
 flowchart LR
-    A[Wave: Draft] -->|Release| B[Wave: Planned]
+    A[Wave: Draft] -->|Manual or scheduled release| B[Wave: Planned]
     B --> C[Order: Pending]
     C --> D[Order: Processing]
     D --> E{Saved release result}
@@ -280,11 +275,17 @@ flowchart LR
     I --> J
     J -->|Yes| B
     J -->|No| K[Wave: Released]
+    K -->|Retry blocked or failed| B
+    L[Wave: In progress] -->|Retry blocked or failed| B
+    N[Wave: Completed] -->|Retry blocked or failed| B
+    K -->|Picking starts| L
+    K -->|All known picking work is already complete| N
+    L -->|Known picking work is complete| N
     A -->|Cancel Wave| M[Wave: Cancelled]
     B -->|Cancel before member work starts| M
 ```
 
-The diagram stops when the release generation settles. Picking status uses separate, complete work evidence: a non-station wave becomes `InProgress` when pick or task work exists, while a station wave waits until its first shared tote reaches the station. `Completed` requires all known work to be finished, no broken work links and every station position to be free. A `Blocked` member can be terminal only when it has explicitly zero work; a `Failed` member never proves completion.
+After the release generation settles, picking status uses separate, complete work evidence: a non-station wave becomes `In progress` when pick or task work exists, while a station wave waits until its first shared tote reaches the station. A wave can move directly from `Released` to `Completed` when all known work is already terminal. `Completed` requires all known work to be finished, no broken work links and every station position to be free. A `Blocked` member can be terminal only when it has explicitly zero work; a `Failed` member never proves completion.
 
 ### Configure an automatic wave strategy
 
