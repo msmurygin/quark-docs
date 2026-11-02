@@ -141,6 +141,36 @@ On each screen the line above the field shows what is expected. The footer shows
 ![PICK15 - Confirm Lot Attribute](../assets/screens/PICK15.png)
 *Screen PICK15: attribute name, expected value, and Value.*
 
+#### Use another LPN of the same lot
+
+Use this option when the reserved pallet is unavailable but another pallet at
+the same source location contains the same owner, SKU and lot.
+
+1. On **Confirm Source LPN**, scan the pallet that is physically available.
+2. The terminal keeps you on the screen and shows
+   **F8: take {scanned LPN} instead (same lot only)**.
+3. Check the label and press `F8` (**Use this LPN**).
+4. The system moves the remaining reservation to that LPN and continues with
+   the next confirmation. Use only the newly accepted LPN for this pick.
+
+This option is available in discrete picking, cart picking and a station route.
+It does not split the required quantity between two source LPNs.
+
+The replacement is accepted only when all of these conditions are true:
+
+- both LPNs are at the same source location;
+- the replacement contains the same owner, SKU, lot, unit and pack as the
+  reserved stock;
+- it has enough free quantity for the whole remaining pick;
+- it is not held against outbound work; and
+- serial capture has not started for the pick.
+
+The terminal refuses the replacement when the pick must ship as its original
+factory package. It also refuses an unknown LPN, the already reserved LPN, an
+LPN with a different lot, an LPN with too little free stock or one whose stock
+cannot be identified unambiguously. Read the message, leave the reservation as
+it is and use the reserved LPN or ask a supervisor to resolve the stock.
+
 ### A6. Confirm the quantity
 
 ![PICK08 - Confirm Quantity](../assets/screens/PICK08.png)
@@ -340,6 +370,10 @@ If you already hold an assignment, the terminal resumes it.
 
 ![PKA21A - Confirm Lot Attribute](../assets/screens/PKA21A.png)
 *Screen PKA21A: attribute and Value.*
+
+If the reserved LPN is unavailable, scan another LPN of the same lot and use
+`F8` only when the terminal offers **Use this LPN**. The same checks and limits
+as [Use another LPN of the same lot](#use-another-lpn-of-the-same-lot) apply.
 
 4. On **Confirm Quantity** (`PKA24`), check **Required** and **Picked qty**. Press `Enter`.
 
@@ -590,7 +624,11 @@ flowchart TD
 | **task {id} is not assigned to you (currently: {user})** | Another user has the task. | Ask for work again. |
 | **Pick task {id} has instructions the picker has not acknowledged** | You skipped the instructions. | Read and acknowledge them. |
 | **pick {id} needs source confirmation first: {list}** | You must confirm the source first. | Scan the location, item, LPN or lot as asked. |
-| **scanned LPN {scanned} is not the reserved source LPN** | You scanned the wrong pallet. | Scan the pallet shown in **Source LPN**. |
+| **scanned LPN {scanned} is not the reserved source LPN** | The scanned pallet is not the reserved source. The terminal may offer `F8` when it can be considered as a replacement. | Scan the pallet shown in **Source LPN**, or check the offered LPN and press `F8` only when it contains the same owner, SKU, lot, unit and pack. |
+| **LPN {lpn} has {free} free, the pick needs {needs}** | The replacement LPN cannot cover the whole remaining pick. | Use the reserved LPN or another same-lot LPN with enough free stock. Do not split the substitution across LPNs. |
+| **LPN {lpn} is on a hold that blocks outbound flow** | The replacement stock is held. | Leave it in place and ask a supervisor to resolve the hold. |
+| **this pick ships as its factory package: its LPN cannot be replaced** | The original package is part of what must be shipped. | Use the reserved LPN. |
+| **serials are being captured for this pick: finish or cancel them first** | The serial episode already belongs to the reserved LPN. | Continue with the reserved LPN. Ask a supervisor if the source must change. |
 | **scanned lot {scanned} is not the reserved internal lot** | You scanned the wrong lot. | Scan the lot shown in **Lot**. |
 | **lot attributes do not match the reserved lot: {codes}** | The goods in your hand have other lot attributes. | Check the goods. Use `F7` (**Reject**) or `F6` (**Short**) if needed. |
 | **{n} lots in the source match the confirmed attributes** | The source has several matching lots. | Tell your supervisor. |

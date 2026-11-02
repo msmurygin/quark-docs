@@ -73,6 +73,28 @@ Tab `Dates`: `Receipt Date`, `Effective Date`, `Close Date`, `Arrival Date`, `Ac
 Tab `Summary` (read-only): `Completion`, `Version`, `Close Summary`, `Cancel Summary`.
 Other tabs: `Audit`, `Damage Records`, `Expected Boxes` (buttons `Move Boxes`, `Cancel Box`).
 
+### Temperature rules and their current scope
+
+The system has two separate kinds of temperature rule:
+
+- A SKU can require a temperature reading and define an accepted and warning
+  range on its **Temperature & Aging** tab. When a receiving integration sends
+  a reading, the system validates it. A value outside the accepted range is a
+  warning that can require approval; a value outside the warning range can put
+  the received LPN on `QcQuarantine` hold. Without an LPN, the hold covers the
+  destination location and therefore affects other stock in that location too.
+- A putaway zone can define its storage range. A putaway-policy step with
+  **Temperature** on uses the SKU and zone ranges to avoid an unsuitable zone.
+
+The standard RF receiving screens and the web **Receive line** window do not
+currently ask the operator for a temperature reading. Do not switch on
+**Requires Temperature Capture** for those workflows: a receive without the
+reading is refused. Use it only when the receiving integration supplies the
+temperature.
+
+These settings are storage and receiving checks. They do not collect live
+sensor readings or provide continuous temperature monitoring.
+
 Receipt line, tab `Detail` (`receipt_detail_fields_form`):
 
 | Field | Meaning | Allowed values | Example |
