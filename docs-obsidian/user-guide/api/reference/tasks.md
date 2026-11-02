@@ -45,6 +45,7 @@ Count work_area — CRUD.
 | `filters[].picking_policy_code` | string filter | no | Filter on `picking_policy_code`. |
 | `filters[].pack_station_location` | string filter | no | Filter on `pack_station_location`. |
 | `filters[].consolidation_station_location` | string filter | no | Filter on `consolidation_station_location`. |
+| `filters[].control_station_location` | string filter | no | Filter on `control_station_location`. |
 | `filters[].add_who` | integer filter | no | Filter on `add_who`. |
 | `filters[].add_when` | value (date, time or other) filter | no | Filter on `add_when`. |
 | `filters[].mod_who` | integer filter | no | Filter on `mod_who`. |
@@ -126,10 +127,11 @@ Create a work area, optionally naming its pack station (a Pack location).
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (WorkAreaForCreate) | yes | A field left `None` is left out of the INSERT, so the column takes its DEFAULT (`''`, `1`, `true` — wms-app 315). |
+| `data` | object (WorkAreaForCreate) | yes | A field left `None` is left out of the INSERT, so the column takes its DEFAULT. |
 | `data.allow_task_release` | boolean or null | no |  |
 | `data.code` | string | yes |  |
 | `data.consolidation_station_location` | string or null | no |  |
+| `data.control_station_location` | string or null | no |  |
 | `data.description` | string or null | no |  |
 | `data.max_concurrent_tasks` | integer (int16) or null | no |  |
 | `data.pack_station_location` | string or null | no |  |
@@ -144,13 +146,14 @@ The `result` member of the response is: `{ "data": WorkArea }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.allow_task_release` | boolean | yes | May an operator hand a task back here (Infor "Sign Off Allowed"). |
 | `data.code` | string | yes |  |
-| `data.consolidation_station_location` | string or null | no | The area's consolidation station (consolidation H1; wms-app 20261021191021): the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.consolidation_station_location` | string or null | no | The area's consolidation station: the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.control_station_location` | string or null | no | The area's order control station: the `Control` location where every container of an order is checked before it goes on. |
 | `data.description` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area (spec §4.1). |
+| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.pack_station_location` | string or null | no | The area's pack station (wms-app 065; post-pick spec O-1, D-55): the `Pack` location where its carriers are delivered when their units go to packing. |
+| `data.pack_station_location` | string or null | no | The area's pack station: the `Pack` location its carriers are delivered to when their units go to packing. |
 | `data.picking_policy_code` | string or null | no | Code of the picking policy this area works by (its published revision); `None` = `DISCRETE`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -324,13 +327,14 @@ The `result` member of the response is: `{ "data": WorkArea }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.allow_task_release` | boolean | yes | May an operator hand a task back here (Infor "Sign Off Allowed"). |
 | `data.code` | string | yes |  |
-| `data.consolidation_station_location` | string or null | no | The area's consolidation station (consolidation H1; wms-app 20261021191021): the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.consolidation_station_location` | string or null | no | The area's consolidation station: the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.control_station_location` | string or null | no | The area's order control station: the `Control` location where every container of an order is checked before it goes on. |
 | `data.description` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area (spec §4.1). |
+| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.pack_station_location` | string or null | no | The area's pack station (wms-app 065; post-pick spec O-1, D-55): the `Pack` location where its carriers are delivered when their units go to packing. |
+| `data.pack_station_location` | string or null | no | The area's pack station: the `Pack` location its carriers are delivered to when their units go to packing. |
 | `data.picking_policy_code` | string or null | no | Code of the picking policy this area works by (its published revision); `None` = `DISCRETE`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -499,13 +503,14 @@ The `result` member of the response is: `{ "data": WorkArea }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.allow_task_release` | boolean | yes | May an operator hand a task back here (Infor "Sign Off Allowed"). |
 | `data.code` | string | yes |  |
-| `data.consolidation_station_location` | string or null | no | The area's consolidation station (consolidation H1; wms-app 20261021191021): the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.consolidation_station_location` | string or null | no | The area's consolidation station: the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.control_station_location` | string or null | no | The area's order control station: the `Control` location where every container of an order is checked before it goes on. |
 | `data.description` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area (spec §4.1). |
+| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.pack_station_location` | string or null | no | The area's pack station (wms-app 065; post-pick spec O-1, D-55): the `Pack` location where its carriers are delivered when their units go to packing. |
+| `data.pack_station_location` | string or null | no | The area's pack station: the `Pack` location its carriers are delivered to when their units go to packing. |
 | `data.picking_policy_code` | string or null | no | Code of the picking policy this area works by (its published revision); `None` = `DISCRETE`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -669,6 +674,7 @@ List work_area — CRUD.
 | `filters[].picking_policy_code` | string filter | no | Filter on `picking_policy_code`. |
 | `filters[].pack_station_location` | string filter | no | Filter on `pack_station_location`. |
 | `filters[].consolidation_station_location` | string filter | no | Filter on `consolidation_station_location`. |
+| `filters[].control_station_location` | string filter | no | Filter on `control_station_location`. |
 | `filters[].add_who` | integer filter | no | Filter on `add_who`. |
 | `filters[].add_when` | value (date, time or other) filter | no | Filter on `add_when`. |
 | `filters[].mod_who` | integer filter | no | Filter on `mod_who`. |
@@ -687,13 +693,14 @@ The `result` member of the response is: `{ "data": [WorkArea] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].allow_task_release` | boolean | yes | May an operator hand a task back here (Infor "Sign Off Allowed"). |
 | `data[].code` | string | yes |  |
-| `data[].consolidation_station_location` | string or null | no | The area's consolidation station (consolidation H1; wms-app 20261021191021): the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data[].consolidation_station_location` | string or null | no | The area's consolidation station: the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data[].control_station_location` | string or null | no | The area's order control station: the `Control` location where every container of an order is checked before it goes on. |
 | `data[].description` | string | yes |  |
 | `data[].id` | integer (int64) | yes |  |
-| `data[].max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area (spec §4.1). |
+| `data[].max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].pack_station_location` | string or null | no | The area's pack station (wms-app 065; post-pick spec O-1, D-55): the `Pack` location where its carriers are delivered when their units go to packing. |
+| `data[].pack_station_location` | string or null | no | The area's pack station: the `Pack` location its carriers are delivered to when their units go to packing. |
 | `data[].picking_policy_code` | string or null | no | Code of the picking policy this area works by (its published revision); `None` = `DISCRETE`. |
 
 **Errors**
@@ -836,6 +843,7 @@ Update work-area behavior and its pack station without changing its stable code.
 | `data` | object (WorkAreaUpdateApi) | yes |  |
 | `data.allow_task_release` | boolean | no |  |
 | `data.consolidation_station_location` | string or null | no |  |
+| `data.control_station_location` | string or null | no |  |
 | `data.description` | string | no |  |
 | `data.max_concurrent_tasks` | integer (int16) | no |  |
 | `data.pack_station_location` | string or null | no |  |
@@ -850,13 +858,14 @@ The `result` member of the response is: `{ "data": WorkArea }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.allow_task_release` | boolean | yes | May an operator hand a task back here (Infor "Sign Off Allowed"). |
 | `data.code` | string | yes |  |
-| `data.consolidation_station_location` | string or null | no | The area's consolidation station (consolidation H1; wms-app 20261021191021): the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.consolidation_station_location` | string or null | no | The area's consolidation station: the `Consolidation` location where its packed units are put onto outbound pallets. |
+| `data.control_station_location` | string or null | no | The area's order control station: the `Control` location where every container of an order is checked before it goes on. |
 | `data.description` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area (spec §4.1). |
+| `data.max_concurrent_tasks` | integer (int16) | yes | Tasks one operator may hold at once inside this area — only when the terminal names the area. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.pack_station_location` | string or null | no | The area's pack station (wms-app 065; post-pick spec O-1, D-55): the `Pack` location where its carriers are delivered when their units go to packing. |
+| `data.pack_station_location` | string or null | no | The area's pack station: the `Pack` location its carriers are delivered to when their units go to packing. |
 | `data.picking_policy_code` | string or null | no | Code of the picking policy this area works by (its published revision); `None` = `DISCRETE`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -1111,7 +1120,7 @@ Create a new equipment_profile — CRUD.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (EquipmentProfileForCreate) | yes | A field left `None` is left out of the INSERT, so the column takes its DEFAULT (`''`, `0`, `0`, `true` — wms-app 320). |
+| `data` | object (EquipmentProfileForCreate) | yes | A field left `None` is left out of the INSERT, so the column takes its DEFAULT. |
 | `data.code` | string | yes |  |
 | `data.description` | string or null | no |  |
 | `data.is_active` | boolean or null | no |  |
@@ -2577,7 +2586,7 @@ The `result` member of the response is: `{ "data": Operator }`
 |---|---|---|---|
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
-| `data.equipment_profile_id` | integer (int64) or null | no | The machine this operator drives (`equipment_profile`, wms-app 320); `None` = on foot. |
+| `data.equipment_profile_id` | integer (int64) or null | no | The machine this operator drives; `None` = on foot. |
 | `data.full_name` | string or null | no |  |
 | `data.id` | integer (int64) | yes | Equals `enterprise.user.id` — see the module doc comment. |
 | `data.is_active` | boolean | yes |  |
@@ -2764,7 +2773,7 @@ The `result` member of the response is: `{ "data": [Operator] }`
 |---|---|---|---|
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
-| `data[].equipment_profile_id` | integer (int64) or null | no | The machine this operator drives (`equipment_profile`, wms-app 320); `None` = on foot. |
+| `data[].equipment_profile_id` | integer (int64) or null | no | The machine this operator drives; `None` = on foot. |
 | `data[].full_name` | string or null | no |  |
 | `data[].id` | integer (int64) | yes | Equals `enterprise.user.id` — see the module doc comment. |
 | `data[].is_active` | boolean | yes |  |
@@ -3001,7 +3010,7 @@ The `result` member of the response is: `{ "data": Operator }`
 |---|---|---|---|
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
-| `data.equipment_profile_id` | integer (int64) or null | no | The machine this operator drives (`equipment_profile`, wms-app 320); `None` = on foot. |
+| `data.equipment_profile_id` | integer (int64) or null | no | The machine this operator drives; `None` = on foot. |
 | `data.full_name` | string or null | no |  |
 | `data.id` | integer (int64) | yes | Equals `enterprise.user.id` — see the module doc comment. |
 | `data.is_active` | boolean | yes |  |
@@ -3296,7 +3305,7 @@ The `result` member of the response is: `{ "data": Task }`
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -3308,8 +3317,8 @@ The `result` member of the response is: `{ "data": Task }`
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -3324,7 +3333,7 @@ The `result` member of the response is: `{ "data": Task }`
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -3418,7 +3427,7 @@ The `result` member of the response is: `{ "data": [Task] }`
 | `data[].container_id` | integer (int64) or null | no |  |
 | `data[].created_at` | string | yes |  |
 | `data[].ended_at` | string or null | no |  |
-| `data[].escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data[].escalated_at` | string or null | no |  |
 | `data[].from_location` | string or null | no |  |
 | `data[].heartbeat_at` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
@@ -3430,8 +3439,8 @@ The `result` member of the response is: `{ "data": [Task] }`
 | `data[].priority` | integer (int16) | yes |  |
 | `data[].qty` | number (double) or null | no |  |
 | `data[].qty_done` | number (double) | yes |  |
-| `data[].refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data[].return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data[].refused_count` | integer (int32) | yes |  |
+| `data[].return_kind` | string or null | no |  |
 | `data[].short_reason_code` | string or null | no |  |
 | `data[].short_reason_note` | string or null | no |  |
 | `data[].skip_reason` | string or null | no |  |
@@ -3446,7 +3455,7 @@ The `result` member of the response is: `{ "data": [Task] }`
 | `data[].uom` | string or null | no |  |
 | `data[].version` | integer (int32) | yes |  |
 | `data[].wave_id` | integer (int64) or null | no |  |
-| `data[].weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data[].weight` | number (double) or null | no |  |
 | `data[].workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -3515,7 +3524,7 @@ Claim work: your own unfinished task if you have one, else one from the pool.
 | `data` | object (ClaimTask) | yes | `task_claim` wire command. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.task_type` | one of: Pick \| Putaway \| Replenish \| Move \| Count | yes |  |
-| `data.work_area_id` | integer (int64) or null | no | The work area the terminal is set to, when it names one (spec §4.1): only that area's tasks are handed out. |
+| `data.work_area_id` | integer (int64) or null | no | The work area the terminal is set to, when it names one: only that area's tasks are handed out. |
 
 **Result**
 
@@ -3535,7 +3544,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.container_id` | integer (int64) or null | no |  |
 | `data.task.created_at` | string | yes |  |
 | `data.task.ended_at` | string or null | no |  |
-| `data.task.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.task.escalated_at` | string or null | no |  |
 | `data.task.from_location` | string or null | no |  |
 | `data.task.heartbeat_at` | string or null | no |  |
 | `data.task.id` | integer (int64) | yes |  |
@@ -3547,8 +3556,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.priority` | integer (int16) | yes |  |
 | `data.task.qty` | number (double) or null | no |  |
 | `data.task.qty_done` | number (double) | yes |  |
-| `data.task.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.task.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.task.refused_count` | integer (int32) | yes |  |
+| `data.task.return_kind` | string or null | no |  |
 | `data.task.short_reason_code` | string or null | no |  |
 | `data.task.short_reason_note` | string or null | no |  |
 | `data.task.skip_reason` | string or null | no |  |
@@ -3563,7 +3572,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.uom` | string or null | no |  |
 | `data.task.version` | integer (int32) | yes |  |
 | `data.task.wave_id` | integer (int64) or null | no |  |
-| `data.task.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.task.weight` | number (double) or null | no |  |
 | `data.task.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -3639,12 +3648,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.launch_cleared` | boolean | yes | The last task of the order was deleted and the launch was cleared. |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
-| `data.new_version` | integer (int32) | yes | The order header version after the command. |
+| `data.launch_cleared` | boolean | yes |  |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
+| `data.new_version` | integer (int32) | yes |  |
 | `data.order_id` | integer (int64) | yes |  |
-| `data.order_number` | string | yes | The order number, for the message on the screen: a supervisor knows the order by number, not by id. |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The order status AFTER the recount in this same transaction, so the screen need not guess (the same contract as `DeletePickDetailResult`). |
+| `data.order_number` | string | yes |  |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes |  |
 | `data.pick_detail_id` | integer (int64) | yes |  |
 | `data.task_id` | integer (int64) | yes |  |
 
@@ -3745,16 +3754,16 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.deleted` | array of object (DeleteTaskResult) | yes | The deleted tasks, in the order they were sent, one `DeleteTask` answer per task (with the order, the statuses and `launch_cleared`). |
-| `data.deleted[].launch_cleared` | boolean | yes | The last task of the order was deleted and the launch was cleared. |
-| `data.deleted[].line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
-| `data.deleted[].new_version` | integer (int32) | yes | The order header version after the command. |
+| `data.deleted` | array of object (DeleteTaskResult) | yes |  |
+| `data.deleted[].launch_cleared` | boolean | yes |  |
+| `data.deleted[].line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
+| `data.deleted[].new_version` | integer (int32) | yes |  |
 | `data.deleted[].order_id` | integer (int64) | yes |  |
-| `data.deleted[].order_number` | string | yes | The order number, for the message on the screen: a supervisor knows the order by number, not by id. |
-| `data.deleted[].order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The order status AFTER the recount in this same transaction, so the screen need not guess (the same contract as `DeletePickDetailResult`). |
+| `data.deleted[].order_number` | string | yes |  |
+| `data.deleted[].order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes |  |
 | `data.deleted[].pick_detail_id` | integer (int64) | yes |  |
 | `data.deleted[].task_id` | integer (int64) | yes |  |
-| `data.refused` | array of object (TaskNotDeleted) | yes | The tasks that were not deleted, each with the reason in plain words. |
+| `data.refused` | array of object (TaskNotDeleted) | yes |  |
 | `data.refused[].reason` | string | yes |  |
 | `data.refused[].task_id` | integer (int64) | yes |  |
 
@@ -3876,7 +3885,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -3888,8 +3897,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -3904,7 +3913,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -3991,7 +4000,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -4003,8 +4012,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -4019,7 +4028,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -4106,7 +4115,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -4118,8 +4127,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -4134,7 +4143,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -4221,7 +4230,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -4233,8 +4242,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -4249,7 +4258,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -4337,7 +4346,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -4349,8 +4358,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -4365,7 +4374,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**
@@ -4432,7 +4441,7 @@ Give a claimed task back: refuse it (cools down) or hand it back (available at o
 | `data` | object | yes | `task_skip` wire command. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.task_id` | integer (int64) | yes |  |
-| `data.work_area_id` | integer (int64) or null | no | The work area the terminal is set to (step 6). |
+| `data.work_area_id` | integer (int64) or null | no |  |
 
 **Result**
 
@@ -4451,7 +4460,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.created_at` | string | yes |  |
 | `data.ended_at` | string or null | no |  |
-| `data.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.escalated_at` | string or null | no |  |
 | `data.from_location` | string or null | no |  |
 | `data.heartbeat_at` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
@@ -4463,8 +4472,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.priority` | integer (int16) | yes |  |
 | `data.qty` | number (double) or null | no |  |
 | `data.qty_done` | number (double) | yes |  |
-| `data.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.refused_count` | integer (int32) | yes |  |
+| `data.return_kind` | string or null | no |  |
 | `data.short_reason_code` | string or null | no |  |
 | `data.short_reason_note` | string or null | no |  |
 | `data.skip_reason` | string or null | no |  |
@@ -4479,7 +4488,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.uom` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 | `data.wave_id` | integer (int64) or null | no |  |
-| `data.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.weight` | number (double) or null | no |  |
 | `data.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 **Errors**

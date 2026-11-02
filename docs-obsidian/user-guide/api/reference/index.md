@@ -1,6 +1,7 @@
 # API reference index
 
-This customer reference lists **932** WMS JSON-RPC methods from the published OpenRPC snapshot (`openrpc.json`). Service-internal and non-WMS product surfaces are not included.
+This reference lists **960** JSON-RPC methods. It is generated from the production OpenRPC catalog (`openrpc.json`). The catalog holds 960 methods.
+The catalog is the production catalog. No registered method is hidden: the server routes all 960 methods it registers for discovery.
 
 ## How to read a method entry
 
@@ -15,11 +16,11 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 
 | Category | Methods |
 |---|---|
-| query | 23 |
-| query (read method, type not declared) | 438 |
-| stateful_command | 124 |
-| stateless_command | 176 |
-| write method, type not declared | 171 |
+| query | 33 |
+| query (read method, type not declared) | 439 |
+| stateful_command | 137 |
+| stateless_command | 183 |
+| write method, type not declared | 168 |
 
 "Type not declared" means the method has no `x-quark-command-type` in the catalog. For a read method the reference still shows the category `query`, inferred from the operation. For a write method it shows `not declared`.
 
@@ -102,7 +103,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [update_system_settings](enterprise.md#update_system_settings) | not declared* | Update the value of an editable system setting; metadata is immutable. |
 | [update_user](enterprise.md#update_user) | not declared* | Update an account through the guarded security model; audit facts are read-only. |
 | [update_user_warehouse](enterprise.md#update_user_warehouse) | not declared* | Update an assignment's role/default marker; null and identity changes are rejected. |
-| [warehouse_admin_create](enterprise.md#warehouse_admin_create) | not declared* | Create an inactive warehouse and provision its complete application schema. |
+| [warehouse_admin_create](enterprise.md#warehouse_admin_create) | stateless_command | Create an inactive warehouse, provision its schema, and apply WarehouseBootstrapV1 with durable replay. |
 | [warehouse_admin_get](enterprise.md#warehouse_admin_get) | query* | Read one warehouse definition and schema readiness in Enterprise administration. |
 | [warehouse_admin_list](enterprise.md#warehouse_admin_list) | query* | List warehouse definitions and actual schema readiness in Enterprise administration. |
 | [warehouse_admin_update](enterprise.md#warehouse_admin_update) | not declared* | Rename or change warehouse activity; activation requires current schema migrations. |
@@ -147,7 +148,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [create_pack](master_data.md#create_pack) | not declared* | Create a pack (header only) |
 | [create_pack_item](master_data.md#create_pack_item) | not declared* | Create a single pack item |
 | [create_pack_with_items](master_data.md#create_pack_with_items) | stateless_command | Create a pack with child items |
-| [create_putawayzone](master_data.md#create_putawayzone) | not declared* | Create a new putawayzone — CRUD. |
+| [create_putawayzone](master_data.md#create_putawayzone) | stateless_command | Create a putaway zone with durable caller-key replay. |
 | [create_putawayzone_lot_commingle](master_data.md#create_putawayzone_lot_commingle) | not declared* | Create a putawayzone lot commingle rule |
 | [create_sku](master_data.md#create_sku) | stateless_command | Create a SKU master-data root after validating its packaging UOM. |
 | [create_sku_barcode](master_data.md#create_sku_barcode) | stateless_command | Attach a barcode to one SKU, deriving owner and SKU code from its id. |
@@ -174,7 +175,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [delete_putawayzone_lot_commingle](master_data.md#delete_putawayzone_lot_commingle) | not declared* | Delete a putawayzone lot commingle rule |
 | [delete_sku](master_data.md#delete_sku) | stateless_command | Delete an unreferenced SKU and its owned serial configuration. |
 | [delete_sku_barcode](master_data.md#delete_sku_barcode) | not declared* | Delete a sku_barcode by ID — CRUD. |
-| [gen_locs](master_data.md#gen_locs) | not declared* | Generate locations from a pattern (bulk create) |
+| [gen_locs](master_data.md#gen_locs) | stateless_command | Generate locations from a pattern (bulk create) |
 | [generate_check_digit](master_data.md#generate_check_digit) | query* | Compute check digit for a location code |
 | [get_barcode_format](master_data.md#get_barcode_format) | query* | Get a barcode_format by ID — CRUD. |
 | [get_barcode_format_detail](master_data.md#get_barcode_format_detail) | query* | Get a barcode_format_detail by ID — CRUD. |
@@ -339,7 +340,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [receipt_cancel](inbound.md#receipt_cancel) | stateful_command | Cancel a receipt (D-19, completion=Pending only). |
 | [receipt_cancel_planned_case](inbound.md#receipt_cancel_planned_case) | stateless_command | Cancel a planned case before it is received (D-69e SameReceipt). |
 | [receipt_close](inbound.md#receipt_close) | stateful_command | Close a receipt with optional discrepancy override (D-21). |
-| [receipt_create_case_level_asn](inbound.md#receipt_create_case_level_asn) | stateless_command | Load a case-level ASN (D-69, ADR-046). |
+| [receipt_create_case_level_asn](inbound.md#receipt_create_case_level_asn) | stateless_command | Load a case-level ASN. |
 | [receipt_damage_context](inbound.md#receipt_damage_context) | query | What a damage report on one receipt line is about: the line number, the SKU and its description, the receipt number, the line's unit, how m… |
 | [receipt_damage_destination](inbound.md#receipt_damage_destination) | query | Where a damage report of this severity sends the goods: whether the destination field is shown at all (only Major → QC and Total → Damage m… |
 | [receipt_damage_photo_upload_url](inbound.md#receipt_damage_photo_upload_url) | query | Ask for a presigned PUT link to upload one damage photo, for a receipt line. |
@@ -538,7 +539,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [update_sku_pick_location](inventory.md#update_sku_pick_location) | stateful_command | Edit a pick location of a SKU on the version read. |
 | [update_sku_serial_config](inventory.md#update_sku_serial_config) | not declared* | Update serial-tracking settings without changing their SKU identity. |
 
-### Outbound (263)
+### Outbound (291)
 
 [outbound.md](outbound.md). Shipping: shipment orders, allocation, waves, picking, packing, cartonization and replenishment policies.
 
@@ -590,7 +591,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [create_allocation_policy](outbound.md#create_allocation_policy) | stateless_command | Create an allocation policy whose steps are owned by the allocation pipeline. |
 | [create_cartonization_policy_detail_form](outbound.md#create_cartonization_policy_detail_form) | stateless_command | Add one carton candidate through the metadata detail form. |
 | [create_cartonization_policy_form](outbound.md#create_cartonization_policy_form) | stateless_command | Create a cartonization policy from the metadata form. |
-| [create_replenishment_policy](outbound.md#create_replenishment_policy) | stateless_command | Create a replenishment-policy root with replay protection. |
+| [create_replenishment_policy](outbound.md#create_replenishment_policy) | stateless_command | Create a replenishment-policy root with durable caller-key replay. |
 | [delete_allocation_policy](outbound.md#delete_allocation_policy) | stateless_command | Delete an unreferenced allocation policy and all of its owned steps. |
 | [delete_cartonization_policy](outbound.md#delete_cartonization_policy) | stateless_command | Delete an unreferenced cartonization policy and all of its owned cartons. |
 | [delete_cartonization_policy_detail_form](outbound.md#delete_cartonization_policy_detail_form) | stateless_command | Delete one carton candidate through the metadata detail form. |
@@ -600,17 +601,21 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [delete_many_replenishment_policy](outbound.md#delete_many_replenishment_policy) | not declared* | Delete multiple replenishment_policy by IDs — CRUD. |
 | [delete_replenishment_policy](outbound.md#delete_replenishment_policy) | not declared* | Delete a replenishment_policy by ID — CRUD. |
 | [dispatch_add_order](outbound.md#dispatch_add_order) | stateful_command | Add active Order planning intent to a Draft Dispatch. |
+| [dispatch_cancel](outbound.md#dispatch_cancel) | stateful_command | Cancel a Draft or Planned Dispatch before loading starts: its empty open load and its load plan are cancelled, its stage cards and order in… |
 | [dispatch_create](outbound.md#dispatch_create) | stateless_command | Create a manual Dispatch. |
 | [dispatch_get](outbound.md#dispatch_get) | query* | Get Dispatch stops, Order intent and physical unit assignments. |
 | [dispatch_header_get](outbound.md#dispatch_header_get) | query* | Read a flat Dispatch header and its current version, without claiming work. |
-| [dispatch_header_list](outbound.md#dispatch_header_list) | query* | Filter and page Dispatch headers for planning. |
-| [dispatch_list](outbound.md#dispatch_list) | query* | List Dispatches. |
+| [dispatch_header_list](outbound.md#dispatch_header_list) | query* | Filter and page Dispatch headers for planning, with their planned door and truck. |
+| [dispatch_list](outbound.md#dispatch_list) | query* | List Dispatches with their planned door and truck. |
 | [dispatch_order_list](outbound.md#dispatch_order_list) | query* | Filter and page current Order transport intent; removed history is excluded. |
 | [dispatch_plan](outbound.md#dispatch_plan) | stateful_command | Freeze a manually prepared Dispatch as Planned. |
 | [dispatch_remove_order](outbound.md#dispatch_remove_order) | stateful_command | Remove active Order planning intent from a Draft Dispatch. |
+| [dispatch_set_door](outbound.md#dispatch_set_door) | stateful_command | Plan or clear the door of a Draft or Planned Dispatch before its load opens. |
+| [dispatch_set_transport_unit](outbound.md#dispatch_set_transport_unit) | stateful_command | Plan or clear the truck of a Draft or Planned Dispatch before its load opens. |
 | [dispatch_stop_add](outbound.md#dispatch_stop_add) | stateful_command | Add an ordered delivery stop to a Draft Dispatch. |
 | [dispatch_stop_list](outbound.md#dispatch_stop_list) | query* | Filter and page ordered Dispatch stops, without changing their sequence. |
 | [dispatch_stop_resequence](outbound.md#dispatch_stop_resequence) | stateful_command | Replace the complete stop order of a Draft Dispatch and audit it. |
+| [dispatch_stop_set_stage_place](outbound.md#dispatch_stop_set_stage_place) | stateful_command | Choose or change a stop's stage place until its plan is frozen or a load opens. |
 | [dispatch_stop_update](outbound.md#dispatch_stop_update) | stateful_command | Edit a delivery stop on a Draft Dispatch. |
 | [find_shipment_order_by_number](outbound.md#find_shipment_order_by_number) | query* | Find a shipment order by order_number |
 | [get_allocation_policy](outbound.md#get_allocation_policy) | query* | Get a allocation_policy by ID — CRUD. |
@@ -641,6 +646,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [load_cancel](outbound.md#load_cancel) | stateful_command | Cancel an empty not-shipped Load after all physical units were explicitly unloaded. |
 | [load_complete](outbound.md#load_complete) | stateful_command | Complete all required units only after rechecking their immutable content. |
 | [load_get](outbound.md#load_get) | query* | Read current Load, transport, static manifest and membership from one snapshot. |
+| [load_goods_issue_get](outbound.md#load_goods_issue_get) | query* | Read the Orders a Load ships with their receipts, and while Loaded what Ship would recheck; changes nothing. |
 | [load_header_get](outbound.md#load_header_get) | query* | Read a flat Load header and its version without advancing physical loading or shipment. |
 | [load_header_list](outbound.md#load_header_list) | query* | Filter and page Load headers; no claims, loading facts or Goods Issue. |
 | [load_lookup](outbound.md#load_lookup) | query* | Look up an exact Load label without changing progress or stock. |
@@ -652,6 +658,8 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [load_plan_get](outbound.md#load_plan_get) | query* | Get stop groups and current physical planning members (not load authorization). |
 | [load_plan_header_get](outbound.md#load_plan_header_get) | query* | Read a flat Load Plan header and its seen version without advancing it. |
 | [load_plan_header_list](outbound.md#load_plan_header_list) | query* | Filter and page Load Plan headers; no membership or physical execution change. |
+| [load_plan_rebuild](outbound.md#load_plan_rebuild) | stateful_command | Rebuild a Draft or Planned plan with any rule; Explicit onto a stop rule drops the manual order. |
+| [load_plan_rebuild_preview](outbound.md#load_plan_rebuild_preview) | query* | Review a rebuild before it: the rule now and next, how many units change place, whether the manual order is lost. |
 | [load_plan_remove_unit](outbound.md#load_plan_remove_unit) | stateful_command | Remove an explicit planning member, without touching stock. |
 | [load_plan_reopen](outbound.md#load_plan_reopen) | stateful_command | Supervisor pre-Load replan with mandatory audited reason. |
 | [load_plan_resequence](outbound.md#load_plan_resequence) | stateful_command | Replace the complete explicit unit order. |
@@ -660,6 +668,17 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [load_unit_confirm](outbound.md#load_unit_confirm) | stateful_command | Confirm the scanned reviewed unit against current sequence/content; Loaded is not Shipped. |
 | [load_unit_remove](outbound.md#load_unit_remove) | stateful_command | Controlled physical unload acknowledgment with required scan/reason; preserve history and stock. |
 | [load_unit_review](outbound.md#load_unit_review) | query* | Validate a scanned physical root and show its card; no Loading commitment. |
+| [order_control_complete](outbound.md#order_control_complete) | stateful_command | Complete an order's control when its set became full without a scan. |
+| [order_control_exception_get](outbound.md#order_control_exception_get) | query | Read one container reported missing at order control with its allowed actions. |
+| [order_control_exception_list](outbound.md#order_control_exception_list) | query | List the containers reported missing at order control with the actions their rule allows. |
+| [order_control_exception_request_count](outbound.md#order_control_exception_request_count) | stateful_command | Request a count of where a container reported missing at order control was last seen. |
+| [order_control_exception_resolve](outbound.md#order_control_exception_resolve) | stateful_command | Resolve a container reported missing at order control: found, written off or skipped. |
+| [order_control_get](outbound.md#order_control_get) | query | Read the card of an order's control session: k of N and what it waits for. |
+| [order_control_list](outbound.md#order_control_list) | query | List the warehouse's open order controls with k of N and their holding exceptions. |
+| [order_control_open](outbound.md#order_control_open) | stateless_command | Open (or resume) an order's control at a control station by one of its containers (counted at once) or by the order's number. |
+| [order_control_report_missing](outbound.md#order_control_report_missing) | stateless_command | Report a container of an order's control set missing at the control station. |
+| [order_control_scan](outbound.md#order_control_scan) | stateless_command | Count a container scanned at the control station; the last one completes the order. |
+| [order_control_station_get](outbound.md#order_control_station_get) | query | Read a control station and the orders waiting there for order control. |
 | [outbound_unit_assign](outbound.md#outbound_unit_assign) | stateful_command | Assign an unassigned physical root from the confirmed current Order plan (version 0). |
 | [outbound_unit_assignment_get](outbound.md#outbound_unit_assignment_get) | query* | Get unit transport intent, current Order plan and explicit change history. |
 | [outbound_unit_reassign](outbound.md#outbound_unit_reassign) | stateful_command | Explicitly align an assigned physical root with its confirmed current Order plan; no stock movement. |
@@ -709,8 +728,8 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [pick_drop_list](outbound.md#pick_drop_list) | query | List every operator's open pick pallet with its record version and whether its frozen destination still takes it, for the supervisor. |
 | [pick_drop_open](outbound.md#pick_drop_open) | stateless_command | Open the operator's pick pallet (a scanned DRP label) for the task's order in INTRANSIT. |
 | [pick_manual_complete](outbound.md#pick_manual_complete) | stateful_command | Complete a reviewed workstation Pick: actual stock, Pick, Task and durable receipt atomically. |
-| [pick_manual_finalize](outbound.md#pick_manual_finalize) | stateless_command | Hand off completed workstation roots using their frozen routes; never mark Pack done. |
 | [pick_manual_review](outbound.md#pick_manual_review) | query* | Review workstation Pick source requirements without an RF lease. |
+| [pick_manual_short](outbound.md#pick_manual_short) | stateful_command | Short a workstation Pick from paper: move what was found, release the rest and request the reason's remediation. |
 | [pick_reconciliation_report](outbound.md#pick_reconciliation_report) | query* | Report task/Pick lifecycle and dispatch-eligibility inconsistencies. |
 | [pick_reject](outbound.md#pick_reject) | stateful_command | Reject untouched Pick work using Task Manager cooldown and refusal audit. |
 | [pick_short](outbound.md#pick_short) | stateful_command | Atomically commit a partial or zero Pick and persist remediation intent. |
@@ -751,13 +770,18 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [shipment_order_line_upsert](outbound.md#shipment_order_line_upsert) | stateful_command | Add or edit a draft order's line. |
 | [shipment_order_release](outbound.md#shipment_order_release) | stateful_command | Release a draft order (full validation, freezes the ship-to address). |
 | [shipment_order_ship](outbound.md#shipment_order_ship) | stateful_command | Ship a fully picked order: atomic Goods Issue, serials, counters, close and outbox. |
+| [shipment_order_ship_preview](outbound.md#shipment_order_ship_preview) | query | Preview a direct shipment: per line, what ships now and what remains (base units). |
 | [shipment_order_shipment_history](outbound.md#shipment_order_shipment_history) | query* | Immutable Goods Issue deltas by Order line; read only, no shipment retry or stock movement. |
 | [shipment_order_update](outbound.md#shipment_order_update) | stateful_command | Edit a shipment order's header fields. |
 | [shipment_order_validate](outbound.md#shipment_order_validate) | query* | Dry-run the release checks. |
+| [stage_board_get](outbound.md#stage_board_get) | query* | The Stage screen: every stage place with the stop that holds it, what stands on it and what is coming, and the exception history. |
+| [stage_place_close](outbound.md#stage_place_close) | stateful_command | Close a stage place with a reason: no new pallet, even with permission; what stands on it may be loaded or moved. |
+| [stage_place_open](outbound.md#stage_place_open) | stateful_command | Open a closed stage place again. |
 | [stage_unit_assign](outbound.md#stage_unit_assign) | stateful_command | Assign a ready physical root to an exact Stage without moving stock. |
 | [stage_unit_confirm](outbound.md#stage_unit_confirm) | stateful_command | Confirm the assigned Stage and expected source, moving the entire picked root atomically. |
 | [stage_unit_get](outbound.md#stage_unit_get) | query* | Read unit transport, Stage card, physical source and execution fact in one snapshot. |
 | [stage_unit_lookup](outbound.md#stage_unit_lookup) | query* | Find the exact live Stage root by container label, without changing assignment or stock. |
+| [stage_unit_put](outbound.md#stage_unit_put) | stateful_command | Put a pallet on a stage place in one step: its stop's place, or another with a shift lead's one-time grant and reason, recorded in the hist… |
 | [stage_unit_transfer](outbound.md#stage_unit_transfer) | stateful_command | Transfer an intact staged remainder from a completed trip to the current Planned Dispatch, preserving evidence and physical stock. |
 | [station_box_bind](outbound.md#station_box_bind) | stateless_command | Put an empty box on a distribution station's position. |
 | [station_box_close](outbound.md#station_box_close) | stateless_command | Close a distribution station position's box once nothing more is coming to it. |
@@ -786,6 +810,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [update_cartonization_policy_form](outbound.md#update_cartonization_policy_form) | stateful_command | Update cartonization policy header fields from the metadata form. |
 | [wave_add_order](outbound.md#wave_add_order) | stateful_command | Add an Order to a Draft Wave. |
 | [wave_cancel](outbound.md#wave_cancel) | stateful_command | Cancel a Wave before release starts. |
+| [wave_card_get](outbound.md#wave_card_get) | query* | Read the Wave screen: the wave, every order with its customer, picks and dispatch. |
 | [wave_create](outbound.md#wave_create) | stateless_command | Create a manual Wave. |
 | [wave_get](outbound.md#wave_get) | query* | Get a Wave with members and progress. |
 | [wave_header_get](outbound.md#wave_header_get) | query* | Read a flat Wave header without advancing it. |
@@ -793,14 +818,18 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [wave_list](outbound.md#wave_list) | query* | List Waves. |
 | [wave_policy_build](outbound.md#wave_policy_build) | stateful_command | Build bounded Draft Waves from a versioned Wave policy. |
 | [wave_policy_create](outbound.md#wave_policy_create) | stateless_command | Create a Wave policy. |
-| [wave_policy_get](outbound.md#wave_policy_get) | query* | Get a Wave policy. |
-| [wave_policy_list](outbound.md#wave_policy_list) | query* | List Wave policies. |
-| [wave_policy_preview](outbound.md#wave_policy_preview) | query* | Preview the Draft Waves a policy would build. |
+| [wave_policy_duplicate](outbound.md#wave_policy_duplicate) | stateless_command | Copy a saved Wave policy, inactive, under the next WS number. |
+| [wave_policy_get](outbound.md#wave_policy_get) | query | Get a Wave policy. |
+| [wave_policy_last_run](outbound.md#wave_policy_last_run) | query | The latest run of a Wave policy and its waves. |
+| [wave_policy_list](outbound.md#wave_policy_list) | query | List Wave policies. |
+| [wave_policy_new](outbound.md#wave_policy_new) | stateless_command | Create a new inactive Wave policy under the next WS number. |
+| [wave_policy_preview](outbound.md#wave_policy_preview) | query | Preview the Draft Waves a policy would build. |
 | [wave_policy_save](outbound.md#wave_policy_save) | stateful_command | Save a versioned Wave policy. |
 | [wave_preview](outbound.md#wave_preview) | query* | Preview release eligibility for every Wave order. |
 | [wave_release](outbound.md#wave_release) | stateful_command | Freeze and enqueue a Wave for release. |
 | [wave_remove_order](outbound.md#wave_remove_order) | stateful_command | Remove an Order from a Draft Wave. |
 | [wave_retry_blocked](outbound.md#wave_retry_blocked) | stateful_command | Retry only blocked or failed Wave orders. |
+| [wave_set_release_at](outbound.md#wave_set_release_at) | stateful_command | Set or clear the time a Draft Wave is released by the server. |
 | [wave_set_station](outbound.md#wave_set_station) | stateful_command | Name or clear the distribution station of a Draft Wave. |
 | [work_area_assign_picking_policy](outbound.md#work_area_assign_picking_policy) | stateless_command | Point a work area at a published picking policy (none: DISCRETE). |
 | [work_area_equipment_policy_create](outbound.md#work_area_equipment_policy_create) | stateless_command | Name the picking policy a work area works by for one equipment profile. |
@@ -947,9 +976,9 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 |---|---|---|
 | [confirm_aggregation](integration.md#confirm_aggregation) | not declared* | Marking: confirm regulator aggregation acknowledgement |
 | [confirm_inbound](integration.md#confirm_inbound) | not declared* | Marking: confirm inbound regulator acknowledgement |
-| [confirm_kz_inbound](integration.md#confirm_kz_inbound) | not declared* | (The code comment for this item is not in English. |
+| [confirm_kz_inbound](integration.md#confirm_kz_inbound) | not declared* |  |
 | [confirm_outbound](integration.md#confirm_outbound) | not declared* | Marking: confirm outbound regulator acknowledgement |
-| [confirm_pharma_inbound](integration.md#confirm_pharma_inbound) | not declared* | (The code comment for this item is not in English. |
+| [confirm_pharma_inbound](integration.md#confirm_pharma_inbound) | not declared* |  |
 | [count_attribute_def](integration.md#count_attribute_def) | query* | Count attribute_def — CRUD. |
 | [count_attribute_value](integration.md#count_attribute_value) | query* | Count attribute_value — CRUD. |
 | [count_event_registry](integration.md#count_event_registry) | query* | Count event_registry — CRUD. |
@@ -972,7 +1001,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [create_integration_subscriber](integration.md#create_integration_subscriber) | stateless_command | Create a validated integration event subscriber. |
 | [delete_attribute_def](integration.md#delete_attribute_def) | not declared* | Delete a attribute_def by ID — CRUD. |
 | [delete_attribute_value](integration.md#delete_attribute_value) | not declared* | Delete a attribute_value by ID — CRUD. |
-| [delete_event_registry](integration.md#delete_event_registry) | not declared* | Delete a event_registry by ID — CRUD. |
+| [delete_event_registry](integration.md#delete_event_registry) | not declared* | Delete a custom event-catalog entry; built-in events are protected. |
 | [delete_integration_subscriber](integration.md#delete_integration_subscriber) | not declared* | Delete a integration_subscriber by ID — CRUD. |
 | [get_all_stock](integration.md#get_all_stock) | query* | Inventory: get all stock |
 | [get_attribute_def](integration.md#get_attribute_def) | query* | Get a attribute_def by ID — CRUD. |
@@ -989,7 +1018,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [get_integration_event_delivery](integration.md#get_integration_event_delivery) | query* | Get a integration_event_delivery by ID — CRUD. |
 | [get_integration_subscriber](integration.md#get_integration_subscriber) | query* | Get a integration_subscriber by ID — CRUD. |
 | [get_inventory_hold](integration.md#get_inventory_hold) | query* | Get a inventory_hold by ID — CRUD. |
-| [get_kz_inbound_codes](integration.md#get_kz_inbound_codes) | query* | (The code comment for this item is not in English. |
+| [get_kz_inbound_codes](integration.md#get_kz_inbound_codes) | query* |  |
 | [get_pharma_sgtins](integration.md#get_pharma_sgtins) | query* | Marking: get pharma SGTINs |
 | [get_shipment_sgtins](integration.md#get_shipment_sgtins) | query* | Marking: get shipment SGTINs |
 | [get_withdrawal_codes](integration.md#get_withdrawal_codes) | query* | Marking: get withdrawal codes |
@@ -1035,7 +1064,7 @@ Read from `routes_rpc.rs`:
 
 ## Gaps in the catalog
 
-- Methods with no summary: 0.
+- Methods with no summary: 3: `confirm_kz_inbound`, `confirm_pharma_inbound`, `get_kz_inbound_codes`
 - Methods that list no parameters and really take none (checked in the handler): 8: `me`, `get_warehouse_defaults`, `list_audit_event_kinds`, `get_log_level`, `list_force_close_candidates`, `list_open_episodes_for_operator`, `get_screen_tree`, `list_screen_def`.
 - Methods whose catalog entry is empty although they take parameters: 4: `create_project`, `delete_project`, `list_projects`, `update_project`. Their parameters and result fields are read from the Rust source and shown in the reference.
 - Methods that list no parameters and are not checked: 0.

@@ -90,7 +90,7 @@ Rules the server follows (from `CommandParams` in `wms-lib-rpc-core`):
 - Unknown keys in `meta` are ignored. For example `meta.trace_id` and `meta.tenant_id` (shown in ADR-058) are not read.
 - The `meta` is not part of the idempotency hash. Only `data` is. So a retry with a refreshed version still counts as the same call.
 
-Some commands (29 of the 193 methods that declare a command type) have no `meta` parameter. They are mostly the generic `create_*` and `delete_*` of reference data. They take `data` or `id` directly.
+Some commands (37 of the 320 methods declared as stateful or stateless commands) have no `meta` parameter. They are mostly the generic `create_*` and `delete_*` methods for reference data. They take `data` or `id` directly.
 
 ### Lists, filters and paging
 

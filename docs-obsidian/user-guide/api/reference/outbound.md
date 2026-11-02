@@ -2,31 +2,32 @@
 
 Shipping: shipment orders, allocation, waves, picking, packing, cartonization and replenishment policies.
 
-This page documents 263 methods of the `outbound` context. It is generated from the OpenRPC catalog. Do not edit it by hand.
+This page documents 291 methods of the `outbound` context. It is generated from the OpenRPC catalog. Do not edit it by hand.
 
 How to read a method entry: see [reference/index.md](index.md). Every call is `POST /api/rpc` with a JSON-RPC 2.0 body. See [03-request-and-response-format.md](../03-request-and-response-format.md).
 
 ## Modules
 
-- **loading**: [load_get](#load_get), [load_lookup](#load_lookup), [load_unit_review](#load_unit_review), [load_header_get](#load_header_get), [load_header_list](#load_header_list), [transport_unit_get](#transport_unit_get), [transport_unit_list](#transport_unit_list), [transport_unit_register](#transport_unit_register), [load_open](#load_open), [load_unit_remove](#load_unit_remove), [load_cancel](#load_cancel), [load_start](#load_start), [load_unit_confirm](#load_unit_confirm), [load_complete](#load_complete), [confirm_shipment](#confirm_shipment)
-- **load_plan**: [load_plan_get](#load_plan_get), [load_plan_header_get](#load_plan_header_get), [load_plan_header_list](#load_plan_header_list), [load_plan_create](#load_plan_create), [load_plan_generate](#load_plan_generate), [load_plan_add_unit](#load_plan_add_unit), [load_plan_remove_unit](#load_plan_remove_unit), [load_plan_resequence](#load_plan_resequence), [load_plan_set_position](#load_plan_set_position), [load_plan_freeze](#load_plan_freeze), [load_plan_reopen](#load_plan_reopen)
-- **staging**: [stage_unit_get](#stage_unit_get), [stage_unit_lookup](#stage_unit_lookup), [stage_unit_assign](#stage_unit_assign), [stage_unit_confirm](#stage_unit_confirm), [stage_unit_transfer](#stage_unit_transfer)
+- **loading**: [load_get](#load_get), [load_lookup](#load_lookup), [load_unit_review](#load_unit_review), [load_header_get](#load_header_get), [load_header_list](#load_header_list), [load_goods_issue_get](#load_goods_issue_get), [transport_unit_get](#transport_unit_get), [transport_unit_list](#transport_unit_list), [transport_unit_register](#transport_unit_register), [load_open](#load_open), [load_unit_remove](#load_unit_remove), [load_cancel](#load_cancel), [load_start](#load_start), [load_unit_confirm](#load_unit_confirm), [load_complete](#load_complete), [confirm_shipment](#confirm_shipment)
+- **load_plan**: [load_plan_get](#load_plan_get), [load_plan_header_get](#load_plan_header_get), [load_plan_header_list](#load_plan_header_list), [load_plan_rebuild_preview](#load_plan_rebuild_preview), [load_plan_create](#load_plan_create), [load_plan_generate](#load_plan_generate), [load_plan_rebuild](#load_plan_rebuild), [load_plan_add_unit](#load_plan_add_unit), [load_plan_remove_unit](#load_plan_remove_unit), [load_plan_resequence](#load_plan_resequence), [load_plan_set_position](#load_plan_set_position), [load_plan_freeze](#load_plan_freeze), [load_plan_reopen](#load_plan_reopen)
+- **staging**: [stage_unit_get](#stage_unit_get), [stage_unit_lookup](#stage_unit_lookup), [stage_unit_assign](#stage_unit_assign), [stage_unit_confirm](#stage_unit_confirm), [stage_unit_transfer](#stage_unit_transfer), [stage_board_get](#stage_board_get), [stage_unit_put](#stage_unit_put), [stage_place_close](#stage_place_close), [stage_place_open](#stage_place_open), [dispatch_stop_set_stage_place](#dispatch_stop_set_stage_place)
 - **allocation_policy**: [create_allocation_policy](#create_allocation_policy), [get_allocation_policy](#get_allocation_policy), [list_allocation_policy](#list_allocation_policy), [update_allocation_policy](#update_allocation_policy), [delete_allocation_policy](#delete_allocation_policy), [delete_many_allocation_policy](#delete_many_allocation_policy), [count_allocation_policy](#count_allocation_policy), [get_allocation_policy_detail](#get_allocation_policy_detail), [list_allocation_policy_detail](#list_allocation_policy_detail), [count_allocation_policy_detail](#count_allocation_policy_detail), [allocation_pipeline_view](#allocation_pipeline_view), [allocation_policy_validate](#allocation_policy_validate), [allocation_steps_save](#allocation_steps_save), [allocation_step_add](#allocation_step_add), [allocation_step_delete](#allocation_step_delete), [allocation_steps_reorder](#allocation_steps_reorder), [allocation_policy_publish](#allocation_policy_publish), [allocation_policy_deactivate](#allocation_policy_deactivate), [allocation_policy_clone](#allocation_policy_clone)
 - **replenishment_policy**: [create_replenishment_policy](#create_replenishment_policy), [replenishment_policy_save](#replenishment_policy_save), [get_replenishment_policy](#get_replenishment_policy), [list_replenishment_policy](#list_replenishment_policy), [delete_replenishment_policy](#delete_replenishment_policy), [delete_many_replenishment_policy](#delete_many_replenishment_policy), [count_replenishment_policy](#count_replenishment_policy), [get_replenishment_policy_detail](#get_replenishment_policy_detail), [list_replenishment_policy_detail](#list_replenishment_policy_detail), [count_replenishment_policy_detail](#count_replenishment_policy_detail)
 - **cartonization_policy**: [get_cartonization_policy](#get_cartonization_policy), [list_cartonization_policy](#list_cartonization_policy), [delete_cartonization_policy](#delete_cartonization_policy), [delete_many_cartonization_policy](#delete_many_cartonization_policy), [count_cartonization_policy](#count_cartonization_policy), [get_cartonization_policy_detail](#get_cartonization_policy_detail), [list_cartonization_policy_detail](#list_cartonization_policy_detail), [count_cartonization_policy_detail](#count_cartonization_policy_detail), [get_cartonization_policy_detail_form](#get_cartonization_policy_detail_form), [cartonization_policy_view](#cartonization_policy_view), [cartonization_policy_template](#cartonization_policy_template), [cartonization_policy_create](#cartonization_policy_create), [cartonization_policy_save](#cartonization_policy_save), [create_cartonization_policy_form](#create_cartonization_policy_form), [update_cartonization_policy_form](#update_cartonization_policy_form), [create_cartonization_policy_detail_form](#create_cartonization_policy_detail_form), [update_cartonization_policy_detail_form](#update_cartonization_policy_detail_form), [delete_cartonization_policy_detail_form](#delete_cartonization_policy_detail_form), [delete_many_cartonization_policy_detail_form](#delete_many_cartonization_policy_detail_form)
-- **wave**: [wave_get](#wave_get), [wave_list](#wave_list), [wave_header_get](#wave_header_get), [wave_header_list](#wave_header_list), [wave_preview](#wave_preview), [wave_policy_get](#wave_policy_get), [wave_policy_list](#wave_policy_list), [wave_policy_preview](#wave_policy_preview), [wave_create](#wave_create), [wave_add_order](#wave_add_order), [wave_remove_order](#wave_remove_order), [wave_cancel](#wave_cancel), [wave_release](#wave_release), [wave_retry_blocked](#wave_retry_blocked), [wave_set_station](#wave_set_station), [wave_policy_create](#wave_policy_create), [wave_policy_save](#wave_policy_save), [wave_policy_build](#wave_policy_build)
-- **dispatch**: [dispatch_get](#dispatch_get), [dispatch_list](#dispatch_list), [dispatch_header_get](#dispatch_header_get), [dispatch_header_list](#dispatch_header_list), [dispatch_stop_list](#dispatch_stop_list), [dispatch_order_list](#dispatch_order_list), [dispatch_create](#dispatch_create), [dispatch_add_order](#dispatch_add_order), [dispatch_remove_order](#dispatch_remove_order), [dispatch_stop_add](#dispatch_stop_add), [dispatch_stop_update](#dispatch_stop_update), [dispatch_stop_resequence](#dispatch_stop_resequence), [dispatch_plan](#dispatch_plan)
+- **wave**: [wave_get](#wave_get), [wave_card_get](#wave_card_get), [wave_list](#wave_list), [wave_header_get](#wave_header_get), [wave_header_list](#wave_header_list), [wave_preview](#wave_preview), [wave_policy_get](#wave_policy_get), [wave_policy_list](#wave_policy_list), [wave_policy_preview](#wave_policy_preview), [wave_policy_last_run](#wave_policy_last_run), [wave_create](#wave_create), [wave_add_order](#wave_add_order), [wave_remove_order](#wave_remove_order), [wave_cancel](#wave_cancel), [wave_release](#wave_release), [wave_retry_blocked](#wave_retry_blocked), [wave_set_station](#wave_set_station), [wave_set_release_at](#wave_set_release_at), [wave_policy_create](#wave_policy_create), [wave_policy_new](#wave_policy_new), [wave_policy_duplicate](#wave_policy_duplicate), [wave_policy_save](#wave_policy_save), [wave_policy_build](#wave_policy_build)
+- **dispatch**: [dispatch_get](#dispatch_get), [dispatch_list](#dispatch_list), [dispatch_header_get](#dispatch_header_get), [dispatch_header_list](#dispatch_header_list), [dispatch_stop_list](#dispatch_stop_list), [dispatch_order_list](#dispatch_order_list), [dispatch_create](#dispatch_create), [dispatch_add_order](#dispatch_add_order), [dispatch_remove_order](#dispatch_remove_order), [dispatch_stop_add](#dispatch_stop_add), [dispatch_stop_update](#dispatch_stop_update), [dispatch_stop_resequence](#dispatch_stop_resequence), [dispatch_plan](#dispatch_plan), [dispatch_set_door](#dispatch_set_door), [dispatch_set_transport_unit](#dispatch_set_transport_unit), [dispatch_cancel](#dispatch_cancel)
 - **outbound_unit_assignment**: [outbound_unit_assignment_get](#outbound_unit_assignment_get), [outbound_unit_assign](#outbound_unit_assign), [outbound_unit_reassign](#outbound_unit_reassign)
 - **shipment_order**: [get_shipment_order](#get_shipment_order), [list_shipment_order](#list_shipment_order), [count_shipment_order](#count_shipment_order), [get_shipment_order_line](#get_shipment_order_line), [list_shipment_order_line](#list_shipment_order_line), [count_shipment_order_line](#count_shipment_order_line), [get_order_type](#get_order_type), [list_order_type](#list_order_type), [count_order_type](#count_order_type), [find_shipment_order_by_number](#find_shipment_order_by_number), [get_shipment_order_full](#get_shipment_order_full), [get_shipment_order_line_lot_requirements](#get_shipment_order_line_lot_requirements), [shipment_order_fulfilment_list](#shipment_order_fulfilment_list), [shipment_order_shipment_history](#shipment_order_shipment_history)
-- **shipment_order_commands**: [shipment_order_validate](#shipment_order_validate), [shipment_order_create](#shipment_order_create), [shipment_order_update](#shipment_order_update), [shipment_order_release](#shipment_order_release), [shipment_order_cancel](#shipment_order_cancel), [shipment_order_close](#shipment_order_close), [shipment_order_ship](#shipment_order_ship), [shipment_order_allocate_preview](#shipment_order_allocate_preview), [shipment_order_allocate](#shipment_order_allocate), [shipment_order_cancel_allocation](#shipment_order_cancel_allocation), [pick_detail_delete](#pick_detail_delete), [shipment_order_line_upsert](#shipment_order_line_upsert), [shipment_order_line_remove](#shipment_order_line_remove), [shipment_order_line_set_lot_requirements](#shipment_order_line_set_lot_requirements), [shipment_order_line_cancel_qty](#shipment_order_line_cancel_qty), [shipment_order_line_adjust_qty](#shipment_order_line_adjust_qty)
+- **shipment_order_commands**: [shipment_order_validate](#shipment_order_validate), [shipment_order_create](#shipment_order_create), [shipment_order_update](#shipment_order_update), [shipment_order_release](#shipment_order_release), [shipment_order_cancel](#shipment_order_cancel), [shipment_order_close](#shipment_order_close), [shipment_order_ship](#shipment_order_ship), [shipment_order_ship_preview](#shipment_order_ship_preview), [shipment_order_allocate_preview](#shipment_order_allocate_preview), [shipment_order_allocate](#shipment_order_allocate), [shipment_order_cancel_allocation](#shipment_order_cancel_allocation), [pick_detail_delete](#pick_detail_delete), [shipment_order_line_upsert](#shipment_order_line_upsert), [shipment_order_line_remove](#shipment_order_line_remove), [shipment_order_line_set_lot_requirements](#shipment_order_line_set_lot_requirements), [shipment_order_line_cancel_qty](#shipment_order_line_cancel_qty), [shipment_order_line_adjust_qty](#shipment_order_line_adjust_qty)
 - **container_commands**: [container_restructure](#container_restructure), [container_dispose](#container_dispose), [container_repack](#container_repack)
-- **pick_commands**: [pick_dispatch_next](#pick_dispatch_next), [pick_drop_open](#pick_drop_open), [pick_drop_close](#pick_drop_close), [pick_confirm_location](#pick_confirm_location), [pick_confirm_item](#pick_confirm_item), [pick_confirm_source_lpn](#pick_confirm_source_lpn), [pick_substitute_source_lpn](#pick_substitute_source_lpn), [pick_confirm_qty](#pick_confirm_qty), [pick_confirm_serial](#pick_confirm_serial), [pick_confirm_internal_lot](#pick_confirm_internal_lot), [pick_confirm_lot_attributes](#pick_confirm_lot_attributes), [pick_commit](#pick_commit), [pick_short](#pick_short), [pick_reject](#pick_reject), [pick_manual_complete](#pick_manual_complete), [pick_manual_finalize](#pick_manual_finalize), [shared_pick_route_start](#shared_pick_route_start), [shared_pick_tote_bind](#shared_pick_tote_bind), [shared_pick_commit](#shared_pick_commit), [shared_pick_tote_deliver](#shared_pick_tote_deliver), [shared_pick_tote_release](#shared_pick_tote_release), [pick_work_get](#pick_work_get), [pick_drop_current](#pick_drop_current), [pick_manual_review](#pick_manual_review), [shared_pick_route_get](#shared_pick_route_get), [pick_reconciliation_report](#pick_reconciliation_report), [shared_pick_tote_complete_supervised](#shared_pick_tote_complete_supervised), [pick_drop_list](#pick_drop_list), [shared_pick_route_list](#shared_pick_route_list)
+- **pick_commands**: [pick_dispatch_next](#pick_dispatch_next), [pick_drop_open](#pick_drop_open), [pick_drop_close](#pick_drop_close), [pick_confirm_location](#pick_confirm_location), [pick_confirm_item](#pick_confirm_item), [pick_confirm_source_lpn](#pick_confirm_source_lpn), [pick_substitute_source_lpn](#pick_substitute_source_lpn), [pick_confirm_qty](#pick_confirm_qty), [pick_confirm_serial](#pick_confirm_serial), [pick_confirm_internal_lot](#pick_confirm_internal_lot), [pick_confirm_lot_attributes](#pick_confirm_lot_attributes), [pick_commit](#pick_commit), [pick_short](#pick_short), [pick_reject](#pick_reject), [pick_manual_complete](#pick_manual_complete), [pick_manual_short](#pick_manual_short), [shared_pick_route_start](#shared_pick_route_start), [shared_pick_tote_bind](#shared_pick_tote_bind), [shared_pick_commit](#shared_pick_commit), [shared_pick_tote_deliver](#shared_pick_tote_deliver), [shared_pick_tote_release](#shared_pick_tote_release), [pick_work_get](#pick_work_get), [pick_drop_current](#pick_drop_current), [pick_manual_review](#pick_manual_review), [shared_pick_route_get](#shared_pick_route_get), [pick_reconciliation_report](#pick_reconciliation_report), [shared_pick_tote_complete_supervised](#shared_pick_tote_complete_supervised), [pick_drop_list](#pick_drop_list), [shared_pick_route_list](#shared_pick_route_list)
 - **pick_assignment**: [pick_assignment_start](#pick_assignment_start), [pick_assignment_bind_position](#pick_assignment_bind_position), [pick_assignment_get](#pick_assignment_get), [pick_assignment_dissolve](#pick_assignment_dissolve), [pick_assignment_dissolve_supervised](#pick_assignment_dissolve_supervised), [pick_assignment_skip](#pick_assignment_skip), [pick_assignment_complete](#pick_assignment_complete), [pick_assignment_position_close](#pick_assignment_position_close), [pick_assignment_position_hand_over](#pick_assignment_position_hand_over), [pick_assignment_position_replace_container](#pick_assignment_position_replace_container), [cartonization_exception_retry](#cartonization_exception_retry), [cartonization_exception_list](#cartonization_exception_list), [pick_assignment_complete_supervised](#pick_assignment_complete_supervised), [pick_destination_retarget](#pick_destination_retarget), [pick_assignment_list](#pick_assignment_list), [pick_assignment_board_get](#pick_assignment_board_get), [pick_assignment_position_list](#pick_assignment_position_list)
 - **pick_short_reason**: [pick_short_reason_create_draft](#pick_short_reason_create_draft), [pick_short_reason_update_draft](#pick_short_reason_update_draft), [pick_short_reason_publish](#pick_short_reason_publish), [pick_short_reason_retire](#pick_short_reason_retire), [pick_short_reason_get](#pick_short_reason_get), [pick_short_reason_list](#pick_short_reason_list), [get_pick_short_reason_revision](#get_pick_short_reason_revision), [list_pick_short_reason_revision](#list_pick_short_reason_revision), [count_pick_short_reason_revision](#count_pick_short_reason_revision), [get_pick_short_reason_action](#get_pick_short_reason_action), [list_pick_short_reason_action](#list_pick_short_reason_action), [count_pick_short_reason_action](#count_pick_short_reason_action)
 - **picking_policy**: [picking_policy_create_draft](#picking_policy_create_draft), [picking_policy_update_draft](#picking_policy_update_draft), [picking_policy_publish](#picking_policy_publish), [picking_policy_retire](#picking_policy_retire), [work_area_assign_picking_policy](#work_area_assign_picking_policy), [work_area_equipment_policy_create](#work_area_equipment_policy_create), [work_area_equipment_policy_update](#work_area_equipment_policy_update), [work_area_equipment_policy_delete](#work_area_equipment_policy_delete), [picking_policy_get](#picking_policy_get), [picking_policy_list](#picking_policy_list), [work_area_equipment_policy_list](#work_area_equipment_policy_list)
 - **packing**: [packing_queue_list](#packing_queue_list), [packing_work_get](#packing_work_get), [packing_work_open](#packing_work_open), [packing_carton_close](#packing_carton_close), [packing_carton_void](#packing_carton_void), [packing_carton_reopen](#packing_carton_reopen), [packing_exception_report](#packing_exception_report), [packing_carton_open](#packing_carton_open), [packing_add](#packing_add), [packing_remove](#packing_remove), [packing_source_complete](#packing_source_complete), [packing_exception_list](#packing_exception_list), [packing_exception_get](#packing_exception_get), [packing_exception_resolve](#packing_exception_resolve), [packing_exception_resolve_short](#packing_exception_resolve_short), [packing_exception_resolve_unexpected](#packing_exception_resolve_unexpected)
 - **station**: [station_excess_list](#station_excess_list), [station_excess_context](#station_excess_context), [station_remainder_order](#station_remainder_order), [station_tote_short](#station_tote_short), [station_excess_report](#station_excess_report), [station_tote_lost](#station_tote_lost), [station_excess_count](#station_excess_count), [station_order_withdraw](#station_order_withdraw), [station_get](#station_get), [station_list](#station_list), [station_card_get](#station_card_get), [station_position_list](#station_position_list), [station_place_suggest](#station_place_suggest), [station_configure](#station_configure), [station_box_bind](#station_box_bind), [station_box_deliver](#station_box_deliver), [station_place](#station_place), [station_box_close](#station_box_close), [station_box_close_full](#station_box_close_full)
 - **consolidation**: [consolidation_queue_list](#consolidation_queue_list), [consolidation_unit_get](#consolidation_unit_get), [consolidation_target_get](#consolidation_target_get), [consolidation_station_list](#consolidation_station_list), [consolidation_station_card_get](#consolidation_station_card_get), [consolidation_board_pallet_list](#consolidation_board_pallet_list), [consolidation_board_box_list](#consolidation_board_box_list), [consolidation_session_open](#consolidation_session_open), [consolidation_session_close](#consolidation_session_close), [consolidation_add](#consolidation_add), [consolidation_remove](#consolidation_remove), [consolidation_target_close](#consolidation_target_close), [consolidation_target_reopen](#consolidation_target_reopen)
+- **order_control**: [order_control_station_get](#order_control_station_get), [order_control_get](#order_control_get), [order_control_open](#order_control_open), [order_control_scan](#order_control_scan), [order_control_complete](#order_control_complete), [order_control_report_missing](#order_control_report_missing), [order_control_list](#order_control_list), [order_control_exception_list](#order_control_exception_list), [order_control_exception_get](#order_control_exception_get), [order_control_exception_resolve](#order_control_exception_resolve), [order_control_exception_request_count](#order_control_exception_request_count)
 
 ## Module: loading
 
@@ -64,7 +65,9 @@ Irreversible complete-Load Goods Issue: atomic stock, serials, Orders, Load and 
 
 **Result**
 
-The `result` member of the response is: `{ "data": ConfirmShipmentResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ConfirmShipmentResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -109,6 +112,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "already_committed": false,
       "load": {
@@ -222,7 +228,9 @@ Cancel an empty not-shipped Load after all physical units were explicitly unload
 
 **Result**
 
-The `result` member of the response is: `{ "data": OutboundLoad }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OutboundLoad }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -318,7 +326,9 @@ Complete all required units only after rechecking their immutable content.
 
 **Result**
 
-The `result` member of the response is: `{ "data": OutboundLoad }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OutboundLoad }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -408,6 +418,27 @@ The `result` member of the response is: `{ "data": LoadDetails }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data.cancellation` | object (LoadChangeNote) or null | no | Who cancelled the Load, when and why; `None` while it is not cancelled. |
+| `data.cancellation.performed_at` | string | yes |  |
+| `data.cancellation.performed_by` | integer (int64) | yes |  |
+| `data.cancellation.reason` | string or null | no |  |
+| `data.history` | array of object (LoadFactHistory) | no | Every unit fact the Load recorded, an unloaded one kept with who unloaded it, when and why — the Loading tab's history. |
+| `data.history[].actual_sequence` | integer (int32) | yes |  |
+| `data.history[].content_snapshot` | any | yes |  |
+| `data.history[].current` | boolean | yes | The fact is the unit's current membership (not unloaded). |
+| `data.history[].id` | integer (int64) | yes |  |
+| `data.history[].load_id` | integer (int64) | yes |  |
+| `data.history[].loaded_at` | string | yes |  |
+| `data.history[].loaded_by` | integer (int64) | yes |  |
+| `data.history[].order_id` | integer (int64) or null | no | `None` for a pallet of several orders. |
+| `data.history[].outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.history[].removal_reason` | string or null | no |  |
+| `data.history[].removed_at` | string or null | no |  |
+| `data.history[].removed_by` | integer (int64) or null | no |  |
+| `data.history[].result` | any | yes |  |
+| `data.history[].root_code` | string | yes |  |
+| `data.history[].root_container_id` | integer (int64) | yes |  |
+| `data.history[].stop_id` | integer (int64) | yes |  |
 | `data.load` | object (OutboundLoad) | yes |  |
 | `data.load.active_stop_id` | integer (int64) or null | no |  |
 | `data.load.code` | string | yes |  |
@@ -432,28 +463,7 @@ The `result` member of the response is: `{ "data": LoadDetails }`
 | `data.loaded` | array of object (LoadUnitFact) | yes |  |
 | `data.loaded[].actual_sequence` | integer (int32) | yes |  |
 | `data.loaded[].content_snapshot` | any | yes |  |
-| `data.loaded[].id` | integer (int64) | yes |  |
-| `data.loaded[].load_id` | integer (int64) | yes |  |
-| `data.loaded[].loaded_at` | string | yes |  |
-| `data.loaded[].loaded_by` | integer (int64) | yes |  |
-| `data.loaded[].order_id` | integer (int64) or null | no | `None` for a pallet of several orders. |
-| `data.loaded[].outbound_flow_unit_id` | integer (int64) | yes |  |
-| `data.loaded[].result` | any | yes |  |
-| `data.loaded[].root_code` | string | yes |  |
-| `data.loaded[].root_container_id` | integer (int64) | yes |  |
-| `data.loaded[].stop_id` | integer (int64) | yes |  |
-| `data.loaded_count` | integer (uint) | yes |  |
-| `data.manifest` | array of object (LoadManifestUnit) | yes |  |
-| `data.manifest[].assignment_version` | integer (int32) | yes |  |
-| `data.manifest[].container_ids` | any | yes |  |
-| `data.manifest[].load_id` | integer (int64) | yes |  |
-| `data.manifest[].order_id` | integer (int64) or null | no | `None` for a consolidated pallet of several orders (H2): its orders are its unit's (`outbound_flow_unit_order`). |
-| `data.manifest[].outbound_flow_unit_id` | integer (int64) | yes |  |
-| `data.manifest[].planned_sequence` | integer (int32) | yes |  |
-| `data.manifest[].root_code` | string | yes |  |
-| `data.manifest[].root_container_id` | integer (int64) | yes |  |
-| `data.manifest[].stop_id` | integer (int64) | yes |  |
-| … | | | 12 more fields. See `openrpc.json`. |
+| … | | | 33 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -544,6 +554,145 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "jsonrpc": "2.0",
   "id": 1,
   "method": "load_get",
+  "params": {
+    "data": {
+      "load_id": 1
+    }
+  }
+}'
+```
+
+### load_goods_issue_get
+
+Read the Orders a Load ships with their receipts, and while Loaded what Ship would recheck; changes nothing.
+
+| | |
+|---|---|
+| Context / module | outbound / loading |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `load_goods_issue_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (LoadIdInput) | yes |  |
+| `data.load_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": LoadGoodsIssue }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.load` | object (OutboundLoad) | yes |  |
+| `data.load.active_stop_id` | integer (int64) or null | no |  |
+| `data.load.code` | string | yes |  |
+| `data.load.completed_at` | string or null | no |  |
+| `data.load.dispatch_id` | integer (int64) | yes |  |
+| `data.load.door_location_code` | string or null | no |  |
+| `data.load.frozen_plan_version` | integer (int32) | yes |  |
+| `data.load.id` | integer (int64) | yes |  |
+| `data.load.last_actual_sequence` | integer (int32) | yes |  |
+| `data.load.load_plan_id` | integer (int64) | yes |  |
+| `data.load.opened_at` | string | yes |  |
+| `data.load.opened_by` | integer (int64) | yes |  |
+| `data.load.require_staged` | boolean | yes |  |
+| `data.load.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.load.shipped_at` | string or null | no |  |
+| `data.load.started_at` | string or null | no |  |
+| `data.load.status` | one of: Open \| Loading \| Loaded \| Shipped \| Cancelled | yes |  |
+| `data.load.transport_confirmed` | boolean | yes |  |
+| `data.load.transport_external_ref` | string | yes |  |
+| `data.load.transport_unit_id` | integer (int64) | yes |  |
+| `data.load.version` | integer (int32) | yes |  |
+| `data.orders` | array of object (LoadGoodsIssueOrder) | yes | Every Order the Load ships, in order-number order, each with its receipt once the Load shipped. |
+| `data.orders[].customer_code` | string or null | no | The Order's ship-to (`owners`): its code and company name. |
+| `data.orders[].customer_name` | string or null | no |  |
+| `data.orders[].goods_issue_id` | integer (int64) or null | no | The Order's receipt of this Load; `None` until the Load shipped. |
+| `data.orders[].order_id` | integer (int64) | yes |  |
+| `data.orders[].order_number` | string | yes |  |
+| `data.orders[].order_status` | string | yes | `shipment_order.status`. |
+| `data.orders[].qty_picked` | number (double) | yes | The Order lines' `qty_picked` and `qty_shipped`, summed. |
+| `data.orders[].qty_shipped` | number (double) | yes |  |
+| `data.orders[].receipt_qty` | number (double) or null | no | What the receipt shipped (its lines, summed). |
+| `data.orders[].receipt_serial_count` | integer (int64) or null | no | Serial numbers the receipt took out of the warehouse. |
+| `data.orders[].shipped_at` | string or null | no |  |
+| `data.orders[].shipped_by` | integer (int64) or null | no |  |
+| `data.orders[].stop_id` | integer (int64) | yes | The stop the Order's units of this Load are delivered at. |
+| `data.orders[].unit_count` | integer (int64) | yes | Manifest units of this Load carrying the Order (a pallet of several Orders counts for each of them). |
+| `data.readiness` | object (ShipmentReadiness) or null | no |  |
+| `data.readiness.differences` | integer (uint) | yes | Loaded units whose content, stage proof or claim moved since loading. |
+| `data.readiness.holds` | integer (uint) | yes | Loaded units under an outbound hold (location, LPN or position). |
+| `data.readiness.orders_outside_load` | integer (uint) | yes | Orders of the Dispatch (its plan's Orders) the Load does not carry. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "load": {
+        "code": "<code>",
+        "dispatch_id": 1,
+        "frozen_plan_version": 1,
+        "id": 1,
+        "last_actual_sequence": 1,
+        "load_plan_id": 1,
+        "opened_at": "<opened_at>",
+        "opened_by": 1,
+        "require_staged": false,
+        "sequence_policy": "ReverseStop",
+        "status": "Open",
+        "transport_confirmed": false,
+        "transport_external_ref": "<transport_external_ref>",
+        "transport_unit_id": 1,
+        "version": 1
+      },
+      "orders": [
+        {
+          "order_id": 1,
+          "order_number": "<order_number>",
+          "order_status": "<order_status>",
+          "qty_picked": 1,
+          "qty_shipped": 1,
+          "stop_id": 1,
+          "unit_count": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "load_goods_issue_get",
   "params": {
     "data": {
       "load_id": 1
@@ -765,6 +914,27 @@ The `result` member of the response is: `{ "data": LoadDetails }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data.cancellation` | object (LoadChangeNote) or null | no | Who cancelled the Load, when and why; `None` while it is not cancelled. |
+| `data.cancellation.performed_at` | string | yes |  |
+| `data.cancellation.performed_by` | integer (int64) | yes |  |
+| `data.cancellation.reason` | string or null | no |  |
+| `data.history` | array of object (LoadFactHistory) | no | Every unit fact the Load recorded, an unloaded one kept with who unloaded it, when and why — the Loading tab's history. |
+| `data.history[].actual_sequence` | integer (int32) | yes |  |
+| `data.history[].content_snapshot` | any | yes |  |
+| `data.history[].current` | boolean | yes | The fact is the unit's current membership (not unloaded). |
+| `data.history[].id` | integer (int64) | yes |  |
+| `data.history[].load_id` | integer (int64) | yes |  |
+| `data.history[].loaded_at` | string | yes |  |
+| `data.history[].loaded_by` | integer (int64) | yes |  |
+| `data.history[].order_id` | integer (int64) or null | no | `None` for a pallet of several orders. |
+| `data.history[].outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.history[].removal_reason` | string or null | no |  |
+| `data.history[].removed_at` | string or null | no |  |
+| `data.history[].removed_by` | integer (int64) or null | no |  |
+| `data.history[].result` | any | yes |  |
+| `data.history[].root_code` | string | yes |  |
+| `data.history[].root_container_id` | integer (int64) | yes |  |
+| `data.history[].stop_id` | integer (int64) | yes |  |
 | `data.load` | object (OutboundLoad) | yes |  |
 | `data.load.active_stop_id` | integer (int64) or null | no |  |
 | `data.load.code` | string | yes |  |
@@ -789,28 +959,7 @@ The `result` member of the response is: `{ "data": LoadDetails }`
 | `data.loaded` | array of object (LoadUnitFact) | yes |  |
 | `data.loaded[].actual_sequence` | integer (int32) | yes |  |
 | `data.loaded[].content_snapshot` | any | yes |  |
-| `data.loaded[].id` | integer (int64) | yes |  |
-| `data.loaded[].load_id` | integer (int64) | yes |  |
-| `data.loaded[].loaded_at` | string | yes |  |
-| `data.loaded[].loaded_by` | integer (int64) | yes |  |
-| `data.loaded[].order_id` | integer (int64) or null | no | `None` for a pallet of several orders. |
-| `data.loaded[].outbound_flow_unit_id` | integer (int64) | yes |  |
-| `data.loaded[].result` | any | yes |  |
-| `data.loaded[].root_code` | string | yes |  |
-| `data.loaded[].root_container_id` | integer (int64) | yes |  |
-| `data.loaded[].stop_id` | integer (int64) | yes |  |
-| `data.loaded_count` | integer (uint) | yes |  |
-| `data.manifest` | array of object (LoadManifestUnit) | yes |  |
-| `data.manifest[].assignment_version` | integer (int32) | yes |  |
-| `data.manifest[].container_ids` | any | yes |  |
-| `data.manifest[].load_id` | integer (int64) | yes |  |
-| `data.manifest[].order_id` | integer (int64) or null | no | `None` for a consolidated pallet of several orders (H2): its orders are its unit's (`outbound_flow_unit_order`). |
-| `data.manifest[].outbound_flow_unit_id` | integer (int64) | yes |  |
-| `data.manifest[].planned_sequence` | integer (int32) | yes |  |
-| `data.manifest[].root_code` | string | yes |  |
-| `data.manifest[].root_container_id` | integer (int64) | yes |  |
-| `data.manifest[].stop_id` | integer (int64) | yes |  |
-| … | | | 12 more fields. See `openrpc.json`. |
+| … | | | 33 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -938,11 +1087,12 @@ Open Load from a reviewed Frozen plan and registered transport.
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (OpenLoad) | yes |  |
+| `data.door_location_code` | string or null | no | The door the truck stands at, named as it arrives. |
 | `data.expected_plan_version` | integer (int32) | yes |  |
-| `data.expected_transport_version` | integer (int32) | yes |  |
+| `data.expected_transport_version` | integer (int32) | yes | The version of the truck the open is decided on: the named truck's, or — when none is named — the planned truck's, as the Dispatch read showed it (`planned_transport_version`). |
 | `data.idempotency_key` | string (uuid) | no |  |
 | `data.load_plan_id` | integer (int64) | yes |  |
-| `data.transport_unit_id` | integer (int64) | yes |  |
+| `data.transport_unit_id` | integer (int64) or null | no | The truck at the dock, named as it arrives. |
 
 **Result**
 
@@ -1004,8 +1154,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
     "data": {
       "expected_plan_version": 1,
       "expected_transport_version": 1,
-      "load_plan_id": 1,
-      "transport_unit_id": 1
+      "load_plan_id": 1
     }
   }
 }'
@@ -1046,7 +1195,9 @@ Confirm the reviewed Load's exact transport before loading units.
 
 **Result**
 
-The `result` member of the response is: `{ "data": OutboundLoad }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OutboundLoad }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -1144,7 +1295,9 @@ Confirm the scanned reviewed unit against current sequence/content; Loaded is no
 
 **Result**
 
-The `result` member of the response is: `{ "data": ConfirmLoadUnitResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ConfirmLoadUnitResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -1190,6 +1343,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "fact": {
         "actual_sequence": 1,
@@ -1301,7 +1457,9 @@ Controlled physical unload acknowledgment with required scan/reason; preserve hi
 
 **Result**
 
-The `result` member of the response is: `{ "data": OutboundLoad }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OutboundLoad }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -1825,7 +1983,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -1834,7 +1992,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -1948,7 +2106,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -1957,7 +2115,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2062,14 +2220,16 @@ Freeze the reviewed complete unit set with per-unit/assignment version echoes; n
 
 **Result**
 
-The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2078,7 +2238,7 @@ The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2088,6 +2248,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "plan": {
         "add_when": "<add_when>",
@@ -2193,7 +2356,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2202,7 +2365,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2310,7 +2473,7 @@ The `result` member of the response is: `{ "data": LoadPlanDetails }`
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2319,7 +2482,7 @@ The `result` member of the response is: `{ "data": LoadPlanDetails }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 | `data.unplanned_units` | array of object (LoadPlanUnit) | yes |  |
 | `data.unplanned_units[].assignment` | object (OutboundUnitAssignment) | yes |  |
@@ -2482,7 +2645,7 @@ The `result` member of the response is: `{ "data": LoadPlan }`
 |---|---|---|---|
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
-| `data.code` | string | yes |  |
+| `data.code` | string | yes | The plan's operator-facing number. |
 | `data.dispatch_id` | integer (int64) | yes |  |
 | `data.frozen_at` | string or null | no |  |
 | `data.generated_at` | string or null | no |  |
@@ -2491,7 +2654,7 @@ The `result` member of the response is: `{ "data": LoadPlan }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2588,7 +2751,7 @@ The `result` member of the response is: `{ "data": [LoadPlan] }`
 |---|---|---|---|
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
-| `data[].code` | string | yes |  |
+| `data[].code` | string | yes | The plan's operator-facing number. |
 | `data[].dispatch_id` | integer (int64) | yes |  |
 | `data[].frozen_at` | string or null | no |  |
 | `data[].generated_at` | string or null | no |  |
@@ -2597,7 +2760,7 @@ The `result` member of the response is: `{ "data": [LoadPlan] }`
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data[].sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data[].status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data[].status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data[].version` | integer (int32) | yes |  |
 
 **Errors**
@@ -2630,6 +2793,259 @@ curl -s -X POST "$BASE_URL/api/rpc" \
     "list_options": {
       "limit": 10,
       "offset": 0
+    }
+  }
+}'
+```
+
+### load_plan_rebuild
+
+Rebuild a Draft or Planned plan with any rule; Explicit onto a stop rule drops the manual order.
+
+| | |
+|---|---|
+| Context / module | outbound / load_plan |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `load_plan_rebuild` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `load_plan`: send `expected_plan_version` for row `load_plan_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_plan_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (RebuildLoadPlan) | yes |  |
+| `data.expected_plan_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.load_plan_id` | integer (int64) | yes |  |
+| `data.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes | The rule the plan is rebuilt with; its mode follows from it. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.plan` | object (LoadPlan) | yes |  |
+| `data.plan.add_when` | string | yes |  |
+| `data.plan.add_who` | integer (int64) | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
+| `data.plan.dispatch_id` | integer (int64) | yes |  |
+| `data.plan.frozen_at` | string or null | no |  |
+| `data.plan.generated_at` | string or null | no |  |
+| `data.plan.id` | integer (int64) | yes |  |
+| `data.plan.mod_when` | string | yes |  |
+| `data.plan.mod_who` | integer (int64) | yes |  |
+| `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
+| `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
+| `data.plan.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "plan": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "dispatch_id": 1,
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "mode": "StopBased",
+        "sequence_policy": "ReverseStop",
+        "status": "Draft",
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "load_plan_rebuild",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "expected_plan_version": 1,
+      "load_plan_id": 1,
+      "sequence_policy": "ReverseStop"
+    }
+  }
+}'
+```
+
+### load_plan_rebuild_preview
+
+Review a rebuild before it: the rule now and next, how many units change place, whether the manual order is lost.
+
+| | |
+|---|---|
+| Context / module | outbound / load_plan |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `load_plan_rebuild_preview` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (LoadPlanRebuildPreviewInput) | yes |  |
+| `data.load_plan_id` | integer (int64) | yes |  |
+| `data.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes | The rule the planner considers rebuilding with. |
+
+**Result**
+
+The `result` member of the response is: `{ "data": LoadPlanRebuildPreview }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.builds_order` | boolean | yes | `false` while the Dispatch is not Planned: only the rule and mode change, nothing is built yet. |
+| `data.current_mode` | one of: StopBased \| ExplicitUnit | yes |  |
+| `data.current_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.manual_order_from_current` | boolean | yes | A built stop-based plan onto `Explicit`: the manual order starts from the current stop order, so no unit changes place. |
+| `data.manual_order_lost` | boolean | yes | `Explicit` onto a stop rule: the manual unit order is dropped. |
+| `data.new_mode` | one of: StopBased \| ExplicitUnit | yes |  |
+| `data.new_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.plan` | object (LoadPlan) | yes | The plan as read — its `version` is what the rebuild echoes. |
+| `data.plan.add_when` | string | yes |  |
+| `data.plan.add_who` | integer (int64) | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
+| `data.plan.dispatch_id` | integer (int64) | yes |  |
+| `data.plan.frozen_at` | string or null | no |  |
+| `data.plan.generated_at` | string or null | no |  |
+| `data.plan.id` | integer (int64) | yes |  |
+| `data.plan.mod_when` | string | yes |  |
+| `data.plan.mod_who` | integer (int64) | yes |  |
+| `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
+| `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
+| `data.plan.version` | integer (int32) | yes |  |
+| `data.stops` | array of object (LoadPlanRebuildStop) | yes |  |
+| `data.stops[].current_load_order` | integer (int32) or null | no |  |
+| `data.stops[].new_load_order` | integer (int32) or null | no |  |
+| `data.stops[].sequence` | integer (int32) | yes |  |
+| `data.stops[].stop_id` | integer (int64) | yes |  |
+| `data.stops[].units` | integer (uint) | yes |  |
+| `data.units_changing_place` | integer (uint) | yes | N: of them, those that would stand at another place of the loading order — or lose their place, or gain one. |
+| `data.units_total` | integer (uint) | yes | M: the plan's current units. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "builds_order": false,
+      "current_mode": "StopBased",
+      "current_policy": "ReverseStop",
+      "manual_order_from_current": false,
+      "manual_order_lost": false,
+      "new_mode": "StopBased",
+      "new_policy": "ReverseStop",
+      "plan": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "dispatch_id": 1,
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "mode": "StopBased",
+        "sequence_policy": "ReverseStop",
+        "status": "Draft",
+        "version": 1
+      },
+      "stops": [
+        {
+          "sequence": 1,
+          "stop_id": 1,
+          "units": 1
+        }
+      ],
+      "units_changing_place": 1,
+      "units_total": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "load_plan_rebuild_preview",
+  "params": {
+    "data": {
+      "load_plan_id": 1,
+      "sequence_policy": "ReverseStop"
     }
   }
 }'
@@ -2670,14 +3086,16 @@ Remove an explicit planning member, without touching stock.
 
 **Result**
 
-The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2686,7 +3104,7 @@ The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2696,6 +3114,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "plan": {
         "add_when": "<add_when>",
@@ -2787,14 +3208,16 @@ Supervisor pre-Load replan with mandatory audited reason.
 
 **Result**
 
-The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2803,7 +3226,7 @@ The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2813,6 +3236,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "plan": {
         "add_when": "<add_when>",
@@ -2904,14 +3330,16 @@ Replace the complete explicit unit order.
 
 **Result**
 
-The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -2920,7 +3348,7 @@ The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -2930,6 +3358,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "plan": {
         "add_when": "<add_when>",
@@ -3024,14 +3455,16 @@ Set an intended transport position, or explicitly clear it with null.
 
 **Result**
 
-The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LoadPlanMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.plan` | object (LoadPlan) | yes |  |
 | `data.plan.add_when` | string | yes |  |
 | `data.plan.add_who` | integer (int64) | yes |  |
-| `data.plan.code` | string | yes |  |
+| `data.plan.code` | string | yes | The plan's operator-facing number. |
 | `data.plan.dispatch_id` | integer (int64) | yes |  |
 | `data.plan.frozen_at` | string or null | no |  |
 | `data.plan.generated_at` | string or null | no |  |
@@ -3040,7 +3473,7 @@ The `result` member of the response is: `{ "data": LoadPlanMutationResult }`
 | `data.plan.mod_who` | integer (int64) | yes |  |
 | `data.plan.mode` | one of: StopBased \| ExplicitUnit | yes |  |
 | `data.plan.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
-| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed | yes |  |
+| `data.plan.status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled | yes |  |
 | `data.plan.version` | integer (int32) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -3050,6 +3483,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "plan": {
         "add_when": "<add_when>",
@@ -3109,6 +3545,468 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ## Module: staging
 
+### dispatch_stop_set_stage_place
+
+Choose or change a stop's stage place until its plan is frozen or a load opens.
+
+| | |
+|---|---|
+| Context / module | outbound / staging |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `dispatch_stop_set_stage_place` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `dispatch`: send `expected_dispatch_version` for row `dispatch_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_dispatch_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (SetDispatchStopStagePlace) | yes |  |
+| `data.dispatch_id` | integer (int64) | yes |  |
+| `data.expected_dispatch_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.move_standing` | boolean | no |  |
+| `data.stage_location_code` | string | yes |  |
+| `data.stop_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchStopStagePlaceResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.dispatch_id` | integer (int64) | yes |  |
+| `data.dispatch_version` | integer (int32) | yes |  |
+| `data.moved_standing` | integer (uint) | yes | How many standing pallets now wait to be scanned on the new place. |
+| `data.stop` | object (DispatchStop) | yes |  |
+| `data.stop.add_when` | string | yes |  |
+| `data.stop.add_who` | integer (int64) | yes |  |
+| `data.stop.destination_ref` | string | yes |  |
+| `data.stop.dispatch_id` | integer (int64) | yes |  |
+| `data.stop.id` | integer (int64) | yes |  |
+| `data.stop.mod_when` | string | yes |  |
+| `data.stop.mod_who` | integer (int64) | yes |  |
+| `data.stop.planned_arrival_at` | string or null | no |  |
+| `data.stop.planned_departure_at` | string or null | no |  |
+| `data.stop.sequence` | integer (int32) | yes |  |
+| `data.stop.stage_location_code` | string or null | no | The stage place of this stop: what every pallet of it is suggested. |
+| `data.stop.stop_type` | string | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "dispatch_id": 1,
+      "dispatch_version": 1,
+      "moved_standing": 1,
+      "stop": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "destination_ref": "<destination_ref>",
+        "dispatch_id": 1,
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "sequence": 1,
+        "stop_type": "<stop_type>"
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "dispatch_stop_set_stage_place",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "dispatch_id": 1,
+      "expected_dispatch_version": 1,
+      "stage_location_code": "<stage_location_code>",
+      "stop_id": 1
+    }
+  }
+}'
+```
+
+### stage_board_get
+
+The Stage screen: every stage place with the stop that holds it, what stands on it and what is coming, and the exception history.
+
+| | |
+|---|---|
+| Context / module | outbound / staging |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `stage_board_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": StageBoard }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.exceptions` | array of object (StageException) | yes |  |
+| `data.exceptions[].authorized_by` | integer (int64) | yes |  |
+| `data.exceptions[].container_code` | string | yes |  |
+| `data.exceptions[].id` | integer (int64) | yes |  |
+| `data.exceptions[].operator_id` | integer (int64) | yes |  |
+| `data.exceptions[].outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.exceptions[].placed_at` | string | yes |  |
+| `data.exceptions[].placed_location_code` | string | yes |  |
+| `data.exceptions[].reason` | string | yes |  |
+| `data.exceptions[].suggested_location_code` | string | yes |  |
+| `data.places` | array of object (StageBoardPlace) | yes |  |
+| `data.places[].holder` | object (StagePlaceHolder) or null | no |  |
+| `data.places[].pallets_on_place` | integer (int64) | yes |  |
+| `data.places[].place` | object (StagePlace) | yes | One stage location with its closure. |
+| `data.places[].still_coming` | integer (int64) | yes |  |
+| `data.places[].units` | array of object | yes |  |
+| `data.units` | array of object (StageBoardUnit) | yes | Every live pallet, for the suggestion the Put window shows. |
+| `data.units[].container_code` | string | yes |  |
+| `data.units[].current_location` | string or null | no |  |
+| `data.units[].dispatch_code` | string | yes |  |
+| `data.units[].order_number` | string or null | no |  |
+| `data.units[].outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.units[].stage_version` | integer (int32) | yes | Its stage card's version, zero with no card: what the Put echoes. |
+| `data.units[].staged` | boolean | yes | Its stage fact under its current transport stands where it is. |
+| `data.units[].stop_id` | integer (int64) | yes |  |
+| `data.units[].stop_place` | string or null | no | What this pallet is suggested: its stop's place, else its card's. |
+| `data.units[].stop_sequence` | integer (int32) | yes |  |
+| `data.units[].trip_live` | boolean | yes | Whether its trip is still live: a cancelled trip's pallet stands free. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "exceptions": [
+        {
+          "authorized_by": 1,
+          "container_code": "<container_code>",
+          "id": 1,
+          "operator_id": 1,
+          "outbound_flow_unit_id": 1,
+          "placed_at": "<placed_at>",
+          "placed_location_code": "<placed_location_code>",
+          "reason": "<reason>",
+          "suggested_location_code": "<suggested_location_code>"
+        }
+      ],
+      "places": [
+        {
+          "pallets_on_place": 1,
+          "place": {
+            "location_code": "<location_code>",
+            "version": 1
+          },
+          "still_coming": 1,
+          "units": []
+        }
+      ],
+      "units": [
+        {
+          "container_code": "<container_code>",
+          "dispatch_code": "<dispatch_code>",
+          "outbound_flow_unit_id": 1,
+          "stage_version": 1,
+          "staged": false,
+          "stop_id": 1,
+          "stop_sequence": 1,
+          "trip_live": false
+        }
+      ]
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "stage_board_get",
+  "params": {
+    "data": {}
+  }
+}'
+```
+
+### stage_place_close
+
+Close a stage place with a reason: no new pallet, even with permission; what stands on it may be loaded or moved.
+
+| | |
+|---|---|
+| Context / module | outbound / staging |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `stage_place_close` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `stage_place`: send `expected_version` for row `location_code` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CloseStagePlace) | yes |  |
+| `data.expected_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.location_code` | string | yes |  |
+| `data.reason` | string | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": StagePlace }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.closed_at` | string or null | no |  |
+| `data.closed_reason` | string or null | no |  |
+| `data.location_code` | string | yes |  |
+| `data.mod_when` | string or null | no |  |
+| `data.mod_who` | integer (int64) or null | no |  |
+| `data.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "location_code": "<location_code>",
+      "version": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "stage_place_close",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "location_code": "<location_code>",
+      "reason": "<reason>"
+    }
+  }
+}'
+```
+
+### stage_place_open
+
+Open a closed stage place again.
+
+| | |
+|---|---|
+| Context / module | outbound / staging |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `stage_place_open` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `stage_place`: send `expected_version` for row `location_code` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (OpenStagePlace) | yes |  |
+| `data.expected_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.location_code` | string | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": StagePlace }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.closed_at` | string or null | no |  |
+| `data.closed_reason` | string or null | no |  |
+| `data.location_code` | string | yes |  |
+| `data.mod_when` | string or null | no |  |
+| `data.mod_who` | integer (int64) or null | no |  |
+| `data.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "location_code": "<location_code>",
+      "version": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "stage_place_open",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "location_code": "<location_code>"
+    }
+  }
+}'
+```
+
 ### stage_unit_assign
 
 Assign a ready physical root to an exact Stage without moving stock.
@@ -3160,6 +4058,9 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.assignment.mod_when` | string | yes |  |
 | `data.assignment.mod_who` | integer (int64) | yes |  |
 | `data.assignment.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.assignment.released_at` | string or null | no | Set when the card's trip was cancelled (`dispatch_cancel`): the box stands where it stands and belongs to no trip until it is staged for another one. |
+| `data.assignment.released_by` | integer (int64) or null | no |  |
+| `data.assignment.restage_from_location` | string or null | no | The place a committed pallet stands on while its stop's place moved: its next stage is admitted once, from there. |
 | `data.assignment.stage_location_code` | string | yes |  |
 | `data.assignment.stop_id` | integer (int64) | yes |  |
 | `data.assignment.unit_assignment_id` | integer (int64) | yes |  |
@@ -3194,10 +4095,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.is_current_root` | boolean | yes |  |
 | `data.nested_units` | boolean | yes |  |
 | `data.packing_open` | boolean | yes |  |
-| `data.stage_committed` | boolean | no | Historical commitment remains authoritative even when an old/faulty writer made the current transport generation disagree with its proof. |
-| `data.stop_sequence` | integer (int32) or null | no |  |
-| `data.transport_assignment` | object (OutboundUnitAssignment) or null | no |  |
-| … | | | 29 more fields. See `openrpc.json`. |
+| … | | | 34 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -3287,6 +4185,9 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.assignment.mod_when` | string | yes |  |
 | `data.assignment.mod_who` | integer (int64) | yes |  |
 | `data.assignment.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.assignment.released_at` | string or null | no | Set when the card's trip was cancelled (`dispatch_cancel`): the box stands where it stands and belongs to no trip until it is staged for another one. |
+| `data.assignment.released_by` | integer (int64) or null | no |  |
+| `data.assignment.restage_from_location` | string or null | no | The place a committed pallet stands on while its stop's place moved: its next stage is admitted once, from there. |
 | `data.assignment.stage_location_code` | string | yes |  |
 | `data.assignment.stop_id` | integer (int64) | yes |  |
 | `data.assignment.unit_assignment_id` | integer (int64) | yes |  |
@@ -3321,10 +4222,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.is_current_root` | boolean | yes |  |
 | `data.nested_units` | boolean | yes |  |
 | `data.packing_open` | boolean | yes |  |
-| `data.stage_committed` | boolean | no | Historical commitment remains authoritative even when an old/faulty writer made the current transport generation disagree with its proof. |
-| `data.stop_sequence` | integer (int32) or null | no |  |
-| `data.transport_assignment` | object (OutboundUnitAssignment) or null | no |  |
-| … | | | 29 more fields. See `openrpc.json`. |
+| … | | | 34 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -3401,6 +4299,9 @@ The `result` member of the response is: `{ "data": StageUnitState }`
 | `data.assignment.mod_when` | string | yes |  |
 | `data.assignment.mod_who` | integer (int64) | yes |  |
 | `data.assignment.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.assignment.released_at` | string or null | no | Set when the card's trip was cancelled (`dispatch_cancel`): the box stands where it stands and belongs to no trip until it is staged for another one. |
+| `data.assignment.released_by` | integer (int64) or null | no |  |
+| `data.assignment.restage_from_location` | string or null | no | The place a committed pallet stands on while its stop's place moved: its next stage is admitted once, from there. |
 | `data.assignment.stage_location_code` | string | yes |  |
 | `data.assignment.stop_id` | integer (int64) | yes |  |
 | `data.assignment.unit_assignment_id` | integer (int64) | yes |  |
@@ -3435,10 +4336,7 @@ The `result` member of the response is: `{ "data": StageUnitState }`
 | `data.is_current_root` | boolean | yes |  |
 | `data.nested_units` | boolean | yes |  |
 | `data.packing_open` | boolean | yes |  |
-| `data.stage_committed` | boolean | no | Historical commitment remains authoritative even when an old/faulty writer made the current transport generation disagree with its proof. |
-| `data.stop_sequence` | integer (int32) or null | no |  |
-| `data.transport_assignment` | object (OutboundUnitAssignment) or null | no |  |
-| … | | | 29 more fields. See `openrpc.json`. |
+| … | | | 34 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -3505,6 +4403,9 @@ The `result` member of the response is: `{ "data": StageUnitState }`
 | `data.assignment.mod_when` | string | yes |  |
 | `data.assignment.mod_who` | integer (int64) | yes |  |
 | `data.assignment.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.assignment.released_at` | string or null | no | Set when the card's trip was cancelled (`dispatch_cancel`): the box stands where it stands and belongs to no trip until it is staged for another one. |
+| `data.assignment.released_by` | integer (int64) or null | no |  |
+| `data.assignment.restage_from_location` | string or null | no | The place a committed pallet stands on while its stop's place moved: its next stage is admitted once, from there. |
 | `data.assignment.stage_location_code` | string | yes |  |
 | `data.assignment.stop_id` | integer (int64) | yes |  |
 | `data.assignment.unit_assignment_id` | integer (int64) | yes |  |
@@ -3539,10 +4440,7 @@ The `result` member of the response is: `{ "data": StageUnitState }`
 | `data.is_current_root` | boolean | yes |  |
 | `data.nested_units` | boolean | yes |  |
 | `data.packing_open` | boolean | yes |  |
-| `data.stage_committed` | boolean | no | Historical commitment remains authoritative even when an old/faulty writer made the current transport generation disagree with its proof. |
-| `data.stop_sequence` | integer (int32) or null | no |  |
-| `data.transport_assignment` | object (OutboundUnitAssignment) or null | no |  |
-| … | | | 29 more fields. See `openrpc.json`. |
+| … | | | 34 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -3567,6 +4465,134 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "params": {
     "data": {
       "container_code": "<container_code>"
+    }
+  }
+}'
+```
+
+### stage_unit_put
+
+Put a pallet on a stage place in one step: its stop's place, or another with a shift lead's one-time grant and reason, recorded in the history.
+
+| | |
+|---|---|
+| Context / module | outbound / staging |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `stage_unit_put` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+| Version check | entity `outbound_stage_assignment`: send `expected_stage_version` for row `outbound_flow_unit_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_stage_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (PutStageUnit) | yes |  |
+| `data.expected_from_location` | string | yes |  |
+| `data.expected_stage_version` | integer (int32) | yes | Zero: no card yet. |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.override_grant_id` | string (uuid) or null | no | Only for another place than the stop's. |
+| `data.scanned_stage_location_code` | string | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": StageUnitState }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.assignment` | object (StageAssignment) or null | no |  |
+| `data.assignment.add_when` | string | yes |  |
+| `data.assignment.add_who` | integer (int64) | yes |  |
+| `data.assignment.dispatch_id` | integer (int64) | yes |  |
+| `data.assignment.id` | integer (int64) | yes |  |
+| `data.assignment.mod_when` | string | yes |  |
+| `data.assignment.mod_who` | integer (int64) | yes |  |
+| `data.assignment.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.assignment.released_at` | string or null | no | Set when the card's trip was cancelled (`dispatch_cancel`): the box stands where it stands and belongs to no trip until it is staged for another one. |
+| `data.assignment.released_by` | integer (int64) or null | no |  |
+| `data.assignment.restage_from_location` | string or null | no | The place a committed pallet stands on while its stop's place moved: its next stage is admitted once, from there. |
+| `data.assignment.stage_location_code` | string | yes |  |
+| `data.assignment.stop_id` | integer (int64) | yes |  |
+| `data.assignment.unit_assignment_id` | integer (int64) | yes |  |
+| `data.assignment.unit_assignment_version` | integer (int32) | yes |  |
+| `data.assignment.version` | integer (int32) | yes |  |
+| `data.assignment_matches_transport` | boolean | no | The card pins the actual transport intent, not merely its Dispatch id. |
+| `data.assignment_version` | integer (int32) | yes | Zero denotes absence; echo this Stage entity, not Dispatch-wide OCC. |
+| `data.container_code` | string or null | no |  |
+| `data.container_status` | one of: Active \| Empty \| Disposed \| InTransit \| Planned or null | no |  |
+| `data.current_location` | string or null | no |  |
+| `data.dispatch_code` | string or null | no |  |
+| `data.dispatch_status` | one of: Draft \| Planned \| Shipped \| Cancelled or null | no |  |
+| `data.execution` | object (StageExecution) or null | no |  |
+| `data.execution.container_ids` | array of integer (int64) | yes |  |
+| `data.execution.dispatch_id` | integer (int64) | yes |  |
+| `data.execution.from_location_code` | string | yes |  |
+| `data.execution.id` | integer (int64) | yes |  |
+| `data.execution.moved` | boolean | yes |  |
+| `data.execution.operation_id` | string (uuid) | yes |  |
+| `data.execution.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.execution.stage_assignment_id` | integer (int64) | yes |  |
+| `data.execution.stage_assignment_version` | integer (int32) | yes |  |
+| `data.execution.stage_location_code` | string | yes |  |
+| `data.execution.staged_at` | string | yes |  |
+| `data.execution.staged_by` | integer (int64) | yes |  |
+| `data.execution.stop_id` | integer (int64) | yes |  |
+| `data.execution.subject_container_id` | integer (int64) | yes |  |
+| `data.execution.transfer_reason` | string or null | no |  |
+| `data.execution.transferred_from_execution_id` | integer (int64) or null | no |  |
+| `data.execution.unit_assignment_id` | integer (int64) | yes |  |
+| `data.execution.unit_assignment_version` | integer (int32) | yes |  |
+| `data.is_current_root` | boolean | yes |  |
+| `data.nested_units` | boolean | yes |  |
+| `data.packing_open` | boolean | yes |  |
+| … | | | 34 more fields. See `openrpc.json`. |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "stage_unit_put",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "expected_from_location": "<expected_from_location>",
+      "expected_stage_version": 1,
+      "outbound_flow_unit_id": 1,
+      "scanned_stage_location_code": "<scanned_stage_location_code>"
     }
   }
 }'
@@ -3645,6 +4671,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.stage.packing_open` | boolean | yes |  |
 | `data.stage.stage_committed` | boolean | no | Historical commitment remains authoritative even when an old/faulty writer made the current transport generation disagree with its proof. |
 | `data.stage.stop_sequence` | integer (int32) or null | no |  |
+| `data.stage.stop_stage_location` | string or null | no | The stage place of the unit's stop. |
+| `data.stage.suggested_stage_location` | string or null | no | What the pallet is suggested: its stop's place, or the place a supervisor chose. |
 | `data.stage.transport_assignment` | object (OutboundUnitAssignment) or null | no |  |
 | `data.stage.unit` | object (OutboundFlowUnit) | yes |  |
 
@@ -4167,7 +5195,7 @@ Validate an allocation-policy draft and return every publication blocker.
 | Operation | read (read_model) |
 | Permission | RBAC resource type `api`, resource code `allocation_policy_validate` |
 | Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR, VIEWER |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | not required |
 
 **Notes**
 
@@ -4552,7 +5580,7 @@ Write every edited step of one allocation policy, each against its own version.
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (SaveAllocationSteps) | yes |  |
-| `data.idempotency_key` | string (uuid) | no | Resolved at the RPC boundary from `params.meta` when the wire did not put it here — see `IdempotencyKey::unset` for why the default is a sentinel and never a fresh random key. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.policy_id` | integer (int64) | yes |  |
 | `data.steps` | array of object (StepEdit) | yes |  |
 | `data.steps[].expected_version` | integer (int32) | yes |  |
@@ -4838,28 +5866,35 @@ Create an allocation policy whose steps are owned by the allocation pipeline.
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_allocation_policy` |
 | Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog does not say whether this method needs an idempotency key.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (AllocationPolicyCreate) | yes | Authoring contract: every new policy is a draft. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateAllocationPolicy) | yes | Authoring contract: every new policy is an inactive draft. |
 | `data.allow_overallocation` | boolean or null | no |  |
 | `data.code` | string | yes |  |
 | `data.descr` | string or null | no |  |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.name` | string or null | no |  |
 | `data.speed_pick_by_uom` | boolean or null | no |  |
 | `data.strict_lot_rotation` | boolean or null | no |  |
 
 **Result**
 
-The `result` member of the response is: `{ "data": AllocationPolicy }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": AllocationPolicy }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -4877,7 +5912,7 @@ The `result` member of the response is: `{ "data": AllocationPolicy }`
 | `data.retired_at` | string or null | no |  |
 | `data.speed_pick_by_uom` | boolean | yes |  |
 | `data.strict_lot_rotation` | boolean | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -4887,6 +5922,8 @@ The `result` member of the response is: `{ "data": AllocationPolicy }`
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -4901,6 +5938,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_allocation_policy",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>"
     }
@@ -4952,7 +5992,7 @@ The `result` member of the response is: `{ "data": AllocationPolicy }`
 | `data.retired_at` | string or null | no |  |
 | `data.speed_pick_by_uom` | boolean | yes |  |
 | `data.strict_lot_rotation` | boolean | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5094,7 +6134,7 @@ The `result` member of the response is: `{ "data": AllocationPolicy }`
 | `data.retired_at` | string or null | no |  |
 | `data.speed_pick_by_uom` | boolean | yes |  |
 | `data.strict_lot_rotation` | boolean | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5159,7 +6199,7 @@ The `result` member of the response is: `{ "data": AllocationPolicyDetail }`
 | `data.id` | integer (int64) | yes |  |
 | `data.location_abc` | one of: A \| B \| C or null | no |  |
 | `data.location_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
-| `data.location_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.location_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.lpn_quantity_rule` | one of: Any \| EqPackPallet \| NePackPallet | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -5173,7 +6213,7 @@ The `result` member of the response is: `{ "data": AllocationPolicyDetail }`
 | `data.sort_3` | one of: LotRotation \| Location \| LpnQuantity \| Lpn \| LpnRotationInLoc \| LocationAbc or null | no |  |
 | `data.sort_4` | one of: LotRotation \| Location \| LpnQuantity \| Lpn \| LpnRotationInLoc \| LocationAbc or null | no |  |
 | `data.uom_code` | string | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5260,7 +6300,7 @@ The `result` member of the response is: `{ "data": [AllocationPolicy] }`
 | `data[].retired_at` | string or null | no |  |
 | `data[].speed_pick_by_uom` | boolean | yes |  |
 | `data[].strict_lot_rotation` | boolean | yes |  |
-| `data[].version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data[].version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5359,7 +6399,7 @@ The `result` member of the response is: `{ "data": [AllocationPolicyDetail] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].location_abc` | one of: A \| B \| C or null | no |  |
 | `data[].location_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
-| `data[].location_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data[].location_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data[].lpn_quantity_rule` | one of: Any \| EqPackPallet \| NePackPallet | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
@@ -5373,7 +6413,7 @@ The `result` member of the response is: `{ "data": [AllocationPolicyDetail] }`
 | `data[].sort_3` | one of: LotRotation \| Location \| LpnQuantity \| Lpn \| LpnRotationInLoc \| LocationAbc or null | no |  |
 | `data[].sort_4` | one of: LotRotation \| Location \| LpnQuantity \| Lpn \| LpnRotationInLoc \| LocationAbc or null | no |  |
 | `data[].uom_code` | string | yes |  |
-| `data[].version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data[].version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5464,7 +6504,7 @@ The `result` member of the response is: `{ "data": AllocationPolicy }`
 | `data.retired_at` | string or null | no |  |
 | `data.speed_pick_by_uom` | boolean | yes |  |
 | `data.strict_lot_rotation` | boolean | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 344). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -5675,7 +6715,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### create_replenishment_policy
 
-Create a replenishment-policy root with replay protection.
+Create a replenishment-policy root with durable caller-key replay.
 
 | | |
 |---|---|
@@ -5688,20 +6728,20 @@ Create a replenishment-policy root with replay protection.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreateReplenishmentPolicy) | yes | Replenishment-policy root for this create action. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateReplenishmentPolicy) | yes | One caller-owned create intent. |
 | `data.code` | string | yes |  |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `data.idempotency_key` | string (uuid) | no |  |
 
 **Result**
 
@@ -6413,7 +7453,7 @@ Create a cartonization policy and its ordered cartons atomically.
 | `data` | object (CartonizationPolicyAggregateForCreate) | yes |  |
 | `data.code` | string | yes |  |
 | `data.data` | object (CartonizationPolicyAggregateDraft) | yes |  |
-| `data.data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20, ...` on save. |
+| `data.data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20,...` on save. |
 | `data.data.policy` | object (CartonizationPolicyRootDraft) | yes |  |
 
 **Result**
@@ -6428,18 +7468,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyAggregateV
 | `data.cartons[].add_who` | integer (int64) | yes |  |
 | `data.cartons[].cartonization_policy_id` | integer (int64) | yes |  |
 | `data.cartons[].descr` | string | yes |  |
-| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.cartons[].id` | integer (int64) | yes |  |
 | `data.cartons[].inner_height` | number (double) | yes |  |
-| `data.cartons[].inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.cartons[].inner_length` | number (double) | yes |  |
 | `data.cartons[].inner_width` | number (double) | yes |  |
-| `data.cartons[].max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.cartons[].max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.cartons[].max_gross_weight` | number (double) | yes |  |
+| `data.cartons[].max_units` | integer (int32) | yes |  |
 | `data.cartons[].mod_when` | string | yes |  |
 | `data.cartons[].mod_who` | integer (int64) | yes |  |
-| `data.cartons[].sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.cartons[].step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.cartons[].tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.cartons[].sequence` | integer (int32) | yes |  |
+| `data.cartons[].step_num` | string | yes |  |
+| `data.cartons[].tare_weight` | number (double) | yes |  |
 | `data.policy` | object (CartonizationPolicy) | yes |  |
 | `data.policy.active` | boolean | yes |  |
 | `data.policy.add_when` | string | yes |  |
@@ -6612,7 +7652,7 @@ Replace a cartonization policy and its ordered cartons atomically.
 | `meta` | object | no | Control-plane envelope supplied by the platform. |
 | `data` | object | yes | Versioned update payload. |
 | `data.data` | object (CartonizationPolicyAggregateDraft) | yes |  |
-| `data.data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20, ...` on save. |
+| `data.data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20,...` on save. |
 | `data.data.policy` | object (CartonizationPolicyRootDraft) | yes |  |
 | `data.expected_version` | integer (int32) | yes |  |
 | `data.id` | integer (int64) | yes |  |
@@ -6629,18 +7669,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyAggregateV
 | `data.cartons[].add_who` | integer (int64) | yes |  |
 | `data.cartons[].cartonization_policy_id` | integer (int64) | yes |  |
 | `data.cartons[].descr` | string | yes |  |
-| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.cartons[].id` | integer (int64) | yes |  |
 | `data.cartons[].inner_height` | number (double) | yes |  |
-| `data.cartons[].inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.cartons[].inner_length` | number (double) | yes |  |
 | `data.cartons[].inner_width` | number (double) | yes |  |
-| `data.cartons[].max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.cartons[].max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.cartons[].max_gross_weight` | number (double) | yes |  |
+| `data.cartons[].max_units` | integer (int32) | yes |  |
 | `data.cartons[].mod_when` | string | yes |  |
 | `data.cartons[].mod_who` | integer (int64) | yes |  |
-| `data.cartons[].sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.cartons[].step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.cartons[].tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.cartons[].sequence` | integer (int32) | yes |  |
+| `data.cartons[].step_num` | string | yes |  |
+| `data.cartons[].tare_weight` | number (double) | yes |  |
 | `data.policy` | object (CartonizationPolicy) | yes |  |
 | `data.policy.active` | boolean | yes |  |
 | `data.policy.add_when` | string | yes |  |
@@ -6820,7 +7860,7 @@ The `result` member of the response is: `{ "data": CartonizationPolicyAggregateD
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20, ...` on save. |
+| `data.cartons` | array of object (CartonizationCartonDraft) | yes | The vector order becomes `sequence = 10, 20,...` on save. |
 | `data.cartons[].active` | boolean | yes |  |
 | `data.cartons[].code` | string | yes |  |
 | `data.cartons[].descr` | string | yes |  |
@@ -6956,18 +7996,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyAggregateV
 | `data.cartons[].add_who` | integer (int64) | yes |  |
 | `data.cartons[].cartonization_policy_id` | integer (int64) | yes |  |
 | `data.cartons[].descr` | string | yes |  |
-| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.cartons[].handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.cartons[].id` | integer (int64) | yes |  |
 | `data.cartons[].inner_height` | number (double) | yes |  |
-| `data.cartons[].inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.cartons[].inner_length` | number (double) | yes |  |
 | `data.cartons[].inner_width` | number (double) | yes |  |
-| `data.cartons[].max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.cartons[].max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.cartons[].max_gross_weight` | number (double) | yes |  |
+| `data.cartons[].max_units` | integer (int32) | yes |  |
 | `data.cartons[].mod_when` | string | yes |  |
 | `data.cartons[].mod_who` | integer (int64) | yes |  |
-| `data.cartons[].sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.cartons[].step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.cartons[].tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.cartons[].sequence` | integer (int32) | yes |  |
+| `data.cartons[].step_num` | string | yes |  |
+| `data.cartons[].tare_weight` | number (double) | yes |  |
 | `data.policy` | object (CartonizationPolicy) | yes |  |
 | `data.policy.active` | boolean | yes |  |
 | `data.policy.add_when` | string | yes |  |
@@ -7302,18 +8342,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyDetailForm
 | `data.add_who` | integer (int64) | yes |  |
 | `data.cartonization_policy_id` | integer (int64) | yes |  |
 | `data.descr` | string | yes |  |
-| `data.handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.inner_height` | number (double) | yes |  |
-| `data.inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.inner_length` | number (double) | yes |  |
 | `data.inner_width` | number (double) | yes |  |
-| `data.max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.max_gross_weight` | number (double) | yes |  |
+| `data.max_units` | integer (int32) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.sequence` | integer (int32) | yes |  |
+| `data.step_num` | string | yes |  |
+| `data.tare_weight` | number (double) | yes |  |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this carton. |
 
 **Errors**
@@ -7565,18 +8605,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.cartonization_policy_id` | integer (int64) | yes |  |
 | `data.descr` | string | yes |  |
-| `data.handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.inner_height` | number (double) | yes |  |
-| `data.inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.inner_length` | number (double) | yes |  |
 | `data.inner_width` | number (double) | yes |  |
-| `data.max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.max_gross_weight` | number (double) | yes |  |
+| `data.max_units` | integer (int32) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.sequence` | integer (int32) | yes |  |
+| `data.step_num` | string | yes |  |
+| `data.tare_weight` | number (double) | yes |  |
 
 **Errors**
 
@@ -7860,18 +8900,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.cartonization_policy_id` | integer (int64) | yes |  |
 | `data.descr` | string | yes |  |
-| `data.handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.inner_height` | number (double) | yes |  |
-| `data.inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.inner_length` | number (double) | yes |  |
 | `data.inner_width` | number (double) | yes |  |
-| `data.max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.max_gross_weight` | number (double) | yes |  |
+| `data.max_units` | integer (int32) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.sequence` | integer (int32) | yes |  |
+| `data.step_num` | string | yes |  |
+| `data.tare_weight` | number (double) | yes |  |
 
 **Errors**
 
@@ -7934,18 +8974,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyDetailForm
 | `data.add_who` | integer (int64) | yes |  |
 | `data.cartonization_policy_id` | integer (int64) | yes |  |
 | `data.descr` | string | yes |  |
-| `data.handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.inner_height` | number (double) | yes |  |
-| `data.inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.inner_length` | number (double) | yes |  |
 | `data.inner_width` | number (double) | yes |  |
-| `data.max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.max_gross_weight` | number (double) | yes |  |
+| `data.max_units` | integer (int32) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.sequence` | integer (int32) | yes |  |
+| `data.step_num` | string | yes |  |
+| `data.tare_weight` | number (double) | yes |  |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this carton. |
 
 **Errors**
@@ -8122,18 +9162,18 @@ The `result` member of the response is: `{ "data": [CartonizationPolicyDetail] }
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].cartonization_policy_id` | integer (int64) | yes |  |
 | `data[].descr` | string | yes |  |
-| `data[].handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data[].handling_unit_type_id` | integer (int64) or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].inner_height` | number (double) | yes |  |
-| `data[].inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data[].inner_length` | number (double) | yes |  |
 | `data[].inner_width` | number (double) | yes |  |
-| `data[].max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data[].max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data[].max_gross_weight` | number (double) | yes |  |
+| `data[].max_units` | integer (int32) | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data[].step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data[].tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data[].sequence` | integer (int32) | yes |  |
+| `data[].step_num` | string | yes |  |
+| `data[].tare_weight` | number (double) | yes |  |
 
 **Errors**
 
@@ -8221,18 +9261,18 @@ The `result` member of the response is: `{ "data": CartonizationPolicyDetailForm
 | `data.add_who` | integer (int64) | yes |  |
 | `data.cartonization_policy_id` | integer (int64) | yes |  |
 | `data.descr` | string | yes |  |
-| `data.handling_unit_type_id` | integer (int64) or null | no | The packaging type this candidate plans (`enterprise.handling_unit_type.id`, pick slice 7). |
+| `data.handling_unit_type_id` | integer (int64) or null | no |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.inner_height` | number (double) | yes |  |
-| `data.inner_length` | number (double) | yes | INNER dimensions: the solver packs goods inside them. |
+| `data.inner_length` | number (double) | yes |  |
 | `data.inner_width` | number (double) | yes |  |
-| `data.max_gross_weight` | number (double) | yes | The carrier's limit for the WHOLE box, with its packaging. |
-| `data.max_units` | integer (int32) | yes | The limit on the number of units inside. |
+| `data.max_gross_weight` | number (double) | yes |  |
+| `data.max_units` | integer (int32) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.sequence` | integer (int32) | yes | The order in which the solver considers the rows. |
-| `data.step_num` | string | yes | Code of the candidate box, for example `BOX-S` or `BOX-M`. |
-| `data.tare_weight` | number (double) | yes | Weight of the empty box. |
+| `data.sequence` | integer (int32) | yes |  |
+| `data.step_num` | string | yes |  |
+| `data.tare_weight` | number (double) | yes |  |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this carton. |
 
 **Errors**
@@ -8420,7 +9460,9 @@ Add an Order to a Draft Wave.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WaveMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -8436,10 +9478,12 @@ The `result` member of the response is: `{ "data": WaveMutationResult }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -8450,6 +9494,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "wave": {
         "add_when": "<add_when>",
@@ -8538,7 +9585,9 @@ Cancel a Wave before release starts.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WaveMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -8554,10 +9603,12 @@ The `result` member of the response is: `{ "data": WaveMutationResult }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -8568,6 +9619,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "wave": {
         "add_when": "<add_when>",
@@ -8615,6 +9669,161 @@ curl -s -X POST "$BASE_URL/api/rpc" \
     },
     "data": {
       "expected_wave_version": 1,
+      "wave_id": 1
+    }
+  }
+}'
+```
+
+### wave_card_get
+
+Read the Wave screen: the wave, every order with its customer, picks and dispatch.
+
+| | |
+|---|---|
+| Context / module | outbound / wave |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `wave_card_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (WaveIdInput) | yes |  |
+| `data.wave_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": WaveCard }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.lines_total` | integer (int64) | yes | Lines of every member. |
+| `data.members` | array of object (WaveCardMember) | yes |  |
+| `data.members[].attempt_count` | integer (int32) | yes |  |
+| `data.members[].customer` | string | yes | The ship-to's company name; its code when it has none. |
+| `data.members[].dispatch_code` | string or null | no | The active dispatch the order rides, and its stop. |
+| `data.members[].last_error_code` | string or null | no |  |
+| `data.members[].last_error_detail` | string or null | no |  |
+| `data.members[].lines` | integer (int64) | yes |  |
+| `data.members[].member_id` | integer (int64) | yes |  |
+| `data.members[].order_id` | integer (int64) | yes |  |
+| `data.members[].order_number` | string | yes |  |
+| `data.members[].priority` | integer (int32) | yes | The priority the member was added with, else the order's own. |
+| `data.members[].released_at` | string or null | no |  |
+| `data.members[].requested_ship_date` | string or null | no | `YYYY-MM-DD`; the order may not have one. |
+| `data.members[].sequence` | integer (int32) or null | no |  |
+| `data.members[].status` | one of: Draft \| Pending \| Processing \| Released \| Blocked \| Failed \| Skipped | yes |  |
+| `data.members[].stop_sequence` | integer (int32) or null | no |  |
+| `data.members[].tasks_done` | integer (int64) | yes |  |
+| `data.members[].tasks_total` | integer (int64) | yes | Pick tasks of the order, and those finished (done, shorted or cancelled). |
+| `data.progress` | object (WaveProgress) | yes |  |
+| `data.progress.blocked` | integer (int64) | yes |  |
+| `data.progress.draft` | integer (int64) | yes |  |
+| `data.progress.failed` | integer (int64) | yes |  |
+| `data.progress.pending` | integer (int64) | yes |  |
+| `data.progress.processing` | integer (int64) | yes |  |
+| `data.progress.released` | integer (int64) | yes |  |
+| `data.progress.skipped` | integer (int64) | yes |  |
+| `data.tasks_done` | integer (int64) | yes |  |
+| `data.tasks_total` | integer (int64) | yes | Pick tasks of every member, and those finished. |
+| `data.wave` | object (Wave) | yes |  |
+| `data.wave.add_when` | string | yes |  |
+| `data.wave.add_who` | integer (int64) | yes |  |
+| `data.wave.cancelled_at` | string or null | no |  |
+| `data.wave.code` | string | yes |  |
+| `data.wave.completed_at` | string or null | no |  |
+| `data.wave.id` | integer (int64) | yes |  |
+| `data.wave.mod_when` | string | yes |  |
+| `data.wave.mod_who` | integer (int64) | yes |  |
+| `data.wave.planned_at` | string or null | no |  |
+| `data.wave.policy_id` | integer (int64) or null | no |  |
+| `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
+| `data.wave.release_generation` | integer (int32) | yes |  |
+| `data.wave.release_requested_by` | integer (int64) or null | no |  |
+| … | | | 5 more fields. See `openrpc.json`. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "lines_total": 1,
+      "members": [
+        {
+          "attempt_count": 1,
+          "customer": "<customer>",
+          "lines": 1,
+          "member_id": 1,
+          "order_id": 1,
+          "order_number": "<order_number>",
+          "priority": 1,
+          "status": "Draft",
+          "tasks_done": 1,
+          "tasks_total": 1
+        }
+      ],
+      "progress": {
+        "blocked": 1,
+        "draft": 1,
+        "failed": 1,
+        "pending": 1,
+        "processing": 1,
+        "released": 1,
+        "skipped": 1
+      },
+      "tasks_done": 1,
+      "tasks_total": 1,
+      "wave": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "release_generation": 1,
+        "status": "Draft",
+        "version": 1
+      },
+      "wave_tasks": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "wave_card_get",
+  "params": {
+    "data": {
       "wave_id": 1
     }
   }
@@ -8671,10 +9880,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -8809,11 +10020,11 @@ The `result` member of the response is: `{ "data": WaveDetails }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
-| `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
-| … | | | 2 more fields. See `openrpc.json`. |
+| … | | | 4 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -8914,25 +10125,35 @@ Read a flat Wave header without advancing it.
 
 **Result**
 
-The `result` member of the response is: `{ "data": Wave }`
+The `result` member of the response is: `{ "data": WaveHeader }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
+| `data.blocked_count` | integer (int64) | yes |  |
 | `data.cancelled_at` | string or null | no |  |
 | `data.code` | string | yes |  |
 | `data.completed_at` | string or null | no |  |
+| `data.draft_count` | integer (int64) | yes |  |
+| `data.failed_count` | integer (int64) | yes |  |
 | `data.id` | integer (int64) | yes |  |
+| `data.member_count` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pending_count` | integer (int64) | yes |  |
 | `data.planned_at` | string or null | no |  |
 | `data.policy_id` | integer (int64) or null | no |  |
 | `data.policy_run_id` | integer (int64) or null | no |  |
+| `data.processing_count` | integer (int64) | yes |  |
+| `data.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.release_generation` | integer (int32) | yes |  |
 | `data.release_requested_by` | integer (int64) or null | no |  |
 | `data.released_at` | string or null | no |  |
-| `data.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.released_count` | integer (int64) | yes |  |
+| `data.skipped_count` | integer (int64) | yes |  |
+| `data.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.version` | integer (int32) | yes |  |
 
@@ -9013,10 +10234,12 @@ The `result` member of the response is: `{ "data": [Wave] }`
 | `data[].planned_at` | string or null | no |  |
 | `data[].policy_id` | integer (int64) or null | no |  |
 | `data[].policy_run_id` | integer (int64) or null | no |  |
+| `data[].release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data[].release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data[].release_generation` | integer (int32) | yes |  |
 | `data[].release_requested_by` | integer (int64) or null | no |  |
 | `data[].released_at` | string or null | no |  |
-| `data[].station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data[].station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data[].status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -9096,10 +10319,12 @@ The `result` member of the response is: `{ "data": [Wave] }`
 | `data[].planned_at` | string or null | no |  |
 | `data[].policy_id` | integer (int64) or null | no |  |
 | `data[].policy_run_id` | integer (int64) or null | no |  |
+| `data[].release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data[].release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data[].release_generation` | integer (int32) | yes |  |
 | `data[].release_requested_by` | integer (int64) or null | no |  |
 | `data[].released_at` | string or null | no |  |
-| `data[].station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data[].station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data[].status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -9181,6 +10406,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.id` | integer (int64) | yes |  |
@@ -9196,9 +10422,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
 | `data.policy.version` | integer (int32) | yes |  |
 | `data.run` | object (WavePolicyRun) | yes |  |
@@ -9208,13 +10437,9 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.run.error` | string or null | no | Why a `Failed` run failed; `None` exactly when it succeeded. |
 | `data.run.excluded_order_count` | integer (int32) | yes |  |
 | `data.run.id` | integer (int64) | yes |  |
-| `data.run.outcome` | one of: Succeeded \| Failed | yes | `Failed` when a scheduled build was rolled back (wms-app 094, P-12): the slot is recorded and skipped rather than retried forever. |
+| `data.run.outcome` | one of: Succeeded \| Failed | yes | `Failed` when a scheduled build was rolled back: the slot is recorded and skipped rather than retried forever. |
 | `data.run.policy_id` | integer (int64) | yes |  |
-| `data.run.scheduled_for` | string or null | no |  |
-| `data.run.selected_order_count` | integer (int32) | yes |  |
-| `data.run.started_at` | string | yes |  |
-| `data.run.wave_count` | integer (int32) | yes |  |
-| … | | | 18 more fields. See `openrpc.json`. |
+| … | | | 24 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -9250,6 +10475,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "<eligible_statuses>"
         ],
         "group_by_carrier": false,
+        "group_by_dispatch": false,
         "group_by_owner": false,
         "group_by_requested_ship_date": false,
         "id": 1,
@@ -9361,6 +10587,7 @@ Create a Wave policy.
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | no | The orders of one dispatch go into one wave. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.include_undated` | boolean | yes |  |
@@ -9371,9 +10598,12 @@ Create a Wave policy.
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Built waves stay Draft and are released this many minutes later. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
-| `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
+| `data.policy.schedule_interval_minutes` | integer (int32) or null | no | "Every N minutes" from `schedule_starts_at` — one of the two kinds of schedule. |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | "At these HH:MM on these weekdays", in the warehouse's time zone — the other kind of schedule. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of the weekly schedule (1 = Monday … 7 = Sunday). |
 | `data.policy.station_location` | string or null | no | The distribution station the policy's waves are released onto (R-4). |
 
 **Result**
@@ -9393,6 +10623,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.id` | integer (int64) | yes |  |
@@ -9408,9 +10639,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
 | `data.policy.version` | integer (int32) | yes |  |
 
@@ -9434,6 +10668,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "<eligible_statuses>"
         ],
         "group_by_carrier": false,
+        "group_by_dispatch": false,
         "group_by_owner": false,
         "group_by_requested_ship_date": false,
         "id": 1,
@@ -9496,6 +10731,149 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 }'
 ```
 
+### wave_policy_duplicate
+
+Copy a saved Wave policy, inactive, under the next WS number.
+
+| | |
+|---|---|
+| Context / module | outbound / wave |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `wave_policy_duplicate` |
+| Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (DuplicateWavePolicy) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.policy_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WavePolicyMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.policy` | object (WavePolicy) | yes |  |
+| `data.policy.add_when` | string | yes |  |
+| `data.policy.add_who` | integer (int64) | yes |  |
+| `data.policy.auto_release` | boolean | yes |  |
+| `data.policy.carrier_id` | integer (int64) or null | no |  |
+| `data.policy.code` | string | yes |  |
+| `data.policy.description` | string or null | no |  |
+| `data.policy.eligible_statuses` | array of string | yes |  |
+| `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
+| `data.policy.group_by_owner` | boolean | yes |  |
+| `data.policy.group_by_requested_ship_date` | boolean | yes |  |
+| `data.policy.id` | integer (int64) | yes |  |
+| `data.policy.include_undated` | boolean | yes |  |
+| `data.policy.is_active` | boolean | yes |  |
+| `data.policy.last_scheduled_at` | string or null | no |  |
+| `data.policy.max_lines` | integer (int32) or null | no |  |
+| `data.policy.max_orders` | integer (int32) | yes |  |
+| `data.policy.max_waves_per_run` | integer (int32) | yes |  |
+| `data.policy.mod_when` | string | yes |  |
+| `data.policy.mod_who` | integer (int64) | yes |  |
+| `data.policy.next_run_at` | string or null | no |  |
+| `data.policy.owner_id` | integer (int64) or null | no |  |
+| `data.policy.priority_from` | integer (int16) or null | no |  |
+| `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
+| `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
+| `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
+| `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
+| `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
+| `data.policy.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "policy": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "auto_release": false,
+        "code": "<code>",
+        "eligible_statuses": [
+          "<eligible_statuses>"
+        ],
+        "group_by_carrier": false,
+        "group_by_dispatch": false,
+        "group_by_owner": false,
+        "group_by_requested_ship_date": false,
+        "id": 1,
+        "include_undated": false,
+        "is_active": false,
+        "max_orders": 1,
+        "max_waves_per_run": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "wave_policy_duplicate",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "policy_id": 1
+    }
+  }
+}'
+```
+
 ### wave_policy_get
 
 Get a Wave policy.
@@ -9503,10 +10881,11 @@ Get a Wave policy.
 | | |
 |---|---|
 | Context / module | outbound / wave |
-| Category | query (read operation; not declared in the catalog) |
+| Category | query |
 | Operation | read (read_model) |
 | Permission | RBAC resource type `api`, resource code `wave_policy_get` |
-| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, VIEWER |
+| Idempotency key | not stated in the catalog |
 
 **Notes**
 
@@ -9533,6 +10912,7 @@ The `result` member of the response is: `{ "data": WavePolicy }`
 | `data.description` | string or null | no |  |
 | `data.eligible_statuses` | array of string | yes |  |
 | `data.group_by_carrier` | boolean | yes |  |
+| `data.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data.group_by_owner` | boolean | yes |  |
 | `data.group_by_requested_ship_date` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
@@ -9548,9 +10928,12 @@ The `result` member of the response is: `{ "data": WavePolicy }`
 | `data.owner_id` | integer (int64) or null | no |  |
 | `data.priority_from` | integer (int16) or null | no |  |
 | `data.priority_to` | integer (int16) or null | no |  |
+| `data.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data.requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data.schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data.schedule_starts_at` | string or null | no |  |
+| `data.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
 | `data.version` | integer (int32) | yes |  |
 
@@ -9582,6 +10965,83 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 }'
 ```
 
+### wave_policy_last_run
+
+The latest run of a Wave policy and its waves.
+
+| | |
+|---|---|
+| Context / module | outbound / wave |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `wave_policy_last_run` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, VIEWER |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (WavePolicyIdInput) | yes |  |
+| `data.policy_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": object (WavePolicyLastRun) or null }`
+
+Type of `data`: object (WavePolicyLastRun) or null
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "outcome": "Succeeded",
+      "started_at": "<started_at>",
+      "started_at_text": "<started_at_text>",
+      "wave_codes": [
+        "<wave_codes>"
+      ]
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "wave_policy_last_run",
+  "params": {
+    "data": {
+      "policy_id": 1
+    }
+  }
+}'
+```
+
 ### wave_policy_list
 
 List Wave policies.
@@ -9589,10 +11049,11 @@ List Wave policies.
 | | |
 |---|---|
 | Context / module | outbound / wave |
-| Category | query (read operation; not declared in the catalog) |
+| Category | query |
 | Operation | read (read_model) |
 | Permission | RBAC resource type `api`, resource code `wave_policy_list` |
-| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, VIEWER |
+| Idempotency key | not stated in the catalog |
 
 **Notes**
 
@@ -9620,6 +11081,7 @@ The `result` member of the response is: `{ "data": [WavePolicy] }`
 | `data[].description` | string or null | no |  |
 | `data[].eligible_statuses` | array of string | yes |  |
 | `data[].group_by_carrier` | boolean | yes |  |
+| `data[].group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data[].group_by_owner` | boolean | yes |  |
 | `data[].group_by_requested_ship_date` | boolean | yes |  |
 | `data[].id` | integer (int64) | yes |  |
@@ -9635,9 +11097,12 @@ The `result` member of the response is: `{ "data": [WavePolicy] }`
 | `data[].owner_id` | integer (int64) or null | no |  |
 | `data[].priority_from` | integer (int16) or null | no |  |
 | `data[].priority_to` | integer (int16) or null | no |  |
+| `data[].release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data[].requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data[].schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data[].schedule_starts_at` | string or null | no |  |
+| `data[].schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data[].schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data[].station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -9667,6 +11132,146 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 }'
 ```
 
+### wave_policy_new
+
+Create a new inactive Wave policy under the next WS number.
+
+| | |
+|---|---|
+| Context / module | outbound / wave |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `wave_policy_new` |
+| Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (NewWavePolicy) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WavePolicyMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.policy` | object (WavePolicy) | yes |  |
+| `data.policy.add_when` | string | yes |  |
+| `data.policy.add_who` | integer (int64) | yes |  |
+| `data.policy.auto_release` | boolean | yes |  |
+| `data.policy.carrier_id` | integer (int64) or null | no |  |
+| `data.policy.code` | string | yes |  |
+| `data.policy.description` | string or null | no |  |
+| `data.policy.eligible_statuses` | array of string | yes |  |
+| `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
+| `data.policy.group_by_owner` | boolean | yes |  |
+| `data.policy.group_by_requested_ship_date` | boolean | yes |  |
+| `data.policy.id` | integer (int64) | yes |  |
+| `data.policy.include_undated` | boolean | yes |  |
+| `data.policy.is_active` | boolean | yes |  |
+| `data.policy.last_scheduled_at` | string or null | no |  |
+| `data.policy.max_lines` | integer (int32) or null | no |  |
+| `data.policy.max_orders` | integer (int32) | yes |  |
+| `data.policy.max_waves_per_run` | integer (int32) | yes |  |
+| `data.policy.mod_when` | string | yes |  |
+| `data.policy.mod_who` | integer (int64) | yes |  |
+| `data.policy.next_run_at` | string or null | no |  |
+| `data.policy.owner_id` | integer (int64) or null | no |  |
+| `data.policy.priority_from` | integer (int16) or null | no |  |
+| `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
+| `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
+| `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
+| `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
+| `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
+| `data.policy.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "policy": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "auto_release": false,
+        "code": "<code>",
+        "eligible_statuses": [
+          "<eligible_statuses>"
+        ],
+        "group_by_carrier": false,
+        "group_by_dispatch": false,
+        "group_by_owner": false,
+        "group_by_requested_ship_date": false,
+        "id": 1,
+        "include_undated": false,
+        "is_active": false,
+        "max_orders": 1,
+        "max_waves_per_run": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "wave_policy_new",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {}
+  }
+}'
+```
+
 ### wave_policy_preview
 
 Preview the Draft Waves a policy would build.
@@ -9674,10 +11279,11 @@ Preview the Draft Waves a policy would build.
 | | |
 |---|---|
 | Context / module | outbound / wave |
-| Category | query (read operation; not declared in the catalog) |
+| Category | query |
 | Operation | read (read_model) |
 | Permission | RBAC resource type `api`, resource code `wave_policy_preview` |
-| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, VIEWER |
+| Idempotency key | not stated in the catalog |
 
 **Notes**
 
@@ -9697,14 +11303,18 @@ The `result` member of the response is: `{ "data": WavePolicyPreview }`
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.batches` | array of object (WavePolicyBatch) | yes |  |
+| `data.batches[].carrier_code` | string or null | no | The group's carrier code, when the policy groups by carrier. |
+| `data.batches[].dispatch_code` | string or null | no | The group's dispatch code, when the policy groups by dispatch. |
 | `data.batches[].group` | object (WavePolicyGroup) | yes |  |
 | `data.batches[].line_count` | integer (int64) | yes |  |
 | `data.batches[].order_count` | integer (int32) | yes |  |
 | `data.batches[].orders` | array of object (WavePolicyCandidate) | yes |  |
+| `data.batches[].owner_code` | string or null | no | The group's owner code, when the policy groups by owner. |
 | `data.candidate_count` | integer (int32) | yes |  |
 | `data.exclusions` | array of object (WavePolicyExclusion) | yes |  |
 | `data.exclusions[].order` | object (WavePolicyCandidate) | yes | One currently eligible Order and the capacity fact W2a can prove before allocation: its active document-line count. |
 | `data.exclusions[].reason` | string | yes |  |
+| `data.in_other_wave_count` | integer (int64) | yes | Orders the policy matches that already belong to an active wave. |
 | `data.policy` | object (WavePolicy) | yes |  |
 | `data.policy.add_when` | string | yes |  |
 | `data.policy.add_who` | integer (int64) | yes |  |
@@ -9714,6 +11324,7 @@ The `result` member of the response is: `{ "data": WavePolicyPreview }`
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.id` | integer (int64) | yes |  |
@@ -9729,12 +11340,14 @@ The `result` member of the response is: `{ "data": WavePolicyPreview }`
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
-| `data.policy.version` | integer (int32) | yes |  |
-| `data.selected_order_count` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -9777,6 +11390,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "reason": "<reason>"
         }
       ],
+      "in_other_wave_count": 1,
       "policy": {
         "add_when": "<add_when>",
         "add_who": 1,
@@ -9786,6 +11400,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "<eligible_statuses>"
         ],
         "group_by_carrier": false,
+        "group_by_dispatch": false,
         "group_by_owner": false,
         "group_by_requested_ship_date": false,
         "id": 1,
@@ -9868,6 +11483,7 @@ Save a versioned Wave policy.
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | no | The orders of one dispatch go into one wave. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.include_undated` | boolean | yes |  |
@@ -9878,9 +11494,12 @@ Save a versioned Wave policy.
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Built waves stay Draft and are released this many minutes later. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
-| `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
+| `data.policy.schedule_interval_minutes` | integer (int32) or null | no | "Every N minutes" from `schedule_starts_at` — one of the two kinds of schedule. |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | "At these HH:MM on these weekdays", in the warehouse's time zone — the other kind of schedule. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of the weekly schedule (1 = Monday … 7 = Sunday). |
 | `data.policy.station_location` | string or null | no | The distribution station the policy's waves are released onto (R-4). |
 | `data.policy_id` | integer (int64) | yes |  |
 
@@ -9901,6 +11520,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.description` | string or null | no |  |
 | `data.policy.eligible_statuses` | array of string | yes |  |
 | `data.policy.group_by_carrier` | boolean | yes |  |
+| `data.policy.group_by_dispatch` | boolean | yes | The orders of one dispatch go into one wave; orders on no dispatch form a group of their own. |
 | `data.policy.group_by_owner` | boolean | yes |  |
 | `data.policy.group_by_requested_ship_date` | boolean | yes |  |
 | `data.policy.id` | integer (int64) | yes |  |
@@ -9916,9 +11536,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.owner_id` | integer (int64) or null | no |  |
 | `data.policy.priority_from` | integer (int16) or null | no |  |
 | `data.policy.priority_to` | integer (int16) or null | no |  |
+| `data.policy.release_after_minutes` | integer (int32) or null | no | Each built wave stays Draft with its release time this many minutes ahead; never with `auto_release`. |
 | `data.policy.requested_ship_days_ahead` | integer (int32) or null | no |  |
 | `data.policy.schedule_interval_minutes` | integer (int32) or null | no |  |
 | `data.policy.schedule_starts_at` | string or null | no |  |
+| `data.policy.schedule_times_of_day` | array of string or null | no | The warehouse-local times of a weekly slot, each `"HH:MM"`; paired with `schedule_weekdays`, and never with `schedule_interval_minutes`. |
+| `data.policy.schedule_weekdays` | array of integer (int16) or null | no | ISO weekdays of a weekly slot: 1 = Monday … 7 = Sunday. |
 | `data.policy.station_location` | string or null | no | The distribution station every wave this policy builds names (R-4); `None` = no station. |
 | `data.policy.version` | integer (int32) | yes |  |
 
@@ -9942,6 +11565,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "<eligible_statuses>"
         ],
         "group_by_carrier": false,
+        "group_by_dispatch": false,
         "group_by_owner": false,
         "group_by_requested_ship_date": false,
         "id": 1,
@@ -10053,10 +11677,12 @@ The `result` member of the response is: `{ "data": WavePreview }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -10169,7 +11795,9 @@ Freeze and enqueue a Wave for release.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WaveReleaseResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveReleaseResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -10193,10 +11821,12 @@ The `result` member of the response is: `{ "data": WaveReleaseResult }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -10207,6 +11837,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "progress": {
         "blocked": 1,
@@ -10304,7 +11937,9 @@ Remove an Order from a Draft Wave.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WaveMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -10320,10 +11955,12 @@ The `result` member of the response is: `{ "data": WaveMutationResult }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -10334,6 +11971,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "wave": {
         "add_when": "<add_when>",
@@ -10422,7 +12062,9 @@ Retry only blocked or failed Wave orders.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WaveReleaseResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveReleaseResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -10446,10 +12088,12 @@ The `result` member of the response is: `{ "data": WaveReleaseResult }`
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -10460,6 +12104,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "progress": {
         "blocked": 1,
@@ -10510,6 +12157,131 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "jsonrpc": "2.0",
   "id": 1,
   "method": "wave_retry_blocked",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "expected_wave_version": 1,
+      "wave_id": 1
+    }
+  }
+}'
+```
+
+### wave_set_release_at
+
+Set or clear the time a Draft Wave is released by the server.
+
+| | |
+|---|---|
+| Context / module | outbound / wave |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `wave_set_release_at` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `wave`: send `expected_wave_version` for row `wave_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_wave_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (SetWaveReleaseAt) | yes | Set the time the server releases a Draft wave itself, or clear it (owner, 2026-10-28). |
+| `data.expected_wave_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.release_at` | string or null | no | An RFC 3339 instant in the future; `None` clears the time. |
+| `data.wave_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WaveMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.wave` | object (Wave) | yes |  |
+| `data.wave.add_when` | string | yes |  |
+| `data.wave.add_who` | integer (int64) | yes |  |
+| `data.wave.cancelled_at` | string or null | no |  |
+| `data.wave.code` | string | yes |  |
+| `data.wave.completed_at` | string or null | no |  |
+| `data.wave.id` | integer (int64) | yes |  |
+| `data.wave.mod_when` | string | yes |  |
+| `data.wave.mod_who` | integer (int64) | yes |  |
+| `data.wave.planned_at` | string or null | no |  |
+| `data.wave.policy_id` | integer (int64) or null | no |  |
+| `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
+| `data.wave.release_generation` | integer (int32) | yes |  |
+| `data.wave.release_requested_by` | integer (int64) or null | no |  |
+| `data.wave.released_at` | string or null | no |  |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
+| `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
+| `data.wave.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "wave": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "release_generation": 1,
+        "status": "Draft",
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "wave_set_release_at",
   "params": {
     "meta": {
       "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
@@ -10575,10 +12347,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.wave.planned_at` | string or null | no |  |
 | `data.wave.policy_id` | integer (int64) or null | no |  |
 | `data.wave.policy_run_id` | integer (int64) or null | no |  |
+| `data.wave.release_at` | string or null | no | When the server releases this Draft wave itself, through the manual release path; `None` = no timed release. |
+| `data.wave.release_at_refusal` | string or null | no | Why the last timed release was refused as a whole; the wave stayed Draft and its time was cleared. |
 | `data.wave.release_generation` | integer (int32) | yes |  |
 | `data.wave.release_requested_by` | integer (int64) or null | no |  |
 | `data.wave.released_at` | string or null | no |  |
-| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station (wms-app 095, R-4). |
+| `data.wave.station_location` | string or null | no | The distribution station (a `Sort` location) the wave is released onto; `None` = no station. |
 | `data.wave.status` | one of: Draft \| Planned \| Released \| InProgress \| Completed \| Cancelled | yes |  |
 | `data.wave.version` | integer (int32) | yes |  |
 
@@ -10685,7 +12459,9 @@ Add active Order planning intent to a Draft Dispatch.
 
 **Result**
 
-The `result` member of the response is: `{ "data": DispatchMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -10702,6 +12478,7 @@ The `result` member of the response is: `{ "data": DispatchMutationResult }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 
@@ -10712,6 +12489,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -10761,6 +12541,184 @@ curl -s -X POST "$BASE_URL/api/rpc" \
       "expected_dispatch_version": 1,
       "order_id": 1,
       "stop_id": 1
+    }
+  }
+}'
+```
+
+### dispatch_cancel
+
+Cancel a Draft or Planned Dispatch before loading starts: its empty open load and its load plan are cancelled, its stage cards and order intents released.
+
+| | |
+|---|---|
+| Context / module | outbound / dispatch |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `dispatch_cancel` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `dispatch`: send `expected_dispatch_version` for row `dispatch_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_dispatch_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CancelDispatch) | yes |  |
+| `data.dispatch_id` | integer (int64) | yes |  |
+| `data.expected_dispatch_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.reason` | string or null | no | Why the trip is cancelled, up to 500 characters; optional. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchCancelResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.dispatch` | object (Dispatch) | yes |  |
+| `data.dispatch.add_when` | string | yes |  |
+| `data.dispatch.add_who` | integer (int64) | yes |  |
+| `data.dispatch.cancelled_at` | string or null | no |  |
+| `data.dispatch.carrier_id` | integer (int64) or null | no |  |
+| `data.dispatch.code` | string | yes |  |
+| `data.dispatch.door_location_id` | integer (int64) or null | no |  |
+| `data.dispatch.external_ref` | string or null | no |  |
+| `data.dispatch.id` | integer (int64) | yes |  |
+| `data.dispatch.mod_when` | string | yes |  |
+| `data.dispatch.mod_who` | integer (int64) | yes |  |
+| `data.dispatch.planned_at` | string or null | no |  |
+| `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
+| `data.dispatch.version` | integer (int32) | yes |  |
+| `data.load` | object (OutboundLoad) or null | no | The open load cancelled with the dispatch, if one was open. |
+| `data.load.active_stop_id` | integer (int64) or null | no |  |
+| `data.load.code` | string | yes |  |
+| `data.load.completed_at` | string or null | no |  |
+| `data.load.dispatch_id` | integer (int64) | yes |  |
+| `data.load.door_location_code` | string or null | no |  |
+| `data.load.frozen_plan_version` | integer (int32) | yes |  |
+| `data.load.id` | integer (int64) | yes |  |
+| `data.load.last_actual_sequence` | integer (int32) | yes |  |
+| `data.load.load_plan_id` | integer (int64) | yes |  |
+| `data.load.opened_at` | string | yes |  |
+| `data.load.opened_by` | integer (int64) | yes |  |
+| `data.load.require_staged` | boolean | yes |  |
+| `data.load.sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted | yes |  |
+| `data.load.shipped_at` | string or null | no |  |
+| `data.load.started_at` | string or null | no |  |
+| `data.load.status` | one of: Open \| Loading \| Loaded \| Shipped \| Cancelled | yes |  |
+| `data.load.transport_confirmed` | boolean | yes |  |
+| `data.load.transport_external_ref` | string | yes |  |
+| `data.load.transport_unit_id` | integer (int64) | yes |  |
+| `data.load.version` | integer (int32) | yes |  |
+| `data.load_plan` | object (LoadPlan) or null | no | The plan, now `Cancelled`; none when the dispatch had none. |
+| `data.load_plan.add_when` | string | yes |  |
+| `data.load_plan.add_who` | integer (int64) | yes |  |
+| `data.load_plan.code` | string | yes | The plan's operator-facing number. |
+| `data.load_plan.dispatch_id` | integer (int64) | yes |  |
+| `data.load_plan.frozen_at` | string or null | no |  |
+| `data.load_plan.generated_at` | string or null | no |  |
+| `data.load_plan.id` | integer (int64) | yes |  |
+| … | | | 35 more fields. See `openrpc.json`. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "dispatch": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "status": "Draft",
+        "version": 1
+      },
+      "released_orders": [
+        {
+          "add_when": "<add_when>",
+          "add_who": 1,
+          "dispatch_id": 1,
+          "id": 1,
+          "mod_when": "<mod_when>",
+          "mod_who": 1,
+          "order_id": 1,
+          "stop_id": 1
+        }
+      ],
+      "released_stage_cards": [
+        {
+          "add_when": "<add_when>",
+          "add_who": 1,
+          "dispatch_id": 1,
+          "id": 1,
+          "mod_when": "<mod_when>",
+          "mod_who": 1,
+          "outbound_flow_unit_id": 1,
+          "stage_location_code": "<stage_location_code>",
+          "stop_id": 1,
+          "unit_assignment_id": 1,
+          "unit_assignment_version": 1,
+          "version": 1
+        }
+      ]
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "dispatch_cancel",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "dispatch_id": 1,
+      "expected_dispatch_version": 1
     }
   }
 }'
@@ -10821,6 +12779,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 
@@ -10913,12 +12872,13 @@ The `result` member of the response is: `{ "data": DispatchDetails }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.dispatch` | object (Dispatch) | yes |  |
+| `data.dispatch` | object (DispatchWithTruckAndDoor) | yes | The header with the codes of its door and planned truck. |
 | `data.dispatch.add_when` | string | yes |  |
 | `data.dispatch.add_who` | integer (int64) | yes |  |
 | `data.dispatch.cancelled_at` | string or null | no |  |
 | `data.dispatch.carrier_id` | integer (int64) or null | no |  |
 | `data.dispatch.code` | string | yes |  |
+| `data.dispatch.door_location_code` | string or null | no | The code of `door_location_id`. |
 | `data.dispatch.door_location_id` | integer (int64) or null | no |  |
 | `data.dispatch.external_ref` | string or null | no |  |
 | `data.dispatch.id` | integer (int64) | yes |  |
@@ -10926,8 +12886,23 @@ The `result` member of the response is: `{ "data": DispatchDetails }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data.dispatch.planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data.dispatch.planned_transport_plate` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data.dispatch.planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
+| `data.order_summaries` | array of object (DispatchOrderSummary) | no | Each current Order with its lines, quantity, status and wave — what the «Stops & orders» grid shows under its stop. |
+| `data.order_summaries[].dispatch_order_id` | integer (int64) | yes | The `dispatch_order` row. |
+| `data.order_summaries[].line_count` | integer (int64) | yes | Lines of the Order that are not cancelled. |
+| `data.order_summaries[].order_id` | integer (int64) | yes |  |
+| `data.order_summaries[].order_number` | string | yes |  |
+| `data.order_summaries[].order_status` | string | yes | `shipment_order.status`. |
+| `data.order_summaries[].preferred_stage_location_code` | string or null | no | The code of `dispatch_order.preferred_stage_location_id`. |
+| `data.order_summaries[].qty_ea` | number (double) | yes |  |
+| `data.order_summaries[].stop_id` | integer (int64) | yes |  |
+| `data.order_summaries[].wave_code` | string or null | no | The wave the Order was last put into, a cancelled wave aside. |
 | `data.orders` | array of object (DispatchOrder) | yes |  |
 | `data.orders[].add_when` | string | yes |  |
 | `data.orders[].add_who` | integer (int64) | yes |  |
@@ -10942,22 +12917,7 @@ The `result` member of the response is: `{ "data": DispatchDetails }`
 | `data.orders[].removed_by` | integer (int64) or null | no |  |
 | `data.orders[].stop_id` | integer (int64) | yes |  |
 | `data.stops` | array of object (DispatchStop) | yes |  |
-| `data.stops[].add_when` | string | yes |  |
-| `data.stops[].add_who` | integer (int64) | yes |  |
-| `data.stops[].destination_ref` | string | yes |  |
-| `data.stops[].dispatch_id` | integer (int64) | yes |  |
-| `data.stops[].id` | integer (int64) | yes |  |
-| `data.stops[].mod_when` | string | yes |  |
-| `data.stops[].mod_who` | integer (int64) | yes |  |
-| `data.stops[].planned_arrival_at` | string or null | no |  |
-| `data.stops[].planned_departure_at` | string or null | no |  |
-| `data.stops[].sequence` | integer (int32) | yes |  |
-| `data.stops[].stop_type` | string | yes |  |
-| `data.units` | array of object (OutboundUnitAssignmentView) | yes | Includes historical subjects; only `is_current_root` candidates can proceed to future Stage/Load validation. |
-| `data.units[].assignment` | object (OutboundUnitAssignment) | yes |  |
-| `data.units[].flow_status` | one of: Pending \| Completed \| Consumed | yes |  |
-| `data.units[].is_current_root` | boolean | yes |  |
-| `data.units[].subject_container_id` | integer (int64) | yes |  |
+| … | | | 29 more fields. See `openrpc.json`. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -11088,13 +13048,34 @@ The `result` member of the response is: `{ "data": DispatchPlanningHeader }`
 | `data.cancelled_at` | string or null | no |  |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.code` | string | yes |  |
+| `data.door_location_code` | string or null | no | The code of `door_location_id`. |
 | `data.door_location_id` | integer (int64) or null | no |  |
 | `data.external_ref` | string or null | no |  |
+| `data.has_active_load` | boolean | yes | A load is open on the Dispatch (not yet shipped or cancelled): its frozen plan cannot return to editing (`load_plan_reopen`). |
+| `data.has_load` | boolean | yes |  |
+| `data.has_load_plan` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
+| `data.load_has_units` | boolean | yes |  |
+| `data.load_id` | integer (int64) or null | no | The Dispatch's latest load as the card shows it and its loading commands echo: id, status, version, and how many units its manifest needs and has on the trailer. |
+| `data.load_loaded_count` | integer (int64) or null | no |  |
+| `data.load_plan_id` | integer (int64) or null | no | The Dispatch's Load Plan as the card shows it and its plan commands echo: id, status, version, rule. |
+| `data.load_plan_sequence_policy` | one of: ReverseStop \| ForwardStop \| StopGroup \| Explicit \| Unrestricted or null | no |  |
+| `data.load_plan_status` | one of: Draft \| Planned \| Frozen \| Completed \| Cancelled or null | no |  |
+| `data.load_plan_version` | integer (int32) or null | no |  |
+| `data.load_remaining_count` | integer (int64) or null | no |  |
+| `data.load_required_count` | integer (int64) or null | no |  |
+| `data.load_status` | one of: Open \| Loading \| Loaded \| Shipped \| Cancelled or null | no |  |
+| `data.load_version` | integer (int32) or null | no |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.planned_at` | string or null | no |  |
 | `data.planned_departure_at` | string or null | no |  |
+| `data.planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data.planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data.planned_transport_plate` | string or null | no |  |
+| `data.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data.planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
+| `data.route_appendable` | boolean | yes | Whether the route still takes additions — an order onto a stop it has, a new stop at its end. |
 | `data.route_editable` | boolean | yes | Advisory display gate; commands repeat it under the complete lock set. |
 | `data.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.version` | integer (int32) | yes |  |
@@ -11128,7 +13109,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### dispatch_header_list
 
-Filter and page Dispatch headers for planning.
+Filter and page Dispatch headers for planning, with their planned door and truck.
 
 | | |
 |---|---|
@@ -11153,6 +13134,7 @@ Filter and page Dispatch headers for planning.
 | `filters[].external_ref` | string filter | no | Filter on `external_ref`. |
 | `filters[].carrier_id` | integer filter | no | Filter on `carrier_id`. |
 | `filters[].door_location_id` | integer filter | no | Filter on `door_location_id`. |
+| `filters[].planned_transport_unit_id` | integer filter | no | Filter on `planned_transport_unit_id`. |
 | `filters[].status` | string filter | no | Filter on `status`. |
 | `list_options` | object | no | Pagination/sorting |
 | `list_options.limit` | integer | no |  |
@@ -11160,7 +13142,7 @@ Filter and page Dispatch headers for planning.
 
 **Result**
 
-The `result` member of the response is: `{ "data": [Dispatch] }`
+The `result` member of the response is: `{ "data": [DispatchWithTruckAndDoor] }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11169,6 +13151,7 @@ The `result` member of the response is: `{ "data": [Dispatch] }`
 | `data[].cancelled_at` | string or null | no |  |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].code` | string | yes |  |
+| `data[].door_location_code` | string or null | no | The code of `door_location_id`. |
 | `data[].door_location_id` | integer (int64) or null | no |  |
 | `data[].external_ref` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
@@ -11176,6 +13159,11 @@ The `result` member of the response is: `{ "data": [Dispatch] }`
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].planned_at` | string or null | no |  |
 | `data[].planned_departure_at` | string or null | no |  |
+| `data[].planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data[].planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data[].planned_transport_plate` | string or null | no |  |
+| `data[].planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data[].planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
 | `data[].status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -11216,7 +13204,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### dispatch_list
 
-List Dispatches.
+List Dispatches with their planned door and truck.
 
 | | |
 |---|---|
@@ -11240,7 +13228,7 @@ List Dispatches.
 
 **Result**
 
-The `result` member of the response is: `{ "data": [Dispatch] }`
+The `result` member of the response is: `{ "data": [DispatchWithTruckAndDoor] }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11249,6 +13237,7 @@ The `result` member of the response is: `{ "data": [Dispatch] }`
 | `data[].cancelled_at` | string or null | no |  |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].code` | string | yes |  |
+| `data[].door_location_code` | string or null | no | The code of `door_location_id`. |
 | `data[].door_location_id` | integer (int64) or null | no |  |
 | `data[].external_ref` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
@@ -11256,6 +13245,11 @@ The `result` member of the response is: `{ "data": [Dispatch] }`
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].planned_at` | string or null | no |  |
 | `data[].planned_departure_at` | string or null | no |  |
+| `data[].planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data[].planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data[].planned_transport_plate` | string or null | no |  |
+| `data[].planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data[].planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
 | `data[].status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -11403,7 +13397,9 @@ Freeze a manually prepared Dispatch as Planned.
 
 **Result**
 
-The `result` member of the response is: `{ "data": DispatchMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11420,6 +13416,7 @@ The `result` member of the response is: `{ "data": DispatchMutationResult }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 
@@ -11430,6 +13427,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -11517,7 +13517,9 @@ Remove active Order planning intent from a Draft Dispatch.
 
 **Result**
 
-The `result` member of the response is: `{ "data": DispatchMutationResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchMutationResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11534,6 +13536,7 @@ The `result` member of the response is: `{ "data": DispatchMutationResult }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 
@@ -11544,6 +13547,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -11597,6 +13603,256 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 }'
 ```
 
+### dispatch_set_door
+
+Plan or clear the door of a Draft or Planned Dispatch before its load opens.
+
+| | |
+|---|---|
+| Context / module | outbound / dispatch |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `dispatch_set_door` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `dispatch`: send `expected_dispatch_version` for row `dispatch_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_dispatch_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (SetDispatchDoor) | yes |  |
+| `data.dispatch_id` | integer (int64) | yes |  |
+| `data.door_location_id` | integer (int64) or null | no | The door location; `null` clears the planned door. |
+| `data.expected_dispatch_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchTruckAndDoorResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.dispatch` | object (DispatchWithTruckAndDoor) | yes | A dispatch header with its planned truck and door, flat on the wire. |
+| `data.dispatch.add_when` | string | yes |  |
+| `data.dispatch.add_who` | integer (int64) | yes |  |
+| `data.dispatch.cancelled_at` | string or null | no |  |
+| `data.dispatch.carrier_id` | integer (int64) or null | no |  |
+| `data.dispatch.code` | string | yes |  |
+| `data.dispatch.door_location_code` | string or null | no | The code of `door_location_id`. |
+| `data.dispatch.door_location_id` | integer (int64) or null | no |  |
+| `data.dispatch.external_ref` | string or null | no |  |
+| `data.dispatch.id` | integer (int64) | yes |  |
+| `data.dispatch.mod_when` | string | yes |  |
+| `data.dispatch.mod_who` | integer (int64) | yes |  |
+| `data.dispatch.planned_at` | string or null | no |  |
+| `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data.dispatch.planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data.dispatch.planned_transport_plate` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data.dispatch.planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
+| `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
+| `data.dispatch.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "dispatch": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "status": "Draft",
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "dispatch_set_door",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "dispatch_id": 1,
+      "expected_dispatch_version": 1
+    }
+  }
+}'
+```
+
+### dispatch_set_transport_unit
+
+Plan or clear the truck of a Draft or Planned Dispatch before its load opens.
+
+| | |
+|---|---|
+| Context / module | outbound / dispatch |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `dispatch_set_transport_unit` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `dispatch`: send `expected_dispatch_version` for row `dispatch_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_dispatch_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (SetDispatchTransportUnit) | yes |  |
+| `data.dispatch_id` | integer (int64) | yes |  |
+| `data.expected_dispatch_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | no |  |
+| `data.transport_unit_id` | integer (int64) or null | no | The registered transport resource; `null` clears the planned truck. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchTruckAndDoorResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.dispatch` | object (DispatchWithTruckAndDoor) | yes | A dispatch header with its planned truck and door, flat on the wire. |
+| `data.dispatch.add_when` | string | yes |  |
+| `data.dispatch.add_who` | integer (int64) | yes |  |
+| `data.dispatch.cancelled_at` | string or null | no |  |
+| `data.dispatch.carrier_id` | integer (int64) or null | no |  |
+| `data.dispatch.code` | string | yes |  |
+| `data.dispatch.door_location_code` | string or null | no | The code of `door_location_id`. |
+| `data.dispatch.door_location_id` | integer (int64) or null | no |  |
+| `data.dispatch.external_ref` | string or null | no |  |
+| `data.dispatch.id` | integer (int64) | yes |  |
+| `data.dispatch.mod_when` | string | yes |  |
+| `data.dispatch.mod_who` | integer (int64) | yes |  |
+| `data.dispatch.planned_at` | string or null | no |  |
+| `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_external_ref` | string or null | no | The planned truck's reference (`transport_unit.external_ref`). |
+| `data.dispatch.planned_transport_kind` | one of: Truck \| Trailer \| Container \| SwapBody \| CourierCage or null | no |  |
+| `data.dispatch.planned_transport_plate` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
+| `data.dispatch.planned_transport_version` | integer (int32) or null | no | The planned truck's version: what `load_open` echoes as `expected_transport_version` when it opens with the planned truck. |
+| `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
+| `data.dispatch.version` | integer (int32) | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "dispatch": {
+        "add_when": "<add_when>",
+        "add_who": 1,
+        "code": "<code>",
+        "id": 1,
+        "mod_when": "<mod_when>",
+        "mod_who": 1,
+        "status": "Draft",
+        "version": 1
+      }
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "dispatch_set_transport_unit",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "dispatch_id": 1,
+      "expected_dispatch_version": 1
+    }
+  }
+}'
+```
+
 ### dispatch_stop_add
 
 Add an ordered delivery stop to a Draft Dispatch.
@@ -11635,7 +13891,9 @@ Add an ordered delivery stop to a Draft Dispatch.
 
 **Result**
 
-The `result` member of the response is: `{ "data": DispatchStopResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchStopResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11652,6 +13910,7 @@ The `result` member of the response is: `{ "data": DispatchStopResult }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 | `data.stop` | object (DispatchStop) | yes |  |
@@ -11665,6 +13924,7 @@ The `result` member of the response is: `{ "data": DispatchStopResult }`
 | `data.stop.planned_arrival_at` | string or null | no |  |
 | `data.stop.planned_departure_at` | string or null | no |  |
 | `data.stop.sequence` | integer (int32) | yes |  |
+| `data.stop.stage_location_code` | string or null | no | The stage place of this stop: what every pallet of it is suggested. |
 | `data.stop.stop_type` | string | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -11674,6 +13934,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -11785,6 +14048,7 @@ The `result` member of the response is: `{ "data": [DispatchStop] }`
 | `data[].planned_arrival_at` | string or null | no |  |
 | `data[].planned_departure_at` | string or null | no |  |
 | `data[].sequence` | integer (int32) | yes |  |
+| `data[].stage_location_code` | string or null | no | The stage place of this stop: what every pallet of it is suggested. |
 | `data[].stop_type` | string | yes |  |
 
 **Errors**
@@ -11858,7 +14122,9 @@ Replace the complete stop order of a Draft Dispatch and audit it.
 
 **Result**
 
-The `result` member of the response is: `{ "data": ResequenceDispatchStopsResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ResequenceDispatchStopsResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -11875,6 +14141,7 @@ The `result` member of the response is: `{ "data": ResequenceDispatchStopsResult
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 | `data.stops` | array of object (DispatchStop) | yes |  |
@@ -11888,6 +14155,7 @@ The `result` member of the response is: `{ "data": ResequenceDispatchStopsResult
 | `data.stops[].planned_arrival_at` | string or null | no |  |
 | `data.stops[].planned_departure_at` | string or null | no |  |
 | `data.stops[].sequence` | integer (int32) | yes |  |
+| `data.stops[].stage_location_code` | string or null | no | The stage place of this stop: what every pallet of it is suggested. |
 | `data.stops[].stop_type` | string | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -11897,6 +14165,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -12003,7 +14274,9 @@ Edit a delivery stop on a Draft Dispatch.
 
 **Result**
 
-The `result` member of the response is: `{ "data": DispatchStopResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": DispatchStopResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -12020,6 +14293,7 @@ The `result` member of the response is: `{ "data": DispatchStopResult }`
 | `data.dispatch.mod_who` | integer (int64) | yes |  |
 | `data.dispatch.planned_at` | string or null | no |  |
 | `data.dispatch.planned_departure_at` | string or null | no |  |
+| `data.dispatch.planned_transport_unit_id` | integer (int64) or null | no | The truck planned in advance (`dispatch_set_transport_unit`); a load opened with no truck named takes it. |
 | `data.dispatch.status` | one of: Draft \| Planned \| Shipped \| Cancelled | yes |  |
 | `data.dispatch.version` | integer (int32) | yes |  |
 | `data.stop` | object (DispatchStop) | yes |  |
@@ -12033,6 +14307,7 @@ The `result` member of the response is: `{ "data": DispatchStopResult }`
 | `data.stop.planned_arrival_at` | string or null | no |  |
 | `data.stop.planned_departure_at` | string or null | no |  |
 | `data.stop.sequence` | integer (int32) | yes |  |
+| `data.stop.stage_location_code` | string or null | no | The stage place of this stop: what every pallet of it is suggested. |
 | `data.stop.stop_type` | string | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -12042,6 +14317,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "dispatch": {
         "add_when": "<add_when>",
@@ -12145,7 +14423,9 @@ Assign an unassigned physical root from the confirmed current Order plan (versio
 
 **Result**
 
-The `result` member of the response is: `{ "data": UnitAssignmentResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": UnitAssignmentResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -12170,6 +14450,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "assignment": {
         "add_when": "<add_when>",
@@ -12398,7 +14681,9 @@ Explicitly align an assigned physical root with its confirmed current Order plan
 
 **Result**
 
-The `result` member of the response is: `{ "data": UnitAssignmentResult }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": UnitAssignmentResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -12423,6 +14708,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "assignment": {
         "add_when": "<add_when>",
@@ -12944,7 +15232,7 @@ The `result` member of the response is: `{ "data": ShipmentOrder }`
 | `data.ship_to_id` | integer (int64) | yes |  |
 | `data.ship_to_snapshot` | any | no | The ship-to address as frozen at release. |
 | `data.source` | one of: Ui \| Api | yes |  |
-| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
 | `data.version` | integer (int32) | yes | Per-row OCC version, independent of `shipment_order_line.version`. |
 
 **Errors**
@@ -13081,14 +15369,14 @@ The `result` member of the response is: `{ "data": ShipmentOrderLine }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_requested` | boolean | yes | `true`: the customer ordered `pack_id`, and the line is reserved only from stock of that pack. |
-| `data.pick_instruction` | string or null | no | One-off pick instruction for this line, from the ERP (wms-app 044): shown on its picks and acknowledged before a pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | One-off pick instruction for this line, from the ERP: shown on its picks and acknowledged before a pick commits (RF `PICKINS`). |
 | `data.qty_allocated` | number (double) | yes | Always 0 in Phase 1 — written by allocation in Phase 2. |
 | `data.qty_cancelled` | number (double) | yes |  |
 | `data.qty_ordered` | number (double) | yes | All five counters are in BASE units. |
 | `data.qty_picked` | number (double) | yes | Always 0 in Phase 1 — written by picking in Phase 3. |
 | `data.qty_shipped` | number (double) | yes | Always 0 in Phase 1 — written by shipping in Phase 3. |
 | `data.sku_code` | string | yes |  |
-| `data.status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.uom` | string | yes |  |
 | `data.uom_factor` | number (double) | yes | `pack_item.base_qty` snapshot taken when the line was created. |
 | `data.version` | integer (int32) | yes | Per-line OCC, independent of the header's version. |
@@ -13336,7 +15624,7 @@ The `result` member of the response is: `{ "data": [ShipmentOrder] }`
 | `data[].ship_to_id` | integer (int64) | yes |  |
 | `data[].ship_to_snapshot` | any | no | The ship-to address as frozen at release. |
 | `data[].source` | one of: Ui \| Api | yes |  |
-| `data[].status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data[].status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
 | `data[].version` | integer (int32) | yes | Per-row OCC version, independent of `shipment_order_line.version`. |
 
 **Errors**
@@ -13422,14 +15710,14 @@ The `result` member of the response is: `{ "data": [ShipmentOrderLine] }`
 | `data[].owner_id` | integer (int64) | yes |  |
 | `data[].pack_id` | integer (int64) | yes |  |
 | `data[].pack_requested` | boolean | yes | `true`: the customer ordered `pack_id`, and the line is reserved only from stock of that pack. |
-| `data[].pick_instruction` | string or null | no | One-off pick instruction for this line, from the ERP (wms-app 044): shown on its picks and acknowledged before a pick commits (RF `PICKINS`). |
+| `data[].pick_instruction` | string or null | no | One-off pick instruction for this line, from the ERP: shown on its picks and acknowledged before a pick commits (RF `PICKINS`). |
 | `data[].qty_allocated` | number (double) | yes | Always 0 in Phase 1 — written by allocation in Phase 2. |
 | `data[].qty_cancelled` | number (double) | yes |  |
 | `data[].qty_ordered` | number (double) | yes | All five counters are in BASE units. |
 | `data[].qty_picked` | number (double) | yes | Always 0 in Phase 1 — written by picking in Phase 3. |
 | `data[].qty_shipped` | number (double) | yes | Always 0 in Phase 1 — written by shipping in Phase 3. |
 | `data[].sku_code` | string | yes |  |
-| `data[].status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data[].status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data[].uom` | string | yes |  |
 | `data[].uom_factor` | number (double) | yes | `pack_item.base_qty` snapshot taken when the line was created. |
 | `data[].version` | integer (int32) | yes | Per-line OCC, independent of the header's version. |
@@ -13602,7 +15890,7 @@ The `result` member of the response is: `{ "data": [ShipmentHistoryLine] }`
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data[].goods_issue_id` | integer (int64) | yes |  |
-| `data[].id` | string | yes | Collision-free composite identity (receipt id : Order line id). |
+| `data[].id` | string | yes | Collision-free composite identity (receipt id: Order line id). |
 | `data[].line_no` | integer (int32) | yes |  |
 | `data[].load_id` | integer (int64) or null | no |  |
 | `data[].order_id` | integer (int64) | yes |  |
@@ -13689,10 +15977,10 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.line_id` | integer (int64) | yes |  |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The affected LINE's stored status after the same derivation — the shape `CancelLineQtyResult::line_status` already reports for the other line-touching command family. |
-| `data.new_version` | integer (int32) | yes | Echo of the header version that was already there — this command never writes the header row (releases touch LINES and `pick_detail`), same contract as `CancelOrderAllocationResult::new_version`. |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes |  |
+| `data.new_version` | integer (int32) | yes |  |
 | `data.order_id` | integer (int64) | yes |  |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header status AS DERIVED after the release, in this command's own transaction — same contract as `CancelOrderAllocationResult::status` (`cancel_allocation.rs`): the screen patches its copy of the order from this (spec §6.3) instead of keeping whatever it… |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | A delete can move the header (a fully-`Released` order loses a pick → `PartiallyReleased`), and a result that stayed silent about it left the header box stale until a full reopen — the owner's live find, 2026-08-24. |
 | `data.released_qty` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -13793,14 +16081,14 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.allocated` | number (double) | yes |  |
-| `data.blocked_by_dropped_step` | number (double) | yes | Sum, across every line, of `crate::allocation::LineAllocationPlan::blocked_by_dropped_step` — base units `short` includes that were never searched for at all, because the only step of some line's policy naming that UOM rung failed to parse (round-2 review fin… |
-| `data.cartonization` | object (WrittenPlan) or null | no | What cartonization computed: the plan number and how many boxes, placements and unplaced items it holds. |
+| `data.blocked_by_dropped_step` | number (double) | yes | Zero on the common path. |
+| `data.cartonization` | object (WrittenPlan) or null | no |  |
 | `data.cartonization.cartons` | integer (uint) | yes |  |
 | `data.cartonization.master_data_divergences` | array of string | no | What stands was taken as written; where today's master data says otherwise, it is named here for master-data review (an executed unit whose size, weight or rotation rule changed). |
 | `data.cartonization.placements` | integer (uint) | yes |  |
 | `data.cartonization.plan_id` | integer (int64) | yes |  |
 | `data.cartonization.unplaced` | integer (uint) | yes |  |
-| `data.cartonization_error` | string or null | no | Set when cartonization failed. |
+| `data.cartonization_error` | string or null | no |  |
 | `data.contention_deferred` | number (double) | no | Quantity deferred because another transaction held the inventory lock. |
 | `data.dispatched_tasks` | array of integer (int64) | no | Tasks THIS pass handed out — one per live pick of the order that had none yet (see the dispatch comment in `allocate_order_lines`). |
 | `data.new_version` | integer (int32) | yes |  |
@@ -13910,9 +16198,9 @@ The `result` member of the response is: `{ "data": AllocationPreview }`
 | `data.lines[].allocated` | number (double) | yes | Sum of `positions[].qty` — what the plan found, not a guarantee (see `AllocationPreview`'s own doc comment). |
 | `data.lines[].allocation_policy_id` | integer (int64) or null | no | Frozen policy snapshot used by the shared planner. |
 | `data.lines[].allocation_policy_version` | integer (int32) or null | no |  |
-| `data.lines[].blocked_by_dropped_step` | number (double) | yes | This line's own `crate::allocation::LineAllocationPlan:: blocked_by_dropped_step` — a subset of `short` a caller can use to tell "the policy needs fixing" apart from "there is no stock." Zero on the common path. |
+| `data.lines[].blocked_by_dropped_step` | number (double) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
-| `data.lines[].need` | number (double) | yes | `qty_to_allocate()` at read time, floored at zero. |
+| `data.lines[].need` | number (double) | yes | `qty_to_allocate` at read time, floored at zero. |
 | `data.lines[].positions` | array of object (AllocatedPosition) | yes |  |
 | `data.lines[].short` | number (double) | yes |  |
 | `data.lines[].sku_code` | string | yes |  |
@@ -14156,7 +16444,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.order_number` | string | yes |  |
 | `data.released` | number (double) | yes |  |
 | `data.skipped_in_work` | integer (int64) | yes | Picks left untouched because they are in work (MVP stub: a task holds them). |
-| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header status AS DERIVED after the release pass — `New` when the launch marker was cleared (full un-reservation, owner decision 2026-08-24), `PartiallyReleased` when in-work picks kept the order launched (spec §2.2/§2.3). |
+| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header status AS DERIVED after the release pass — `New` when the launch marker was cleared, `PartiallyReleased` when in-work picks kept the order launched. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -14350,7 +16638,7 @@ Create a draft shipment order with its lines.
 | `data.lines` | array of object (NewOrderLine) | yes | May be empty: a draft is allowed to exist before its first line does. |
 | `data.lines[].external_line_no` | string or null | no |  |
 | `data.lines[].pack_id` | integer (int64) or null | no | The pack the customer ordered: the line is then reserved only from stock of it. |
-| `data.lines[].pick_instruction` | string or null | no | One-off pick instruction for this line (wms-app 044), shown and acknowledged on its picks. |
+| `data.lines[].pick_instruction` | string or null | no | One-off pick instruction for this line, shown and acknowledged on its picks. |
 | `data.lines[].qty` | number (double) | yes | Quantity in BASE units. |
 | `data.lines[].sku_code` | string | yes |  |
 | `data.lines[].uom` | string | yes | Entry UOM. `uom_factor` is resolved from `pack_item` and snapshotted. |
@@ -14591,7 +16879,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.line_id` | integer (int64) | yes |  |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.new_version` | integer (int32) | yes |  |
 | `data.qty_cancelled` | number (double) | yes |  |
 | `data.qty_open` | number (double) | yes |  |
@@ -14897,7 +17185,7 @@ Add or edit a draft order's line.
 | `data.line_id` | integer (int64) or null | no | Absent inserts a new line; present edits that one. |
 | `data.order_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) or null | no | The pack the customer ordered: the line is then reserved only from stock of it. |
-| `data.pick_instruction` | string or null | no | One-off pick instruction for this line (wms-app 044). |
+| `data.pick_instruction` | string or null | no | One-off pick instruction for this line. |
 | `data.qty` | number (double) | yes | Quantity in BASE units. |
 | `data.sku_code` | string | yes |  |
 | `data.uom` | string | yes |  |
@@ -15013,9 +17301,9 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 |---|---|---|---|
 | `data.auto_allocation` | object (AllocateShipmentOrderResult) or null | no | What release's own allocation half did — `allocated`/`short` report the pass that ran in this same transaction. |
 | `data.auto_allocation.allocated` | number (double) | yes |  |
-| `data.auto_allocation.blocked_by_dropped_step` | number (double) | yes | Sum, across every line, of `crate::allocation::LineAllocationPlan::blocked_by_dropped_step` — base units `short` includes that were never searched for at all, because the only step of some line's policy naming that UOM rung failed to parse (round-2 review fin… |
-| `data.auto_allocation.cartonization` | object (WrittenPlan) or null | no | What cartonization computed: the plan number and how many boxes, placements and unplaced items it holds. |
-| `data.auto_allocation.cartonization_error` | string or null | no | Set when cartonization failed. |
+| `data.auto_allocation.blocked_by_dropped_step` | number (double) | yes | Zero on the common path. |
+| `data.auto_allocation.cartonization` | object (WrittenPlan) or null | no |  |
+| `data.auto_allocation.cartonization_error` | string or null | no |  |
 | `data.auto_allocation.contention_deferred` | number (double) | no | Quantity deferred because another transaction held the inventory lock. |
 | `data.auto_allocation.dispatched_tasks` | array of integer (int64) | no | Tasks THIS pass handed out — one per live pick of the order that had none yet (see the dispatch comment in `allocate_order_lines`). |
 | `data.auto_allocation.new_version` | integer (int32) | yes |  |
@@ -15029,7 +17317,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.order_id` | integer (int64) | yes |  |
 | `data.order_number` | string | yes |  |
 | `data.ship_to_snapshot` | any | yes |  |
-| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header status AS DERIVED at the end of this command's own transaction — `Released` when the allocation half covered every live line, `PartiallyReleased` when it did not (spec §2.2). |
+| `data.status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header status AS DERIVED at the end of this command's own transaction — `Released` when the allocation half covered every live line, `PartiallyReleased` when it did not. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -15201,6 +17489,105 @@ curl -s -X POST "$BASE_URL/api/rpc" \
     },
     "data": {
       "expected_order_version": 1,
+      "order_id": 1
+    }
+  }
+}'
+```
+
+### shipment_order_ship_preview
+
+Preview a direct shipment: per line, what ships now and what remains (base units).
+
+| | |
+|---|---|
+| Context / module | outbound / shipment_order_commands |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `shipment_order_ship_preview` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR, VIEWER |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (OrderIdInput) | yes |  |
+| `data.order_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": ShipPreview }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.lines` | array of object (ShipPreviewLine) | yes |  |
+| `data.lines[].line_no` | integer (int32) | yes |  |
+| `data.lines[].order_line_id` | integer (int64) | yes |  |
+| `data.lines[].qty_cancelled` | number (double) | yes |  |
+| `data.lines[].qty_ordered` | number (double) | yes |  |
+| `data.lines[].qty_shipped` | number (double) | yes |  |
+| `data.lines[].remains` | number (double) | yes | What stays the order's demand after this shipment. |
+| `data.lines[].ships_now` | number (double) | yes | The content of the order's ready roots on this line. |
+| `data.lines[].sku_code` | string | yes |  |
+| `data.nothing_ready_reason` | string or null | no | Why nothing ships now — the refusal "Ship order" would answer. |
+| `data.nothing_ready_spoken` | any | no | The same refusal as a template and its values, for a reader of another language (`error.shipment_order.ship.*`). |
+| `data.order_id` | integer (int64) | yes |  |
+| `data.order_version` | integer (int32) | yes | The order version the preview was read at. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "lines": [
+        {
+          "line_no": 1,
+          "order_line_id": 1,
+          "qty_cancelled": 1,
+          "qty_ordered": 1,
+          "qty_shipped": 1,
+          "remains": 1,
+          "ships_now": 1,
+          "sku_code": "<sku_code>"
+        }
+      ],
+      "order_id": 1,
+      "order_version": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "shipment_order_ship_preview",
+  "params": {
+    "data": {
       "order_id": 1
     }
   }
@@ -15547,11 +17934,11 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.items_moved` | array of object (RepackItemDelta) | yes |  |
-| `data.items_moved[].balance_id` | integer (int64) | no | The balance row. |
-| `data.items_moved[].location` | string | no | The cell where all of this stands. |
+| `data.items_moved[].balance_id` | integer (int64) | no |  |
+| `data.items_moved[].location` | string | no |  |
 | `data.items_moved[].lot` | string or null | no |  |
-| `data.items_moved[].owner_id` | integer (int64) | no | Whose goods moved. |
-| `data.items_moved[].pack_id` | integer (int64) | no | The pack and unit of the balance row: how the goods are stored. |
+| `data.items_moved[].owner_id` | integer (int64) | no |  |
+| `data.items_moved[].pack_id` | integer (int64) | no |  |
 | `data.items_moved[].qty` | number (double) | yes |  |
 | `data.items_moved[].sku_code` | string | yes |  |
 | `data.items_moved[].uom` | string | no |  |
@@ -15770,11 +18157,11 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.already_committed` | boolean | yes |  |
 | `data.ask_location_empty` | boolean | no | The pick emptied its source location and the policy says to ask the operator whether it is empty (`pick_to_zero = Confirm`, count spec Appendix L): the RF asks, and sends the answer to `location_confirm_empty`. |
 | `data.destination_balance_id` | integer (int64) or null | no |  |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.movement_id` | integer (int64) | yes |  |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
 | `data.pick_detail_id` | integer (int64) | yes |  |
-| `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes | (The code comment for this item is not in English. |
+| `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes |  |
 | `data.qty_picked` | number (double) | yes |  |
 | `data.route` | object (RouteProgress) or null | no | Present only for a pick of an assignment: where its route stands after this commit (R3). |
 | `data.route.assignment_id` | integer (int64) | yes |  |
@@ -16679,7 +19066,7 @@ Assign the next executable Pick using fixed dispatch phases.
 | `data.equipment_profile_code` | string or null | no | The equipment kind chosen for the shift; it becomes the operator's profile. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.on_foot` | boolean | no | The operator works on foot this shift: their profile is cleared (`NULL` = excludes no zone, no lift limit) and the area's default policy applies. |
-| `data.work_area_code` | string or null | no | The work area the operator names (scanned or typed) on the RF entry "Pick by area". |
+| `data.work_area_code` | string or null | no |  |
 | `data.work_area_id` | integer (int64) or null | no |  |
 
 **Result**
@@ -16706,7 +19093,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.drop_to_close.pick_drop_id` | integer (int64) | yes | The pallet's record. |
 | `data.drop_to_close.version` | integer (int32) | yes | The record's version (every write of it bumps it). |
 | `data.work` | object (PickDispatchWork) or null | no |  |
-| `data.work.blocked` | string or null | no | The caller's own held task whose source turned unusable under them — the location not `Ok` or flagged other than by a count (`LOCATION_BLOCKED`), an inventory hold (`INVENTORY_HOLD`): the code (ruling D13). |
+| `data.work.blocked` | string or null | no | The caller's own held task whose source turned unusable under them — the location not `Ok` or flagged other than by a count (`LOCATION_BLOCKED`), an inventory hold (`INVENTORY_HOLD`): the code. |
 | `data.work.order_id` | integer (int64) | yes |  |
 | `data.work.packaging` | one of: Bypassed or object | yes |  |
 | `data.work.phase` | one of: Assigned \| CurrentArea \| PermittedAreas | yes |  |
@@ -16797,7 +19184,7 @@ Close a pick pallet: its whole tree moves from INTRANSIT into its frozen destina
 | `data.drop_code` | string | yes | The scanned DRP label of the pallet. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.location_code` | string | no | The scanned location: the pallet's frozen destination. |
-| `data.override_grant_id` | string (uuid) or null | no | A supervisor's grant (`supervisor_override_grant`) for `pick_override_codes::close_foreign_drop(pick_drop_id)` — lets a caller without the right close another operator's pallet. |
+| `data.override_grant_id` | string (uuid) or null | no |  |
 
 **Result**
 
@@ -16815,7 +19202,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.location` | string | yes | Where the pallet stands now: its destination. |
 | `data.order_id` | integer (int64) | yes |  |
 | `data.pick_drop_id` | integer (int64) | yes | The pallet's record. |
-| `data.released` | boolean | no | The pallet held nothing: its record was let go (`Released`) and its label is free again; nothing moved (ruling D12). |
+| `data.released` | boolean | no | The pallet held nothing: its record was let go (`Released`) and its label is free again; nothing moved. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -17054,7 +19441,7 @@ Open the operator's pick pallet (a scanned DRP label) for the task's order in IN
 | `data.drop_code` | string | yes | The scanned DRP label. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.task_id` | integer (int64) | yes |  |
-| `data.work_area_code` | string or null | no | (The code comment for this item is not in English. |
+| `data.work_area_code` | string or null | no |  |
 
 **Result**
 
@@ -17158,7 +19545,7 @@ Complete a reviewed workstation Pick: actual stock, Pick, Task and durable recei
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (CompleteManualPick) | yes |  |
 | `data.count_freeze_grant_id` | string (uuid) or null | no | A shift lead's single-use grant to take stock off a location an open Hard count is counting (owner's decision 2026-10-21 §6) — the same grant `CommitPick` redeems. |
-| `data.destination_lpn` | string or null | no |  |
+| `data.destination_lpn` | string or null | no | The pick pallet's label (`DRP…`). |
 | `data.expected_task_version` | integer (int32) | yes |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.instructions_acknowledged` | boolean | no |  |
@@ -17184,17 +19571,19 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 |---|---|---|---|
 | `data.already_committed` | boolean | yes |  |
 | `data.ask_location_empty` | boolean | yes |  |
-| `data.completion_capability` | one of: Pack \| Consolidate \| Stage \| Ship \| None or null | no | Frozen before the physical write, not recomputed by later shipping. |
+| `data.completion_capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | Frozen before the physical write, not recomputed by later shipping. |
 | `data.destination_balance_id` | integer (int64) | yes |  |
-| `data.destination_container_id` | integer (int64) | yes |  |
-| `data.destination_location` | string | yes |  |
-| `data.destination_lpn` | string | yes |  |
+| `data.destination_container_id` | integer (int64) | yes | The pick pallet's container. |
+| `data.destination_location` | string | yes | Where the pallet goes: its frozen destination, the location it is put into to be handed on (`pick_drop_close`). |
+| `data.destination_lpn` | string | yes | The pick pallet's label. |
 | `data.executed_by` | integer (int64) | yes |  |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.movement_id` | integer (int64) | yes |  |
 | `data.order_id` | integer (int64) | no |  |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.pallet_opened` | boolean | no | This completion opened the pallet. |
 | `data.pick_detail_id` | integer (int64) | yes |  |
+| `data.pick_drop_id` | integer (int64) | no | The pick pallet's record. |
 | `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes |  |
 | `data.qty_picked` | number (double) | yes |  |
 | `data.task_id` | integer (int64) | yes |  |
@@ -17237,111 +19626,6 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 }'
 ```
 
-### pick_manual_finalize
-
-Hand off completed workstation roots using their frozen routes; never mark Pack done.
-
-| | |
-|---|---|
-| Context / module | outbound / pick_commands |
-| Category | stateless_command |
-| Operation | execute (domain_command) |
-| Permission | RBAC resource type `api`, resource code `pick_manual_finalize` |
-| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
-| Idempotency key | required |
-
-**Notes**
-
-- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
-- There is no version check.
-
-**Parameters** (the keys of `params`)
-
-| Name | Type | Required | Description |
-|---|---|---|---|
-| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
-| `meta.acknowledged_overrides` | array of integer or object | no |  |
-| `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no |  |
-| `data` | object (FinalizeManualPicks) | yes | Stateless physical follow-up: the same completed deposits need the same hand-off regardless of what a screen rendered. |
-| `data.idempotency_key` | string (uuid) | yes |  |
-| `data.order_id` | integer (int64) | yes |  |
-
-**Result**
-
-The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": FinalizeManualPicksResult }`
-
-`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
-
-| Field | Type | Always present | Description |
-|---|---|---|---|
-| `data.created_unit_ids` | array of integer (int64) | yes |  |
-| `data.existing_unit_ids` | array of integer (int64) | yes |  |
-| `data.order_id` | integer (int64) | yes |  |
-| `data.unrouted_container_ids` | array of integer (int64) | yes |  |
-| `data.waiting_for_picks` | boolean | yes |  |
-
-Example response. It shows the shape only. The required fields have placeholder values:
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "result": {
-    "meta": {
-      "idempotency_replayed": false
-    },
-    "data": {
-      "created_unit_ids": [
-        1
-      ],
-      "existing_unit_ids": [
-        1
-      ],
-      "order_id": 1,
-      "unrouted_container_ids": [
-        1
-      ],
-      "waiting_for_picks": false
-    }
-  }
-}
-```
-
-**Errors**
-
-| HTTP | Error | When |
-|---|---|---|
-| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
-| 401 | NO_AUTH | No valid cookie, API key or service token. |
-| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
-| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
-| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
-| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
-| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
-
-**Example**
-
-```bash
-curl -s -X POST "$BASE_URL/api/rpc" \
-  -H "Authorization: Bearer $WMS_API_KEY" \
-  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
-  -H "Content-Type: application/json" \
-  -d '{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "pick_manual_finalize",
-  "params": {
-    "meta": {
-      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
-    },
-    "data": {
-      "order_id": 1
-    }
-  }
-}'
-```
-
 ### pick_manual_review
 
 Review workstation Pick source requirements without an RF lease.
@@ -17371,10 +19655,11 @@ The `result` member of the response is: `{ "data": ManualPickReview }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.destination_location` | string | yes |  |
+| `data.destination_location` | string | yes | Where the pick's pallet goes: the clerk's open pallet's frozen destination, else where its first deposit would freeze it. |
 | `data.destination_lpn_required` | boolean | yes |  |
 | `data.instructions` | array of string | yes |  |
 | `data.internal_lot` | string | yes |  |
+| `data.open_pallet_lpn` | string or null | no | The label of the clerk's open pick pallet of this order, which takes the row when no other label is entered. |
 | `data.pick_detail_id` | integer (int64) | yes |  |
 | `data.qty` | number (double) | yes |  |
 | `data.required_serial_count` | integer (uint32) | yes |  |
@@ -17388,7 +19673,7 @@ The `result` member of the response is: `{ "data": ManualPickReview }`
 | `data.verification_plan.policy_id` | integer (int64) | yes |  |
 | `data.verification_plan.policy_revision` | integer (int32) | yes |  |
 | `data.verification_plan.required_evidence` | array of object (RequiredEvidence) | yes |  |
-| `data.verification_plan.source` | object (SourceFingerprint) | yes | Spec §9 (cross-review 2026-10-06): the expected SOURCE. |
+| `data.verification_plan.source` | object (SourceFingerprint) | yes | `source_container_id` is `pick_detail.container_id` — where the goods are taken FROM; the pallet (`drop_id`, `pick_drop_id`) and the planned box (`carton_id`) are where they go and are never part of it (X-06). |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -17455,6 +19740,119 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "method": "pick_manual_review",
   "params": {
     "data": {
+      "task_id": 1
+    }
+  }
+}'
+```
+
+### pick_manual_short
+
+Short a workstation Pick from paper: move what was found, release the rest and request the reason's remediation.
+
+| | |
+|---|---|
+| Context / module | outbound / pick_commands |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `pick_manual_short` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+| Version check | entity `task`: send `expected_task_version` for row `task_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_task_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (ShortManualPick) | yes |  |
+| `data.actual_qty` | number (double) | yes | What was found on the shelf, base units: zero or more, below the pick's quantity, as the reason allows. |
+| `data.count_freeze_grant_id` | string (uuid) or null | no | A shift lead's single-use grant past an open Hard count on the source, as `CompleteManualPick` takes it. |
+| `data.destination_lpn` | string or null | no | The pick pallet's label (`DRP…`) the found part goes onto. |
+| `data.expected_task_version` | integer (int32) | yes |  |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.instructions_acknowledged` | boolean | no |  |
+| `data.note` | string or null | no |  |
+| `data.reason_code` | string | yes |  |
+| `data.serial_scans` | array of string | no |  |
+| `data.source` | object (ManualPickSourceInput) | no | The source evidence the pick's policy asks for — when something was found. |
+| `data.source.internal_lot` | string or null | no |  |
+| `data.source.internal_lot_typed` | boolean | no |  |
+| `data.source.item_scan` | string or null | no |  |
+| `data.source.location_scan` | string or null | no |  |
+| `data.source.lot_attribute_scan` | string or null | no |  |
+| `data.source.lot_attribute_scans` | array of string | no | Separate human scans, in addition to the legacy single-scan field. |
+| `data.source.lot_attributes` | array of object (ManualLotAttribute) | no |  |
+| `data.source.source_lpn_scan` | string or null | no |  |
+| `data.task_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ShortManualPickResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.already_committed` | boolean | yes |  |
+| `data.completion_capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | What waits at the pallet's destination, as its first deposit froze it. |
+| `data.destination_container_id` | integer (int64) or null | no | The pick pallet's container, when something was found. |
+| `data.destination_location` | string or null | no | Where the pallet goes: its frozen destination. |
+| `data.destination_lpn` | string or null | no | The pick pallet's label, when something was found. |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
+| `data.location_blocked` | boolean | yes |  |
+| `data.order_id` | integer (int64) | yes |  |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.pallet_opened` | boolean | no | This short opened the pallet. |
+| `data.pick_detail_id` | integer (int64) | yes |  |
+| `data.pick_drop_id` | integer (int64) or null | no | The pick pallet's record, when something was found. |
+| `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes |  |
+| `data.picked_qty` | number (double) | yes |  |
+| `data.remediation_id` | integer (int64) | yes |  |
+| `data.short_qty` | number (double) | yes |  |
+| `data.task_id` | integer (int64) | yes |  |
+| `data.task_version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "pick_manual_short",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "actual_qty": 1,
+      "expected_task_version": 1,
+      "reason_code": "<reason_code>",
       "task_id": 1
     }
   }
@@ -17586,7 +19984,7 @@ Reject untouched Pick work using Task Manager cooldown and refusal audit.
 | `data.reason` | string | yes |  |
 | `data.task_id` | integer (int64) | yes |  |
 | `data.whole_group` | boolean | no | The summary step's reject (slice 5 §7): every remaining place of the group the task's pick stands in. |
-| `data.work_area_code` | string or null | no | (The code comment for this item is not in English. |
+| `data.work_area_code` | string or null | no |  |
 | `data.work_area_id` | integer (int64) or null | no | Where the task cools down, and whose `allow_task_release` judges the return. |
 
 **Result**
@@ -17599,7 +19997,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 |---|---|---|---|
 | `data.rejected_task_ids` | array of integer (int64) | no | Every task that went back to the pool, ascending: the named one alone, or with `whole_group` every place taken along. |
 | `data.reservation_unchanged` | boolean | yes |  |
-| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this reject repaired — rejected picks whose target could no longer be started as it stood (ruling D2), ascending. |
+| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this reject repaired — rejected picks whose target could no longer be started as it stood, ascending. |
 | `data.task` | object (Task) | yes | The named place's task, back in the pool. |
 | `data.task.add_when` | string | yes |  |
 | `data.task.add_who` | integer (int64) | yes |  |
@@ -17610,7 +20008,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.container_id` | integer (int64) or null | no |  |
 | `data.task.created_at` | string | yes |  |
 | `data.task.ended_at` | string or null | no |  |
-| `data.task.escalated_at` | string or null | no | Set when the task went to a supervisor: refusals reached the threshold `TASK_SKIP_ESCALATE_AFTER`. |
+| `data.task.escalated_at` | string or null | no |  |
 | `data.task.from_location` | string or null | no |  |
 | `data.task.heartbeat_at` | string or null | no |  |
 | `data.task.id` | integer (int64) | yes |  |
@@ -17622,8 +20020,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.priority` | integer (int16) | yes |  |
 | `data.task.qty` | number (double) or null | no |  |
 | `data.task.qty_done` | number (double) | yes |  |
-| `data.task.refused_count` | integer (int32) | yes | How many times the task was REFUSED (a hand-back does not count). |
-| `data.task.return_kind` | string or null | no | HOW the task last went back to the pool: `Refused` (operator refused), `HandedBack` (operator handed it back), `Seized` (a supervisor took it), `Expired` (the lease ran out). |
+| `data.task.refused_count` | integer (int32) | yes |  |
+| `data.task.return_kind` | string or null | no |  |
 | `data.task.short_reason_code` | string or null | no |  |
 | `data.task.short_reason_note` | string or null | no |  |
 | `data.task.skip_reason` | string or null | no |  |
@@ -17638,7 +20036,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.task.uom` | string or null | no |  |
 | `data.task.version` | integer (int32) | yes |  |
 | `data.task.wave_id` | integer (int64) or null | no |  |
-| `data.task.weight` | number (double) or null | no | The stock weight of the task when it was created, using the one weight formula (`pack::StockWeights`), copied like `qty` (wms-app 340). |
+| `data.task.weight` | number (double) or null | no |  |
 | `data.task.workstation_completed_by` | integer (int64) or null | no | Real web executor of source-owned workstation Pick completion. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -17763,10 +20161,10 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.already_committed` | boolean | yes |  |
 | `data.destination_balance_id` | integer (int64) or null | no |  |
 | `data.inventory_count` | one of: NotConfigured \| Requested | yes | Whether the short's reason has its source location counted (spec count Appendix C): the count itself is requested by the remediation that follows (`remediate_pick_discrepancy`), once the residual is in Lost. |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.location_blocked` | boolean | yes |  |
 | `data.movement_id` | integer (int64) or null | no |  |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
 | `data.pick_detail_id` | integer (int64) | yes |  |
 | `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes |  |
 | `data.picked_qty` | number (double) | yes |  |
@@ -17776,7 +20174,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.route.status` | one of: Picking \| Delivering \| Completed \| Dissolved \| Building \| Ready | yes |  |
 | `data.route.version` | integer (int32) | yes |  |
 | `data.short_qty` | number (double) | yes |  |
-| `data.shorted_pick_id` | integer (int64) or null | no | (The code comment for this item is not in English. |
+| `data.shorted_pick_id` | integer (int64) or null | no |  |
 | `data.task_id` | integer (int64) | yes |  |
 | `data.task_version` | integer (int32) | yes |  |
 
@@ -17844,7 +20242,7 @@ Take the Pick's remaining from another LPN of the same lot at the location and r
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
-| `data` | object (SubstituteSourceLpn) | yes | (The code comment for this item is not in English. |
+| `data` | object (SubstituteSourceLpn) | yes |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.scanned_lpn` | string | yes | The LPN the operator scanned at the location (the one a `WRONG_SOURCE_LPN` refused). |
 | `data.task_id` | integer (int64) | yes |  |
@@ -17967,7 +20365,7 @@ The `result` member of the response is: `{ "data": PickWorkView }`
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.allowed_actions` | array of one of: ConfirmLocation \| ConfirmItem \| ConfirmSourceLpn \| ConfirmInternalLot \| ConfirmLotAttributes \| ConfirmQuantity \| Commit \| Short \| Reject \| OpenDrop | yes |  |
-| `data.instructions` | array of string | yes | What the picker must read before the pick commits, in reading order: the SKU's instruction, the order line's, the ShipAsIs rule (`picking::instructions`). |
+| `data.instructions` | array of string | yes | What the picker must read before the pick commits, in reading order: the SKU's instruction, the order line's, the ShipAsIs rule. |
 | `data.instructions_require_acknowledgement` | boolean | yes | `pick_commit` (and `pick_short` with stock found) refuses without `instructions_acknowledged` while this is true — exactly when `instructions` is not empty. |
 | `data.lease_expires_at` | string or null | no |  |
 | `data.order_id` | integer (int64) | yes |  |
@@ -18002,7 +20400,7 @@ The `result` member of the response is: `{ "data": PickWorkView }`
 | `data.task_id` | integer (int64) | yes |  |
 | `data.task_version` | integer (int32) | yes |  |
 | `data.verification` | object (VerificationView) | yes | What must be proven about the source before the pick commits, what is proven, what comes next (R17). |
-| `data.verification.blocked` | string or null | no | The wire code of the refusal that makes the pick uncommittable: `SOURCE_EXPIRED` — the reserved lot fell below the SKU's minimum shelf life on pick after it was reserved (ruling D5; the pick is shorted to zero with the reason `EXPIRED`, or rejected); or `SOUR… |
+| `data.verification.blocked` | string or null | no | The wire code of the refusal that makes the pick uncommittable: `SOURCE_EXPIRED` — the reserved lot fell below the SKU's minimum shelf life on pick after it was reserved; or `SOURCE_NOT_PHYSICALLY_IDENTIFIABLE` — the source cannot be told apart by what is phy… |
 | `data.verification.blocked_message` | string or null | no | What the card says about `blocked`, in the reader's language: why the pick cannot be committed and the way out a short has. |
 | `data.verification.episode_id` | integer (int64) or null | no | The caller's usable open episode, if one exists. |
 | `data.verification.next` | object (RequiredEvidence) or null | no | What the operator proves next; `None` when the plan is satisfied (or blocked). |
@@ -18135,11 +20533,11 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.already_committed` | boolean | yes |  |
 | `data.ask_location_empty` | boolean | no | The pick emptied its source location and the policy says to ask the operator whether it is empty (`pick_to_zero = Confirm`, count spec Appendix L): the RF asks, and sends the answer to `location_confirm_empty`. |
 | `data.destination_balance_id` | integer (int64) or null | no |  |
-| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder (migration 285, spec 2026-08-19 §1.2). |
+| `data.line_status` | one of: NotAllocated \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The line's status ladder. |
 | `data.movement_id` | integer (int64) | yes |  |
-| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder (migration 285, spec 2026-08-19 §1.1): `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
+| `data.order_status` | one of: New \| PartiallyAllocated \| Allocated \| PartiallyReleased \| Released \| PartiallyPicked \| Picked \| PartiallyShipped \| Shipped \| Closed \| Cancelled | yes | The header's status ladder: `New → Allocated → Released → Picked → Closed`, every working rung with a `Partially` form, `Cancelled` reachable until things are picked. |
 | `data.pick_detail_id` | integer (int64) | yes |  |
-| `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes | (The code comment for this item is not in English. |
+| `data.pick_status` | one of: Picked \| Allocated \| Released \| Cancelled \| Shorted \| AwaitingPlacement \| Returned | yes |  |
 | `data.qty_picked` | number (double) | yes |  |
 | `data.route` | object (RouteProgress) or null | no | Present only for a pick of an assignment: where its route stands after this commit (R3). |
 | `data.route.assignment_id` | integer (int64) | yes |  |
@@ -18395,7 +20793,7 @@ Start a portion of a station wave's route by wave code, or resume the operator's
 | `data` | object (StartSharedPickRoute) | yes |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.max_picks` | integer (uint16) | yes | Maximum number of stops to claim in this portion (1..100). |
-| `data.wave_code` | string | yes | The wave by its code — what the operator sees (ruling 8). |
+| `data.wave_code` | string | yes | The wave by its code — what the operator sees. |
 | `data.work_area_code` | string | yes |  |
 
 **Result**
@@ -18710,7 +21108,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.route_completed` | boolean | yes | The delivery finished the route: no live stop and no undelivered tote is left, and the operator's next start takes a new portion. |
 | `data.station_location` | string | yes |  |
 | `data.tote_container_id` | integer (int64) | yes |  |
-| `data.wave_id` | integer (int64) | yes | The wave whose route the tote served: reconciled at once after a delivery that moved the tote (ruling 6). |
+| `data.wave_id` | integer (int64) | yes | The wave whose route the tote served: reconciled at once after a delivery that moved the tote. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -19239,7 +21637,7 @@ The `result` member of the response is: `{ "data": PickAssignmentBoardRow }`
 | `data.assignee` | integer (int64) | yes |  |
 | `data.assignee_name` | string or null | no |  |
 | `data.assignee_username` | string | yes |  |
-| `data.awaits_delivery` | boolean | yes | The cart waits to be delivered: `Delivering`, or dissolved with a box still on its carrier and never delivered — what the supervisor's delivery and retarget act on (ruling R6). |
+| `data.awaits_delivery` | boolean | yes | The cart waits to be delivered: `Delivering`, or dissolved with a box still on its carrier and never delivered — what the supervisor's delivery and retarget act on. |
 | `data.carrier_code` | string or null | no |  |
 | `data.carrier_container_id` | integer (int64) or null | no |  |
 | `data.code` | string | yes |  |
@@ -19310,7 +21708,7 @@ Deliver your pick assignment's carrier (or a carrier dissolved with goods) to it
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
-| `data` | object (CompletePickAssignment) | yes | "The carrier is delivered here" (spec C.3, C.6, ADR-091 section 4.4; R11 to R13). |
+| `data` | object (CompletePickAssignment) | yes | "The carrier is delivered here". |
 | `data.carrier_code` | string or null | no | A carrier dissolved with goods, scanned by any operator (R12). |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.location_code` | string or null | no | The scanned delivery location. |
@@ -19329,7 +21727,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.carrier_freed` | boolean | yes | The carrier is `Empty` with no children — always `true` after a successful delivery (R12); kept as a field for the RF result. |
 | `data.closed_positions` | array of integer (int16) | yes | Positions whose box holds goods: `Closed` (box and planned carton kept on the row as the record), ascending. |
 | `data.code` | string | yes |  |
-| `data.delivered_by` | integer (int64) or null | no | Who delivered it: the caller — the holder, the operator who scanned a carrier dissolved with goods, or a supervisor on the holder's behalf (ruling D3). |
+| `data.delivered_by` | integer (int64) or null | no | Who delivered it: the caller — the holder, the operator who scanned a carrier dissolved with goods, or a supervisor on the holder's behalf. |
 | `data.delivered_location` | string | yes |  |
 | `data.moved` | boolean | yes | The tree was moved (`false`: it already stood there, or `Complete`). |
 | `data.released_positions` | array of integer (int16) | yes | Bound positions with an empty box: `Released`, the box off the carrier, ascending. |
@@ -19430,7 +21828,7 @@ Deliver a pick assignment's carrier waiting for delivery (Delivering, or dissolv
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
-| `data` | object (CompletePickAssignmentSupervised) | yes | A supervisor delivers a `Delivering` cart on its holder's behalf (ruling D3): the holder left the shift, is ill, or their account is gone, and the picked goods must still reach their location. |
+| `data` | object (CompletePickAssignmentSupervised) | yes | A supervisor delivers a `Delivering` cart on its holder's behalf: the holder left the shift, is ill, or their account is gone, and the picked goods must still reach their location. |
 | `data.assignment_id` | integer (int64) | yes |  |
 | `data.expected_version` | integer (int32) | yes | `pick_assignment.version` as the board row showed it. |
 | `data.idempotency_key` | string (uuid) | yes |  |
@@ -19449,7 +21847,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.carrier_freed` | boolean | yes | The carrier is `Empty` with no children — always `true` after a successful delivery (R12); kept as a field for the RF result. |
 | `data.closed_positions` | array of integer (int16) | yes | Positions whose box holds goods: `Closed` (box and planned carton kept on the row as the record), ascending. |
 | `data.code` | string | yes |  |
-| `data.delivered_by` | integer (int64) or null | no | Who delivered it: the caller — the holder, the operator who scanned a carrier dissolved with goods, or a supervisor on the holder's behalf (ruling D3). |
+| `data.delivered_by` | integer (int64) or null | no | Who delivered it: the caller — the holder, the operator who scanned a carrier dissolved with goods, or a supervisor on the holder's behalf. |
 | `data.delivered_location` | string | yes |  |
 | `data.moved` | boolean | yes | The tree was moved (`false`: it already stood there, or `Complete`). |
 | `data.released_positions` | array of integer (int16) | yes | Bound positions with an empty box: `Released`, the box off the carrier, ascending. |
@@ -19553,11 +21951,11 @@ Dissolve your own pick assignment; after its first commit with a supervisor's gr
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
-| `data` | object (DissolvePickAssignment) | yes | The operator dissolves the assignment they hold (RF): before the first commit alone — after it, `DissolveRefusal::SupervisorConfirmationRequired` unless a supervisor's grant comes with it. |
+| `data` | object (DissolvePickAssignment) | yes |  |
 | `data.assignment_id` | integer (int64) | yes |  |
 | `data.expected_version` | integer (int32) | yes | `pick_assignment.version` as `pick_assignment_get` returned it. |
 | `data.idempotency_key` | string (uuid) | yes |  |
-| `data.override_grant_id` | string (uuid) or null | no | A supervisor's grant (`supervisor_override_grant`) for `pick_override_codes::dissolve_after_commit(assignment_id)` — lets the holder dissolve after a commit (R14). |
+| `data.override_grant_id` | string (uuid) or null | no |  |
 
 **Result**
 
@@ -19575,7 +21973,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.kept_positions` | array of integer (int16) | yes | `Bound` positions kept because their box holds goods, ascending. |
 | `data.released_positions` | array of integer (int16) | yes | Positions `Released`, ascending. |
 | `data.released_task_ids` | array of integer (int64) | yes | Tasks returned to the pool, ascending. |
-| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this dissolve repaired — targets whose rest could no longer be started as it stood (ruling D2), ascending. |
+| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this dissolve repaired — targets whose rest could no longer be started as it stood, ascending. |
 | `data.status` | one of: Picking \| Delivering \| Completed \| Dissolved \| Building \| Ready | yes |  |
 | `data.version` | integer (int32) | yes | The version after the dissolve. |
 
@@ -19696,7 +22094,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.kept_positions` | array of integer (int16) | yes | `Bound` positions kept because their box holds goods, ascending. |
 | `data.released_positions` | array of integer (int16) | yes | Positions `Released`, ascending. |
 | `data.released_task_ids` | array of integer (int64) | yes | Tasks returned to the pool, ascending. |
-| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this dissolve repaired — targets whose rest could no longer be started as it stood (ruling D2), ascending. |
+| `data.rest_exception_ids` | array of integer (int64) | no | The execution exceptions (`TargetLeftCart`) of the rests this dissolve repaired — targets whose rest could no longer be started as it stood, ascending. |
 | `data.status` | one of: Picking \| Delivering \| Completed \| Dissolved \| Building \| Ready | yes |  |
 | `data.version` | integer (int32) | yes | The version after the dissolve. |
 
@@ -19878,7 +22276,7 @@ The `result` member of the response is: `{ "data": [PickAssignmentBoardRow] }`
 | `data[].assignee` | integer (int64) | yes |  |
 | `data[].assignee_name` | string or null | no |  |
 | `data[].assignee_username` | string | yes |  |
-| `data[].awaits_delivery` | boolean | yes | The cart waits to be delivered: `Delivering`, or dissolved with a box still on its carrier and never delivered — what the supervisor's delivery and retarget act on (ruling R6). |
+| `data[].awaits_delivery` | boolean | yes | The cart waits to be delivered: `Delivering`, or dissolved with a box still on its carrier and never delivered — what the supervisor's delivery and retarget act on. |
 | `data[].carrier_code` | string or null | no |  |
 | `data[].carrier_container_id` | integer (int64) or null | no |  |
 | `data[].code` | string | yes |  |
@@ -20576,7 +22974,7 @@ Build a pick assignment of whole planned targets on a scanned carrier.
 | `data` | object (StartPickAssignment) | yes |  |
 | `data.carrier_code` | string | yes | The scanned carrier. |
 | `data.idempotency_key` | string (uuid) | yes |  |
-| `data.work_area_code` | string | yes | The work area the operator named on the "Pick by area" screen. |
+| `data.work_area_code` | string | yes |  |
 
 **Result**
 
@@ -20598,7 +22996,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.assignment.step` | object | yes | The next step of an assignment. |
 | `data.assignment.version` | integer (int32) | yes | Echo it back on `pick_assignment_dissolve` (a `stateful_command`). |
 | `data.assignment.work_area_id` | integer (int64) | yes |  |
-| `data.continuations_taken` | array of integer (int64) | no | The `Bypassed` continuations this start took, each as one position of the new assignment (ruling T22), in position order. |
+| `data.continuations_taken` | array of integer (int64) | no | The `Bypassed` continuations this start took, each as one position of the new assignment, in position order. |
 | `data.resumed` | boolean | yes | The operator already had a live assignment: it is continued and nothing new was built or claimed. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -22161,12 +24559,13 @@ Create the next editable revision of a picking policy.
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 
@@ -22191,11 +24590,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.published_at` | string or null | no |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22210,19 +24610,19 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 | `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes |  |
 | `data.status` | one of: Draft \| Published \| Retired | yes |  |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
-| `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
-| `data.version` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -22300,11 +24700,12 @@ The `result` member of the response is: `{ "data": PickingPolicyView }`
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.published_at` | string or null | no |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22319,19 +24720,19 @@ The `result` member of the response is: `{ "data": PickingPolicyView }`
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 | `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes |  |
 | `data.status` | one of: Draft \| Published \| Retired | yes |  |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
-| `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
-| `data.version` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -22409,11 +24810,12 @@ The `result` member of the response is: `{ "data": [PickingPolicy] }`
 | `data[].loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data[].lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data[].max_targets` | integer (int16) | yes |  |
+| `data[].missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data[].pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data[].pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data[].pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data[].pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data[].published_at` | string or null | no |  |
 | `data[].qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data[].reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22513,11 +24915,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.published_at` | string or null | no |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22532,19 +24935,19 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 | `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes |  |
 | `data.status` | one of: Draft \| Published \| Retired | yes |  |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
-| `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
-| `data.version` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -22634,11 +25037,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.published_at` | string or null | no |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22653,19 +25057,19 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 | `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes |  |
 | `data.status` | one of: Draft \| Published \| Retired | yes |  |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
-| `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
-| `data.version` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -22741,13 +25145,14 @@ Replace the description and sections of one picking-policy draft.
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.policy_id` | integer (int64) | yes |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 
@@ -22772,11 +25177,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.max_targets` | integer (int16) | yes |  |
+| `data.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.published_at` | string or null | no |  |
 | `data.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22791,19 +25197,19 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.sections.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.sections.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.sections.max_targets` | integer (int16) | yes |  |
+| `data.sections.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes |  |
 | `data.sections.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the location suggested for a closed pallet comes from. |
-| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | The location types a closed discrete pick pallet may be put into (section "Completion"): at least one, none twice, all from `PALLET_DROP_ADMISSIBLE`, kept in the order they were saved. |
-| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes | (The code comment for this item is not in English. |
+| `data.sections.pallet_drop_types` | array of one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes |  |
+| `data.sections.pick_to_zero` | one of: Off \| Count \| Confirm | yes |  |
 | `data.sections.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.sections.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
-| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Spec section 7, "Confirmation": what the operator proves at the source. |
+| `data.sections.source_location_confirmation` | one of: DisplayOnly \| Scan | yes | Not part of the grouping shape (`shape_eq` ignores them). |
 | `data.sections.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
 | `data.sections.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
 | `data.source_location_confirmation` | one of: DisplayOnly \| Scan | yes |  |
 | `data.status` | one of: Draft \| Published \| Retired | yes |  |
 | `data.target_binding` | one of: Unbound \| BeforeRoute | yes |  |
-| `data.target_confirmation` | one of: ScanContainer \| PositionNumber | yes |  |
-| `data.version` | integer (int32) | yes |  |
+| … | | | 2 more fields. See `openrpc.json`. |
 
 **Errors**
 
@@ -22843,6 +25249,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
       "loose_lot_confirmation": "NoConfirmation",
       "lot_attribute_capture": "ScanOnly",
       "max_targets": 1,
+      "missing_container_at_control": "WriteOffToLost",
       "pallet_drop_suggestion": "OwnerThenTask",
       "pallet_drop_types": [
         "None"
@@ -22913,11 +25320,12 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.resolved.loose_lot_confirmation` | one of: NoConfirmation \| ScanInternalLot \| ConfirmLotAttributes \| Automatic \| ExclusiveLocation | yes |  |
 | `data.resolved.lot_attribute_capture` | one of: ScanOnly \| ScanOrManual | yes |  |
 | `data.resolved.max_targets` | integer (int16) | yes |  |
+| `data.resolved.missing_container_at_control` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | What a supervisor may do with a container reported missing at order control: write it off to Lost, release the order without it, or only wait until it is found. |
 | `data.resolved.mod_when` | string | yes |  |
 | `data.resolved.mod_who` | integer (int64) | yes |  |
 | `data.resolved.pallet_drop_suggestion` | one of: OwnerThenTask | yes | Where the suggested location for a closed pick pallet comes from. |
-| `data.resolved.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into (the pick-pallet wms-app migration, `chk_picking_policy_pallet_drop_types`). |
-| `data.resolved.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does (wms-app 111, count spec Appendices D and L). |
+| `data.resolved.pallet_drop_types` | array of string | yes | Location types (`LocType` labels) a closed discrete pick pallet may be put into. |
+| `data.resolved.pick_to_zero` | one of: Off \| Count \| Confirm | yes | What a full pick that leaves its source location holding no stock does. |
 | `data.resolved.published_at` | string or null | no |  |
 | `data.resolved.qty_confirmation` | one of: PerPick \| Aggregated | yes |  |
 | `data.resolved.reserved_lpn_confirmation` | one of: DoNotConfirm \| ScanWhenPresent | yes |  |
@@ -22955,6 +25363,7 @@ Example response. It shows the shape only. The required fields have placeholder 
         "loose_lot_confirmation": "NoConfirmation",
         "lot_attribute_capture": "ScanOnly",
         "max_targets": 1,
+        "missing_container_at_control": "WriteOffToLost",
         "mod_when": "<mod_when>",
         "mod_who": 1,
         "pallet_drop_suggestion": "OwnerThenTask",
@@ -23555,9 +25964,9 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.label_printer.name` | string | yes |  |
 | `data.measured_gross_weight` | number (double) | yes |  |
 | `data.obligation_status` | one of: Open \| Satisfied or null | no | A package's obligation after the close; `None` for an output carton of `Repack` (its source's obligation is not touched, §11.4). |
-| `data.order_packed` | boolean | yes | The close finished the order's packing (spec §14). |
+| `data.order_packed` | boolean | yes | The close finished the order's packing. |
 | `data.unit_id` | integer (int64) | yes | The package's unit, or the unit the output carton released. |
-| `data.unit_next` | one of: Pack \| Consolidate \| Stage \| Ship \| None | yes | What the router sends the package to next (`None`: its flow is done). |
+| `data.unit_next` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes | What the router sends the package to next (`None`: its flow is done). |
 | `data.unit_status` | one of: Pending \| Completed \| Consumed | yes |  |
 | `data.weight_verdict` | one of: Recorded \| NotComparable | yes |  |
 
@@ -23756,7 +26165,7 @@ Reopen a closed package with a supervisor's grant and a reason.
 | `data.carton_id` | integer (int64) | yes |  |
 | `data.expected_version` | integer (int32) | yes | `packing_carton.version` as the operator saw it. |
 | `data.idempotency_key` | string (uuid) | yes |  |
-| `data.override_grant_id` | string (uuid) or null | no | A supervisor's grant for `packing_override_codes::reopen_carton(carton_id)`. |
+| `data.override_grant_id` | string (uuid) or null | no |  |
 | `data.reason` | string | yes | Why the package is reopened; journalled. |
 
 **Result**
@@ -23772,13 +26181,13 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.carton_status` | one of: Open \| Closed \| Voided | yes |  |
 | `data.carton_version` | integer (int32) | yes | The version after the reopen. |
 | `data.job_id` | integer (int64) | yes |  |
-| `data.job_reopened` | boolean | yes | The job was `Packed` and is `Open` again (recovery, P-32). |
+| `data.job_reopened` | boolean | yes | The job was `Packed` and is `Open` again. |
 | `data.job_status` | one of: Open \| Packed \| Cancelled | yes |  |
 | `data.obligation_id` | integer (int64) or null | no | A package's obligation; `None` for an output carton of `Repack`. |
 | `data.obligation_status` | one of: Open \| Satisfied or null | no |  |
 | `data.reopen_id` | integer (int64) | yes | The journal row. |
 | `data.unit_id` | integer (int64) | yes |  |
-| `data.unit_next` | one of: Pack \| Consolidate \| Stage \| Ship \| None | yes | What the unit waits for now: `Pack` again. |
+| `data.unit_next` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes | What the unit waits for now: `Pack` again. |
 | `data.unit_status` | one of: Pending \| Completed \| Consumed | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
@@ -24252,7 +26661,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.exception_id` | integer (int64) | yes |  |
 | `data.job_status` | one of: Open \| Packed \| Cancelled | yes |  |
 | `data.order_id` | integer (int64) | yes |  |
-| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order (spec §14). |
+| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order. |
 | `data.resolution` | one of: NoDiscrepancy \| CorrectedByAccounting \| WrittenOffToLost \| SetAsideForCount | yes |  |
 | `data.status` | one of: Open \| Resolved | yes |  |
 | `data.version` | integer (int32) | yes | The version after the resolution. |
@@ -24371,7 +26780,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.moved_qty` | number (double) | yes | How much left the package. |
 | `data.obligation_status` | one of: Open \| Satisfied | yes | `Satisfied` when the short emptied the package; as it was otherwise. |
 | `data.order_id` | integer (int64) | yes |  |
-| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order (spec §14). |
+| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order. |
 | `data.resolution` | one of: NoDiscrepancy \| CorrectedByAccounting \| WrittenOffToLost \| SetAsideForCount | yes |  |
 | `data.shorted` | array of object (PackageShortedPick) | yes | The picks shorted, in content order. |
 | `data.shorted[].pick_id` | integer (int64) | yes |  |
@@ -24472,7 +26881,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.excess_id` | integer (int64) | yes | The `packing_excess` fact. |
 | `data.job_status` | one of: Open \| Packed \| Cancelled | yes |  |
 | `data.order_id` | integer (int64) | yes |  |
-| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order (spec §14). |
+| `data.order_packed` | boolean | yes | The resolution was the last thing that held the order. |
 | `data.resolution` | one of: NoDiscrepancy \| CorrectedByAccounting \| WrittenOffToLost \| SetAsideForCount | yes |  |
 | `data.set_aside_location` | string | yes |  |
 | `data.status` | one of: Open \| Resolved | yes |  |
@@ -24574,7 +26983,7 @@ The `result` member of the response is: `{ "data": StationQueue }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.capability` | one of: Pack \| Consolidate \| Stage \| Ship \| None | yes |  |
+| `data.capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes |  |
 | `data.station` | string | yes | The station's location code, as stored. |
 | `data.units` | array of object (StationQueueRow) | yes | Oldest first. |
 | `data.units[].container_code` | string or null | no | The label the operator scans; `None` when the container is gone. |
@@ -24797,7 +27206,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.obligation_id` | integer (int64) | yes |  |
 | `data.obligation_status` | one of: Open \| Satisfied | yes |  |
 | `data.obligation_version` | integer (int32) | yes | The version after the completion. |
-| `data.order_packed` | boolean | yes | The completion finished the order's packing (spec §14). |
+| `data.order_packed` | boolean | yes | The completion finished the order's packing. |
 | `data.unit_id` | integer (int64) | yes |  |
 | `data.unit_status` | one of: Pending \| Completed \| Consumed | yes | `Consumed`. |
 
@@ -24913,7 +27322,7 @@ The `result` member of the response is: `{ "data": PackingWork }`
 | `data.carton.opened_by` | integer (int64) | yes |  |
 | `data.carton.plan_expected_weight` | number (double) or null | no |  |
 | `data.carton.planned_carton_ref` | integer (int64) or null | no |  |
-| `data.carton.produced_flow_unit_id` | integer (int64) or null | no | A `Repack` output carton: the router unit its first close released (wms-app 088, §8.1); `None` until then and for a `Verify` package. |
+| `data.carton.produced_flow_unit_id` | integer (int64) or null | no | A `Repack` output carton: the router unit its first close released; `None` until then and for a `Verify` package. |
 | `data.carton.sscc` | string or null | no |  |
 | `data.carton.status` | one of: Open \| Closed \| Voided | yes |  |
 | `data.carton.tracking_ref` | string or null | no |  |
@@ -28300,6 +30709,1255 @@ curl -s -X POST "$BASE_URL/api/rpc" \
     "data": {
       "container_code": "<container_code>",
       "station": "<station>"
+    }
+  }
+}'
+```
+
+## Module: order_control
+
+### order_control_complete
+
+Complete an order's control when its set became full without a scan.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_complete` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+| Version check | entity `order_control_session`: send `expected_version` for row `session_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CompleteOrderControl) | yes |  |
+| `data.expected_version` | integer (int32) | yes | `order_control_session.version` as the card showed it. |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OrderControlCard }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.completable` | boolean | yes | k = N, nothing ahead, no unfinished picking, no exception holding it. |
+| `data.expected_total` | integer (int64) | yes | N: every container of the order that goes through this control — waiting here and still on its way (§5.2). |
+| `data.next_step` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | After `Completed`: where the order's units go next. |
+| `data.open_exceptions` | integer (int64) | yes | Live exceptions holding the order. |
+| `data.order_id` | integer (int64) | yes |  |
+| `data.order_number` | string | yes |  |
+| `data.pass_line` | string or null | no | A second or later control of an order checked before (`narration.order_control.repeat_pass`). |
+| `data.pass_no` | integer (int32) | yes |  |
+| `data.scanned` | integer (int64) | yes | k: those scanned in their current version. |
+| `data.scanned_units` | array of object (ScannedUnit) | yes |  |
+| `data.scanned_units[].container_code` | string | yes |  |
+| `data.scanned_units[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.scanned_units[].other_orders` | array of string | yes |  |
+| `data.scanned_units[].unit_id` | integer (int64) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+| `data.session_version` | integer (int32) | yes | What `order_control_complete` sends back as `expected_version`. |
+| `data.ship_to_name` | string or null | no |  |
+| `data.skipped` | array of object (SkippedUnit) | yes | Let go without control. |
+| `data.skipped[].container_code` | string | yes |  |
+| `data.skipped[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.skipped[].unit_id` | integer (int64) | yes |  |
+| `data.skipped_line` | string or null | no | A checked order a supervisor released without some containers, as the terminal says it (`narration.order_control.completed_with_skipped`): "4 of 5 — PAL-0007 released without control". |
+| `data.station_location` | string | yes |  |
+| `data.status` | one of: Open \| Completed | yes |  |
+| `data.unfinished_picks` | integer (int64) | yes | Picks of the order that still have to become a container. |
+| `data.upstream` | array of object (UpstreamUnit) | yes |  |
+| `data.upstream[].at` | string or null | no | The station of that step. |
+| `data.upstream[].container_code` | string | yes |  |
+| `data.upstream[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.upstream[].next_capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes |  |
+| `data.upstream[].unit_id` | integer (int64) | yes |  |
+| `data.waiting` | array of object (WaitingUnit) | yes |  |
+| `data.waiting[].container_code` | string | yes |  |
+| `data.waiting[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.waiting[].last_seen_location` | string or null | no | The container's current location. |
+| `data.waiting[].missing_reported` | boolean | yes | A live `Open` / `CountRequested` exception: it is with a supervisor. |
+| `data.waiting[].other_orders` | array of string | yes | The other orders of a mixed pallet, by number. |
+| `data.waiting[].unit_id` | integer (int64) | yes |  |
+| `data.waiting[].unit_version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_complete",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "session_id": 1
+    }
+  }
+}'
+```
+
+### order_control_exception_get
+
+Read one container reported missing at order control with its allowed actions.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `order_control_exception_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `exception_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": ControlExceptionView }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.actions` | array of object (ExceptionActionView) | yes | Found, write off, skip, request a count — each allowed or why not. |
+| `data.actions[].action` | one of: Found \| WrittenOff \| Skip \| RequestCount | yes | What a supervisor may do with a container reported missing. |
+| `data.actions[].allowed` | boolean | yes |  |
+| `data.actions[].reason` | string or null | no | Why not (`None` when allowed), in the language of whoever reads the list — the web screen greys the button with these words. |
+| `data.actions[].reason_code` | string or null | no | The refusal's stable code (`CONTROL_RESOLUTION_NOT_ALLOWED`, `CONTROL_EXCEPTION_NOT_OPEN`). |
+| `data.container_code` | string | yes |  |
+| `data.container_id` | integer (int64) | yes |  |
+| `data.count_requested_at` | string or null | no |  |
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.found_allowed` | boolean | yes | `actions` flattened for the metadata list's field gates. |
+| `data.found_reason` | string or null | no |  |
+| `data.id` | integer (int64) | yes | The record's key for a metadata list (`= exception_id`). |
+| `data.kind` | one of: Missing | yes |  |
+| `data.last_seen_location` | string or null | no | Where the container stood when it was reported. |
+| `data.missing_rule` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | The rule frozen at the report and the policy revision it came from. |
+| `data.order_id` | integer (int64) | yes | The reporting session's order. |
+| `data.order_number` | string | yes |  |
+| `data.orders` | array of string | yes | Every order the container carries (a mixed pallet: all of them), ascending by id. |
+| `data.orders_line` | string | yes | `orders` as one line, `SO-1, SO-2` — what a list cell shows. |
+| `data.outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data.picking_policy_id` | integer (int64) | yes |  |
+| `data.policy_code` | string | yes |  |
+| `data.policy_revision` | integer (int32) | yes |  |
+| `data.recount_allowed` | boolean | yes |  |
+| `data.recount_reason` | string or null | no |  |
+| `data.reported_at` | string | yes |  |
+| `data.reported_by` | integer (int64) | yes |  |
+| `data.resolution` | one of: Found \| WrittenOff or null | no |  |
+| `data.resolution_note` | string or null | no |  |
+| `data.session_id` | integer (int64) | yes |  |
+| `data.ship_to_name` | string or null | no |  |
+| `data.skip_allowed` | boolean | yes |  |
+| `data.skip_reason` | string or null | no |  |
+| `data.skipped_at` | string or null | no |  |
+| `data.station_location` | string | yes |  |
+| `data.status` | one of: Open \| CountRequested \| Skipped \| Resolved | yes |  |
+| `data.unit_kind` | one of: Box \| Pallet \| Package or null | no | The container's kind (`None`: its unit is gone — written off). |
+| `data.unit_version` | integer (int32) | yes |  |
+| `data.version` | integer (int32) | yes | What `order_control_exception_resolve` / `_request_count` send back as `expected_version`. |
+| `data.write_off_allowed` | boolean | yes |  |
+| `data.write_off_reason` | string or null | no |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_exception_get",
+  "params": {
+    "exception_id": 1
+  }
+}'
+```
+
+### order_control_exception_list
+
+List the containers reported missing at order control with the actions their rule allows.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `order_control_exception_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `filters[].id` | integer filter | no | Filter on `id`. |
+| `filters[].order_id` | integer filter | no | Filter on `order_id`. |
+| `filters[].station_location` | string filter | no | Filter on `station_location`. |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [ControlExceptionView] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].actions` | array of object (ExceptionActionView) | yes | Found, write off, skip, request a count — each allowed or why not. |
+| `data[].actions[].action` | one of: Found \| WrittenOff \| Skip \| RequestCount | yes | What a supervisor may do with a container reported missing. |
+| `data[].actions[].allowed` | boolean | yes |  |
+| `data[].actions[].reason` | string or null | no | Why not (`None` when allowed), in the language of whoever reads the list — the web screen greys the button with these words. |
+| `data[].actions[].reason_code` | string or null | no | The refusal's stable code (`CONTROL_RESOLUTION_NOT_ALLOWED`, `CONTROL_EXCEPTION_NOT_OPEN`). |
+| `data[].container_code` | string | yes |  |
+| `data[].container_id` | integer (int64) | yes |  |
+| `data[].count_requested_at` | string or null | no |  |
+| `data[].exception_id` | integer (int64) | yes |  |
+| `data[].found_allowed` | boolean | yes | `actions` flattened for the metadata list's field gates. |
+| `data[].found_reason` | string or null | no |  |
+| `data[].id` | integer (int64) | yes | The record's key for a metadata list (`= exception_id`). |
+| `data[].kind` | one of: Missing | yes |  |
+| `data[].last_seen_location` | string or null | no | Where the container stood when it was reported. |
+| `data[].missing_rule` | one of: WriteOffToLost \| Skip \| FoundOnly | yes | The rule frozen at the report and the policy revision it came from. |
+| `data[].order_id` | integer (int64) | yes | The reporting session's order. |
+| `data[].order_number` | string | yes |  |
+| `data[].orders` | array of string | yes | Every order the container carries (a mixed pallet: all of them), ascending by id. |
+| `data[].orders_line` | string | yes | `orders` as one line, `SO-1, SO-2` — what a list cell shows. |
+| `data[].outbound_flow_unit_id` | integer (int64) | yes |  |
+| `data[].picking_policy_id` | integer (int64) | yes |  |
+| `data[].policy_code` | string | yes |  |
+| `data[].policy_revision` | integer (int32) | yes |  |
+| `data[].recount_allowed` | boolean | yes |  |
+| `data[].recount_reason` | string or null | no |  |
+| `data[].reported_at` | string | yes |  |
+| `data[].reported_by` | integer (int64) | yes |  |
+| `data[].resolution` | one of: Found \| WrittenOff or null | no |  |
+| `data[].resolution_note` | string or null | no |  |
+| `data[].session_id` | integer (int64) | yes |  |
+| `data[].ship_to_name` | string or null | no |  |
+| `data[].skip_allowed` | boolean | yes |  |
+| `data[].skip_reason` | string or null | no |  |
+| `data[].skipped_at` | string or null | no |  |
+| `data[].station_location` | string | yes |  |
+| `data[].status` | one of: Open \| CountRequested \| Skipped \| Resolved | yes |  |
+| `data[].unit_kind` | one of: Box \| Pallet \| Package or null | no | The container's kind (`None`: its unit is gone — written off). |
+| `data[].unit_version` | integer (int32) | yes |  |
+| `data[].version` | integer (int32) | yes | What `order_control_exception_resolve` / `_request_count` send back as `expected_version`. |
+| `data[].write_off_allowed` | boolean | yes |  |
+| `data[].write_off_reason` | string or null | no |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_exception_list",
+  "params": {
+    "filters": [
+      {
+        "id": 1
+      }
+    ],
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### order_control_exception_request_count
+
+Request a count of where a container reported missing at order control was last seen.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_exception_request_count` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `order_control_exception`: send `expected_version` for row `exception_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (RequestControlRecount) | yes |  |
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.expected_version` | integer (int32) | yes | `order_control_exception.version` as the supervisor saw it. |
+| `data.idempotency_key` | string (uuid) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ResolvedControlException }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.resolution` | one of: Found \| WrittenOff or null | no | `None` while the exception is still live (`Skipped`). |
+| `data.shorted_picks` | array of object (ShortedInControl) | no | The picks a `WrittenOff` shorted. |
+| `data.shorted_picks[].pick_id` | integer (int64) | yes |  |
+| `data.shorted_picks[].qty` | number (double) | yes |  |
+| `data.shorted_picks[].remediation_id` | integer (int64) | yes | The discrepancy event (`enterprise.integration_event` id). |
+| `data.shorted_picks[].shorted_pick_id` | integer (int64) | yes | `pick_id` when the whole pick was shorted; the split-off part otherwise. |
+| `data.status` | one of: Open \| CountRequested \| Skipped \| Resolved | yes |  |
+| `data.version` | integer (int32) | yes | The version after the decision. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "exception_id": 1,
+      "status": "Open",
+      "version": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_exception_request_count",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "exception_id": 1
+    }
+  }
+}'
+```
+
+### order_control_exception_resolve
+
+Resolve a container reported missing at order control: found, written off or skipped.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateful_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_exception_resolve` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | required |
+| Version check | entity `order_control_exception`: send `expected_version` for row `exception_id` |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send the current version of the row in `expected_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (ResolveControlException) | yes |  |
+| `data.decision` | one of: Found \| WrittenOff \| Skip | yes | The supervisor's decision on a missing container. |
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.expected_version` | integer (int32) | yes | `order_control_exception.version` as the supervisor saw it. |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.note` | string or null | no | What the supervisor writes about it; blank is none. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ResolvedControlException }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.resolution` | one of: Found \| WrittenOff or null | no | `None` while the exception is still live (`Skipped`). |
+| `data.shorted_picks` | array of object (ShortedInControl) | no | The picks a `WrittenOff` shorted. |
+| `data.shorted_picks[].pick_id` | integer (int64) | yes |  |
+| `data.shorted_picks[].qty` | number (double) | yes |  |
+| `data.shorted_picks[].remediation_id` | integer (int64) | yes | The discrepancy event (`enterprise.integration_event` id). |
+| `data.shorted_picks[].shorted_pick_id` | integer (int64) | yes | `pick_id` when the whole pick was shorted; the split-off part otherwise. |
+| `data.status` | one of: Open \| CountRequested \| Skipped \| Resolved | yes |  |
+| `data.version` | integer (int32) | yes | The version after the decision. |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "exception_id": 1,
+      "status": "Open",
+      "version": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR, return_code 40 | The row changed since you read it. The answer carries `context.current_state`. Read again and decide again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_exception_resolve",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "decision": "Found",
+      "exception_id": 1
+    }
+  }
+}'
+```
+
+### order_control_get
+
+Read the card of an order's control session: k of N and what it waits for.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `order_control_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR, VIEWER |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (OrderControlGetInput) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": OrderControlCard }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.completable` | boolean | yes | k = N, nothing ahead, no unfinished picking, no exception holding it. |
+| `data.expected_total` | integer (int64) | yes | N: every container of the order that goes through this control — waiting here and still on its way (§5.2). |
+| `data.next_step` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | After `Completed`: where the order's units go next. |
+| `data.open_exceptions` | integer (int64) | yes | Live exceptions holding the order. |
+| `data.order_id` | integer (int64) | yes |  |
+| `data.order_number` | string | yes |  |
+| `data.pass_line` | string or null | no | A second or later control of an order checked before (`narration.order_control.repeat_pass`). |
+| `data.pass_no` | integer (int32) | yes |  |
+| `data.scanned` | integer (int64) | yes | k: those scanned in their current version. |
+| `data.scanned_units` | array of object (ScannedUnit) | yes |  |
+| `data.scanned_units[].container_code` | string | yes |  |
+| `data.scanned_units[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.scanned_units[].other_orders` | array of string | yes |  |
+| `data.scanned_units[].unit_id` | integer (int64) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+| `data.session_version` | integer (int32) | yes | What `order_control_complete` sends back as `expected_version`. |
+| `data.ship_to_name` | string or null | no |  |
+| `data.skipped` | array of object (SkippedUnit) | yes | Let go without control. |
+| `data.skipped[].container_code` | string | yes |  |
+| `data.skipped[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.skipped[].unit_id` | integer (int64) | yes |  |
+| `data.skipped_line` | string or null | no | A checked order a supervisor released without some containers, as the terminal says it (`narration.order_control.completed_with_skipped`): "4 of 5 — PAL-0007 released without control". |
+| `data.station_location` | string | yes |  |
+| `data.status` | one of: Open \| Completed | yes |  |
+| `data.unfinished_picks` | integer (int64) | yes | Picks of the order that still have to become a container. |
+| `data.upstream` | array of object (UpstreamUnit) | yes |  |
+| `data.upstream[].at` | string or null | no | The station of that step. |
+| `data.upstream[].container_code` | string | yes |  |
+| `data.upstream[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.upstream[].next_capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes |  |
+| `data.upstream[].unit_id` | integer (int64) | yes |  |
+| `data.waiting` | array of object (WaitingUnit) | yes |  |
+| `data.waiting[].container_code` | string | yes |  |
+| `data.waiting[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.waiting[].last_seen_location` | string or null | no | The container's current location. |
+| `data.waiting[].missing_reported` | boolean | yes | A live `Open` / `CountRequested` exception: it is with a supervisor. |
+| `data.waiting[].other_orders` | array of string | yes | The other orders of a mixed pallet, by number. |
+| `data.waiting[].unit_id` | integer (int64) | yes |  |
+| `data.waiting[].unit_version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_get",
+  "params": {
+    "data": {
+      "session_id": 1
+    }
+  }
+}'
+```
+
+### order_control_list
+
+List the warehouse's open order controls with k of N and their holding exceptions.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `order_control_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `filters[].id` | integer filter | no | Filter on `id`. |
+| `filters[].order_id` | integer filter | no | Filter on `order_id`. |
+| `filters[].station_location` | string filter | no | Filter on `station_location`. |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OrderControlSessionView] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].expected_total` | integer (int64) | yes | N (§5.2). |
+| `data[].holding_exceptions` | integer (int64) | yes | Live exceptions that hold the order (`Open`, `CountRequested`). |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].opened_at` | string | yes |  |
+| `data[].opened_by` | integer (int64) | yes |  |
+| `data[].order_id` | integer (int64) | yes |  |
+| `data[].order_number` | string or null | no |  |
+| `data[].pass_no` | integer (int32) | yes |  |
+| `data[].scanned` | integer (int64) | yes | k. |
+| `data[].station_location` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_list",
+  "params": {
+    "filters": [
+      {
+        "id": 1
+      }
+    ],
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### order_control_open
+
+Open (or resume) an order's control at a control station by one of its containers (counted at once) or by the order's number.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_open` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (OpenOrderControl) | yes |  |
+| `data.code` | string | yes | Any container of the order, as scanned — or the order's number, as typed or scanned from its papers. |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.station_location` | string | yes | The control station, as scanned. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OrderControlCard }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.completable` | boolean | yes | k = N, nothing ahead, no unfinished picking, no exception holding it. |
+| `data.expected_total` | integer (int64) | yes | N: every container of the order that goes through this control — waiting here and still on its way (§5.2). |
+| `data.next_step` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | After `Completed`: where the order's units go next. |
+| `data.open_exceptions` | integer (int64) | yes | Live exceptions holding the order. |
+| `data.order_id` | integer (int64) | yes |  |
+| `data.order_number` | string | yes |  |
+| `data.pass_line` | string or null | no | A second or later control of an order checked before (`narration.order_control.repeat_pass`). |
+| `data.pass_no` | integer (int32) | yes |  |
+| `data.scanned` | integer (int64) | yes | k: those scanned in their current version. |
+| `data.scanned_units` | array of object (ScannedUnit) | yes |  |
+| `data.scanned_units[].container_code` | string | yes |  |
+| `data.scanned_units[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.scanned_units[].other_orders` | array of string | yes |  |
+| `data.scanned_units[].unit_id` | integer (int64) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+| `data.session_version` | integer (int32) | yes | What `order_control_complete` sends back as `expected_version`. |
+| `data.ship_to_name` | string or null | no |  |
+| `data.skipped` | array of object (SkippedUnit) | yes | Let go without control. |
+| `data.skipped[].container_code` | string | yes |  |
+| `data.skipped[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.skipped[].unit_id` | integer (int64) | yes |  |
+| `data.skipped_line` | string or null | no | A checked order a supervisor released without some containers, as the terminal says it (`narration.order_control.completed_with_skipped`): "4 of 5 — PAL-0007 released without control". |
+| `data.station_location` | string | yes |  |
+| `data.status` | one of: Open \| Completed | yes |  |
+| `data.unfinished_picks` | integer (int64) | yes | Picks of the order that still have to become a container. |
+| `data.upstream` | array of object (UpstreamUnit) | yes |  |
+| `data.upstream[].at` | string or null | no | The station of that step. |
+| `data.upstream[].container_code` | string | yes |  |
+| `data.upstream[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.upstream[].next_capability` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None | yes |  |
+| `data.upstream[].unit_id` | integer (int64) | yes |  |
+| `data.waiting` | array of object (WaitingUnit) | yes |  |
+| `data.waiting[].container_code` | string | yes |  |
+| `data.waiting[].kind` | one of: Box \| Pallet \| Package | yes |  |
+| `data.waiting[].last_seen_location` | string or null | no | The container's current location. |
+| `data.waiting[].missing_reported` | boolean | yes | A live `Open` / `CountRequested` exception: it is with a supervisor. |
+| `data.waiting[].other_orders` | array of string | yes | The other orders of a mixed pallet, by number. |
+| `data.waiting[].unit_id` | integer (int64) | yes |  |
+| `data.waiting[].unit_version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_open",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "code": "<code>",
+      "station_location": "<station_location>"
+    }
+  }
+}'
+```
+
+### order_control_report_missing
+
+Report a container of an order's control set missing at the control station.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_report_missing` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (ReportMissingAtControl) | yes |  |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.outbound_flow_unit_id` | integer (int64) | yes | The router unit the card listed as waiting. |
+| `data.session_id` | integer (int64) | yes | The control the container is missing from. |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ReportedMissing }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.card` | object (OrderControlCard) | yes | The card after the report: the container marked reported, the order held. |
+| `data.card.completable` | boolean | yes | k = N, nothing ahead, no unfinished picking, no exception holding it. |
+| `data.card.expected_total` | integer (int64) | yes | N: every container of the order that goes through this control — waiting here and still on its way (§5.2). |
+| `data.card.next_step` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | After `Completed`: where the order's units go next. |
+| `data.card.open_exceptions` | integer (int64) | yes | Live exceptions holding the order. |
+| `data.card.order_id` | integer (int64) | yes |  |
+| `data.card.order_number` | string | yes |  |
+| `data.card.pass_line` | string or null | no | A second or later control of an order checked before (`narration.order_control.repeat_pass`). |
+| `data.card.pass_no` | integer (int32) | yes |  |
+| `data.card.scanned` | integer (int64) | yes | k: those scanned in their current version. |
+| `data.card.scanned_units` | array of object (ScannedUnit) | yes |  |
+| `data.card.session_id` | integer (int64) | yes |  |
+| `data.card.session_version` | integer (int32) | yes | What `order_control_complete` sends back as `expected_version`. |
+| `data.card.ship_to_name` | string or null | no |  |
+| `data.card.skipped` | array of object (SkippedUnit) | yes | Let go without control. |
+| `data.card.skipped_line` | string or null | no | A checked order a supervisor released without some containers, as the terminal says it (`narration.order_control.completed_with_skipped`): "4 of 5 — PAL-0007 released without control". |
+| `data.card.station_location` | string | yes |  |
+| `data.card.status` | one of: Open \| Completed | yes |  |
+| `data.card.unfinished_picks` | integer (int64) | yes | Picks of the order that still have to become a container. |
+| `data.card.upstream` | array of object (UpstreamUnit) | yes |  |
+| `data.card.waiting` | array of object (WaitingUnit) | yes |  |
+| `data.container_code` | string | no | The reported container, as the card knows it — what `message` names. |
+| `data.exception_id` | integer (int64) | yes |  |
+| `data.message` | string | no |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "card": {
+        "completable": false,
+        "expected_total": 1,
+        "open_exceptions": 1,
+        "order_id": 1,
+        "order_number": "<order_number>",
+        "pass_no": 1,
+        "scanned": 1,
+        "scanned_units": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "other_orders": [],
+            "unit_id": 1
+          }
+        ],
+        "session_id": 1,
+        "session_version": 1,
+        "skipped": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "unit_id": 1
+          }
+        ],
+        "station_location": "<station_location>",
+        "status": "Open",
+        "unfinished_picks": 1,
+        "upstream": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "next_capability": null,
+            "unit_id": 1
+          }
+        ],
+        "waiting": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "missing_reported": false,
+            "other_orders": [],
+            "unit_id": 1,
+            "unit_version": 1
+          }
+        ]
+      },
+      "exception_id": 1
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_report_missing",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "outbound_flow_unit_id": 1,
+      "session_id": 1
+    }
+  }
+}'
+```
+
+### order_control_scan
+
+Count a container scanned at the control station; the last one completes the order.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
+| Permission | RBAC resource type `api`, resource code `order_control_scan` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+| Idempotency key | required |
+
+**Notes**
+
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (ScanOrderControl) | yes |  |
+| `data.container_code` | string | yes | The container, as scanned. |
+| `data.idempotency_key` | string (uuid) | yes |  |
+| `data.session_id` | integer (int64) | yes |  |
+
+**Result**
+
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ScanResult }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.card` | object (OrderControlCard) | yes | What the control terminal shows of an order (§4.3). |
+| `data.card.completable` | boolean | yes | k = N, nothing ahead, no unfinished picking, no exception holding it. |
+| `data.card.expected_total` | integer (int64) | yes | N: every container of the order that goes through this control — waiting here and still on its way (§5.2). |
+| `data.card.next_step` | one of: Pack \| Consolidate \| Control \| Stage \| Ship \| None or null | no | After `Completed`: where the order's units go next. |
+| `data.card.open_exceptions` | integer (int64) | yes | Live exceptions holding the order. |
+| `data.card.order_id` | integer (int64) | yes |  |
+| `data.card.order_number` | string | yes |  |
+| `data.card.pass_line` | string or null | no | A second or later control of an order checked before (`narration.order_control.repeat_pass`). |
+| `data.card.pass_no` | integer (int32) | yes |  |
+| `data.card.scanned` | integer (int64) | yes | k: those scanned in their current version. |
+| `data.card.scanned_units` | array of object (ScannedUnit) | yes |  |
+| `data.card.session_id` | integer (int64) | yes |  |
+| `data.card.session_version` | integer (int32) | yes | What `order_control_complete` sends back as `expected_version`. |
+| `data.card.ship_to_name` | string or null | no |  |
+| `data.card.skipped` | array of object (SkippedUnit) | yes | Let go without control. |
+| `data.card.skipped_line` | string or null | no | A checked order a supervisor released without some containers, as the terminal says it (`narration.order_control.completed_with_skipped`): "4 of 5 — PAL-0007 released without control". |
+| `data.card.station_location` | string | yes |  |
+| `data.card.status` | one of: Open \| Completed | yes |  |
+| `data.card.unfinished_picks` | integer (int64) | yes | Picks of the order that still have to become a container. |
+| `data.card.upstream` | array of object (UpstreamUnit) | yes |  |
+| `data.card.waiting` | array of object (WaitingUnit) | yes |  |
+| `data.container_code` | string | no | The container as the card knows it — what `message` names. |
+| `data.message` | string | yes |  |
+| `data.outcome` | one of: Scanned \| AlreadyScanned \| Completed | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
+    "data": {
+      "card": {
+        "completable": false,
+        "expected_total": 1,
+        "open_exceptions": 1,
+        "order_id": 1,
+        "order_number": "<order_number>",
+        "pass_no": 1,
+        "scanned": 1,
+        "scanned_units": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "other_orders": [],
+            "unit_id": 1
+          }
+        ],
+        "session_id": 1,
+        "session_version": 1,
+        "skipped": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "unit_id": 1
+          }
+        ],
+        "station_location": "<station_location>",
+        "status": "Open",
+        "unfinished_picks": 1,
+        "upstream": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "next_capability": null,
+            "unit_id": 1
+          }
+        ],
+        "waiting": [
+          {
+            "container_code": "<container_code>",
+            "kind": null,
+            "missing_reported": false,
+            "other_orders": [],
+            "unit_id": 1,
+            "unit_version": 1
+          }
+        ]
+      },
+      "message": "<message>",
+      "outcome": "Scanned"
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_scan",
+  "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
+    "data": {
+      "container_code": "<container_code>",
+      "session_id": 1
+    }
+  }
+}'
+```
+
+### order_control_station_get
+
+Read a control station and the orders waiting there for order control.
+
+| | |
+|---|---|
+| Context / module | outbound / order_control |
+| Category | query |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `order_control_station_get` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR, VIEWER |
+| Idempotency key | not stated in the catalog |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (OrderControlStationGetInput) | yes |  |
+| `data.station_location` | string | yes | The control station's location code, as scanned. |
+
+**Result**
+
+The `result` member of the response is: `{ "data": OrderControlStation }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data.orders` | array of object (StationOrder) | yes |  |
+| `data.orders[].order_id` | integer (int64) | yes |  |
+| `data.orders[].order_number` | string | yes |  |
+| `data.orders[].scanned` | integer (int64) | yes | Of those, scanned in their current version. |
+| `data.orders[].units_here` | integer (int64) | yes | Its units waiting for control here. |
+| `data.orders_waiting` | integer (int64) | yes |  |
+| `data.station_location` | string | yes |  |
+
+Example response. It shows the shape only. The required fields have placeholder values:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "data": {
+      "orders": [
+        {
+          "order_id": 1,
+          "order_number": "<order_number>",
+          "scanned": 1,
+          "units_here": 1
+        }
+      ],
+      "orders_waiting": 1,
+      "station_location": "<station_location>"
+    }
+  }
+}
+```
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "order_control_station_get",
+  "params": {
+    "data": {
+      "station_location": "<station_location>"
     }
   }
 }'

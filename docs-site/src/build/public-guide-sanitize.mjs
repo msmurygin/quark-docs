@@ -18,6 +18,8 @@ const INTERNAL_PATH_PATTERNS = [
   /\bwms-[a-z0-9_-]+\/(?:src|migrations?|sql)\//i,
   /\bBASELINE(?::\d+(?:-\d+)?)?\b|\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b|\bmigrations?\s+\d{1,4}\b|\bwms-app\s+\d{1,4}\b/i,
   /\b(?:baseline|seed)\s+migration\b|\bdev(?:elopment)?\s+seed\b|\bcode comment\b/i,
+  /\bwms-app\s+(?:\d{6,}(?:\/\d+)?|[a-z0-9]+(?:[_-][a-z0-9]+)+)\b/i,
+  /\b(?:r#)?[A-Za-z_][A-Za-z0-9_]*(?:::\s*(?:r#)?[A-Za-z_][A-Za-z0-9_]*)+\b/,
   /\b(?:grep|rg)\b[^\n]*/i,
   /\b(?:I\s+)?search(?:ed|ing)?\s+(?:all\s+)?(?:the\s+)?(?:Rust\s+)?(?:code|crates|engine)\b/i,
   /\bsearch(?:ed|ing)?\s+(?:over|through)\s+\*?\.(?:rs|sql|go|tsx?)\b|\bchecked by searching\b/i,
@@ -30,10 +32,11 @@ const INTERNAL_PROCESS_PATTERNS = [
   /\b(?:[A-Za-z][A-Za-z -]{0,100}\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?/i,
   /\bowner decision\s+20\d{2}-\d{2}-\d{2}\b/i,
   /\bspec\s*§/i,
-  /\bruling\s+[A-Z]\d+\b/i,
+  /\bruling\s+[A-Z0-9]+(?:[-/][A-Z0-9]+)*\b/i,
   /\bDecisions Log\b/i,
   /\bSlice\s*#\d+\b/i,
 ];
+const CYRILLIC_PROSE = /[\u0400-\u04FF]/;
 const PRIVATE_HEADING = /^(?:(?:\d+|[A-Z]\.\d+)\.?\s*)?(?:where it comes from|not confirmed(?: by code)?|findings|internal audit|known inconsistencies(?: on this page)?|known gaps.*|known problems.*|inconsistencies found.*|bugs, inconsistencies and items to verify|what to verify|what the code does not have|part 4:\s*names in code|keys read by the code but not seeded.*|the rule:\s*every arrow comes from code)$/i;
 const PRIVATE_QUOTE = /^(?:not confirmed(?: by code)?|(?:\*\*)?to verify(?:\*\*)?|label missing in English)\b\s*:*/i;
 const SOURCE_LABEL = /\b(?:source|sources|code proof|implementation evidence)\s*:/i;
@@ -76,6 +79,7 @@ function internalPathMatch(value) {
     'web-ui-server/src/', 'docs-obsidian/', 'docs/superpowers/', '.claude/',
     'dev_only/', 'wms-', '.rs', '.sql', '.go', '.ts', '.tsx', '.toml',
     'baseline', 'migration', 'seed', 'code comment', 'grep', 'rg', 'search', '#[',
+    '::',
   ].some((marker) => lower.includes(marker));
   if (!mayContainPath) return null;
   const matches = [earliestMatch(text, INTERNAL_PATH_PATTERNS), sourceFilenameMatch(text)]
@@ -568,11 +572,19 @@ export function sanitizePublicText(value) {
   return text;
 }
 
-export function sanitizePublicObject(value) {
-  if (typeof value === 'string') return sanitizePublicText(value);
-  if (Array.isArray(value)) return value.map(sanitizePublicObject);
+export function sanitizePublicObject(value, key = '') {
+  if (typeof value === 'string') {
+    const text = sanitizePublicText(value);
+    // The public API reference is English. Source comments may be useful to
+    // maintainers, but untranslated schema prose must not leak into the portal
+    // or its downloadable catalogs. Limit this rule to prose fields so enum
+    // values and other wire-format strings remain untouched.
+    if (/^(?:description|summary|title)$/i.test(key) && CYRILLIC_PROSE.test(text)) return '';
+    return text;
+  }
+  if (Array.isArray(value)) return value.map((item) => sanitizePublicObject(item, key));
   if (!value || typeof value !== 'object') return value;
-  return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, sanitizePublicObject(item)]));
+  return Object.fromEntries(Object.entries(value).map(([itemKey, item]) => [itemKey, sanitizePublicObject(item, itemKey)]));
 }
 
 export const PUBLIC_FORBIDDEN_PATTERNS = [
@@ -597,7 +609,10 @@ export const PUBLIC_FORBIDDEN_PATTERNS = [
   /\b(?:wms-(?:app|meta-ui|enterprise)|meta-ui)\s+migrations?\b/i,
   /\bmigrations?\s+\d{1,4}\b/i,
   /\bwms-app\s+\d{1,4}\b/i,
-  /\bruling\s+[A-Z]\d+\b/i,
+  /\bruling\s+[A-Z0-9]+(?:[-/][A-Z0-9]+)*\b/i,
+  /\bwms-app\s+(?:\d{6,}(?:\/\d+)?|[a-z0-9]+(?:[_-][a-z0-9]+)+)\b/i,
+  /\b(?:r#)?[A-Za-z_][A-Za-z0-9_]*(?:::\s*(?:r#)?[A-Za-z_][A-Za-z0-9_]*)+\b/,
+  /"(?:description|summary|title)"\s*:\s*"[^"\n]*[\u0400-\u04FF]/,
   /\b(?:[A-Za-z][A-Za-z -]+\s+)?spec\s+20\d{2}-\d{2}-\d{2}(?:\s*§\s*\d+)?/i,
   /\bowner decision\s+20\d{2}-\d{2}-\d{2}\b/i,
   /\b(?:F|P)-\d{2}\b/,

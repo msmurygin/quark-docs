@@ -42,12 +42,12 @@ The classifier belongs to the **method**. A client does not choose it.
 
 | Declared command type | Methods |
 |---|---|
-| `query` | 23 |
-| `stateless_command` | 176 |
-| `stateful_command` | 124 |
-| Not declared | 609 |
+| `query` | 33 |
+| `stateless_command` | 183 |
+| `stateful_command` | 137 |
+| Not declared | 607 |
 
-The 609 methods with no declared type are mostly standard reference-data CRUD: 438 read methods (`get_*`, `list_*`, `count_*`, and read models) and 171 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
+The 607 methods with no declared type are mostly standard reference-data CRUD: 439 read methods (`get_*`, `list_*`, `count_*`, and read models) and 168 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
 
 - Treat an undeclared **read** as a `query`. It is safe to repeat.
 - For an undeclared **write**, the catalog gives no idempotency key and no version check. A repeat can run twice, and two editors can overwrite each other (last write wins). Write such calls so that a repeat is harmless, or check the result before you retry. For example, retry `create_*` only after a `list_*` shows the row is missing.
