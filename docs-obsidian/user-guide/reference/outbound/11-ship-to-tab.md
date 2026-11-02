@@ -23,7 +23,7 @@ The form is `shipment_order_shipto_form`. The data table is `shipment_order`.
 ### Carrier
 
 - Read only after the order is launched.
-- The wave policy can group orders by carrier. There is no web screen for waves.
+- A wave strategy can filter or group orders by carrier. Configure it in `Management & Control > Orders & Waves > Wave strategies`.
 - No rule on the order itself reads it.
 
 ### Cancel Reason

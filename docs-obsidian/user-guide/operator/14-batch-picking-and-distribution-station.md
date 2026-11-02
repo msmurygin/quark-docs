@@ -28,7 +28,7 @@ The shared tote is transport equipment, not an order box. Goods from several ord
 ## Before you start
 
 - The wave must be released and assigned to a distribution station.
-- The station must be a `Sort` location with numbered positions. See [Waves and wave policy](../admin/06-outbound-setup.md#4-waves-and-wave-policy).
+- The station must be a `Sort` location with numbered positions. See [Waves and wave strategies](../admin/06-outbound-setup.md#4-waves-and-wave-strategies).
 - Have an empty registered shared tote.
 - The station needs enough empty registered boxes for its positions.
 - Know the wave code and your work area.
@@ -324,6 +324,6 @@ Use **Supervisor > Count Excess Now** when reported excess must be checked befor
 - [Picking](09-picking.md): discrete pallets, carts, summary steps and paper picking.
 - [Picking policy settings](../admin/policies/21-picking-policy-settings.md): how the warehouse chooses work shape, source proof, route grouping, pallet destinations and empty-location handling.
 - [Pick short reasons](../admin/policies/23-pick-short-reasons.md): what each short reason does.
-- [Waves and wave policy](../admin/06-outbound-setup.md#4-waves-and-wave-policy): create and release a wave assigned to a station.
+- [Waves and wave strategies](../admin/06-outbound-setup.md#4-waves-and-wave-strategies): create and release a wave assigned to a station.
 - [Order control after picking](11-order-control-after-picking.md): check complete orders after picking when the area uses control.
 - [Packing, verify and repack](10-packing-verify.md): check and close boxes at a pack station.

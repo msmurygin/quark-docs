@@ -86,7 +86,7 @@ Yes. Use `Ship order` for one fully picked order, or plan a Dispatch and Load fo
 Yes. Configure each SKU's pick location `Min`, `Max` and `Unit`, allow replenishment on the pick zone, grant the `Replenish` task right, and review its replenishment-policy urgency. See `06-outbound-setup.md`, section 11.
 
 **Can I plan waves in the web UI?**
-Yes. Use `Management & Control > Orders & Waves > Waves` for manual composition, station assignment, release and retry. Wave-policy rules remain API-only. See `06-outbound-setup.md`, section 4.
+Yes. Use `Management & Control > Orders & Waves > Waves` for manual composition, station assignment, release and retry. Use `Wave strategies` beside it for rule-based selection, grouping, schedules and previewed runs. See `06-outbound-setup.md`, section 4.
 
 ## Printing and reports
 

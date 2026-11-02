@@ -3,38 +3,38 @@ title: "Journey: Wave Build and Release"
 type: user-guide
 audience: customer administrator, integrator, support
 status: draft
-updated: 2026-10-11
+updated: 2026-11-02
 ---
 
 # Journey: Wave Build and Release
 
-A wave groups orders that are released together. There is no web screen or RF screen for waves. Everything runs through the API methods `wave_*` and `wave_policy_*` and through two background loops of `app-server`. A wave does not allocate by itself. For every member it runs the same `ReleaseShipmentOrder` command as the `Release` button (see [page 10](10-journey-release.md)).
+A wave groups orders that are released together. Use `Management & Control > Orders & Waves > Waves` for manual waves and `Wave strategies` for rule-based or scheduled creation. There is no RF administration screen. A wave does not allocate by itself: each member follows the same release path as the `Release` button (see [page 10](10-journey-release.md)).
 
 ## 1. How a policy builds waves
 
-**What this shows.** One build, started by hand (`wave_policy_build`) or by the scheduler for a due slot.
+**What this shows.** One build, started with `Run now…` or by an active strategy at its scheduled time.
 
 ```mermaid
 sequenceDiagram
-    participant C as Caller or scheduler
-    participant B as Policy builder
+    participant C as User or scheduler
+    participant B as Wave strategy
     participant DB as Database
 
-    C->>B: wave_policy_build, or a due slot
-    B->>DB: lock wave_policy row
-    B->>B: refuse if version old or policy inactive
+    C->>B: Run now, or a due schedule
+    B->>DB: read the saved strategy
+    B->>B: stop if it changed or is inactive
     B->>DB: read candidate orders
     B->>B: group, then cut batches
     B->>DB: lock chosen orders by id, read again
-    B->>DB: insert wave_policy_run
-    loop each batch up to max_waves_per_run
-        B->>DB: insert wave Draft
-        B->>DB: insert wave_order members and claims
-        opt auto_release is on
+    B->>DB: record this run
+    loop each batch up to the per-run limit
+        B->>DB: create a Draft wave
+        B->>DB: add orders and claim them
+        opt Release at once is selected
             B->>DB: wave Planned, members Pending
         end
     end
-    B->>DB: close run with counts
+    B->>DB: save run counts
 ```
 
 Reading notes.
@@ -73,14 +73,14 @@ sequenceDiagram
 
 Reading notes.
 
-- The worker takes members in the order of the member id. For a wave from a policy, that is the order of the plan: lowest order priority number first, then earliest requested ship date, then lowest order id. So the first order of a wave reserves its stock first. `wave_order.priority` and `wave_order.sequence` do not change this.
+- The plan places members in priority and ship-date order, and an available worker prefers the earliest pending member. This is not a strict stock-priority guarantee: when several application workers run, different members can release concurrently.
 - Every member is released in its own transaction. No transaction covers a whole wave.
 - The member outcome is `Released`, `Skipped` (the order was already released), `Blocked` (business refusal, not found, bad transition, version conflict) or `Failed` (anything else).
 - A wave that shows `Released` is only "settled". Members can still be `Blocked` or `Failed`. Read the member counts.
-- A shortage of stock does not block a member. A bad allocation policy does not block it either: the order still launches, and the allocation error stays in the order release result, not in the wave.
+- A shortage of stock does not block a member; the order can release partially. If automatic allocation itself fails, the order launch remains committed but the wave member becomes retryable `Blocked`. Correct the allocation problem and retry that member.
 ## 3. Statuses of a wave and of a member
 
-**What this shows.** Every change of status that code performs. `InProgress` and `Completed` exist in the enum, but no code sets them.
+**What this shows.** Release states followed by the picking-life-cycle states reconciled from current work evidence.
 
 Status of the wave (`wave.status`):
 
@@ -91,6 +91,8 @@ stateDiagram-v2
     Draft --> Planned: wave_release or auto_release
     Planned --> Released: no member Pending or Processing
     Released --> Planned: wave_retry_blocked
+    Released --> InProgress: picking work starts
+    InProgress --> Completed: all known work is complete
     Draft --> Cancelled: wave_cancel
     Planned --> Cancelled: wave_cancel
 ```
@@ -116,10 +118,7 @@ Reading notes.
 
 - `wave_cancel` is refused when a member is `Processing`, `Released` or `Skipped`. Queued members become `Blocked` with `last_error_code = WAVE_CANCELLED`, and the claims of the wave are deleted.
 - A `Processing` member that nobody finishes within 300 seconds is claimed again by the worker.
-## Not shown here
-
-- Nothing in the code moves a wave to `Completed`, so there is no "wave finished" step to draw. The field `wave.completed_at` is never written.
-- Sorting, loading and shipping after the pick are not part of a wave in the code.
+After release, a non-station wave becomes `InProgress` when pick or task work exists. A station wave waits until its first shared tote reaches the station. `Completed` requires all known work to be finished, no broken work links and all station positions to be free. Sorting, loading and shipping after picking are separate processes.
 
 ## Related pages
 

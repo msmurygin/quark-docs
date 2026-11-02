@@ -70,7 +70,7 @@ Do the steps in this order. Each step needs the data from the step before.
 2. **User status `Locked` and `Disabled` block every way in.**
    Such a user cannot sign in, open sessions end on the next request, and the user's API keys are refused. `Active` and `Invited` are let in.
 3. **Loading and Goods Issue are separate decisions.** A `Loaded` Load has not deducted stock. Shipment is an explicit, irreversible Goods Issue. See [Dispatch, loading and Goods Issue](06-outbound-setup.md#10-dispatch-loading-and-goods-issue).
-4. **Manual waves have a web screen; wave policies do not.** Use `Management & Control > Orders & Waves > Waves` for manual composition and release. Rule-based wave-policy configuration remains API-only.
+4. **Waves and wave strategies have separate web screens.** Use `Management & Control > Orders & Waves > Waves` for manual composition and release. Use `Wave strategies` beside it to select orders by rules, preview the result and schedule wave creation.
 5. **Packing is done on the RF terminal**, not in the web UI. The web UI only prepares the data (pack-station locations and work areas).
 
 ## Feature status used in this guide
@@ -85,6 +85,6 @@ Do the steps in this order. Each step needs the data from the step before.
 | Replenishment by pick-location min/max | Available | A pick location at or below **Min** receives work up to **Max**. Operators use `Inventory > Replenish`; the zone must allow replenishment. See [Replenishment](06-outbound-setup.md#11-replenishment-of-pick-locations-minmax). |
 | Replenishment policy | Available | Controls urgency thresholds and whether an empty pick location is urgent. |
 | Manual wave planning | Available | `Management & Control > Orders & Waves > Waves` provides reviewed add, remove, station and release actions with per-order results. |
-| Wave policy | API only | Policy preview and build-now methods can create draft waves by rule. |
+| Wave strategies | Available | Configure filters, grouping, size limits, station, schedule and release mode; preview before creating waves. |
 
 Replenishment quantity still comes from each pick location's **Min** and **Max**. The SKU's replenishment policy sets task urgency; it does not replace the min/max trigger. See [Replenishment](06-outbound-setup.md#11-replenishment-of-pick-locations-minmax).

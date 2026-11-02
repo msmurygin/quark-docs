@@ -214,7 +214,7 @@ Also: `step names qty_fit_rule={...} but no sort_1..sort_4 names LpnQuantity`.
 - Every order line freezes the policy at allocation. Old orders keep their policy.
 - Wrong steps cause unreserved stock (backorder).
 
-## 4. Waves and wave policy
+## 4. Waves and wave strategies
 
 ### What you will do
 
@@ -286,21 +286,21 @@ flowchart LR
 
 The diagram stops when the release generation settles. Picking status uses separate, complete work evidence: a non-station wave becomes `InProgress` when pick or task work exists, while a station wave waits until its first shared tote reaches the station. `Completed` requires all known work to be finished, no broken work links and every station position to be free. A `Blocked` member can be terminal only when it has explicitly zero work; a `Failed` member never proves completion.
 
-Wave policies are not configured in the web interface. Ask your system administrator to create the policy, preview its result and enable its scheduled or manual runs. The available settings include:
+### Configure an automatic wave strategy
 
-| Field | Meaning | Allowed values |
-|---|---|---|
-| `Code` | Policy key. | Text up to 30 characters. |
-| `Eligible statuses` | Order statuses taken into waves. | Default `New`, `PartiallyAllocated`, `Allocated`. |
-| `Priority range` | Lowest and highest order priority. | Numbers. |
-| `Requested ship window` | How many days ahead to include and whether undated orders qualify. | Number and yes or no. |
-| `Owner` / `Carrier` | Limit the policy to one owner or carrier. | A configured owner or carrier. |
-| `Group by` | Split the result by owner, carrier or requested ship date. | Any combination of the three options. |
-| `Maximum orders` | Orders per wave. | Default 100. |
-| `Maximum lines` | Lines per wave. | Number or empty. |
-| `Maximum waves per run` | Waves created in one run. | Default 10. |
-| `Schedule` | Interval and first run time. | Number of minutes and time. |
-| `Auto release` | Release created waves automatically. | Default no, which keeps waves in `Draft`. |
+1. Open `Sidebar > Management & Control > Orders & Waves > Wave strategies`.
+2. Use `More > New strategy…`, or open a similar strategy and choose `Duplicate`.
+3. In `Which orders`, select the eligible order statuses and optional ship-by, carrier and priority filters.
+4. In `How to build waves`, choose any grouping by carrier, ship-by date, dispatch or owner. Set the limits for orders, lines and waves per run. Optionally select a `Sort station`.
+5. In `When and what next`, choose manual, interval or weekday/time scheduling. Then choose whether created waves are released at once, left as drafts or released after a delay.
+6. Click `Save…` and compare `Was` with `Will be`.
+7. Use `More > Activate…` when the saved strategy is ready.
+8. Click `Run now…` to preview `Matched`, `In another wave`, the proposed waves and excluded orders. The preview writes nothing.
+9. Click `Create waves` only when the proposed composition and release state are correct.
+
+Unsaved changes disable run and status actions. An inactive strategy cannot run. Deactivating a strategy stops future scheduled runs but does not change waves already created.
+
+See [Wave Strategy Settings](policies/13-wave-policy-settings.md) for every screen field, range and recovery step.
 
 ### What you should see
 
@@ -312,8 +312,9 @@ Wave policies are not configured in the web interface. Ask your system administr
 
 | Message | Meaning | Fix |
 |---|---|---|
-| `a wave policy with this code already exists` | Duplicate code. | Use another code. |
-| `version conflict on wave policy {policy_id}` | Someone saved first. | Re-read and repeat. |
+| `Save changes first` | The strategy card has unsaved changes. | Save and review before running or changing status. |
+| `Strategy is inactive` | An inactive strategy cannot create waves. | Review and activate it first. |
+| `Wave strategy … changed — refresh.` | Someone saved a newer version first. | Click `Refresh & review`, compare the current card and reapply the intended changes. |
 | `wave membership changed while the command was acquiring locks; retry with the current version` | A race. | Retry. |
 | A wave action says the observed state changed | Another user changed the wave. | Cancel the dialog, click `Refresh`, review the new composition and decide again. |
 
@@ -321,7 +322,7 @@ Wave policies are not configured in the web interface. Ask your system administr
 
 - Release of a wave releases one order per transaction and preserves each order's result.
 
-No wave policy exists until an administrator creates one.
+A warehouse can have no wave strategy until an administrator creates one. Manual waves continue to work independently.
 
 ## 5. Picking policy
 

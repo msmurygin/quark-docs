@@ -81,7 +81,7 @@ Legend: **Included** = present in the initial setup. **Create** = you must creat
 | 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Warehouse Configuration > Policies > Picking Policies` | |
 | 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
 | 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
-| 34 | Manual wave. | None | `Management & Control > Orders & Waves > Waves` | Optional; use for grouped release. Wave-policy rules remain API-only. |
+| 34 | Waves and wave strategies. | None | `Management & Control > Orders & Waves` | Create a manual test wave, then preview one active strategy without confirming the run. Verify its filters, limits, station, schedule and release mode. |
 
 ### 3.6 Printing
 
