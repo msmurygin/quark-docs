@@ -975,7 +975,7 @@ Test dataset SQL query.
 |---|---|---|---|
 | `data` | object (TestDatasetParams) | yes | Parameters for testing a single dataset SQL query. |
 | `data.limit` | integer (int64) | no |  |
-| `data.param_values` | array of string | no | Values for `$1, $2, ...`. |
+| `data.param_values` | array of string | no |  |
 | `data.sql` | string | yes |  |
 
 **Result**
@@ -3990,7 +3990,7 @@ Create a new printer_assignment — CRUD.
 | `data.printer_id` | integer (int64) | yes |  |
 | `data.priority` | integer (int32) or null | no |  |
 | `data.scope_id` | integer (int64) or null | no |  |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 **Result**
 
@@ -4007,7 +4007,7 @@ The `result` member of the response is: `{ "data": PrinterAssignment }`
 | `data.printer_id` | integer (int64) | yes |  |
 | `data.priority` | integer (int32) | yes |  |
 | `data.scope_id` | integer (int64) or null | no | `user_id` \\| `zone_id` \\| `owner_id` \\| NULL for Warehouse default. |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -4168,7 +4168,7 @@ The `result` member of the response is: `{ "data": PrinterAssignment }`
 | `data.printer_id` | integer (int64) | yes |  |
 | `data.priority` | integer (int32) | yes |  |
 | `data.scope_id` | integer (int64) or null | no | `user_id` \\| `zone_id` \\| `owner_id` \\| NULL for Warehouse default. |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -4257,7 +4257,7 @@ The `result` member of the response is: `{ "data": PrinterAssignment }`
 | `data.printer_id` | integer (int64) | yes |  |
 | `data.priority` | integer (int32) | yes |  |
 | `data.scope_id` | integer (int64) or null | no | `user_id` \\| `zone_id` \\| `owner_id` \\| NULL for Warehouse default. |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -4359,7 +4359,7 @@ The `result` member of the response is: `{ "data": [PrinterAssignment] }`
 | `data[].printer_id` | integer (int64) | yes |  |
 | `data[].priority` | integer (int32) | yes |  |
 | `data[].scope_id` | integer (int64) or null | no | `user_id` \\| `zone_id` \\| `owner_id` \\| NULL for Warehouse default. |
-| `data[].scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data[].scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 **Errors**
 
@@ -4422,7 +4422,7 @@ Update a printer-routing rule; a warehouse scope explicitly clears scope_id.
 | `data.printer_id` | integer (int64) | no |  |
 | `data.priority` | integer (int32) | no |  |
 | `data.scope_id` | integer (int64) or null | no |  |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | no | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | no | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 **Result**
 
@@ -4439,7 +4439,7 @@ The `result` member of the response is: `{ "data": PrinterAssignment }`
 | `data.printer_id` | integer (int64) | yes |  |
 | `data.priority` | integer (int32) | yes |  |
 | `data.scope_id` | integer (int64) or null | no | `user_id` \\| `zone_id` \\| `owner_id` \\| NULL for Warehouse default. |
-| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Per migration 085. |
+| `data.scope_type` | one of: User \| Zone \| Owner \| Warehouse | yes | Lookup priority: explicit (in command) → User → Zone → Owner → Warehouse default. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 

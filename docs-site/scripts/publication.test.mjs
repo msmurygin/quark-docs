@@ -93,7 +93,7 @@ test('publication sanitizer hides author evidence without damaging customer inst
 });
 
 test('API publication sanitizer removes internal development narrative and preserves standards',()=>{
- const value={description:'Use this method to release an order. (`release.rs:10-20`)\n\nPer ADR-058, this was wired in `.claude/rules/api.md`.',nested:['Customer-visible result.','ruling T12 came from migration 137.','See docs/superpowers/plans/2026-07-27-change.md.','Owner decision 2026-08-24.','dashboard spec 2026-10-09 §6.','#[serde(default)]','An RFC 3339 time in UTC.']};
+ const value={description:'Use this method to release an order. (`release.rs:10-20`)\n\nPer ADR-058, this was wired in `.claude/rules/api.md`.',nested:['Customer-visible result.','ruling T12 came from migration 137.','See docs/superpowers/plans/2026-07-27-change.md.','Owner decision 2026-08-24.','dashboard spec 2026-10-09 §6.','#[serde(default)]','An RFC 3339 time in UTC.'],schema:{description:'Эпоха строки. PackItemInnerBmc::create строит INSERT.',enum:['Русский']}};
  const clean=sanitizePublicObject(value);
  assert.equal(clean.description,'Use this method to release an order.');
  assert.equal(clean.nested[0],'Customer-visible result.');
@@ -103,6 +103,14 @@ test('API publication sanitizer removes internal development narrative and prese
  assert.equal(clean.nested[4],'');
  assert.equal(clean.nested[5],'');
  assert.equal(clean.nested[6],'An RFC 3339 time in UTC.');
+ assert.equal(clean.schema.description,'');
+ assert.deepEqual(clean.schema.enum,['Русский']);
+ assert.equal(sanitizePublicText('A public sentence (wms-app a_control_station_is_a_location_type).'),'A public sentence.');
+ assert.equal(sanitizePublicText('A public sentence (wms-app 20261021191020/1).'),'A public sentence.');
+ assert.equal(sanitizePublicText('A public sentence (ruling 6).'),'A public sentence.');
+ assert.equal(sanitizePublicText('A public sentence (ruling D-2).'),'A public sentence.');
+ assert.equal(sanitizePublicText('A public sentence (`wms_lib_auth::authorization::audit::log_event`).'),'A public sentence.');
+ assert.equal(sanitizePublicText('A public sentence (`SkuSerialConfigBmc:: serial_tracked_skus`).'),'A public sentence.');
  assert.equal(sanitizePublicText('A useful sentence (`task.rs:12`).'),'A useful sentence.');
  assert.equal(sanitizePublicText('Keep this customer result. That is how they are written in the code.'),'Keep this customer result.');
  assert.equal(sanitizePublicObject({description:'Label missing in English: a diagnostic note.'}).description,'');
@@ -244,6 +252,14 @@ test('public-output rules reject raw author files, audit headings and source rev
   'Source revision abc123456789',
   'Run app-server check-config.',
   'Edit enterprise.warehouse directly.',
+  'wms-app a_control_station_is_a_location_type',
+  'wms-app 20261021191020/1',
+  'ruling 6',
+  'ruling D-2',
+  'PackItemInnerBmc::create',
+  'wms_lib_auth::authorization::audit::log_event',
+  'SkuSerialConfigBmc:: serial_tracked_skus',
+  '"description":"Внутренний комментарий"',
  ];
  for(const value of forbidden){
   assert.ok(PUBLIC_FORBIDDEN_PATTERNS.some((pattern)=>{pattern.lastIndex=0;return pattern.test(value);}),value);

@@ -297,24 +297,31 @@ Create a putaway policy whose steps are owned by the putaway pipeline.
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_putaway_policy` |
 | Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog does not say whether this method needs an idempotency key.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (PutawayPolicyForCreate) | yes |  |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreatePutawayPolicy) | yes | One complete create intent. |
 | `data.code` | string | yes |  |
-| `data.description` | string or null | no | Optional on create: a policy is identified by its code, and demanding a description to write one down would be a field invented by the form rather than by the warehouse. |
+| `data.description` | string or null | no |  |
+| `data.idempotency_key` | string (uuid) | no |  |
 
 **Result**
 
-The `result` member of the response is: `{ "data": PutawayPolicy }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": PutawayPolicy }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -325,7 +332,7 @@ The `result` member of the response is: `{ "data": PutawayPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -334,6 +341,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "add_when": "<add_when>",
       "add_who": 1,
@@ -355,6 +365,8 @@ Example response. It shows the shape only. The required fields have placeholder 
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -369,6 +381,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_putaway_policy",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>"
     }
@@ -484,7 +499,7 @@ The `result` member of the response is: `{ "data": PutawayPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -568,7 +583,7 @@ The `result` member of the response is: `{ "data": PutawayPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -649,7 +664,7 @@ The `result` member of the response is: `{ "data": PutawayPolicyDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.allow_mixed_lot` | boolean or null | no |  |
 | `data.allow_mixed_sku` | boolean or null | no | Whether the suggested location may already hold other SKUs / other lots, and whether it must be empty. |
-| `data.fit_by_cube` | boolean | yes | Which PHYSICAL checks this step applies (migration 231). |
+| `data.fit_by_cube` | boolean | yes | Which PHYSICAL checks this step applies. |
 | `data.fit_by_pallet_dims` | boolean | yes |  |
 | `data.fit_by_quantity` | boolean | yes | What the location already holds, plus what is arriving, against `location.max_qty_capacity` — how a pick face is sized: it holds so many EACHes and then it is full. |
 | `data.fit_by_stack_limit` | boolean | yes | Refuse a location whose pallet POSITIONS are taken — `location.footprint × location.stack_limit`, the count Infor calls Fit by Stack Limit. |
@@ -670,7 +685,7 @@ The `result` member of the response is: `{ "data": PutawayPolicyDetail }`
 | `data.step_num` | string | yes | User-facing step label. |
 | `data.to_location` | string or null | no |  |
 | `data.to_zone` | string or null | no |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -737,7 +752,7 @@ The `result` member of the response is: `{ "data": PutawayStepCriterion }`
 | `data.putaway_policy_detail_id` | integer (int64) | yes |  |
 | `data.rule` | one of: Include \| Exclude | yes |  |
 | `data.subject` | one of: Product \| Location | yes |  |
-| `data.values` | array of string | yes | The `text[]` column (migration 209): one column serves every property kind (an enum's SQL label, `'true'`/`'false'`, or a one-element array for a scalar) because the resolver — not the storage — knows the type. |
+| `data.values` | array of string | yes | The `text[]` column: one column serves every property kind (an enum's SQL label, `'true'`/`'false'`, or a one-element array for a scalar) because the resolver — not the storage — knows the type. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -837,7 +852,7 @@ The `result` member of the response is: `{ "data": [PutawayPolicy] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data[].version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -918,7 +933,7 @@ The `result` member of the response is: `{ "data": [PutawayPolicyDetail] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].allow_mixed_lot` | boolean or null | no |  |
 | `data[].allow_mixed_sku` | boolean or null | no | Whether the suggested location may already hold other SKUs / other lots, and whether it must be empty. |
-| `data[].fit_by_cube` | boolean | yes | Which PHYSICAL checks this step applies (migration 231). |
+| `data[].fit_by_cube` | boolean | yes | Which PHYSICAL checks this step applies. |
 | `data[].fit_by_pallet_dims` | boolean | yes |  |
 | `data[].fit_by_quantity` | boolean | yes | What the location already holds, plus what is arriving, against `location.max_qty_capacity` — how a pick face is sized: it holds so many EACHes and then it is full. |
 | `data[].fit_by_stack_limit` | boolean | yes | Refuse a location whose pallet POSITIONS are taken — `location.footprint × location.stack_limit`, the count Infor calls Fit by Stack Limit. |
@@ -939,7 +954,7 @@ The `result` member of the response is: `{ "data": [PutawayPolicyDetail] }`
 | `data[].step_num` | string | yes | User-facing step label. |
 | `data[].to_location` | string or null | no |  |
 | `data[].to_zone` | string or null | no |  |
-| `data[].version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data[].version` | integer (int32) | yes | Optimistic lock. |
 
 **Errors**
 
@@ -1024,7 +1039,7 @@ The `result` member of the response is: `{ "data": [PutawayStepCriterion] }`
 | `data[].putaway_policy_detail_id` | integer (int64) | yes |  |
 | `data[].rule` | one of: Include \| Exclude | yes |  |
 | `data[].subject` | one of: Product \| Location | yes |  |
-| `data[].values` | array of string | yes | The `text[]` column (migration 209): one column serves every property kind (an enum's SQL label, `'true'`/`'false'`, or a one-element array for a scalar) because the resolver — not the storage — knows the type. |
+| `data[].values` | array of string | yes | The `text[]` column: one column serves every property kind (an enum's SQL label, `'true'`/`'false'`, or a one-element array for a scalar) because the resolver — not the storage — knows the type. |
 
 **Errors**
 
@@ -1152,7 +1167,7 @@ What the putaway engine would do with one LPN under one policy, in words: the pa
 | Operation | read (read_model) |
 | Permission | RBAC resource type `api`, resource code `putaway_dry_run` |
 | Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | not required |
 
 **Notes**
 
@@ -1269,7 +1284,7 @@ Read one putaway policy's step pipeline with its criteria, its readback, its ref
 |---|---|---|---|
 | `drafts` | array of object (StepDraft) or null | no |  |
 | `drafts[].criteria` | array of object (CriterionRow) or null | no | The conditions the operator is holding for this step, or `None` when they have not touched them. |
-| `drafts[].criteria[].attribute_code` | string or null | no | Set for exactly the three EAV properties, NULL for the other thirteen (`CriterionProperty::needs_attribute_code`). |
+| `drafts[].criteria[].attribute_code` | string or null | no | Set for exactly the three EAV properties, NULL for the other thirteen. |
 | `drafts[].criteria[].id` | integer (int64) or null | no |  |
 | `drafts[].criteria[].property` | one of: LocationType \| LocationStatus \| LocationCategory \| LocationProcessingType \| LocationFlag \| LocationAbc \| MixSku \| MixLot \| SkuAbc \| SkuGroup \| SkuClass \| PutawayClass \| … (+5) | yes |  |
 | `drafts[].criteria[].rule` | one of: Include \| Exclude | yes | The negation: `Include` or `Exclude`. |
@@ -1698,7 +1713,7 @@ Write every edited putaway step of one policy, each against its own version, wit
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (SavePutawaySteps) | yes |  |
-| `data.idempotency_key` | string (uuid) | no | Resolved at the RPC boundary from `params.meta` when the wire did not put it here — see `IdempotencyKey::unset` for why the default is a sentinel and never a fresh random key. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.policy_id` | integer (int64) | yes |  |
 | `data.steps` | array of object (PutawayStepEdit) | yes |  |
 | `data.steps[].criteria` | array of object (CriterionRow) or null | no | The conditions this step should END UP with, or `None` to leave them alone. |
@@ -1825,7 +1840,7 @@ The `result` member of the response is: `{ "data": PutawayPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.version` | integer (int32) | yes | Optimistic lock (migration 349). |
+| `data.version` | integer (int32) | yes | Optimistic lock. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2008,7 +2023,7 @@ The `result` member of the response is: `{ "data": InventoryHoldCode }`
 | `data.enforce` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.overridable` | boolean | yes |  |
-| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order (low rank on top, migration 142). |
+| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2102,7 +2117,7 @@ The `result` member of the response is: `{ "data": InventoryHoldCode }`
 | `data.enforce` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.overridable` | boolean | yes |  |
-| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order (low rank on top, migration 142). |
+| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2259,7 +2274,7 @@ The `result` member of the response is: `{ "data": InventoryHoldCode }`
 | `data.enforce` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.overridable` | boolean | yes |  |
-| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order (low rank on top, migration 142). |
+| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2351,7 +2366,7 @@ The `result` member of the response is: `{ "data": [InventoryHoldCode] }`
 | `data[].enforce` | boolean | yes |  |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].overridable` | boolean | yes |  |
-| `data[].rank` | integer (int64) | yes | Intended as the dropdown sort order (low rank on top, migration 142). |
+| `data[].rank` | integer (int64) | yes | Intended as the dropdown sort order. |
 
 **Errors**
 
@@ -2432,7 +2447,7 @@ The `result` member of the response is: `{ "data": InventoryHoldCode }`
 | `data.enforce` | boolean | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.overridable` | boolean | yes |  |
-| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order (low rank on top, migration 142). |
+| `data.rank` | integer (int64) | yes | Intended as the dropdown sort order. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2610,14 +2625,14 @@ Generic Move primitive — validates and executes inventory movement (Putaway, P
 | `data.ctx.dest_container_id` | integer (int64) or null | no |  |
 | `data.ctx.dest_loc` | string or null | no |  |
 | `data.ctx.dest_lpn` | string or null | no |  |
-| `data.ctx.dest_lpn_auto` | boolean | no | When `true` and no `dest_lpn`/`dest_container_id` is given, the primitive GENERATES a fresh LPN (`ContainerService::generate_container_code`) and lands the stock in that NEW container at `dest_loc`, instead of landing loose. |
+| `data.ctx.dest_lpn_auto` | boolean | no | When `true` and no `dest_lpn`/`dest_container_id` is given, the primitive GENERATES a fresh LPN and lands the stock in that NEW container at `dest_loc`, instead of landing loose. |
 | `data.ctx.idempotency_key` | string (uuid) | no | The move's idempotency key. |
 | `data.ctx.lot` | string or null | no |  |
 | `data.ctx.override_grant_id` | string (uuid) or null | no | The server-minted grant authorizing this move's overrides (`supervisor_override_grant`, F6). |
 | `data.ctx.owner_id` | integer (int64) or null | no |  |
 | `data.ctx.pending_move_in_id` | integer (int64) or null | no | The reservation (`inventory_pending_move_in.id`) the putaway engine took when it chose this location. |
 | `data.ctx.qty` | number (double) or null | no | `None` = full move; `Some(n)` = partial. |
-| `data.ctx.reason_code` | string or null | no | Free-form audit hint, ≤80 chars (mirrors `transaction_log.reason_code` VARCHAR(80) constraint per migration 144). |
+| `data.ctx.reason_code` | string or null | no | Free-form audit hint, ≤80 chars. |
 | `data.ctx.recursive` | boolean | yes | Subtree move (existing `MoveContainer.recursive` flag): when `true`, child containers move with the root. |
 | `data.ctx.serial_numbers` | array of string or null | no | Operator-scanned unit serials for a serial-tracked PARTIAL move — the specific units to move, from the RF terminal. |
 | `data.ctx.sku_code` | string or null | no |  |
@@ -2737,6 +2752,7 @@ The holds on a move's source, sorted by what can be done about them: `overridabl
 | `data` | object (MoveSourceHoldsParams) | yes | Which position to ask about: the same two facts `move_execute` resolves its source holds from. |
 | `data.container_id` | integer (int64) or null | no | The container the stock is in; `None` for loose stock. |
 | `data.location` | string | yes | The source location code. |
+| `data.lot` | string or null | no | The lot the move takes, when it takes one: a hold on the lot counts. |
 
 **Result**
 
@@ -3032,7 +3048,7 @@ The `result` member of the response is: `{ "data": [InventoryPendingMoveIn] }`
 | `data[].location` | string | yes | `location.code` — the location being held. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].share_of` | integer (int64) or null | no | The number of the main record, when this row keeps a neighbouring cell for an oversize item. |
+| `data[].share_of` | integer (int64) or null | no |  |
 | `data[].source` | one of: Putaway \| Replenishment \| Move | yes |  |
 | `data[].status` | one of: Active \| Consumed \| Cancelled \| Expired | yes |  |
 | `data[].weight` | number (double) | yes |  |
@@ -3093,8 +3109,8 @@ Ask the putaway engine which location it would choose for a received LPN, withou
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (ExplainLocation) | yes | Ask the engine the same question `SuggestLocation` asks, without `idempotency_key` — a query carries none (`.claude/rules/api-versioning-and-idempotency.md`). |
-| `data.container_id` | integer (int64) | yes | Same field, same meaning as `SuggestLocation::container_id`. |
+| `data` | object (ExplainLocation) | yes | Ask the engine the same question `SuggestLocation` asks, without `idempotency_key` — a query carries none. |
+| `data.container_id` | integer (int64) | yes |  |
 | `data.exclude_locations` | array of string | no |  |
 | `data.trace_detail` | one of: Summary \| Full | no | How much of the scan to keep. |
 
@@ -3106,7 +3122,7 @@ The `result` member of the response is: `{ "data": ExplainLocationResult }`
 |---|---|---|---|
 | `data.location` | string or null | no |  |
 | `data.reason` | string or null | no | Set exactly when `location` is `None`. |
-| `data.trace` | any | yes | `PutawayTrace`, as JSON — same shape `SuggestLocationResult::trace` carries. |
+| `data.trace` | any | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -3483,7 +3499,7 @@ The `result` member of the response is: `{ "data": InventoryHold }`
 | `data.lpn` | string or null | no |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum (15 values after migration 142). |
+| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum. |
 | `data.who_off` | integer (int64) or null | no |  |
 | `data.who_on` | integer (int64) or null | no |  |
 
@@ -3548,7 +3564,7 @@ The `result` member of the response is: `{ "data": [InventoryHoldRowDto] }`
 |---|---|---|---|
 | `data[].code` | string | yes |  |
 | `data[].comments` | string or null | no |  |
-| `data[].date_on` | string | yes | ISO-8601 / RFC-3339 string (serde-default for `time::OffsetDateTime`). |
+| `data[].date_on` | string | yes | ISO-8601 / RFC-3339 string. |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].is_hold_on` | boolean | yes |  |
 | `data[].loc` | string or null | no |  |
@@ -3799,7 +3815,7 @@ Capture one serial during a receipt-line collection loop.
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (CaptureSerial) | yes |  |
-| `data.business_operation` | one of: Receive \| Putaway \| Move \| Pick \| Pack \| Ship \| Return \| Adjust \| Inventory | no | Polymorphic discriminator (spec §7.4 / §16.8). |
+| `data.business_operation` | one of: Receive \| Putaway \| Move \| Pick \| Pack \| Ship \| Return \| Adjust \| Inventory | no | Polymorphic discriminator. |
 | `data.business_ref_id` | integer (int64) | yes | Polymorphic reference to the business document the episode is anchored to: * Receive → `receipt_detail.id` * Move → `move.id` * Pick → `pick_task.id` (line via `business_ref_line`) * Pack → `shipping_carton.id` * Ship → `shipment.id` * Return → `receipt.id` (… |
 | `data.business_ref_line` | integer (int64) or null | no | Optional line-level discriminator within the document (e.g. |
 | `data.idempotency_key` | string (uuid) | yes |  |
@@ -3905,7 +3921,7 @@ Supervisor force-close of an episode that's stuck or abandoned.
 | `data` | object (ForceCloseEpisode) | yes |  |
 | `data.episode_id` | integer (int64) | yes |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
-| `data.reason` | string | yes | Free-text reason, persisted to `serial_capture_episode.closed_reason` as `"supervisor_force_close:{reason}"`. |
+| `data.reason` | string | yes | Free-text reason, persisted to `serial_capture_episode.closed_reason` as `"force_close:{reason}"`. |
 
 **Result**
 
@@ -4992,11 +5008,11 @@ The `result` member of the response is: `{ "data": TransactionLog }`
 | `data.pack_id` | integer (int64) or null | no |  |
 | `data.qty` | number (double) | yes |  |
 | `data.qty_after` | number (double) or null | no |  |
-| `data.qty_before` | number (double) or null | no | Balance quantity before / after this row (wms-app 052) — written by inventory adjustments; NULL for other operations. |
+| `data.qty_before` | number (double) or null | no | Balance quantity before / after this row — written by inventory adjustments; NULL for other operations. |
 | `data.reason_code` | string or null | no | Free-form audit hint (≤80 chars). |
 | `data.sku_code` | string | yes |  |
 | `data.source_code` | string or null | no |  |
-| `data.source_type` | string or null | no | Snake-case discriminator (`MoveSourceType::as_code()`) — populated by Move-primitive writes since migration 144. |
+| `data.source_type` | string or null | no | Receive-time deposits leave this NULL. |
 | `data.status` | string | yes |  |
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string | yes |  |
@@ -5098,11 +5114,11 @@ The `result` member of the response is: `{ "data": [TransactionLog] }`
 | `data[].pack_id` | integer (int64) or null | no |  |
 | `data[].qty` | number (double) | yes |  |
 | `data[].qty_after` | number (double) or null | no |  |
-| `data[].qty_before` | number (double) or null | no | Balance quantity before / after this row (wms-app 052) — written by inventory adjustments; NULL for other operations. |
+| `data[].qty_before` | number (double) or null | no | Balance quantity before / after this row — written by inventory adjustments; NULL for other operations. |
 | `data[].reason_code` | string or null | no | Free-form audit hint (≤80 chars). |
 | `data[].sku_code` | string | yes |  |
 | `data[].source_code` | string or null | no |  |
-| `data[].source_type` | string or null | no | Snake-case discriminator (`MoveSourceType::as_code()`) — populated by Move-primitive writes since migration 144. |
+| `data[].source_type` | string or null | no | Receive-time deposits leave this NULL. |
 | `data[].status` | string | yes |  |
 | `data[].to_loc` | string | yes |  |
 | `data[].to_lpn` | string | yes |  |
@@ -6471,7 +6487,7 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.multi_serial_delimiter` | string or null | no |  |
 | `data.multi_serial_fixed_length` | integer (int32) or null | no |  |
 | `data.pick_episode_reassignment_mode` | string | yes | Behaviour when a different operator resumes a Pick with an unfinished serial episode. |
-| `data.profile_mode` | string | yes | Movement/capture coupling policy (ADR-090). |
+| `data.profile_mode` | string | yes | Movement/capture coupling policy. |
 | `data.require_unique_global` | boolean | yes |  |
 | `data.serial_auto_increment` | boolean | yes |  |
 | `data.serial_format` | string or null | no |  |
@@ -6480,10 +6496,10 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.serial_length` | integer (int32) or null | no |  |
 | `data.serial_mask_format` | string or null | no |  |
 | `data.serial_parse_frequency` | integer (int32) or null | no |  |
-| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | Per Decisions Log D-32. |
+| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | How serial is extracted from a scanned barcode. |
 | `data.serial_parse_start_after` | integer (int32) or null | no |  |
 | `data.serial_parse_start_position` | integer (int32) or null | no |  |
-| `data.serial_scope` | string | yes | Migration 153 — serial granularity. |
+| `data.serial_scope` | string | yes | Tells receive_against_asn / capture_serial how to compute `serials_to_collect_qty` from the operator's submitted qty: - `PerUnit` → 1 serial per atomic EA (qty_base from pack hierarchy) - `PerCase` → 1 serial per submitted UOM (typical SSCC) - `PerPallet` → 1… |
 | `data.serials_per_barcode` | integer (int32) | yes |  |
 | `data.sku_id` | integer (int64) | yes |  |
 | `data.warranty_period_days` | integer (int32) or null | no |  |
@@ -6563,7 +6579,7 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.multi_serial_delimiter` | string or null | no |  |
 | `data.multi_serial_fixed_length` | integer (int32) or null | no |  |
 | `data.pick_episode_reassignment_mode` | string | yes | Behaviour when a different operator resumes a Pick with an unfinished serial episode. |
-| `data.profile_mode` | string | yes | Movement/capture coupling policy (ADR-090). |
+| `data.profile_mode` | string | yes | Movement/capture coupling policy. |
 | `data.require_unique_global` | boolean | yes |  |
 | `data.serial_auto_increment` | boolean | yes |  |
 | `data.serial_format` | string or null | no |  |
@@ -6572,10 +6588,10 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.serial_length` | integer (int32) or null | no |  |
 | `data.serial_mask_format` | string or null | no |  |
 | `data.serial_parse_frequency` | integer (int32) or null | no |  |
-| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | Per Decisions Log D-32. |
+| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | How serial is extracted from a scanned barcode. |
 | `data.serial_parse_start_after` | integer (int32) or null | no |  |
 | `data.serial_parse_start_position` | integer (int32) or null | no |  |
-| `data.serial_scope` | string | yes | Migration 153 — serial granularity. |
+| `data.serial_scope` | string | yes | Tells receive_against_asn / capture_serial how to compute `serials_to_collect_qty` from the operator's submitted qty: - `PerUnit` → 1 serial per atomic EA (qty_base from pack hierarchy) - `PerCase` → 1 serial per submitted UOM (typical SSCC) - `PerPallet` → 1… |
 | `data.serials_per_barcode` | integer (int32) | yes |  |
 | `data.sku_id` | integer (int64) | yes |  |
 | `data.warranty_period_days` | integer (int32) or null | no |  |
@@ -6760,7 +6776,7 @@ The `result` member of the response is: `{ "data": [SkuSerialConfig] }`
 | `data[].multi_serial_delimiter` | string or null | no |  |
 | `data[].multi_serial_fixed_length` | integer (int32) or null | no |  |
 | `data[].pick_episode_reassignment_mode` | string | yes | Behaviour when a different operator resumes a Pick with an unfinished serial episode. |
-| `data[].profile_mode` | string | yes | Movement/capture coupling policy (ADR-090). |
+| `data[].profile_mode` | string | yes | Movement/capture coupling policy. |
 | `data[].require_unique_global` | boolean | yes |  |
 | `data[].serial_auto_increment` | boolean | yes |  |
 | `data[].serial_format` | string or null | no |  |
@@ -6769,10 +6785,10 @@ The `result` member of the response is: `{ "data": [SkuSerialConfig] }`
 | `data[].serial_length` | integer (int32) or null | no |  |
 | `data[].serial_mask_format` | string or null | no |  |
 | `data[].serial_parse_frequency` | integer (int32) or null | no |  |
-| `data[].serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | Per Decisions Log D-32. |
+| `data[].serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | How serial is extracted from a scanned barcode. |
 | `data[].serial_parse_start_after` | integer (int32) or null | no |  |
 | `data[].serial_parse_start_position` | integer (int32) or null | no |  |
-| `data[].serial_scope` | string | yes | Migration 153 — serial granularity. |
+| `data[].serial_scope` | string | yes | Tells receive_against_asn / capture_serial how to compute `serials_to_collect_qty` from the operator's submitted qty: - `PerUnit` → 1 serial per atomic EA (qty_base from pack hierarchy) - `PerCase` → 1 serial per submitted UOM (typical SSCC) - `PerPallet` → 1… |
 | `data[].serials_per_barcode` | integer (int32) | yes |  |
 | `data[].sku_id` | integer (int64) | yes |  |
 | `data[].warranty_period_days` | integer (int32) or null | no |  |
@@ -6856,7 +6872,7 @@ Update serial-tracking settings without changing their SKU identity.
 | `data.serial_length` | integer (int32) or null | no |  |
 | `data.serial_mask_format` | string or null | no |  |
 | `data.serial_parse_frequency` | integer (int32) or null | no |  |
-| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | no | Per Decisions Log D-32. |
+| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | no | How serial is extracted from a scanned barcode. |
 | `data.serial_parse_start_after` | integer (int32) or null | no |  |
 | `data.serial_parse_start_position` | integer (int32) or null | no |  |
 | `data.serial_scope` | one of: PerUnit \| PerCase \| PerPallet \| PerInnerPack | no | Supported serial granularity at the public API boundary. |
@@ -6887,7 +6903,7 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.multi_serial_delimiter` | string or null | no |  |
 | `data.multi_serial_fixed_length` | integer (int32) or null | no |  |
 | `data.pick_episode_reassignment_mode` | string | yes | Behaviour when a different operator resumes a Pick with an unfinished serial episode. |
-| `data.profile_mode` | string | yes | Movement/capture coupling policy (ADR-090). |
+| `data.profile_mode` | string | yes | Movement/capture coupling policy. |
 | `data.require_unique_global` | boolean | yes |  |
 | `data.serial_auto_increment` | boolean | yes |  |
 | `data.serial_format` | string or null | no |  |
@@ -6896,10 +6912,10 @@ The `result` member of the response is: `{ "data": SkuSerialConfig }`
 | `data.serial_length` | integer (int32) or null | no |  |
 | `data.serial_mask_format` | string or null | no |  |
 | `data.serial_parse_frequency` | integer (int32) or null | no |  |
-| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | Per Decisions Log D-32. |
+| `data.serial_parse_mode` | one of: None \| Fixed \| Bounded | yes | How serial is extracted from a scanned barcode. |
 | `data.serial_parse_start_after` | integer (int32) or null | no |  |
 | `data.serial_parse_start_position` | integer (int32) or null | no |  |
-| `data.serial_scope` | string | yes | Migration 153 — serial granularity. |
+| `data.serial_scope` | string | yes | Tells receive_against_asn / capture_serial how to compute `serials_to_collect_qty` from the operator's submitted qty: - `PerUnit` → 1 serial per atomic EA (qty_base from pack hierarchy) - `PerCase` → 1 serial per submitted UOM (typical SSCC) - `PerPallet` → 1… |
 | `data.serials_per_barcode` | integer (int32) | yes |  |
 | `data.sku_id` | integer (int64) | yes |  |
 | `data.warranty_period_days` | integer (int32) or null | no |  |
@@ -7409,14 +7425,14 @@ The `result` member of the response is: `{ "data": [Container] }`
 |---|---|---|---|
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
-| `data[].asset_owner_id` | integer (int64) or null | no | The asset owner is a customer of the warehouse (`owners`). |
-| `data[].asset_warehouse_id` | integer (int64) or null | no | The asset owner is the enterprise warehouse. |
-| `data[].cartonization_policy_detail_id` | integer (int64) or null | no | The cartonization policy row that this box was made from. |
+| `data[].asset_owner_id` | integer (int64) or null | no |  |
+| `data[].asset_warehouse_id` | integer (int64) or null | no |  |
+| `data[].cartonization_policy_detail_id` | integer (int64) or null | no |  |
 | `data[].code` | string | yes |  |
 | `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton | yes |  |
 | `data[].current_loc` | string or null | no |  |
 | `data[].disposable` | boolean | yes |  |
-| `data[].handling_unit_type_id` | integer (int64) or null | no | The packaging type, if the container is an instance of one (`enterprise.handling_unit_type`). |
+| `data[].handling_unit_type_id` | integer (int64) or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].is_reusable` | boolean | yes |  |
 | `data[].mod_when` | string | yes |  |
@@ -7426,10 +7442,10 @@ The `result` member of the response is: `{ "data": [Container] }`
 | `data[].owner_id` | integer (int64) | yes |  |
 | `data[].pack_id` | integer (int64) or null | no |  |
 | `data[].parent_id` | integer (int64) or null | no |  |
-| `data[].planned_at_receipt_id` | integer (int64) or null | no | ADR-046 — non-NULL when this container was minted by `CreateCaseLevelAsn` ahead of physical arrival (planned case or planned pallet); NULL for the dominant post-receive creation path. |
+| `data[].planned_at_receipt_id` | integer (int64) or null | no |  |
 | `data[].sscc` | string or null | no |  |
 | `data[].status` | one of: Active \| Empty \| Disposed \| InTransit \| Planned | yes |  |
-| `data[].usage_policy_override` | one of: OwnOnly \| WarehouseShared or null | no | An exception to the type's `default_usage_policy` for this instance. |
+| `data[].usage_policy_override` | one of: OwnOnly \| WarehouseShared or null | no |  |
 
 **Errors**
 
@@ -7605,8 +7621,8 @@ The `result` member of the response is: `{ "data": AdjustmentLineCard }`
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.error_code` | string or null | no |  |
 | `data.error_message` | string or null | no |  |
-| `data.error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.id` | integer (int64) | yes |  |
 | `data.inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.line_no` | integer (int32) | yes |  |
@@ -7696,8 +7712,8 @@ The `result` member of the response is: `{ "data": AdjustmentLineCard }`
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.error_code` | string or null | no |  |
 | `data.error_message` | string or null | no |  |
-| `data.error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.id` | integer (int64) | yes |  |
 | `data.inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.line_no` | integer (int32) | yes |  |
@@ -7997,8 +8013,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -8187,8 +8203,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -8371,8 +8387,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -8642,8 +8658,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -8914,8 +8930,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -9075,8 +9091,8 @@ The `result` member of the response is: `{ "data": InventoryAdjustmentView }`
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -9411,8 +9427,8 @@ The `result` member of the response is: `{ "data": [InventoryAdjustmentDetail] }
 | `data[].container_id` | integer (int64) or null | no |  |
 | `data[].error_code` | string or null | no |  |
 | `data[].error_message` | string or null | no |  |
-| `data[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data[].line_no` | integer (int32) | yes |  |
@@ -9535,8 +9551,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -9709,8 +9725,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -9882,8 +9898,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -10060,8 +10076,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -10233,8 +10249,8 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.lines[].container_id` | integer (int64) or null | no |  |
 | `data.lines[].error_code` | string or null | no |  |
 | `data.lines[].error_message` | string or null | no |  |
-| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.lines[].error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.lines[].expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.lines[].id` | integer (int64) | yes |  |
 | `data.lines[].inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.lines[].line_no` | integer (int32) | yes |  |
@@ -10462,8 +10478,8 @@ Save a line form: target, reason, comment, on the line's version read.
 | `meta` | object | no | Control-plane envelope supplied by the platform. |
 | `data` | object | yes | Versioned update payload. |
 | `data.data` | object (LineFormChange) | yes | What the line form sends on save: only what changed. |
-| `data.data.comment` | string or null | no |  |
-| `data.data.reason_code` | string or null | no |  |
+| `data.data.comment` | string or null | no | Absent keeps the current comment; `null` or blank text clears it. |
+| `data.data.reason_code` | string or null | no | Absent keeps the current reason; `null` or blank text clears it. |
 | `data.data.serials_in` | string or null | no |  |
 | `data.data.serials_out` | string or null | no |  |
 | `data.data.target_qty` | number (double) or null | no |  |
@@ -10483,8 +10499,8 @@ The `result` member of the response is: `{ "data": AdjustmentLineCard }`
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.error_code` | string or null | no |  |
 | `data.error_message` | string or null | no |  |
-| `data.error_spoken` | any | no | The same refusal as `{template, args}` (wms-app 107), said in the reader's language when the line is read. |
-| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count (wms-app 056). |
+| `data.error_spoken` | any | no | The same refusal as `{template, args}`, said in the reader's language when the line is read. |
+| `data.expected_qty` | number (double) or null | no | What the identity held when the stock was observed — set only by an inventory count. |
 | `data.id` | integer (int64) | yes |  |
 | `data.inventory_adjustment_id` | integer (int64) | yes |  |
 | `data.line_no` | integer (int32) | yes |  |
@@ -10572,9 +10588,9 @@ Open a count from its header form: kind, mode, recounts, a comment — no locati
 | `data.freeze_mode` | one of: Hard \| Soft or null | no | `Hard` (default) or `Soft` (count spec Appendix F). |
 | `data.item_lots` | string or null | no |  |
 | `data.item_lpns` | string or null | no |  |
-| `data.item_skus` | string or null | no | (The code comment for this item is not in English. |
+| `data.item_skus` | string or null | no |  |
 | `data.max_recounts` | integer (int16) or null | no | How many times one location may be recounted; empty = the default. |
-| `data.scope_mode` | one of: LocationFull \| IdentitySubset or null | no | (The code comment for this item is not in English. |
+| `data.scope_mode` | one of: LocationFull \| IdentitySubset or null | no |  |
 
 **Result**
 
@@ -10692,7 +10708,7 @@ The `result` member of the response is: `{ "data": InventoryCountPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -10759,7 +10775,7 @@ Accept a location's variance with its cause: post an adjustment to what was coun
 | `meta.expected_version` | integer (int64) | no |  |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (AcceptCountVariance) | yes |  |
-| `data.cause_code` | string or null | no | Why the count differs: a code of the list `count_variance_cause` (ADR-093 D2, required from a person). |
+| `data.cause_code` | string or null | no | Why the count differs: a code of the list `count_variance_cause`. |
 | `data.comment` | string or null | no | What the supervisor adds to the cause. |
 | `data.expected_version` | integer (int32) | yes |  |
 | `data.idempotency_key` | string (uuid) | no |  |
@@ -10776,7 +10792,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -10786,7 +10802,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -10814,7 +10830,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -11105,7 +11121,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.tasks[].recount_of_task_id` | integer (int64) or null | no |  |
 | `data.tasks[].snapshot_at` | string | yes |  |
 | `data.tasks[].status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data.tasks[].variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data.tasks[].variance_cause` | string or null | no |  |
 | `data.tasks[].variance_comment` | string or null | no |  |
 | … | | | 1 more fields. See `openrpc.json`. |
 
@@ -11322,7 +11338,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -11332,7 +11348,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -11360,7 +11376,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -11503,7 +11519,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -11513,7 +11529,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -11541,7 +11557,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -11730,7 +11746,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.tasks[].recount_of_task_id` | integer (int64) or null | no |  |
 | `data.tasks[].snapshot_at` | string | yes |  |
 | `data.tasks[].status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data.tasks[].variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data.tasks[].variance_cause` | string or null | no |  |
 | `data.tasks[].variance_comment` | string or null | no |  |
 | … | | | 1 more fields. See `openrpc.json`. |
 
@@ -11998,7 +12014,7 @@ The `result` member of the response is: `{ "data": InventoryCountView }`
 | `data.tasks[].recount_of_task_id` | integer (int64) or null | no |  |
 | `data.tasks[].snapshot_at` | string | yes |  |
 | `data.tasks[].status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data.tasks[].variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data.tasks[].variance_cause` | string or null | no |  |
 | `data.tasks[].variance_comment` | string or null | no |  |
 | … | | | 1 more fields. See `openrpc.json`. |
 
@@ -12232,11 +12248,11 @@ The `result` member of the response is: `{ "data": [CountTaskRow] }`
 | `data[].location` | string | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].recount_allowed` | boolean | yes | Whether the count's `max_recounts` still lets this location be counted again. |
+| `data[].recount_allowed` | boolean | yes |  |
 | `data[].recount_of_task_id` | integer (int64) or null | no |  |
 | `data[].snapshot_at` | string | yes |  |
 | `data[].status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data[].variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data[].variance_cause` | string or null | no |  |
 | `data[].variance_comment` | string or null | no |  |
 | `data[].version` | integer (int32) | yes |  |
 
@@ -12498,7 +12514,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -12508,7 +12524,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -12536,7 +12552,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -12708,7 +12724,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -12806,7 +12822,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -12893,7 +12909,7 @@ The `result` member of the response is: `{ "data": CountPolicyCard }`
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -12980,7 +12996,7 @@ The `result` member of the response is: `{ "data": [InventoryCountPolicy] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].is_active` | boolean | yes |  |
 | `data[].last_run_on` | string or null | no |  |
-| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data[].max_recounts` | integer (int16) | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
@@ -13083,7 +13099,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.id` | integer (int64) | yes |  |
 | `data.policy.is_active` | boolean | yes |  |
 | `data.policy.last_run_on` | string or null | no |  |
-| `data.policy.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.policy.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.policy.max_recounts` | integer (int16) | yes |  |
 | `data.policy.mod_when` | string | yes |  |
 | `data.policy.mod_who` | integer (int64) | yes |  |
@@ -13231,7 +13247,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -13320,7 +13336,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -13330,7 +13346,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -13358,7 +13374,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -13544,7 +13560,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.tasks[].recount_of_task_id` | integer (int64) or null | no |  |
 | `data.tasks[].snapshot_at` | string | yes |  |
 | `data.tasks[].status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data.tasks[].variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data.tasks[].variance_cause` | string or null | no |  |
 | `data.tasks[].variance_comment` | string or null | no |  |
 | … | | | 1 more fields. See `openrpc.json`. |
 
@@ -13683,7 +13699,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -13693,7 +13709,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -13721,7 +13737,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -13867,11 +13883,11 @@ The `result` member of the response is: `{ "data": CountTaskRow }`
 | `data.location` | string | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.recount_allowed` | boolean | yes | Whether the count's `max_recounts` still lets this location be counted again. |
+| `data.recount_allowed` | boolean | yes |  |
 | `data.recount_of_task_id` | integer (int64) or null | no |  |
 | `data.snapshot_at` | string | yes |  |
 | `data.status` | one of: Open \| Variance \| Closed \| Recounted \| Cancelled | yes |  |
-| `data.variance_cause` | string or null | no | ADR-093 (wms-app 132): why the accepted variance happened — a code of the `count_variance_cause` list — with what the supervisor added, and whether the accept was the system's own within tolerance. |
+| `data.variance_cause` | string or null | no |  |
 | `data.variance_comment` | string or null | no |  |
 | `data.version` | integer (int32) | yes |  |
 
@@ -13933,7 +13949,7 @@ The `result` member of the response is: `{ "data": CountTaskView }`
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -13943,7 +13959,7 @@ The `result` member of the response is: `{ "data": CountTaskView }`
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -13971,7 +13987,7 @@ The `result` member of the response is: `{ "data": CountTaskView }`
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -14199,7 +14215,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -14209,7 +14225,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -14237,7 +14253,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -14365,7 +14381,7 @@ The `result` member of the response is: `{ "data": InventoryCountTolerance }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value |
 | `data.approval_value` | number (double) or null | no | A task's variance worth more than this is accepted only with `inventory_count.accept_large_variance`. |
 | `data.auto_pct` | number (double) or null | no | …and by at most this percent of what was expected… |
 | `data.auto_qty` | number (double) or null | no | Accepted on its own when the line differs by at most this many units… |
@@ -14452,7 +14468,7 @@ The `result` member of the response is: `{ "data": [InventoryCountTolerance] }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data[].abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data[].abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value |
 | `data[].approval_value` | number (double) or null | no | A task's variance worth more than this is accepted only with `inventory_count.accept_large_variance`. |
 | `data[].auto_pct` | number (double) or null | no | …and by at most this percent of what was expected… |
 | `data[].auto_qty` | number (double) or null | no | Accepted on its own when the line differs by at most this many units… |
@@ -14534,7 +14550,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.count_mode` | one of: Blind \| Informed | yes |  |
 | `data.count_number` | string | yes |  |
 | `data.count_only` | string or null | no | What the counter counts here, in words, when it is not the whole location — a count of the item (Appendix G): "SKU A; lot L1". |
-| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted (spec §8, AC-03). |
+| `data.expected` | array of object (InventoryCountSnapshot) or null | no | The stock the location is counted against — `None` while a blind count is being counted. |
 | `data.expected[].container_id` | integer (int64) or null | no | `None` = loose stock. |
 | `data.expected[].expected_qty` | number (double) | yes |  |
 | `data.expected[].id` | integer (int64) | yes |  |
@@ -14544,7 +14560,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.expected[].pack_id` | integer (int64) | yes |  |
 | `data.expected[].sku_code` | string | yes |  |
 | `data.expected[].uom` | string | yes |  |
-| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included (history, spec §29). |
+| `data.observations` | array of object (InventoryCountObservation) | yes | What the counter recorded, voided rows included. |
 | `data.observations[].add_when` | string | yes |  |
 | `data.observations[].add_who` | integer (int64) | yes |  |
 | `data.observations[].container_id` | integer (int64) or null | no | `None` = loose stock. |
@@ -14572,7 +14588,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.results[].sku_code` | string | yes |  |
 | `data.results[].uom` | string | yes |  |
 | `data.stock_moved_under_count` | boolean | yes | A shift lead let an operation move stock under this count while it was frozen (owner's decision 2026-10-21 §6, `inventory_count_disturbance`). |
-| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted (count spec §8); `None` otherwise. |
+| `data.system_stock` | array of object (SystemStockLine) or null | no | What the system holds here now, for the counter of an `Informed` count's first attempt while it is counted; `None` otherwise. |
 | `data.system_stock[].lot` | string | yes |  |
 | `data.system_stock[].lpn` | string or null | no | The container's code; `None` = loose stock. |
 | `data.system_stock[].qty` | number (double) | yes |  |
@@ -15017,7 +15033,7 @@ The `result` member of the response is: `{ "data": InventoryCountPolicy }`
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.last_run_on` | string or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_recounts` | integer (int16) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
@@ -15100,7 +15116,7 @@ The `result` member of the response is: `{ "data": InventoryCountTolerance }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.abc` | one of: A \| B \| C | yes | Loc/Sku Abc - dependent type, code_list_value |
 | `data.approval_value` | number (double) or null | no | A task's variance worth more than this is accepted only with `inventory_count.accept_large_variance`. |
 | `data.auto_pct` | number (double) or null | no | …and by at most this percent of what was expected… |
 | `data.auto_qty` | number (double) or null | no | Accepted on its own when the line differs by at most this many units… |
@@ -16231,7 +16247,7 @@ Post the transfer: move every line's stock into its new lot, all or nothing.
 | `data` | object (PostLotTransfer) | yes |  |
 | `data.expected_version` | integer (int32) | yes |  |
 | `data.idempotency_key` | string (uuid) | no |  |
-| `data.override_grant_id` | string (uuid) or null | no | (The code comment for this item is not in English. |
+| `data.override_grant_id` | string (uuid) or null | no |  |
 | `data.transfer_id` | integer (int64) | yes |  |
 
 **Result**

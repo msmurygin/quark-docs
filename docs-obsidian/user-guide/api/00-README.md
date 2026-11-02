@@ -9,7 +9,7 @@ The guide focuses on supported request formats, responses and operational workfl
 - The API is **JSON-RPC 2.0 over HTTP**. All business calls go to one URL: `POST /api/rpc`.
 - A call names a **method** (for example `receipt_close`) and sends **params** (a JSON object).
 - The server is `app-server`. It is a Rust program built on Axum.
-- The API has **932 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
+- The API has **960 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
 
 ## Base URL
 

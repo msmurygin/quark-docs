@@ -427,7 +427,7 @@ Create a new user — CRUD.
 | `data.full_name` | string or null | no | What an admin can meaningfully set when creating an account through the Users screen. |
 | `data.locale` | string | yes |  |
 | `data.mode` | string | yes |  |
-| `data.pwd_clear` | string | yes | `pwd` is what the Users screen's field is called (form 171), as on `UserForUpdate::pwd_clear`. |
+| `data.pwd_clear` | string | yes |  |
 | `data.status` | one of: Active \| Locked \| Disabled \| Invited or null | no | `None` leaves the column's DB default (`Active`) in place. |
 | `data.timezone` | string | yes |  |
 | `data.typ` | one of: User \| Admin \| Sys \| Agent or null | no | The New form's Type dropdown. |
@@ -454,9 +454,9 @@ The `result` member of the response is: `{ "data": UserInfo }`
 | `data.password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data.pwd_changed_at` | string or null | no |  |
 | `data.rf_login` | boolean | yes |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | yes |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | yes |  |
 
 **Errors**
@@ -606,9 +606,9 @@ The `result` member of the response is: `{ "data": UserInfo }`
 | `data.password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data.pwd_changed_at` | string or null | no |  |
 | `data.rf_login` | boolean | yes |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | yes |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | yes |  |
 
 **Errors**
@@ -681,9 +681,9 @@ The `result` member of the response is: `{ "data": UserInfo }`
 | `data.password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data.pwd_changed_at` | string or null | no |  |
 | `data.rf_login` | boolean | yes |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | yes |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | yes |  |
 
 **Errors**
@@ -766,9 +766,9 @@ The `result` member of the response is: `{ "data": [UserInfo] }`
 | `data[].password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data[].pwd_changed_at` | string or null | no |  |
 | `data[].rf_login` | boolean | yes |  |
-| `data[].status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data[].status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data[].timezone` | string | yes |  |
-| `data[].typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data[].typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data[].username` | string | yes |  |
 
 **Errors**
@@ -850,9 +850,9 @@ The `result` member of the response is: `{ "data": UserInfo }`
 | `data.password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data.pwd_changed_at` | string or null | no |  |
 | `data.rf_login` | boolean | yes |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | yes |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | yes |  |
 
 **Errors**
@@ -909,9 +909,9 @@ Update an account through the guarded security model; audit facts are read-only.
 | `data.mode` | string | no |  |
 | `data.pwd_clear` | string | no |  |
 | `data.rf_login` | boolean | no |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | no | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | no | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | no |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | no | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | no | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | no |  |
 
 **Result**
@@ -935,9 +935,9 @@ The `result` member of the response is: `{ "data": UserInfo }`
 | `data.password_age_days` | integer (int64) or null | no | "Password age" for the AUDIT block — derived from `pwd_changed_at`, in whole days. |
 | `data.pwd_changed_at` | string or null | no |  |
 | `data.rf_login` | boolean | yes |  |
-| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum (`enterprise` migration 044, tenant-manager migration 005). |
+| `data.status` | one of: Active \| Locked \| Disabled \| Invited | yes | Mirror of the `user_status` PostgreSQL enum. |
 | `data.timezone` | string | yes |  |
-| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum (migration 021). |
+| `data.typ` | one of: User \| Admin \| Sys \| Agent | yes | Mirror of the `enterprise.user_typ` PostgreSQL enum. |
 | `data.username` | string | yes |  |
 
 **Errors**
@@ -1560,25 +1560,31 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### warehouse_admin_create
 
-Create an inactive warehouse and provision its complete application schema.
+Create an inactive warehouse, provision its schema, and apply WarehouseBootstrapV1 with durable replay.
 
 | | |
 |---|---|
 | Context / module | enterprise / warehouse |
-| Category | not declared |
+| Category | stateless_command |
 | Operation | create (reference_crud) |
 | Permission | RBAC resource type `api`, resource code `warehouse_admin_create` |
 | Roles that have it by default | ADMIN |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
 - A tenant extension cannot replace this method.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (WarehouseAdminCreate) | yes |  |
 | `data.code` | string | yes |  |
 | `data.is_active` | boolean or null | no | Accepted for compatibility with generic forms, but always forced false. |
@@ -1590,21 +1596,23 @@ Create an inactive warehouse and provision its complete application schema.
 
 **Result**
 
-The `result` member of the response is: `{ "data": WarehouseAdminRow }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": WarehouseProvisioningOutcome }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data.bootstrap_manifest_hash` | string or null | no |  |
+| `data.bootstrap_version` | integer (int32) or null | no |  |
 | `data.code` | string | yes |  |
-| `data.id` | integer (int64) | yes |  |
+| `data.failure` | object (WarehouseProvisioningFailure) or null | no |  |
+| `data.failure.code` | string | yes |  |
+| `data.failure.message` | string | yes |  |
 | `data.is_active` | boolean | yes |  |
-| `data.length_uom` | string | yes |  |
-| `data.name` | string | yes |  |
-| `data.readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes |  |
-| `data.readiness_label` | string | yes |  |
-| `data.readiness_reason` | string | yes |  |
 | `data.schema_name` | string | yes |  |
-| `data.volume_uom` | string | yes |  |
-| `data.weight_uom` | string | yes |  |
+| `data.stage` | one of: reserved \| schema_ready \| definition_ready \| bootstrap_applied | yes |  |
+| `data.status` | one of: complete \| partial_failure | yes |  |
+| `data.warehouse_id` | integer (int64) or null | no |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -1613,18 +1621,15 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "code": "<code>",
-      "id": 1,
       "is_active": false,
-      "length_uom": "<length_uom>",
-      "name": "<name>",
-      "readiness": "ready",
-      "readiness_label": "<readiness_label>",
-      "readiness_reason": "<readiness_reason>",
       "schema_name": "<schema_name>",
-      "volume_uom": "<volume_uom>",
-      "weight_uom": "<weight_uom>"
+      "stage": "reserved",
+      "status": "complete"
     }
   }
 }
@@ -1639,6 +1644,8 @@ Example response. It shows the shape only. The required fields have placeholder 
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
 | 400 | UNIQUE_VIOLATION or INVALID_DATA | The code already exists, or a value breaks a rule. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 
 **Example**
 
@@ -1652,6 +1659,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "warehouse_admin_create",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>",
       "length_uom": "<length_uom>",
@@ -1693,12 +1703,15 @@ The `result` member of the response is: `{ "data": WarehouseAdminRow }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data.bootstrap_readiness` | string | yes | Server-owned WarehouseBootstrapV1 state persisted in Enterprise. |
 | `data.code` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.length_uom` | string | yes |  |
+| `data.migration_readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Actual schema-ledger readiness derived from the warehouse migration table. |
 | `data.name` | string | yes |  |
-| `data.readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes |  |
+| `data.operational_readiness` | string | yes | Customer/profile configuration and scenario-validation state. |
+| `data.readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Compatibility alias for `migration_readiness`. |
 | `data.readiness_label` | string | yes |  |
 | `data.readiness_reason` | string | yes |  |
 | `data.schema_name` | string | yes |  |
@@ -1713,11 +1726,14 @@ Example response. It shows the shape only. The required fields have placeholder 
   "id": 1,
   "result": {
     "data": {
+      "bootstrap_readiness": "<bootstrap_readiness>",
       "code": "<code>",
       "id": 1,
       "is_active": false,
       "length_uom": "<length_uom>",
+      "migration_readiness": "ready",
       "name": "<name>",
+      "operational_readiness": "<operational_readiness>",
       "readiness": "ready",
       "readiness_label": "<readiness_label>",
       "readiness_reason": "<readiness_reason>",
@@ -1797,12 +1813,15 @@ The `result` member of the response is: `{ "data": [WarehouseAdminRow] }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data[].bootstrap_readiness` | string | yes | Server-owned WarehouseBootstrapV1 state persisted in Enterprise. |
 | `data[].code` | string | yes |  |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].is_active` | boolean | yes |  |
 | `data[].length_uom` | string | yes |  |
+| `data[].migration_readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Actual schema-ledger readiness derived from the warehouse migration table. |
 | `data[].name` | string | yes |  |
-| `data[].readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes |  |
+| `data[].operational_readiness` | string | yes | Customer/profile configuration and scenario-validation state. |
+| `data[].readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Compatibility alias for `migration_readiness`. |
 | `data[].readiness_label` | string | yes |  |
 | `data[].readiness_reason` | string | yes |  |
 | `data[].schema_name` | string | yes |  |
@@ -1876,12 +1895,15 @@ The `result` member of the response is: `{ "data": WarehouseAdminRow }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
+| `data.bootstrap_readiness` | string | yes | Server-owned WarehouseBootstrapV1 state persisted in Enterprise. |
 | `data.code` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
 | `data.is_active` | boolean | yes |  |
 | `data.length_uom` | string | yes |  |
+| `data.migration_readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Actual schema-ledger readiness derived from the warehouse migration table. |
 | `data.name` | string | yes |  |
-| `data.readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes |  |
+| `data.operational_readiness` | string | yes | Customer/profile configuration and scenario-validation state. |
+| `data.readiness` | one of: ready \| needs_provisioning \| outdated \| invalid | yes | Compatibility alias for `migration_readiness`. |
 | `data.readiness_label` | string | yes |  |
 | `data.readiness_reason` | string | yes |  |
 | `data.schema_name` | string | yes |  |
@@ -1896,11 +1918,14 @@ Example response. It shows the shape only. The required fields have placeholder 
   "id": 1,
   "result": {
     "data": {
+      "bootstrap_readiness": "<bootstrap_readiness>",
       "code": "<code>",
       "id": 1,
       "is_active": false,
       "length_uom": "<length_uom>",
+      "migration_readiness": "ready",
       "name": "<name>",
+      "operational_readiness": "<operational_readiness>",
       "readiness": "ready",
       "readiness_label": "<readiness_label>",
       "readiness_reason": "<readiness_reason>",
@@ -4727,19 +4752,19 @@ The `result` member of the response is: `{ "data": AuditLog }`
 | `data.id` | integer (int64) | yes |  |
 | `data.required_bit` | string or null | no |  |
 | `data.resource_code` | string or null | no |  |
-| `data.resource_label` | string or null | no | Alias of `resource_code` until the resource_catalog lands (ADR-025 §D4). |
+| `data.resource_label` | string or null | no | Alias of `resource_code` until the resource_catalog lands. |
 | `data.resource_type` | string or null | no |  |
 | `data.role_code` | string or null | no | Resolved via LEFT JOIN on `enterprise.role`. |
 | `data.role_id` | integer (int64) or null | no |  |
 | `data.target_extra` | string or null | no |  |
 | `data.target_id` | any | no | Extracted from `detail->'target_pk'` (JSON — scalar for single-PK tables, array for composite). |
-| `data.target_label` | string or null | no | Human label for the target row (`r.code`, `u.username`, …) joined from the six RBAC entity types (ADR-025 §D2). |
+| `data.target_label` | string or null | no | Human label for the target row (`r.code`, `u.username`, …) joined from the six RBAC entity types. |
 | `data.target_type` | string or null | no | Extracted from `detail->>'target_table'` — which entity was mutated. |
 | `data.user_id` | integer (int64) or null | no |  |
 | `data.username` | string or null | no | Resolved via LEFT JOIN on `enterprise."user"`. |
-| `data.warehouse_code` | string or null | no | Resolved via LEFT JOIN on `enterprise.warehouse`. |
+| `data.warehouse_code` | string or null | no | Resolved via LEFT JOIN on `warehouse settings`. |
 | `data.warehouse_id` | integer (int64) or null | no |  |
-| `data.warehouse_name` | string or null | no | Resolved via LEFT JOIN on `enterprise.warehouse`. |
+| `data.warehouse_name` | string or null | no | Resolved via LEFT JOIN on `warehouse settings`. |
 
 **Errors**
 
@@ -4868,19 +4893,19 @@ The `result` member of the response is: `{ "data": [AuditLog] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].required_bit` | string or null | no |  |
 | `data[].resource_code` | string or null | no |  |
-| `data[].resource_label` | string or null | no | Alias of `resource_code` until the resource_catalog lands (ADR-025 §D4). |
+| `data[].resource_label` | string or null | no | Alias of `resource_code` until the resource_catalog lands. |
 | `data[].resource_type` | string or null | no |  |
 | `data[].role_code` | string or null | no | Resolved via LEFT JOIN on `enterprise.role`. |
 | `data[].role_id` | integer (int64) or null | no |  |
 | `data[].target_extra` | string or null | no |  |
 | `data[].target_id` | any | no | Extracted from `detail->'target_pk'` (JSON — scalar for single-PK tables, array for composite). |
-| `data[].target_label` | string or null | no | Human label for the target row (`r.code`, `u.username`, …) joined from the six RBAC entity types (ADR-025 §D2). |
+| `data[].target_label` | string or null | no | Human label for the target row (`r.code`, `u.username`, …) joined from the six RBAC entity types. |
 | `data[].target_type` | string or null | no | Extracted from `detail->>'target_table'` — which entity was mutated. |
 | `data[].user_id` | integer (int64) or null | no |  |
 | `data[].username` | string or null | no | Resolved via LEFT JOIN on `enterprise."user"`. |
-| `data[].warehouse_code` | string or null | no | Resolved via LEFT JOIN on `enterprise.warehouse`. |
+| `data[].warehouse_code` | string or null | no | Resolved via LEFT JOIN on `warehouse settings`. |
 | `data[].warehouse_id` | integer (int64) or null | no |  |
-| `data[].warehouse_name` | string or null | no | Resolved via LEFT JOIN on `enterprise.warehouse`. |
+| `data[].warehouse_name` | string or null | no | Resolved via LEFT JOIN on `warehouse settings`. |
 
 **Errors**
 
@@ -5362,7 +5387,7 @@ Dashboard: control-center snapshot.
 | Name | Type | Required | Description |
 |---|---|---|---|
 | `data` | object (DashboardSnapshotInput) | yes |  |
-| `data.rail` | array of string or null | no | The reader's own six rail metrics (dashboard spec 2026-10-09 §6), from their board layout. |
+| `data.rail` | array of string or null | no | The reader's own six rail metrics, from their board layout. |
 | `data.scope` | string or null | no | `shift` \\| `today` \\| `7d`. |
 
 **Result**
@@ -6276,7 +6301,7 @@ Set the live log filter directive.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `filter` | string | yes | A directive in `RUST_LOG` syntax. |
+| `filter` | string | yes |  |
 
 **Result**
 

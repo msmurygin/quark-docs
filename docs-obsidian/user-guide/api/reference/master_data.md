@@ -1668,7 +1668,7 @@ Create a single pack item.
 | `data.min_weight` | number (double) or null | no |  |
 | `data.nominal_weight` | number (double) or null | no |  |
 | `data.pack_id` | integer (int64) | yes |  |
-| `data.pack_revision_id` | integer (int64) or null | no | The revision this row belongs to. |
+| `data.pack_revision_id` | integer (int64) or null | no |  |
 | `data.pallet_hi` | number (double) or null | no |  |
 | `data.pallet_ti` | number (double) or null | no |  |
 | `data.pallet_wood_height` | number (double) or null | no |  |
@@ -1708,7 +1708,7 @@ The `result` member of the response is: `{ "data": PackItemInner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.nominal_weight` | number (double) or null | no |  |
 | `data.pack_id` | integer (int64) | yes |  |
-| `data.pack_revision_id` | integer (int64) | yes | The pack-hierarchy revision that this hierarchy item belongs to (migration 347). |
+| `data.pack_revision_id` | integer (int64) | yes |  |
 | `data.pallet_hi` | number (double) | yes |  |
 | `data.pallet_ti` | number (double) | yes |  |
 | `data.pallet_wood_height` | number (double) | yes |  |
@@ -1768,28 +1768,28 @@ Create a pack with child items.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreatePackWithItems) | yes | Pack header and UOM levels for this create action. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreatePackWithItems) | yes | One immutable create intent. |
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.items` | array of object (PackItemForCreate) | yes |  |
 | `data.items[].cartonize` | boolean or null | no |  |
 | `data.items[].catch_weight_uom` | string or null | no |  |
 | `data.items[].child_uom` | string or null | no |  |
 | `data.items[].cube` | number (double) or null | no |  |
 | `data.items[].height` | number (double) or null | no |  |
-| `data.items[].is_active` | boolean or null | no | Defaults to active when omitted. |
+| `data.items[].is_active` | boolean or null | no |  |
 | `data.items[].is_catch_weight` | boolean or null | no |  |
 | `data.items[].is_dual_uom` | boolean or null | no |  |
 | `data.items[].length` | number (double) or null | no |  |
@@ -1803,7 +1803,7 @@ Create a pack with child items.
 | `data.items[].pallet_wood_width` | number (double) or null | no |  |
 | `data.items[].qty_per_child` | number (double) or null | no |  |
 | `data.items[].replenish` | boolean or null | no |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly or null | no | How this level may be turned. |
+| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly or null | no |  |
 | `data.items[].secondary_uom` | string or null | no |  |
 | `data.items[].ship_as_is` | boolean or null | no |  |
 | `data.items[].uom` | string | yes |  |
@@ -1836,7 +1836,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.pack_items[].height` | number (double) | yes |  |
 | `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
 | `data.pack_items[].id` | integer (int64) | yes |  |
-| `data.pack_items[].is_active` | boolean | yes | Inactive levels remain available to warehouse records that already reference them. |
+| `data.pack_items[].is_active` | boolean | yes | UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. |
 | `data.pack_items[].is_catch_weight` | boolean | yes |  |
 | `data.pack_items[].is_dual_uom` | boolean | yes |  |
 | `data.pack_items[].length` | number (double) | yes |  |
@@ -1854,7 +1854,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
 | `data.pack_items[].qty_per_child` | number (double) or null | no |  |
 | `data.pack_items[].replenish` | boolean | yes |  |
-| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes |  |
 | `data.pack_items[].secondary_uom` | string or null | no |  |
 | `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
 | `data.pack_items[].uom` | string | yes |  |
@@ -2085,7 +2085,7 @@ The `result` member of the response is: `{ "data": PackItemInner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.nominal_weight` | number (double) or null | no |  |
 | `data.pack_id` | integer (int64) | yes |  |
-| `data.pack_revision_id` | integer (int64) | yes | The pack-hierarchy revision that this hierarchy item belongs to (migration 347). |
+| `data.pack_revision_id` | integer (int64) | yes |  |
 | `data.pallet_hi` | number (double) | yes |  |
 | `data.pallet_ti` | number (double) | yes |  |
 | `data.pallet_wood_height` | number (double) | yes |  |
@@ -2160,43 +2160,43 @@ The `result` member of the response is: `{ "data": Pack }`
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.items` | array of object (PackItem) | yes |  |
-| `data.items[].add_when` | string | yes |  |
-| `data.items[].add_who` | integer (int64) | yes |  |
-| `data.items[].base_qty` | number (double) | yes |  |
-| `data.items[].cartonize` | boolean | yes |  |
-| `data.items[].catch_weight_uom` | string or null | no |  |
-| `data.items[].child_pack_item_id` | integer (int64) or null | no |  |
-| `data.items[].cube` | number (double) | yes |  |
-| `data.items[].height` | number (double) | yes |  |
-| `data.items[].hierarchy_level` | integer (int32) | yes |  |
-| `data.items[].id` | integer (int64) | yes |  |
-| `data.items[].is_active` | boolean | yes | ADR-045 §3 — append-only convention. |
-| `data.items[].is_catch_weight` | boolean | yes |  |
-| `data.items[].is_dual_uom` | boolean | yes |  |
-| `data.items[].length` | number (double) | yes |  |
-| `data.items[].max_weight` | number (double) or null | no |  |
-| `data.items[].min_weight` | number (double) or null | no |  |
-| `data.items[].mod_when` | string | yes |  |
-| `data.items[].mod_who` | integer (int64) | yes |  |
-| `data.items[].nominal_weight` | number (double) or null | no |  |
-| `data.items[].pack_id` | integer (int64) | yes |  |
-| `data.items[].pack_revision_id` | integer (int64) | yes |  |
-| `data.items[].pallet_hi` | number (double) | yes |  |
-| `data.items[].pallet_ti` | number (double) | yes |  |
-| `data.items[].pallet_wood_height` | number (double) | yes |  |
-| `data.items[].pallet_wood_length` | number (double) | yes |  |
-| `data.items[].pallet_wood_width` | number (double) | yes |  |
-| `data.items[].qty_per_child` | number (double) or null | no |  |
-| `data.items[].replenish` | boolean | yes |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
-| `data.items[].secondary_uom` | string or null | no |  |
-| `data.items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
-| `data.items[].uom` | string | yes |  |
-| `data.items[].weight` | number (double) | yes |  |
-| `data.items[].width` | number (double) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pack_items` | array of object (PackItem) | yes |  |
+| `data.pack_items[].add_when` | string | yes |  |
+| `data.pack_items[].add_who` | integer (int64) | yes |  |
+| `data.pack_items[].base_qty` | number (double) | yes |  |
+| `data.pack_items[].cartonize` | boolean | yes |  |
+| `data.pack_items[].catch_weight_uom` | string or null | no |  |
+| `data.pack_items[].child_pack_item_id` | integer (int64) or null | no |  |
+| `data.pack_items[].cube` | number (double) | yes |  |
+| `data.pack_items[].height` | number (double) | yes |  |
+| `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
+| `data.pack_items[].id` | integer (int64) | yes |  |
+| `data.pack_items[].is_active` | boolean | yes | UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. |
+| `data.pack_items[].is_catch_weight` | boolean | yes |  |
+| `data.pack_items[].is_dual_uom` | boolean | yes |  |
+| `data.pack_items[].length` | number (double) | yes |  |
+| `data.pack_items[].max_weight` | number (double) or null | no |  |
+| `data.pack_items[].min_weight` | number (double) or null | no |  |
+| `data.pack_items[].mod_when` | string | yes |  |
+| `data.pack_items[].mod_who` | integer (int64) | yes |  |
+| `data.pack_items[].nominal_weight` | number (double) or null | no |  |
+| `data.pack_items[].pack_id` | integer (int64) | yes |  |
+| `data.pack_items[].pack_revision_id` | integer (int64) | yes |  |
+| `data.pack_items[].pallet_hi` | number (double) | yes |  |
+| `data.pack_items[].pallet_ti` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_height` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_length` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
+| `data.pack_items[].qty_per_child` | number (double) or null | no |  |
+| `data.pack_items[].replenish` | boolean | yes |  |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes |  |
+| `data.pack_items[].secondary_uom` | string or null | no |  |
+| `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
+| `data.pack_items[].uom` | string | yes |  |
+| `data.pack_items[].weight` | number (double) | yes |  |
+| `data.pack_items[].width` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2211,7 +2211,9 @@ Example response. It shows the shape only. The required fields have placeholder 
       "code": "<code>",
       "descr": "<descr>",
       "id": 1,
-      "items": [
+      "mod_when": "<mod_when>",
+      "mod_who": 1,
+      "pack_items": [
         {
           "add_when": "<add_when>",
           "add_who": 1,
@@ -2241,9 +2243,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "weight": 1,
           "width": 1
         }
-      ],
-      "mod_when": "<mod_when>",
-      "mod_who": 1
+      ]
     }
   }
 }
@@ -2545,7 +2545,7 @@ The `result` member of the response is: `{ "data": PackItemInner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.nominal_weight` | number (double) or null | no |  |
 | `data.pack_id` | integer (int64) | yes |  |
-| `data.pack_revision_id` | integer (int64) | yes | The pack-hierarchy revision that this hierarchy item belongs to (migration 347). |
+| `data.pack_revision_id` | integer (int64) | yes |  |
 | `data.pallet_hi` | number (double) | yes |  |
 | `data.pallet_ti` | number (double) | yes |  |
 | `data.pallet_wood_height` | number (double) | yes |  |
@@ -2620,43 +2620,43 @@ The `result` member of the response is: `{ "data": Pack }`
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.items` | array of object (PackItem) | yes |  |
-| `data.items[].add_when` | string | yes |  |
-| `data.items[].add_who` | integer (int64) | yes |  |
-| `data.items[].base_qty` | number (double) | yes |  |
-| `data.items[].cartonize` | boolean | yes |  |
-| `data.items[].catch_weight_uom` | string or null | no |  |
-| `data.items[].child_pack_item_id` | integer (int64) or null | no |  |
-| `data.items[].cube` | number (double) | yes |  |
-| `data.items[].height` | number (double) | yes |  |
-| `data.items[].hierarchy_level` | integer (int32) | yes |  |
-| `data.items[].id` | integer (int64) | yes |  |
-| `data.items[].is_active` | boolean | yes | ADR-045 §3 — append-only convention. |
-| `data.items[].is_catch_weight` | boolean | yes |  |
-| `data.items[].is_dual_uom` | boolean | yes |  |
-| `data.items[].length` | number (double) | yes |  |
-| `data.items[].max_weight` | number (double) or null | no |  |
-| `data.items[].min_weight` | number (double) or null | no |  |
-| `data.items[].mod_when` | string | yes |  |
-| `data.items[].mod_who` | integer (int64) | yes |  |
-| `data.items[].nominal_weight` | number (double) or null | no |  |
-| `data.items[].pack_id` | integer (int64) | yes |  |
-| `data.items[].pack_revision_id` | integer (int64) | yes |  |
-| `data.items[].pallet_hi` | number (double) | yes |  |
-| `data.items[].pallet_ti` | number (double) | yes |  |
-| `data.items[].pallet_wood_height` | number (double) | yes |  |
-| `data.items[].pallet_wood_length` | number (double) | yes |  |
-| `data.items[].pallet_wood_width` | number (double) | yes |  |
-| `data.items[].qty_per_child` | number (double) or null | no |  |
-| `data.items[].replenish` | boolean | yes |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
-| `data.items[].secondary_uom` | string or null | no |  |
-| `data.items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
-| `data.items[].uom` | string | yes |  |
-| `data.items[].weight` | number (double) | yes |  |
-| `data.items[].width` | number (double) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pack_items` | array of object (PackItem) | yes |  |
+| `data.pack_items[].add_when` | string | yes |  |
+| `data.pack_items[].add_who` | integer (int64) | yes |  |
+| `data.pack_items[].base_qty` | number (double) | yes |  |
+| `data.pack_items[].cartonize` | boolean | yes |  |
+| `data.pack_items[].catch_weight_uom` | string or null | no |  |
+| `data.pack_items[].child_pack_item_id` | integer (int64) or null | no |  |
+| `data.pack_items[].cube` | number (double) | yes |  |
+| `data.pack_items[].height` | number (double) | yes |  |
+| `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
+| `data.pack_items[].id` | integer (int64) | yes |  |
+| `data.pack_items[].is_active` | boolean | yes | UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. |
+| `data.pack_items[].is_catch_weight` | boolean | yes |  |
+| `data.pack_items[].is_dual_uom` | boolean | yes |  |
+| `data.pack_items[].length` | number (double) | yes |  |
+| `data.pack_items[].max_weight` | number (double) or null | no |  |
+| `data.pack_items[].min_weight` | number (double) or null | no |  |
+| `data.pack_items[].mod_when` | string | yes |  |
+| `data.pack_items[].mod_who` | integer (int64) | yes |  |
+| `data.pack_items[].nominal_weight` | number (double) or null | no |  |
+| `data.pack_items[].pack_id` | integer (int64) | yes |  |
+| `data.pack_items[].pack_revision_id` | integer (int64) | yes |  |
+| `data.pack_items[].pallet_hi` | number (double) | yes |  |
+| `data.pack_items[].pallet_ti` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_height` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_length` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
+| `data.pack_items[].qty_per_child` | number (double) or null | no |  |
+| `data.pack_items[].replenish` | boolean | yes |  |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes |  |
+| `data.pack_items[].secondary_uom` | string or null | no |  |
+| `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
+| `data.pack_items[].uom` | string | yes |  |
+| `data.pack_items[].weight` | number (double) | yes |  |
+| `data.pack_items[].width` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2671,7 +2671,9 @@ Example response. It shows the shape only. The required fields have placeholder 
       "code": "<code>",
       "descr": "<descr>",
       "id": 1,
-      "items": [
+      "mod_when": "<mod_when>",
+      "mod_who": 1,
+      "pack_items": [
         {
           "add_when": "<add_when>",
           "add_who": 1,
@@ -2701,9 +2703,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "weight": 1,
           "width": 1
         }
-      ],
-      "mod_when": "<mod_when>",
-      "mod_who": 1
+      ]
     }
   }
 }
@@ -2787,7 +2787,7 @@ The `result` member of the response is: `{ "data": [PackItemInner] }`
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].nominal_weight` | number (double) or null | no |  |
 | `data[].pack_id` | integer (int64) | yes |  |
-| `data[].pack_revision_id` | integer (int64) | yes | The pack-hierarchy revision that this hierarchy item belongs to (migration 347). |
+| `data[].pack_revision_id` | integer (int64) | yes |  |
 | `data[].pallet_hi` | number (double) | yes |  |
 | `data[].pallet_ti` | number (double) | yes |  |
 | `data[].pallet_wood_height` | number (double) | yes |  |
@@ -2947,43 +2947,43 @@ The `result` member of the response is: `{ "data": Pack }`
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.items` | array of object (PackItem) | yes |  |
-| `data.items[].add_when` | string | yes |  |
-| `data.items[].add_who` | integer (int64) | yes |  |
-| `data.items[].base_qty` | number (double) | yes |  |
-| `data.items[].cartonize` | boolean | yes |  |
-| `data.items[].catch_weight_uom` | string or null | no |  |
-| `data.items[].child_pack_item_id` | integer (int64) or null | no |  |
-| `data.items[].cube` | number (double) | yes |  |
-| `data.items[].height` | number (double) | yes |  |
-| `data.items[].hierarchy_level` | integer (int32) | yes |  |
-| `data.items[].id` | integer (int64) | yes |  |
-| `data.items[].is_active` | boolean | yes | ADR-045 §3 — append-only convention. |
-| `data.items[].is_catch_weight` | boolean | yes |  |
-| `data.items[].is_dual_uom` | boolean | yes |  |
-| `data.items[].length` | number (double) | yes |  |
-| `data.items[].max_weight` | number (double) or null | no |  |
-| `data.items[].min_weight` | number (double) or null | no |  |
-| `data.items[].mod_when` | string | yes |  |
-| `data.items[].mod_who` | integer (int64) | yes |  |
-| `data.items[].nominal_weight` | number (double) or null | no |  |
-| `data.items[].pack_id` | integer (int64) | yes |  |
-| `data.items[].pack_revision_id` | integer (int64) | yes |  |
-| `data.items[].pallet_hi` | number (double) | yes |  |
-| `data.items[].pallet_ti` | number (double) | yes |  |
-| `data.items[].pallet_wood_height` | number (double) | yes |  |
-| `data.items[].pallet_wood_length` | number (double) | yes |  |
-| `data.items[].pallet_wood_width` | number (double) | yes |  |
-| `data.items[].qty_per_child` | number (double) or null | no |  |
-| `data.items[].replenish` | boolean | yes |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
-| `data.items[].secondary_uom` | string or null | no |  |
-| `data.items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
-| `data.items[].uom` | string | yes |  |
-| `data.items[].weight` | number (double) | yes |  |
-| `data.items[].width` | number (double) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pack_items` | array of object (PackItem) | yes |  |
+| `data.pack_items[].add_when` | string | yes |  |
+| `data.pack_items[].add_who` | integer (int64) | yes |  |
+| `data.pack_items[].base_qty` | number (double) | yes |  |
+| `data.pack_items[].cartonize` | boolean | yes |  |
+| `data.pack_items[].catch_weight_uom` | string or null | no |  |
+| `data.pack_items[].child_pack_item_id` | integer (int64) or null | no |  |
+| `data.pack_items[].cube` | number (double) | yes |  |
+| `data.pack_items[].height` | number (double) | yes |  |
+| `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
+| `data.pack_items[].id` | integer (int64) | yes |  |
+| `data.pack_items[].is_active` | boolean | yes | UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. |
+| `data.pack_items[].is_catch_weight` | boolean | yes |  |
+| `data.pack_items[].is_dual_uom` | boolean | yes |  |
+| `data.pack_items[].length` | number (double) | yes |  |
+| `data.pack_items[].max_weight` | number (double) or null | no |  |
+| `data.pack_items[].min_weight` | number (double) or null | no |  |
+| `data.pack_items[].mod_when` | string | yes |  |
+| `data.pack_items[].mod_who` | integer (int64) | yes |  |
+| `data.pack_items[].nominal_weight` | number (double) or null | no |  |
+| `data.pack_items[].pack_id` | integer (int64) | yes |  |
+| `data.pack_items[].pack_revision_id` | integer (int64) | yes |  |
+| `data.pack_items[].pallet_hi` | number (double) | yes |  |
+| `data.pack_items[].pallet_ti` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_height` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_length` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
+| `data.pack_items[].qty_per_child` | number (double) or null | no |  |
+| `data.pack_items[].replenish` | boolean | yes |  |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes |  |
+| `data.pack_items[].secondary_uom` | string or null | no |  |
+| `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
+| `data.pack_items[].uom` | string | yes |  |
+| `data.pack_items[].weight` | number (double) | yes |  |
+| `data.pack_items[].width` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -2998,7 +2998,9 @@ Example response. It shows the shape only. The required fields have placeholder 
       "code": "<code>",
       "descr": "<descr>",
       "id": 1,
-      "items": [
+      "mod_when": "<mod_when>",
+      "mod_who": 1,
+      "pack_items": [
         {
           "add_when": "<add_when>",
           "add_who": 1,
@@ -3028,9 +3030,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "weight": 1,
           "width": 1
         }
-      ],
-      "mod_when": "<mod_when>",
-      "mod_who": 1
+      ]
     }
   }
 }
@@ -3224,7 +3224,7 @@ The `result` member of the response is: `{ "data": PackItemInner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.nominal_weight` | number (double) or null | no |  |
 | `data.pack_id` | integer (int64) | yes |  |
-| `data.pack_revision_id` | integer (int64) | yes | The pack-hierarchy revision that this hierarchy item belongs to (migration 347). |
+| `data.pack_revision_id` | integer (int64) | yes |  |
 | `data.pallet_hi` | number (double) | yes |  |
 | `data.pallet_ti` | number (double) | yes |  |
 | `data.pallet_wood_height` | number (double) | yes |  |
@@ -3297,7 +3297,7 @@ Update a pack with child items.
 | `data.items[].cube` | number (double) or null | no |  |
 | `data.items[].height` | number (double) or null | no |  |
 | `data.items[].id` | integer (int64) or null | no |  |
-| `data.items[].is_active` | boolean or null | no | ADR-045 §3 — flip to false to retire (don't UPDATE other fields). |
+| `data.items[].is_active` | boolean or null | no |  |
 | `data.items[].is_catch_weight` | boolean or null | no |  |
 | `data.items[].is_dual_uom` | boolean or null | no |  |
 | `data.items[].length` | number (double) or null | no |  |
@@ -3311,7 +3311,7 @@ Update a pack with child items.
 | `data.items[].pallet_wood_width` | number (double) or null | no |  |
 | `data.items[].qty_per_child` | number (double) or null | no |  |
 | `data.items[].replenish` | boolean or null | no |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly or null | no | How this level may be turned. |
+| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly or null | no |  |
 | `data.items[].secondary_uom` | string or null | no |  |
 | `data.items[].ship_as_is` | boolean or null | no |  |
 | `data.items[].uom` | string or null | no |  |
@@ -3329,43 +3329,43 @@ The `result` member of the response is: `{ "data": Pack }`
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.items` | array of object (PackItem) | yes |  |
-| `data.items[].add_when` | string | yes |  |
-| `data.items[].add_who` | integer (int64) | yes |  |
-| `data.items[].base_qty` | number (double) | yes |  |
-| `data.items[].cartonize` | boolean | yes |  |
-| `data.items[].catch_weight_uom` | string or null | no |  |
-| `data.items[].child_pack_item_id` | integer (int64) or null | no |  |
-| `data.items[].cube` | number (double) | yes |  |
-| `data.items[].height` | number (double) | yes |  |
-| `data.items[].hierarchy_level` | integer (int32) | yes |  |
-| `data.items[].id` | integer (int64) | yes |  |
-| `data.items[].is_active` | boolean | yes | ADR-045 §3 — append-only convention. |
-| `data.items[].is_catch_weight` | boolean | yes |  |
-| `data.items[].is_dual_uom` | boolean | yes |  |
-| `data.items[].length` | number (double) | yes |  |
-| `data.items[].max_weight` | number (double) or null | no |  |
-| `data.items[].min_weight` | number (double) or null | no |  |
-| `data.items[].mod_when` | string | yes |  |
-| `data.items[].mod_who` | integer (int64) | yes |  |
-| `data.items[].nominal_weight` | number (double) or null | no |  |
-| `data.items[].pack_id` | integer (int64) | yes |  |
-| `data.items[].pack_revision_id` | integer (int64) | yes |  |
-| `data.items[].pallet_hi` | number (double) | yes |  |
-| `data.items[].pallet_ti` | number (double) | yes |  |
-| `data.items[].pallet_wood_height` | number (double) | yes |  |
-| `data.items[].pallet_wood_length` | number (double) | yes |  |
-| `data.items[].pallet_wood_width` | number (double) | yes |  |
-| `data.items[].qty_per_child` | number (double) or null | no |  |
-| `data.items[].replenish` | boolean | yes |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
-| `data.items[].secondary_uom` | string or null | no |  |
-| `data.items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
-| `data.items[].uom` | string | yes |  |
-| `data.items[].weight` | number (double) | yes |  |
-| `data.items[].width` | number (double) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pack_items` | array of object (PackItem) | yes |  |
+| `data.pack_items[].add_when` | string | yes |  |
+| `data.pack_items[].add_who` | integer (int64) | yes |  |
+| `data.pack_items[].base_qty` | number (double) | yes |  |
+| `data.pack_items[].cartonize` | boolean | yes |  |
+| `data.pack_items[].catch_weight_uom` | string or null | no |  |
+| `data.pack_items[].child_pack_item_id` | integer (int64) or null | no |  |
+| `data.pack_items[].cube` | number (double) | yes |  |
+| `data.pack_items[].height` | number (double) | yes |  |
+| `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
+| `data.pack_items[].id` | integer (int64) | yes |  |
+| `data.pack_items[].is_active` | boolean | yes | UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. |
+| `data.pack_items[].is_catch_weight` | boolean | yes |  |
+| `data.pack_items[].is_dual_uom` | boolean | yes |  |
+| `data.pack_items[].length` | number (double) | yes |  |
+| `data.pack_items[].max_weight` | number (double) or null | no |  |
+| `data.pack_items[].min_weight` | number (double) or null | no |  |
+| `data.pack_items[].mod_when` | string | yes |  |
+| `data.pack_items[].mod_who` | integer (int64) | yes |  |
+| `data.pack_items[].nominal_weight` | number (double) or null | no |  |
+| `data.pack_items[].pack_id` | integer (int64) | yes |  |
+| `data.pack_items[].pack_revision_id` | integer (int64) | yes |  |
+| `data.pack_items[].pallet_hi` | number (double) | yes |  |
+| `data.pack_items[].pallet_ti` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_height` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_length` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
+| `data.pack_items[].qty_per_child` | number (double) or null | no |  |
+| `data.pack_items[].replenish` | boolean | yes |  |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes |  |
+| `data.pack_items[].secondary_uom` | string or null | no |  |
+| `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
+| `data.pack_items[].uom` | string | yes |  |
+| `data.pack_items[].weight` | number (double) | yes |  |
+| `data.pack_items[].width` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -3380,7 +3380,9 @@ Example response. It shows the shape only. The required fields have placeholder 
       "code": "<code>",
       "descr": "<descr>",
       "id": 1,
-      "items": [
+      "mod_when": "<mod_when>",
+      "mod_who": 1,
+      "pack_items": [
         {
           "add_when": "<add_when>",
           "add_who": 1,
@@ -3410,9 +3412,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "weight": 1,
           "width": 1
         }
-      ],
-      "mod_when": "<mod_when>",
-      "mod_who": 1
+      ]
     }
   }
 }
@@ -3599,7 +3599,7 @@ The `result` member of the response is: `{ "data": Owner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_type` | one of: Sup \| Cus \| Trn \| Rec \| Con \| Own \| Man \| Dst \| Vnd \| Brk | yes |  |
 | `data.parent_id` | integer (int64) or null | no |  |
-| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier (ADR-091). |
+| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier. |
 | `data.status` | string or null | no |  |
 | `data.timezone` | string or null | no |  |
 | `data.vat` | string or null | no |  |
@@ -3650,18 +3650,18 @@ Create owner with addresses and config in one call.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreateOwnerFull) | yes | Owner, addresses and configuration for this create action. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateOwnerFull) | yes | Caller-owned create intent. |
 | `data.addresses` | array of object (OwnerAddressForCreateInner) or null | no |  |
 | `data.addresses[].address1` | string or null | no |  |
 | `data.addresses[].address2` | string or null | no |  |
@@ -3720,7 +3720,7 @@ Create owner with addresses and config in one call.
 | `data.config.track_inventory_by` | string or null | no |  |
 | `data.config.weight_uom` | string or null | no |  |
 | `data.config.write_off_gl_account_hint` | string or null | no |  |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.owner` | object (OwnerForCreate) | yes |  |
 | `data.owner.code` | string | yes |  |
 | `data.owner.company` | string | yes |  |
@@ -3782,11 +3782,11 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.config.auto_close_po` | boolean or null | no |  |
 | `data.config.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.config.carton_group` | string or null | no |  |
-| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.config.cube_uom` | string or null | no |  |
-| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.config.default_allocation_policy_id` | integer (int64) or null | no |  |
 | … | | | 44 more fields. See `openrpc.json`. |
 
@@ -3871,7 +3871,7 @@ The `result` member of the response is: `{ "data": Owner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_type` | one of: Sup \| Cus \| Trn \| Rec \| Con \| Own \| Man \| Dst \| Vnd \| Brk | yes |  |
 | `data.parent_id` | integer (int64) or null | no |  |
-| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier (ADR-091). |
+| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier. |
 | `data.status` | string or null | no |  |
 | `data.timezone` | string or null | no |  |
 | `data.vat` | string or null | no |  |
@@ -3944,7 +3944,7 @@ The `result` member of the response is: `{ "data": Owner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_type` | one of: Sup \| Cus \| Trn \| Rec \| Con \| Own \| Man \| Dst \| Vnd \| Brk | yes |  |
 | `data.parent_id` | integer (int64) or null | no |  |
-| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier (ADR-091). |
+| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier. |
 | `data.status` | string or null | no |  |
 | `data.timezone` | string or null | no |  |
 | `data.vat` | string or null | no |  |
@@ -4124,11 +4124,11 @@ The `result` member of the response is: `{ "data": OwnerFull }`
 | `data.config.auto_close_po` | boolean or null | no |  |
 | `data.config.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.config.carton_group` | string or null | no |  |
-| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.config.cube_uom` | string or null | no |  |
-| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.config.default_allocation_policy_id` | integer (int64) or null | no |  |
 | … | | | 44 more fields. See `openrpc.json`. |
 
@@ -4221,7 +4221,7 @@ The `result` member of the response is: `{ "data": [Owner] }`
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_type` | one of: Sup \| Cus \| Trn \| Rec \| Con \| Own \| Man \| Dst \| Vnd \| Brk | yes |  |
 | `data[].parent_id` | integer (int64) or null | no |  |
-| `data[].picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier (ADR-091). |
+| `data[].picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier. |
 | `data[].status` | string or null | no |  |
 | `data[].timezone` | string or null | no |  |
 | `data[].vat` | string or null | no |  |
@@ -4375,7 +4375,7 @@ The `result` member of the response is: `{ "data": Owner }`
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_type` | one of: Sup \| Cus \| Trn \| Rec \| Con \| Own \| Man \| Dst \| Vnd \| Brk | yes |  |
 | `data.parent_id` | integer (int64) or null | no |  |
-| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier (ADR-091). |
+| `data.picking_toloc` | string or null | no | Delivery location of this owner's orders for a pick carrier. |
 | `data.status` | string or null | no |  |
 | `data.timezone` | string or null | no |  |
 | `data.vat` | string or null | no |  |
@@ -4492,11 +4492,11 @@ The `result` member of the response is: `{ "data": OwnerFull }`
 | `data.config.auto_close_po` | boolean or null | no |  |
 | `data.config.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.config.carton_group` | string or null | no |  |
-| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.config.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.config.cube_uom` | string or null | no |  |
-| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.config.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.config.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.config.default_allocation_policy_id` | integer (int64) or null | no |  |
 | … | | | 44 more fields. See `openrpc.json`. |
 
@@ -5936,23 +5936,23 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.auto_close_po` | boolean or null | no |  |
 | `data.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.carton_group` | string or null | no |  |
-| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.cube_uom` | string or null | no |  |
-| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.default_allocation_policy_id` | integer (int64) or null | no |  |
 | `data.default_cartonization_policy_id` | integer (int64) or null | no |  |
-| `data.default_discard_loc` | string or null | no | E.2 (migration 162). |
+| `data.default_discard_loc` | string or null | no | E.2. Discard-condition returns deposit destination. NULL → write-off without deposit (current behavior, no inventory row); set → deposit through DepositService into this loc. |
 | `data.default_inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no |  |
 | `data.default_lot_policy_id` | integer (int64) or null | no |  |
 | `data.default_putaway_policy_id` | integer (int64) or null | no |  |
 | `data.default_qc_loc` | string or null | no |  |
 | `data.default_receipt_policy_id` | integer (int64) or null | no |  |
-| `data.default_receiving_loc` | string or null | no | Migration 350. |
+| `data.default_receiving_loc` | string or null | no |  |
 | `data.default_replenishment_policy_id` | integer (int64) or null | no |  |
 | `data.default_returns_loc` | string or null | no |  |
-| `data.default_rtv_loc` | string or null | no | T-062 (migration 148). |
+| `data.default_rtv_loc` | string or null | no | T-062. Falls back to `default_returns_loc` when NULL; if both NULL, MoveDamageToRtv returns NoRtvLocConfigured error. |
 | `data.default_sku_rotation` | one of: Fifo \| Lifo \| Fefo or null | no |  |
 | `data.default_unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no |  |
 | `data.dimension_uom` | string or null | no |  |
@@ -5968,7 +5968,7 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.pick_code` | string or null | no |  |
 | `data.putaway_reservation_ttl_min` | integer (int32) or null | no | Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it. |
 | `data.roll_receipt` | boolean or null | no |  |
-| `data.rtv_gl_account_hint` | string or null | no | T-062 (migration 148). |
+| `data.rtv_gl_account_hint` | string or null | no | T-062. ERP GL account hint passed in `damage.rtv_initiated` outbox event (e.g. SAP `1450-RTV-Receivable`). |
 | `data.shelf_life_warning_multiplier_pct` | integer (int32) | yes |  |
 | `data.track_inventory_by` | string or null | no |  |
 | … | | | 2 more fields. See `openrpc.json`. |
@@ -6040,23 +6040,23 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.auto_close_po` | boolean or null | no |  |
 | `data.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.carton_group` | string or null | no |  |
-| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.cube_uom` | string or null | no |  |
-| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.default_allocation_policy_id` | integer (int64) or null | no |  |
 | `data.default_cartonization_policy_id` | integer (int64) or null | no |  |
-| `data.default_discard_loc` | string or null | no | E.2 (migration 162). |
+| `data.default_discard_loc` | string or null | no | E.2. Discard-condition returns deposit destination. NULL → write-off without deposit (current behavior, no inventory row); set → deposit through DepositService into this loc. |
 | `data.default_inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no |  |
 | `data.default_lot_policy_id` | integer (int64) or null | no |  |
 | `data.default_putaway_policy_id` | integer (int64) or null | no |  |
 | `data.default_qc_loc` | string or null | no |  |
 | `data.default_receipt_policy_id` | integer (int64) or null | no |  |
-| `data.default_receiving_loc` | string or null | no | Migration 350. |
+| `data.default_receiving_loc` | string or null | no |  |
 | `data.default_replenishment_policy_id` | integer (int64) or null | no |  |
 | `data.default_returns_loc` | string or null | no |  |
-| `data.default_rtv_loc` | string or null | no | T-062 (migration 148). |
+| `data.default_rtv_loc` | string or null | no | T-062. Falls back to `default_returns_loc` when NULL; if both NULL, MoveDamageToRtv returns NoRtvLocConfigured error. |
 | `data.default_sku_rotation` | one of: Fifo \| Lifo \| Fefo or null | no |  |
 | `data.default_unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no |  |
 | `data.dimension_uom` | string or null | no |  |
@@ -6072,7 +6072,7 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.pick_code` | string or null | no |  |
 | `data.putaway_reservation_ttl_min` | integer (int32) or null | no | Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it. |
 | `data.roll_receipt` | boolean or null | no |  |
-| `data.rtv_gl_account_hint` | string or null | no | T-062 (migration 148). |
+| `data.rtv_gl_account_hint` | string or null | no | T-062. ERP GL account hint passed in `damage.rtv_initiated` outbox event (e.g. SAP `1450-RTV-Receivable`). |
 | `data.shelf_life_warning_multiplier_pct` | integer (int32) | yes |  |
 | `data.track_inventory_by` | string or null | no |  |
 | … | | | 2 more fields. See `openrpc.json`. |
@@ -6164,23 +6164,23 @@ The `result` member of the response is: `{ "data": [OwnerConfig] }`
 | `data[].auto_close_po` | boolean or null | no |  |
 | `data[].auto_print_lpn_on_receive` | boolean | yes |  |
 | `data[].carton_group` | string or null | no |  |
-| `data[].confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data[].confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data[].cube_uom` | string or null | no |  |
-| `data[].damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data[].damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data[].damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data[].damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data[].damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data[].damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data[].default_allocation_policy_id` | integer (int64) or null | no |  |
 | `data[].default_cartonization_policy_id` | integer (int64) or null | no |  |
-| `data[].default_discard_loc` | string or null | no | E.2 (migration 162). |
+| `data[].default_discard_loc` | string or null | no | E.2. Discard-condition returns deposit destination. NULL → write-off without deposit (current behavior, no inventory row); set → deposit through DepositService into this loc. |
 | `data[].default_inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no |  |
 | `data[].default_lot_policy_id` | integer (int64) or null | no |  |
 | `data[].default_putaway_policy_id` | integer (int64) or null | no |  |
 | `data[].default_qc_loc` | string or null | no |  |
 | `data[].default_receipt_policy_id` | integer (int64) or null | no |  |
-| `data[].default_receiving_loc` | string or null | no | Migration 350. |
+| `data[].default_receiving_loc` | string or null | no |  |
 | `data[].default_replenishment_policy_id` | integer (int64) or null | no |  |
 | `data[].default_returns_loc` | string or null | no |  |
-| `data[].default_rtv_loc` | string or null | no | T-062 (migration 148). |
+| `data[].default_rtv_loc` | string or null | no | T-062. Falls back to `default_returns_loc` when NULL; if both NULL, MoveDamageToRtv returns NoRtvLocConfigured error. |
 | `data[].default_sku_rotation` | one of: Fifo \| Lifo \| Fefo or null | no |  |
 | `data[].default_unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no |  |
 | `data[].dimension_uom` | string or null | no |  |
@@ -6196,7 +6196,7 @@ The `result` member of the response is: `{ "data": [OwnerConfig] }`
 | `data[].pick_code` | string or null | no |  |
 | `data[].putaway_reservation_ttl_min` | integer (int32) or null | no | Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it. |
 | `data[].roll_receipt` | boolean or null | no |  |
-| `data[].rtv_gl_account_hint` | string or null | no | T-062 (migration 148). |
+| `data[].rtv_gl_account_hint` | string or null | no | T-062. ERP GL account hint passed in `damage.rtv_initiated` outbox event (e.g. SAP `1450-RTV-Receivable`). |
 | `data[].shelf_life_warning_multiplier_pct` | integer (int32) | yes |  |
 | `data[].track_inventory_by` | string or null | no |  |
 | … | | | 2 more fields. See `openrpc.json`. |
@@ -6268,9 +6268,9 @@ Update owner configuration with explicit keep, clear and set semantics.
 | `data.carton_group` | string or null | no |  |
 | `data.confirm_empty_on_move` | boolean | no |  |
 | `data.cube_uom` | string or null | no |  |
-| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | no | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.default_allocation_policy_id` | integer (int64) or null | no |  |
 | `data.default_cartonization_policy_id` | integer (int64) or null | no |  |
 | `data.default_discard_loc` | string or null | no |  |
@@ -6316,23 +6316,23 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.auto_close_po` | boolean or null | no |  |
 | `data.auto_print_lpn_on_receive` | boolean | yes |  |
 | `data.carton_group` | string or null | no |  |
-| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
+| `data.confirm_empty_on_move` | boolean | yes | Count spec Appendix L: a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty. |
 | `data.cube_uom` | string or null | no |  |
-| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
-| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.damage_major_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_minor_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
+| `data.damage_total_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.default_allocation_policy_id` | integer (int64) or null | no |  |
 | `data.default_cartonization_policy_id` | integer (int64) or null | no |  |
-| `data.default_discard_loc` | string or null | no | E.2 (migration 162). |
+| `data.default_discard_loc` | string or null | no | E.2. Discard-condition returns deposit destination. NULL → write-off without deposit (current behavior, no inventory row); set → deposit through DepositService into this loc. |
 | `data.default_inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no |  |
 | `data.default_lot_policy_id` | integer (int64) or null | no |  |
 | `data.default_putaway_policy_id` | integer (int64) or null | no |  |
 | `data.default_qc_loc` | string or null | no |  |
 | `data.default_receipt_policy_id` | integer (int64) or null | no |  |
-| `data.default_receiving_loc` | string or null | no | Migration 350. |
+| `data.default_receiving_loc` | string or null | no |  |
 | `data.default_replenishment_policy_id` | integer (int64) or null | no |  |
 | `data.default_returns_loc` | string or null | no |  |
-| `data.default_rtv_loc` | string or null | no | T-062 (migration 148). |
+| `data.default_rtv_loc` | string or null | no | T-062. Falls back to `default_returns_loc` when NULL; if both NULL, MoveDamageToRtv returns NoRtvLocConfigured error. |
 | `data.default_sku_rotation` | one of: Fifo \| Lifo \| Fefo or null | no |  |
 | `data.default_unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no |  |
 | `data.dimension_uom` | string or null | no |  |
@@ -6348,7 +6348,7 @@ The `result` member of the response is: `{ "data": OwnerConfig }`
 | `data.pick_code` | string or null | no |  |
 | `data.putaway_reservation_ttl_min` | integer (int32) or null | no | Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it. |
 | `data.roll_receipt` | boolean or null | no |  |
-| `data.rtv_gl_account_hint` | string or null | no | T-062 (migration 148). |
+| `data.rtv_gl_account_hint` | string or null | no | T-062. ERP GL account hint passed in `damage.rtv_initiated` outbox event (e.g. SAP `1450-RTV-Receivable`). |
 | `data.shelf_life_warning_multiplier_pct` | integer (int32) | yes |  |
 | `data.track_inventory_by` | string or null | no |  |
 | … | | | 2 more fields. See `openrpc.json`. |
@@ -6492,25 +6492,31 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### create_putawayzone
 
-Create a new putawayzone — CRUD.
+Create a putaway zone with durable caller-key replay.
 
 | | |
 |---|---|
 | Context / module | master_data / putawayzone |
-| Category | not declared |
+| Category | stateless_command |
 | Operation | create (reference_crud) |
 | Permission | RBAC resource type `api`, resource code `create_putawayzone` |
 | Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (PutawayZoneForCreate) | yes |  |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreatePutawayZone) | yes | One caller-owned create intent. |
 | `data.auto_print_addr_label` | boolean or null | no |  |
 | `data.auto_print_carton_label` | boolean or null | no |  |
 | `data.code` | string | yes |  |
@@ -6518,6 +6524,7 @@ Create a new putawayzone — CRUD.
 | `data.default_label_printer` | string or null | no |  |
 | `data.default_report_printer` | string or null | no |  |
 | `data.description` | string or null | no |  |
+| `data.idempotency_key` | string (uuid) | yes |  |
 | `data.inbound_loc` | string or null | no |  |
 | `data.max_cases_count` | number (double) or null | no |  |
 | `data.max_cube` | number (double) or null | no |  |
@@ -6533,7 +6540,9 @@ Create a new putawayzone — CRUD.
 
 **Result**
 
-The `result` member of the response is: `{ "data": PutawayZone }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": PutawayZone }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -6571,6 +6580,8 @@ The `result` member of the response is: `{ "data": PutawayZone }`
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
 | 400 | UNIQUE_VIOLATION or INVALID_DATA | The code already exists, or a value breaks a rule. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 
 **Example**
 
@@ -6584,6 +6595,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_putawayzone",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>"
     }
@@ -7197,7 +7211,7 @@ Create a location (auto check-digit).
 | `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff or null | no |  |
 | `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) or null | no |  |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7233,10 +7247,10 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.id` | integer (int64) | yes |  |
 | `data.length` | number (double) or null | no |  |
 | `data.level` | integer (int32) or null | no |  |
-| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7248,7 +7262,7 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.route_sequence` | string or null | no |  |
 | `data.section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data.stack_limit` | integer (int16) | yes |  |
-| `data.status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data.width` | number (double) or null | no |  |
 | `data.x_coord` | number (double) | yes |  |
 | `data.y_coord` | number (double) | yes |  |
@@ -7325,10 +7339,10 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.id` | integer (int64) | yes |  |
 | `data.length` | number (double) or null | no |  |
 | `data.level` | integer (int32) or null | no |  |
-| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7340,7 +7354,7 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.route_sequence` | string or null | no |  |
 | `data.section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data.stack_limit` | integer (int16) | yes |  |
-| `data.status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data.width` | number (double) or null | no |  |
 | `data.x_coord` | number (double) | yes |  |
 | `data.y_coord` | number (double) | yes |  |
@@ -7451,20 +7465,26 @@ Generate locations from a pattern (bulk create).
 | | |
 |---|---|
 | Context / module | master_data / location |
-| Category | not declared |
+| Category | stateless_command |
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `gen_locs` |
 | Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (LocGenerationRequest) | yes | Backward-compatible generator wire data. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (GenerateLocations) | yes | One reviewed, caller-keyed generation intent. |
 | `data.abc` | one of: A \| B \| C or null | no |  |
 | `data.aisle` | string or null | no |  |
 | `data.bay` | integer (int32) or null | no |  |
@@ -7485,11 +7505,12 @@ Generate locations from a pattern (bulk create).
 | `data.generator_attributes.loc_sfx` | string or null | no |  |
 | `data.generator_attributes.locs` | object (LocationCodeGenRange) | yes |  |
 | `data.height` | number (double) or null | no |  |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.length` | number (double) or null | no |  |
 | `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff or null | no |  |
 | `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) or null | no |  |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7507,7 +7528,9 @@ Generate locations from a pattern (bulk create).
 
 **Result**
 
-The `result` member of the response is: `{ "data": [Loc] }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": [Loc] }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -7525,10 +7548,10 @@ The `result` member of the response is: `{ "data": [Loc] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].length` | number (double) or null | no |  |
 | `data[].level` | integer (int32) or null | no |  |
-| `data[].loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data[].loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data[].loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data[].loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data[].loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data[].max_cube_capacity` | number (double) or null | no |  |
 | `data[].max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data[].max_weight_capacity` | number (double) or null | no |  |
@@ -7540,7 +7563,7 @@ The `result` member of the response is: `{ "data": [Loc] }`
 | `data[].route_sequence` | string or null | no |  |
 | `data[].section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data[].stack_limit` | integer (int16) | yes |  |
-| `data[].status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data[].status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data[].width` | number (double) or null | no |  |
 | `data[].x_coord` | number (double) | yes |  |
 | `data[].y_coord` | number (double) | yes |  |
@@ -7554,6 +7577,8 @@ The `result` member of the response is: `{ "data": [Loc] }`
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -7568,6 +7593,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "gen_locs",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "generator_attributes": {
         "aisles": {
@@ -7630,10 +7658,10 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.id` | integer (int64) | yes |  |
 | `data.length` | number (double) or null | no |  |
 | `data.level` | integer (int32) or null | no |  |
-| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7645,7 +7673,7 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.route_sequence` | string or null | no |  |
 | `data.section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data.stack_limit` | integer (int16) | yes |  |
-| `data.status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data.width` | number (double) or null | no |  |
 | `data.x_coord` | number (double) | yes |  |
 | `data.y_coord` | number (double) | yes |  |
@@ -7720,10 +7748,10 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.id` | integer (int64) | yes |  |
 | `data.length` | number (double) or null | no |  |
 | `data.level` | integer (int32) or null | no |  |
-| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7735,7 +7763,7 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.route_sequence` | string or null | no |  |
 | `data.section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data.stack_limit` | integer (int16) | yes |  |
-| `data.status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data.width` | number (double) or null | no |  |
 | `data.x_coord` | number (double) | yes |  |
 | `data.y_coord` | number (double) | yes |  |
@@ -7843,10 +7871,10 @@ The `result` member of the response is: `{ "data": [Loc] }`
 | `data[].id` | integer (int64) | yes |  |
 | `data[].length` | number (double) or null | no |  |
 | `data[].level` | integer (int32) or null | no |  |
-| `data[].loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data[].loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data[].loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data[].loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data[].loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data[].max_cube_capacity` | number (double) or null | no |  |
 | `data[].max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data[].max_weight_capacity` | number (double) or null | no |  |
@@ -7858,7 +7886,7 @@ The `result` member of the response is: `{ "data": [Loc] }`
 | `data[].route_sequence` | string or null | no |  |
 | `data[].section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data[].stack_limit` | integer (int16) | yes |  |
-| `data[].status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data[].status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data[].width` | number (double) or null | no |  |
 | `data[].x_coord` | number (double) | yes |  |
 | `data[].y_coord` | number (double) | yes |  |
@@ -7944,7 +7972,7 @@ Preview generated locations and per-location attributes without creating them.
 | `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff or null | no |  |
 | `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) or null | no |  |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -7983,7 +8011,7 @@ The `result` member of the response is: `{ "data": LocationGenerationPreview }`
 | `data.rows[].loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
 | `data.rows[].loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff or null | no |  |
 | `data.rows[].loc_processing_type` | one of: None \| Pallet \| Case \| Piece or null | no |  |
-| `data.rows[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.rows[].loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.rows[].max_cube_capacity` | number (double) or null | no |  |
 | `data.rows[].max_qty_capacity` | number (double) or null | no |  |
 | `data.rows[].max_weight_capacity` | number (double) or null | no |  |
@@ -8097,7 +8125,7 @@ Update a location; an explicit JSON null or a blank on section clears it back to
 | `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) or null | no |  |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff or null | no |  |
 | `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece or null | no |  |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) or null | no |  |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) or null | no |  |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) or null | no |  |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -8133,10 +8161,10 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.id` | integer (int64) | yes |  |
 | `data.length` | number (double) or null | no |  |
 | `data.level` | integer (int32) or null | no |  |
-| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | LocCategory - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_category` (phase 2a) holds a `PropRule<LocCategory>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.loc_category` | one of: None \| NoPalletization \| Asrs \| CantileverRack \| CartonFlow \| DenseStorage \| DoubleDeepRack \| DriveInRack \| DriveThroughRack \| HorizontalCarousel \| Other \| PalletFlowRack \| … (+5) | yes | Location category stored as the closed PostgreSQL `loc_category` enum. |
 | `data.loc_flag` | one of: None \| CycleCountActive \| SanitationActive \| MaintenanceActive \| ReceivingHoldoff | yes | LocFlag — operational temporary state (NOT location status). |
-| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_processing_type` (phase 2a) holds a `PropRule<LocProcessingType>`, and `CandidateFilter` derives `P… |
-| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+7) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
+| `data.loc_processing_type` | one of: None \| Pallet \| Case \| Piece | yes | LocProcessingType represents the multiselect values for the location handling field |
+| `data.loc_type` | one of: None \| Other \| Case \| Pick \| Pnd \| Door \| Pickto \| Sort \| SpeedPick \| QC \| Damage \| Rtv \| … (+8) | yes | LocType — dependent type, mirrors PostgreSQL `loc_type` enum. |
 | `data.max_cube_capacity` | number (double) or null | no |  |
 | `data.max_qty_capacity` | number (double) | yes | How much stock this location holds before it is full, in its own UOM. |
 | `data.max_weight_capacity` | number (double) or null | no |  |
@@ -8148,7 +8176,7 @@ The `result` member of the response is: `{ "data": Loc }`
 | `data.route_sequence` | string or null | no |  |
 | `data.section` | string or null | no | The run of positions this location belongs to — locations with no beam between them. |
 | `data.stack_limit` | integer (int16) | yes |  |
-| `data.status` | one of: Ok \| Hold \| Damage | yes | LocStatus - dependent type, code_list_value `PartialEq`/`Eq` are unconditional (not `cfg(test)`): `CandidateFilter::loc_status` (phase 2a) holds a `PropRule<LocStatus>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too. |
+| `data.status` | one of: Ok \| Hold \| Damage | yes | Location status stored as the closed PostgreSQL `loc_status` enum. |
 | `data.width` | number (double) or null | no |  |
 | `data.x_coord` | number (double) | yes |  |
 | `data.y_coord` | number (double) | yes |  |
@@ -9294,7 +9322,7 @@ Create a SKU master-data root after validating its packaging UOM.
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no |  |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9354,7 +9382,7 @@ The `result` member of the response is: `{ "data": Sku }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9415,19 +9443,19 @@ Create a SKU and optional serial configuration atomically.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreateSkuFull) | yes | SKU and optional serial configuration for this create action. |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateSkuFull) | yes | Caller-owned create intent for one SKU aggregate. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.serial_config` | object (SkuSerialConfigForCreateInner) or null | no |  |
 | `data.serial_config.allow_asn_pre_advised` | boolean or null | no |  |
 | `data.serial_config.allow_deferred_capture` | boolean or null | no |  |
@@ -9485,7 +9513,7 @@ Create a SKU and optional serial configuration atomically.
 | `data.sku.owner_id` | integer (int64) | yes |  |
 | `data.sku.pack_id` | integer (int64) | yes |  |
 | `data.sku.pack_location` | string or null | no |  |
-| `data.sku.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.sku.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.sku.positions_required` | integer (int16) or null | no |  |
 | `data.sku.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.sku.putaway_loc` | string or null | no |  |
@@ -9547,7 +9575,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9663,7 +9691,7 @@ The `result` member of the response is: `{ "data": Sku }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9765,7 +9793,7 @@ The `result` member of the response is: `{ "data": Sku }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9867,7 +9895,7 @@ The `result` member of the response is: `{ "data": SkuFull }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -9970,7 +9998,7 @@ The `result` member of the response is: `{ "data": Sku }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -10117,7 +10145,7 @@ The `result` member of the response is: `{ "data": [Sku] }`
 | `data[].owner_id` | integer (int64) | yes |  |
 | `data[].pack_id` | integer (int64) | yes |  |
 | `data[].pack_location` | string or null | no |  |
-| `data[].pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data[].pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data[].positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data[].putaway_class` | one of: None \| NoMix or null | no |  |
 | `data[].putaway_loc` | string or null | no |  |
@@ -10273,7 +10301,7 @@ The `result` member of the response is: `{ "data": Sku }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |
@@ -10428,7 +10456,7 @@ The `result` member of the response is: `{ "data": SkuFull }`
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.pack_id` | integer (int64) | yes |  |
 | `data.pack_location` | string or null | no |  |
-| `data.pick_instruction` | string or null | no | Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
+| `data.pick_instruction` | string or null | no | Standing pick instruction for this item: shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`). |
 | `data.positions_required` | integer (int16) or null | no | How many adjacent positions of one section this item occupies. |
 | `data.putaway_class` | one of: None \| NoMix or null | no |  |
 | `data.putaway_loc` | string or null | no |  |

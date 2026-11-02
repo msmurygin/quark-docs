@@ -1199,7 +1199,7 @@ The `result` member of the response is: `{ "data": InventoryHold }`
 | `data.lpn` | string or null | no |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum (15 values after migration 142). |
+| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum. |
 | `data.who_off` | integer (int64) or null | no |  |
 | `data.who_on` | integer (int64) or null | no |  |
 
@@ -1290,17 +1290,17 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].atp` | number (double) | yes | Computed: Available-to-promise = `GREATEST(qty − allocated − picked − on_hold, 0)`. |
 | `data[].container_id` | integer (int64) or null | no |  |
-| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display (migration 178): `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
+| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display: `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
 | `data[].hold_detail` | string or null | no | VIRTUAL: reason + scope of the matching hold, e.g. |
 | `data[].hold_status` | string or null | no | VIRTUAL: `'On hold'` when an active hold matches this row's lot / loc / lpn, else `''` (empty → the grid renders no chip). |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].location` | string | yes |  |
 | `data[].lot` | string | yes |  |
-| `data[].lpn` | string or null | no | Display (migration 178): `container.code` (LPN) for `container_id`; `None` for loose stock. |
+| `data[].lpn` | string or null | no | Display: `container.code` (LPN) for `container_id`; `None` for loose stock. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
-| `data[].owner_name` | string or null | no | Display (migration 178): `owners.company` for `owner_id` (vs the raw `#id`). |
+| `data[].owner_name` | string or null | no | Display: `owners.company` for `owner_id` (vs the raw `#id`). |
 | `data[].pack_id` | integer (int64) | yes |  |
 | `data[].qty` | number (double) | yes |  |
 | `data[].qty_allocated` | number (double) | yes |  |
@@ -1309,7 +1309,7 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].qty_picked` | number (double) | yes |  |
 | `data[].serial_tracked` | boolean | no | Whether this row's SKU is configured for end-to-end serial capture. |
 | `data[].sku_code` | string | yes |  |
-| `data[].sku_descr` | string or null | no | Display (migration 178): `sku.descr` (item name) for `(sku_code, owner_id)`. |
+| `data[].sku_descr` | string or null | no | Display: `sku.descr` (item name) for `(sku_code, owner_id)`. |
 | `data[].uom` | string | yes |  |
 
 **Errors**
@@ -1473,7 +1473,7 @@ The `result` member of the response is: `{ "data": [InventoryBalanceByLot] }`
 |---|---|---|---|
 | `data[].atp` | number (double) | yes |  |
 | `data[].best_by_date_source` | one of: Explicit \| Derived or null | no |  |
-| `data[].days_left` | integer (int32) or null | no | Expiration minus the warehouse day (`warehouse_today()`). |
+| `data[].days_left` | integer (int32) or null | no | Expiration minus the warehouse day (`warehouse_today`). |
 | `data[].delivery_by_date_source` | one of: Explicit \| Derived or null | no |  |
 | `data[].expiration_date` | string or null | no |  |
 | `data[].expiration_date_source` | one of: Explicit \| Derived or null | no | Where each date came from; `None` when the lot has no such date. |
@@ -1839,17 +1839,17 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].atp` | number (double) | yes | Computed: Available-to-promise = `GREATEST(qty − allocated − picked − on_hold, 0)`. |
 | `data[].container_id` | integer (int64) or null | no |  |
-| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display (migration 178): `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
+| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display: `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
 | `data[].hold_detail` | string or null | no | VIRTUAL: reason + scope of the matching hold, e.g. |
 | `data[].hold_status` | string or null | no | VIRTUAL: `'On hold'` when an active hold matches this row's lot / loc / lpn, else `''` (empty → the grid renders no chip). |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].location` | string | yes |  |
 | `data[].lot` | string | yes |  |
-| `data[].lpn` | string or null | no | Display (migration 178): `container.code` (LPN) for `container_id`; `None` for loose stock. |
+| `data[].lpn` | string or null | no | Display: `container.code` (LPN) for `container_id`; `None` for loose stock. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
-| `data[].owner_name` | string or null | no | Display (migration 178): `owners.company` for `owner_id` (vs the raw `#id`). |
+| `data[].owner_name` | string or null | no | Display: `owners.company` for `owner_id` (vs the raw `#id`). |
 | `data[].pack_id` | integer (int64) | yes |  |
 | `data[].qty` | number (double) | yes |  |
 | `data[].qty_allocated` | number (double) | yes |  |
@@ -1858,7 +1858,7 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].qty_picked` | number (double) | yes |  |
 | `data[].serial_tracked` | boolean | no | Whether this row's SKU is configured for end-to-end serial capture. |
 | `data[].sku_code` | string | yes |  |
-| `data[].sku_descr` | string or null | no | Display (migration 178): `sku.descr` (item name) for `(sku_code, owner_id)`. |
+| `data[].sku_descr` | string or null | no | Display: `sku.descr` (item name) for `(sku_code, owner_id)`. |
 | `data[].uom` | string | yes |  |
 
 **Errors**
@@ -1957,7 +1957,7 @@ The `result` member of the response is: `{ "data": [InventoryHold] }`
 | `data[].lpn` | string or null | no |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum (15 values after migration 142). |
+| `data[].status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum. |
 | `data[].who_off` | integer (int64) or null | no |  |
 | `data[].who_on` | integer (int64) or null | no |  |
 
@@ -2366,7 +2366,7 @@ The `result` member of the response is: `{ "data": InventoryHold }`
 | `data.lpn` | string or null | no |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum (15 values after migration 142). |
+| `data.status` | one of: None \| Ok \| PIHold \| QcRequired \| NewItem \| NotHold \| QcQuarantine \| Customs \| CustomerReturn \| Expired \| Damaged \| Rtv \| … (+4) | yes | Mirror of the PostgreSQL `inv_hold_code` enum. |
 | `data.who_off` | integer (int64) or null | no |  |
 | `data.who_on` | integer (int64) or null | no |  |
 
@@ -2520,17 +2520,17 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].atp` | number (double) | yes | Computed: Available-to-promise = `GREATEST(qty − allocated − picked − on_hold, 0)`. |
 | `data[].container_id` | integer (int64) or null | no |  |
-| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display (migration 178): `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
+| `data[].container_type` | one of: Pallet \| Case \| Tote \| Generic \| Carton or null | no | Display: `container.container_type` (Pallet/Case/…) — drives the type-glyph badge on the Container column, paired with `lpn`. |
 | `data[].hold_detail` | string or null | no | VIRTUAL: reason + scope of the matching hold, e.g. |
 | `data[].hold_status` | string or null | no | VIRTUAL: `'On hold'` when an active hold matches this row's lot / loc / lpn, else `''` (empty → the grid renders no chip). |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].location` | string | yes |  |
 | `data[].lot` | string | yes |  |
-| `data[].lpn` | string or null | no | Display (migration 178): `container.code` (LPN) for `container_id`; `None` for loose stock. |
+| `data[].lpn` | string or null | no | Display: `container.code` (LPN) for `container_id`; `None` for loose stock. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
-| `data[].owner_name` | string or null | no | Display (migration 178): `owners.company` for `owner_id` (vs the raw `#id`). |
+| `data[].owner_name` | string or null | no | Display: `owners.company` for `owner_id` (vs the raw `#id`). |
 | `data[].pack_id` | integer (int64) | yes |  |
 | `data[].qty` | number (double) | yes |  |
 | `data[].qty_allocated` | number (double) | yes |  |
@@ -2539,7 +2539,7 @@ The `result` member of the response is: `{ "data": [InventoryBalanceAtp] }`
 | `data[].qty_picked` | number (double) | yes |  |
 | `data[].serial_tracked` | boolean | no | Whether this row's SKU is configured for end-to-end serial capture. |
 | `data[].sku_code` | string | yes |  |
-| `data[].sku_descr` | string or null | no | Display (migration 178): `sku.descr` (item name) for `(sku_code, owner_id)`. |
+| `data[].sku_descr` | string or null | no | Display: `sku.descr` (item name) for `(sku_code, owner_id)`. |
 | `data[].uom` | string | yes |  |
 
 **Errors**
@@ -2706,7 +2706,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### confirm_kz_inbound
 
-(The code comment for this item is not in English.
+.
 
 | | |
 |---|---|
@@ -2840,7 +2840,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### confirm_pharma_inbound
 
-(The code comment for this item is not in English.
+.
 
 | | |
 |---|---|
@@ -3039,7 +3039,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### get_kz_inbound_codes
 
-(The code comment for this item is not in English.
+.
 
 | | |
 |---|---|
@@ -3493,7 +3493,7 @@ Create a new attribute_def — CRUD.
 | `data` | object (AttributeDefForCreate) | yes |  |
 | `data.active` | boolean or null | no |  |
 | `data.code` | string | yes |  |
-| `data.data_type` | one of: Text \| Integer \| Decimal \| Boolean \| Date or null | no | `From<AttrDataType> for sea_query::Value` binds the label as text, and Postgres has no implicit text → `attr_data_type` cast (42804), so the value is cast in the INSERT itself — as every other enum column written through `Fields` is (`sku`, `user`, `task`, …). |
+| `data.data_type` | one of: Text \| Integer \| Decimal \| Boolean \| Date or null | no | Until the 2026-09-23 squash this one column was carried instead by a database-wide `CREATE CAST (text AS attr_data_type) … AS IMPLICIT`. |
 | `data.default_value` | string or null | no |  |
 | `data.display_order` | integer (int32) or null | no |  |
 | `data.entity_type` | string | yes |  |
@@ -4868,7 +4868,6 @@ Create a new event_registry — CRUD.
 | `data.code` | string | yes |  |
 | `data.description` | string or null | no |  |
 | `data.is_active` | boolean or null | no |  |
-| `data.is_builtin` | boolean or null | no |  |
 | `data.name` | string | yes |  |
 
 **Result**
@@ -4944,7 +4943,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### delete_event_registry
 
-Delete a event_registry by ID — CRUD.
+Delete a custom event-catalog entry; built-in events are protected.
 
 | | |
 |---|---|

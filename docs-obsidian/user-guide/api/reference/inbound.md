@@ -260,11 +260,11 @@ The `result` member of the response is: `{ "data": LotPolicyAttributeFormView }`
 | `data.lot_policy_id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.override_allowed` | boolean | yes | Phase 1. |
 | `data.physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.required` | boolean | yes |  |
 | `data.show` | boolean | yes |  |
-| `data.show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this attribute. |
 
 **Errors**
@@ -364,7 +364,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.label_delivery_by_date` | string or null | no |  |
 | `data.label_expiration_date` | string or null | no |  |
 | `data.label_manufactured_date` | string or null | no |  |
-| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.required_best_by_date` | boolean | yes |  |
@@ -378,7 +378,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -453,7 +453,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.label_delivery_by_date` | string or null | no |  |
 | `data.label_expiration_date` | string or null | no |  |
 | `data.label_manufactured_date` | string or null | no |  |
-| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.required_best_by_date` | boolean | yes |  |
@@ -467,7 +467,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -540,11 +540,11 @@ The `result` member of the response is: `{ "data": LotPolicyAttribute }`
 | `data.lot_policy_id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.override_allowed` | boolean | yes | Phase 1. |
 | `data.physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.required` | boolean | yes |  |
 | `data.show` | boolean | yes |  |
-| `data.show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick` | boolean | yes | Shown on the pick card. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -777,7 +777,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.label_delivery_by_date` | string or null | no |  |
 | `data.label_expiration_date` | string or null | no |  |
 | `data.label_manufactured_date` | string or null | no |  |
-| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.required_best_by_date` | boolean | yes |  |
@@ -791,7 +791,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -862,11 +862,11 @@ The `result` member of the response is: `{ "data": LotPolicyAttribute }`
 | `data.lot_policy_id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.override_allowed` | boolean | yes | Phase 1. |
 | `data.physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.required` | boolean | yes |  |
 | `data.show` | boolean | yes |  |
-| `data.show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick` | boolean | yes | Shown on the pick card. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -958,11 +958,11 @@ The `result` member of the response is: `{ "data": LotPolicyAttributeFormView }`
 | `data.lot_policy_id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.override_allowed` | boolean | yes | Phase 1. |
 | `data.physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.required` | boolean | yes |  |
 | `data.show` | boolean | yes |  |
-| `data.show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this attribute. |
 
 **Errors**
@@ -1053,7 +1053,7 @@ The `result` member of the response is: `{ "data": [LotPolicy] }`
 | `data[].label_delivery_by_date` | string or null | no |  |
 | `data[].label_expiration_date` | string or null | no |  |
 | `data[].label_manufactured_date` | string or null | no |  |
-| `data[].lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data[].lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].required_best_by_date` | boolean | yes |  |
@@ -1067,7 +1067,7 @@ The `result` member of the response is: `{ "data": [LotPolicy] }`
 | `data[].show_on_pick_best_by_date` | boolean | yes |  |
 | `data[].show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data[].show_on_pick_expiration_date` | boolean | yes |  |
-| `data[].show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data[].show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data[].verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data[].verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data[].verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -1162,11 +1162,11 @@ The `result` member of the response is: `{ "data": [LotPolicyAttribute] }`
 | `data[].lot_policy_id` | integer (int64) | yes |  |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
-| `data[].override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data[].override_allowed` | boolean | yes | Phase 1. |
 | `data[].physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data[].required` | boolean | yes |  |
 | `data[].show` | boolean | yes |  |
-| `data[].show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data[].show_on_pick` | boolean | yes | Shown on the pick card. |
 
 **Errors**
 
@@ -1218,23 +1218,23 @@ Create a complete lot-policy configuration atomically.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreateLotPolicyConfig) | yes | Complete lot-policy configuration for this create action. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateLotPolicyConfig) | yes | Create the root and first complete attribute set in one transaction. |
 | `data.code` | string | yes |  |
 | `data.data` | object (LotPolicyAggregateDraft) | yes |  |
 | `data.data.attributes` | array of object (LotPolicyAttributeDraft) | yes |  |
 | `data.data.policy` | object (LotPolicyRootDraft) | yes |  |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `data.idempotency_key` | string (uuid) | no |  |
 
 **Result**
 
@@ -1254,11 +1254,11 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.attributes[].lot_policy_id` | integer (int64) | yes |  |
 | `data.attributes[].mod_when` | string | yes |  |
 | `data.attributes[].mod_who` | integer (int64) | yes |  |
-| `data.attributes[].override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.attributes[].override_allowed` | boolean | yes | Phase 1. |
 | `data.attributes[].physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.attributes[].required` | boolean | yes |  |
 | `data.attributes[].show` | boolean | yes |  |
-| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.policy` | object (LotPolicy) | yes |  |
 | `data.policy.add_when` | string | yes |  |
 | `data.policy.add_who` | integer (int64) | yes |  |
@@ -1269,7 +1269,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.label_delivery_by_date` | string or null | no |  |
 | `data.policy.label_expiration_date` | string or null | no |  |
 | `data.policy.label_manufactured_date` | string or null | no |  |
-| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.policy.mod_when` | string | yes |  |
 | `data.policy.mod_who` | integer (int64) | yes |  |
 | `data.policy.required_best_by_date` | boolean | yes |  |
@@ -1283,7 +1283,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.policy.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.policy.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -1450,11 +1450,11 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.attributes[].lot_policy_id` | integer (int64) | yes |  |
 | `data.attributes[].mod_when` | string | yes |  |
 | `data.attributes[].mod_who` | integer (int64) | yes |  |
-| `data.attributes[].override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.attributes[].override_allowed` | boolean | yes | Phase 1. |
 | `data.attributes[].physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.attributes[].required` | boolean | yes |  |
 | `data.attributes[].show` | boolean | yes |  |
-| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.policy` | object (LotPolicy) | yes |  |
 | `data.policy.add_when` | string | yes |  |
 | `data.policy.add_who` | integer (int64) | yes |  |
@@ -1465,7 +1465,7 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.policy.label_delivery_by_date` | string or null | no |  |
 | `data.policy.label_expiration_date` | string or null | no |  |
 | `data.policy.label_manufactured_date` | string or null | no |  |
-| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.policy.mod_when` | string | yes |  |
 | `data.policy.mod_who` | integer (int64) | yes |  |
 | `data.policy.required_best_by_date` | boolean | yes |  |
@@ -1479,7 +1479,7 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.policy.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.policy.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -1755,11 +1755,11 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.attributes[].lot_policy_id` | integer (int64) | yes |  |
 | `data.attributes[].mod_when` | string | yes |  |
 | `data.attributes[].mod_who` | integer (int64) | yes |  |
-| `data.attributes[].override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.attributes[].override_allowed` | boolean | yes | Phase 1. |
 | `data.attributes[].physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.attributes[].required` | boolean | yes |  |
 | `data.attributes[].show` | boolean | yes |  |
-| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.attributes[].show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.policy` | object (LotPolicy) | yes |  |
 | `data.policy.add_when` | string | yes |  |
 | `data.policy.add_who` | integer (int64) | yes |  |
@@ -1770,7 +1770,7 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.policy.label_delivery_by_date` | string or null | no |  |
 | `data.policy.label_expiration_date` | string or null | no |  |
 | `data.policy.label_manufactured_date` | string or null | no |  |
-| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.policy.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.policy.mod_when` | string | yes |  |
 | `data.policy.mod_who` | integer (int64) | yes |  |
 | `data.policy.required_best_by_date` | boolean | yes |  |
@@ -1784,7 +1784,7 @@ The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
 | `data.policy.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.policy.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.policy.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.policy.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.policy.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -1925,11 +1925,11 @@ The `result` member of the response is: `{ "data": LotPolicyAttributeFormView }`
 | `data.lot_policy_id` | integer (int64) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
-| `data.override_allowed` | boolean | yes | Phase 1 (migration 083). |
+| `data.override_allowed` | boolean | yes | Phase 1. |
 | `data.physical_verification` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes | How the operator can check the value on the goods. |
 | `data.required` | boolean | yes |  |
 | `data.show` | boolean | yes |  |
-| `data.show_on_pick` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick` | boolean | yes | Shown on the pick card. |
 | `data.version` | integer (int32) | yes | Version of the aggregate root read with this attribute. |
 
 **Errors**
@@ -2032,7 +2032,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.label_delivery_by_date` | string or null | no |  |
 | `data.label_expiration_date` | string or null | no |  |
 | `data.label_manufactured_date` | string or null | no |  |
-| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes | WHEN a new lot is created (migration 351). |
+| `data.lot_creation` | one of: Existing \| PerReceipt \| PerReceiveEvent | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.required_best_by_date` | boolean | yes |  |
@@ -2046,7 +2046,7 @@ The `result` member of the response is: `{ "data": LotPolicy }`
 | `data.show_on_pick_best_by_date` | boolean | yes |  |
 | `data.show_on_pick_delivery_by_date` | boolean | yes |  |
 | `data.show_on_pick_expiration_date` | boolean | yes |  |
-| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card (spec 2026-10-04 §8). |
+| `data.show_on_pick_manufactured_date` | boolean | yes | Shown on the pick card. |
 | `data.verification_best_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_delivery_by_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
 | `data.verification_expiration_date` | one of: NotVerifiable \| Visual \| Barcode \| VisualOrBarcode | yes |  |
@@ -2215,18 +2215,18 @@ Create a complete receipt-policy configuration.
 
 **Notes**
 
-- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | no | Control fields for replay protection. |
+| `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
-| `data` | object (CreateReceiptPolicy) | yes | Complete receipt policy for this create action. |
+| `meta.idempotency_key` | string (uuid) | no |  |
+| `data` | object (CreateReceiptPolicy) | yes | Caller-owned immutable intent to create one receipt policy. |
 | `data.asn_po_qty_discrepancy` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.code` | string | yes |  |
 | `data.date_deviation_check` | one of: Allow \| HardError \| Warning or null | no |  |
@@ -2236,7 +2236,7 @@ Create a complete receipt-policy configuration.
 | `data.excess_message` | boolean or null | no |  |
 | `data.excess_override` | boolean or null | no |  |
 | `data.excess_override_percent` | integer (int32) or null | no |  |
-| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
+| `data.idempotency_key` | string (uuid) | no |  |
 | `data.no_sku_on_asn` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.no_sku_on_po` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.po_excess_error` | boolean or null | no |  |
@@ -3079,7 +3079,7 @@ Create a new receipt — CRUD.
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no | ADR-046 D-69b — set by `CreateCaseLevelAsn` from the cascade (ASN payload \\|\\| operator UI \\|\\| owner_config default \\|\\| `Aggregate`). |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case or null | no | NULL here means "let the SQL DEFAULT 'Aggregate' apply". |
 | `data.owner_id` | integer (int64) | yes |  |
 | `data.planned_ship_date` | string or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
@@ -3096,7 +3096,7 @@ Create a new receipt — CRUD.
 | `data.total_weight` | number (double) or null | no |  |
 | `data.trailer_plate` | string or null | no |  |
 | `data.trailer_type` | string or null | no |  |
-| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — set by `CreateCaseLevelAsn` from the cascade when granularity != Aggregate. |
+| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | = Aggregate. |
 | `data.vehicle_date` | string or null | no |  |
 | `data.vehicle_plate` | string or null | no |  |
 
@@ -3110,18 +3110,18 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
 | `data.arrival_date` | string or null | no |  |
-| `data.cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data.cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.close_date` | string or null | no |  |
-| `data.close_summary` | any | no | Per Decisions Log D-18. |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data.door` | string or null | no |  |
 | `data.driver_name` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_id` | integer (int64) | yes |  |
@@ -3140,10 +3140,10 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.total_weight` | number (double) or null | no |  |
 | `data.trailer_plate` | string or null | no |  |
 | `data.trailer_type` | string or null | no |  |
-| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data.vehicle_date` | string or null | no |  |
 | `data.vehicle_plate` | string or null | no |  |
-| `data.version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data.version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -3276,18 +3276,18 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
 | `data.arrival_date` | string or null | no |  |
-| `data.cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data.cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.close_date` | string or null | no |  |
-| `data.close_summary` | any | no | Per Decisions Log D-18. |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data.door` | string or null | no |  |
 | `data.driver_name` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_id` | integer (int64) | yes |  |
@@ -3306,10 +3306,10 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.total_weight` | number (double) or null | no |  |
 | `data.trailer_plate` | string or null | no |  |
 | `data.trailer_type` | string or null | no |  |
-| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data.vehicle_date` | string or null | no |  |
 | `data.vehicle_plate` | string or null | no |  |
-| `data.version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data.version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -3702,7 +3702,7 @@ The `result` member of the response is: `{ "data": AsnDetails }`
 | `data.qty_received_total` | number (double) | yes |  |
 | `data.receipt_number` | string | yes |  |
 | `data.status` | string | yes |  |
-| `data.version` | integer (int32) | yes | OCC version (per CLAUDE.md classifier rules) — receipt is a stateful entity, downstream commands (`receipt_close` / `receipt_cancel` / `receipt_adjust_received_qty`) carry this on submit. |
+| `data.version` | integer (int32) | yes | OCC version (per CLAUDE guide classifier rules) — receipt is a stateful entity, downstream commands (`receipt_close` / `receipt_cancel` / `receipt_adjust_received_qty`) carry this on submit. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -3983,18 +3983,18 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
 | `data.arrival_date` | string or null | no |  |
-| `data.cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data.cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.close_date` | string or null | no |  |
-| `data.close_summary` | any | no | Per Decisions Log D-18. |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data.door` | string or null | no |  |
 | `data.driver_name` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_id` | integer (int64) | yes |  |
@@ -4013,10 +4013,10 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.total_weight` | number (double) or null | no |  |
 | `data.trailer_plate` | string or null | no |  |
 | `data.trailer_type` | string or null | no |  |
-| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data.vehicle_date` | string or null | no |  |
 | `data.vehicle_plate` | string or null | no |  |
-| `data.version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data.version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -4143,18 +4143,18 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
 | `data.arrival_date` | string or null | no |  |
-| `data.cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data.cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.close_date` | string or null | no |  |
-| `data.close_summary` | any | no | Per Decisions Log D-18. |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data.door` | string or null | no |  |
 | `data.driver_name` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data.last_audit_event` | object (ReceiptAudit) or null | no | Most recent audit row for the receipt; None when nothing audited yet. |
 | `data.last_audit_event.changed_at` | string | yes |  |
 | `data.last_audit_event.changed_by` | integer (int64) | yes |  |
@@ -4168,7 +4168,7 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.lines[].add_who` | integer (int64) | yes |  |
 | `data.lines[].barcode` | string or null | no |  |
 | `data.lines[].best_by_date` | string or null | no |  |
-| `data.lines[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.lines[].completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.lines[].container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.lines[].delivery_by_date` | string or null | no |  |
 | `data.lines[].effective_date` | string | yes |  |
@@ -4455,9 +4455,9 @@ The `result` member of the response is: `{ "data": SkuEnvelope }`
 | `data.pack.code` | string | yes |  |
 | `data.pack.descr` | string | yes |  |
 | `data.pack.id` | integer (int64) | yes |  |
-| `data.pack.items` | array of object (PackItem) | yes |  |
 | `data.pack.mod_when` | string | yes |  |
 | `data.pack.mod_who` | integer (int64) | yes |  |
+| `data.pack.pack_items` | array of object (PackItem) | yes |  |
 | `data.serial_config` | object (SkuSerialConfig) or null | no | Per-SKU serial-tracking configuration. |
 | `data.serial_config.add_when` | string | yes |  |
 | `data.serial_config.add_who` | integer (int64) | yes |  |
@@ -4698,18 +4698,18 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].arrival_date` | string or null | no |  |
-| `data[].cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data[].cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].close_date` | string or null | no |  |
-| `data[].close_summary` | any | no | Per Decisions Log D-18. |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data[].door` | string or null | no |  |
 | `data[].driver_name` | string or null | no |  |
 | `data[].effective_date` | string or null | no |  |
 | `data[].expected_receipt_date` | string or null | no |  |
 | `data[].external_receipt_number` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
-| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
@@ -4728,10 +4728,10 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].total_weight` | number (double) or null | no |  |
 | `data[].trailer_plate` | string or null | no |  |
 | `data[].trailer_type` | string or null | no |  |
-| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data[].vehicle_date` | string or null | no |  |
 | `data[].vehicle_plate` | string or null | no |  |
-| `data[].version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data[].version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -4796,18 +4796,18 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].arrival_date` | string or null | no |  |
-| `data[].cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data[].cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].close_date` | string or null | no |  |
-| `data[].close_summary` | any | no | Per Decisions Log D-18. |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data[].door` | string or null | no |  |
 | `data[].driver_name` | string or null | no |  |
 | `data[].effective_date` | string or null | no |  |
 | `data[].expected_receipt_date` | string or null | no |  |
 | `data[].external_receipt_number` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
-| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
@@ -4826,10 +4826,10 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].total_weight` | number (double) or null | no |  |
 | `data[].trailer_plate` | string or null | no |  |
 | `data[].trailer_type` | string or null | no |  |
-| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data[].vehicle_date` | string or null | no |  |
 | `data[].vehicle_plate` | string or null | no |  |
-| `data[].version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data[].version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -4893,18 +4893,18 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].arrival_date` | string or null | no |  |
-| `data[].cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data[].cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].close_date` | string or null | no |  |
-| `data[].close_summary` | any | no | Per Decisions Log D-18. |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data[].door` | string or null | no |  |
 | `data[].driver_name` | string or null | no |  |
 | `data[].effective_date` | string or null | no |  |
 | `data[].expected_receipt_date` | string or null | no |  |
 | `data[].external_receipt_number` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
-| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
@@ -4923,10 +4923,10 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].total_weight` | number (double) or null | no |  |
 | `data[].trailer_plate` | string or null | no |  |
 | `data[].trailer_type` | string or null | no |  |
-| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data[].vehicle_date` | string or null | no |  |
 | `data[].vehicle_plate` | string or null | no |  |
-| `data[].version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data[].version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -5082,18 +5082,18 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].add_when` | string | yes |  |
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].arrival_date` | string or null | no |  |
-| `data[].cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data[].cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data[].carrier_id` | integer (int64) or null | no |  |
 | `data[].close_date` | string or null | no |  |
-| `data[].close_summary` | any | no | Per Decisions Log D-18. |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data[].door` | string or null | no |  |
 | `data[].driver_name` | string or null | no |  |
 | `data[].effective_date` | string or null | no |  |
 | `data[].expected_receipt_date` | string or null | no |  |
 | `data[].external_receipt_number` | string or null | no |  |
 | `data[].id` | integer (int64) | yes |  |
-| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data[].inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data[].mod_when` | string | yes |  |
 | `data[].mod_who` | integer (int64) | yes |  |
 | `data[].owner_id` | integer (int64) | yes |  |
@@ -5112,10 +5112,10 @@ The `result` member of the response is: `{ "data": [General Receipt model] }`
 | `data[].total_weight` | number (double) or null | no |  |
 | `data[].trailer_plate` | string or null | no |  |
 | `data[].trailer_type` | string or null | no |  |
-| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data[].unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data[].vehicle_date` | string or null | no |  |
 | `data[].vehicle_plate` | string or null | no |  |
-| `data[].version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data[].version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -6109,18 +6109,18 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.add_when` | string | yes |  |
 | `data.add_who` | integer (int64) | yes |  |
 | `data.arrival_date` | string or null | no |  |
-| `data.cancel_summary` | any | no | Per Decisions Log D-19. |
+| `data.cancel_summary` | any | no | JSON snapshot at CancelReceipt time. |
 | `data.carrier_id` | integer (int64) or null | no |  |
 | `data.close_date` | string or null | no |  |
-| `data.close_summary` | any | no | Per Decisions Log D-18. |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.close_summary` | any | no | JSON snapshot at CloseReceipt time. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Live-updated from details on every receive command. |
 | `data.door` | string or null | no |  |
 | `data.driver_name` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
 | `data.expected_receipt_date` | string or null | no |  |
 | `data.external_receipt_number` | string or null | no |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | ADR-046 D-69b — frozen at creation. |
+| `data.inventory_tracking_granularity` | one of: Aggregate \| Pallet \| Case | yes | Aggregate (default) preserves pre-case-level behaviour; Pallet/Case enable case-scanning flow. |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
 | `data.owner_id` | integer (int64) | yes |  |
@@ -6139,10 +6139,10 @@ The `result` member of the response is: `{ "data": General Receipt model }`
 | `data.total_weight` | number (double) or null | no |  |
 | `data.trailer_plate` | string or null | no |  |
 | `data.trailer_type` | string or null | no |  |
-| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | ADR-046 OQ-03 — what to do when scan hits a case not on ASN. |
+| `data.unplanned_case_on_asn` | one of: Allow \| HardError \| Warning or null | no | NULL when granularity = Aggregate (cases not scanned). |
 | `data.vehicle_date` | string or null | no |  |
 | `data.vehicle_plate` | string or null | no |  |
-| `data.version` | integer (int32) | yes | Per Decisions Log D-07. |
+| `data.version` | integer (int32) | yes | Optimistic-lock. |
 
 **Errors**
 
@@ -6280,7 +6280,7 @@ Adjust a previously received qty (delta + reason).
 | `data` | object (AdjustReceivedQty) | yes |  |
 | `data.acknowledged_overrides` | array of integer (int16) | no |  |
 | `data.delta_qty` | number (double) | yes |  |
-| `data.expected_line_version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data.expected_line_version` | integer (int32) | yes | Per-line OCC version. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.reason_code` | string | yes |  |
 | `data.reason_description` | string or null | no |  |
@@ -6298,7 +6298,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.completion_detail` | one of: Pending \| Partial \| Full \| Over | yes | Receipt completion (qty fulfilment). |
 | `data.completion_header` | one of: Pending \| Partial \| Full \| Over | yes | Receipt completion (qty fulfilment). |
 | `data.new_header_version` | integer (int32) | yes | Post-bump header version. |
-| `data.new_line_version` | integer (int32) | yes | Post-bump line version (Slice #2). |
+| `data.new_line_version` | integer (int32) | yes | Post-bump line version. |
 | `data.new_qty_received` | number (double) | yes |  |
 | `data.receipt_detail_id` | integer (int64) | yes |  |
 | `data.receipt_id` | integer (int64) | yes |  |
@@ -6398,7 +6398,7 @@ Cancel a receipt (D-19, completion=Pending only).
 | `data` | object (CancelReceipt) | yes |  |
 | `data.acknowledged_overrides` | array of integer (int16) | no |  |
 | `data.cancel_reason` | string | yes |  |
-| `data.expected_receipt_version` | integer (int32) | yes | Receipt-header OCC version (per the `expected_<entity>_version` naming convention shared with `AdjustReceivedQty::expected_line_version` and `SetDamageDisposition::expected_damage_version`). |
+| `data.expected_receipt_version` | integer (int32) | yes | Receipt-header OCC version. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.receipt_id` | integer (int64) | yes |  |
 
@@ -6500,7 +6500,7 @@ Close a receipt with optional discrepancy override (D-21).
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (CloseReceipt) | yes |  |
 | `data.acknowledged_overrides` | array of integer (int16) | no |  |
-| `data.expected_receipt_version` | integer (int32) | yes | Receipt-header OCC version (per the `expected_<entity>_version` naming convention shared with `AdjustReceivedQty::expected_line_version` and `SetDamageDisposition::expected_damage_version`). |
+| `data.expected_receipt_version` | integer (int32) | yes | Receipt-header OCC version. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.override_grant_id` | string (uuid) or null | no | A supervisor's grant (`supervisor_override_grant`) authorising the discrepancy (code 71) on THIS receipt, for a receiver who does not hold `receipt.override_close_discrepancy`. |
 | `data.receipt_id` | integer (int64) | yes |  |
@@ -6924,7 +6924,7 @@ Receive against an existing ASN line (D-22).
 | `data.damage_info` | object (DamageInfo) or null | no | UC-RCV-09 — ASN F4 damage hot-key sub-flow. |
 | `data.damage_info.reason_code` | string | yes |  |
 | `data.damage_info.reason_description` | string or null | no |  |
-| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.damage_info.vendor_responsibility` | boolean | no |  |
 | `data.external_lot` | string or null | no | Supplier-side lot ID scanned by the operator (cascade tier 4). |
 | `data.idempotency_key` | string (uuid) | yes |  |
@@ -6942,7 +6942,7 @@ Receive against an existing ASN line (D-22).
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string or null | no | Legacy LPN-string input (Phase 1-3). |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — operator-entered native UOM. |
+| `data.uom_received` | string or null | no | For ASN flow, falls back to `receipt_detail.uom` (line-level expected) → `sku.default_uom`. |
 
 **Result**
 
@@ -6952,7 +6952,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.collect_serials` | boolean | yes | Backend-driven gate for the `RCSN01` serial-capture loop (ADR-062, G-12). |
+| `data.collect_serials` | boolean | yes | Backend-driven gate for the `RCSN01` serial-capture loop. |
 | `data.completion_detail` | one of: Pending \| Partial \| Full \| Over | yes | Receipt completion (qty fulfilment). |
 | `data.completion_header` | one of: Pending \| Partial \| Full \| Over | yes | Receipt completion (qty fulfilment). |
 | `data.holds_applied` | array of object (HoldInfo) | yes | D-28 — auto-holds applied to LPN during this receive. |
@@ -7081,7 +7081,7 @@ Open a fully blind receipt + first line.
 | `data.damage_info` | object (DamageInfo) or null | no | UC-RCV-09 — when the operator marks this receive line as damaged (RCDMG_RECV01 flow), the RF client sends a nested DamageInfo payload. |
 | `data.damage_info.reason_code` | string | yes |  |
 | `data.damage_info.reason_description` | string or null | no |  |
-| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.damage_info.vendor_responsibility` | boolean | no |  |
 | `data.external_lot` | string or null | no | Supplier-side lot ID scanned by the operator. |
 | `data.idempotency_key` | string (uuid) | yes |  |
@@ -7101,7 +7101,7 @@ Open a fully blind receipt + first line.
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string or null | no | Legacy LPN-string input. |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — operator-entered native UOM (e.g. |
+| `data.uom_received` | string or null | no | "CS"). When None, resolver falls back to `sku.default_uom`. `qty` field above is interpreted in this UOM; resolver converts to base for storage. |
 
 **Result**
 
@@ -7236,7 +7236,7 @@ Receive a blind SKU line on an existing receipt.
 | `data.damage_info` | object (DamageInfo) or null | no | UC-RCV-09 — see ReceiveBlind.damage_info doc. |
 | `data.damage_info.reason_code` | string | yes |  |
 | `data.damage_info.reason_description` | string or null | no |  |
-| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.damage_info.vendor_responsibility` | boolean | no |  |
 | `data.external_lot` | string or null | no | Supplier-side lot ID scanned by the operator. |
 | `data.idempotency_key` | string (uuid) | yes |  |
@@ -7253,7 +7253,7 @@ Receive a blind SKU line on an existing receipt.
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string or null | no | Legacy LPN-string input. |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered (defaults to sku.default_uom). |
+| `data.uom_received` | string or null | no |  |
 
 **Result**
 
@@ -7386,7 +7386,7 @@ Receive a customer return (RMA flow).
 | `data.damage_info` | object (DamageInfo) or null | no | UC-RCV-09 + UC-RCV-03 — when condition=Damaged operator may also capture severity/reason/description/vendor_responsibility via this nested payload. |
 | `data.damage_info.reason_code` | string | yes |  |
 | `data.damage_info.reason_description` | string or null | no |  |
-| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.damage_info.vendor_responsibility` | boolean | no |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.lot_attributes` | object (map) | no |  |
@@ -7403,7 +7403,7 @@ Receive a customer return (RMA flow).
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string or null | no | Legacy LPN-string input. |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at return. |
+| `data.uom_received` | string or null | no |  |
 
 **Result**
 
@@ -7539,7 +7539,7 @@ Receive an additional line on an existing Customer Return (multi-line F3).
 | `data.damage_info` | object (DamageInfo) or null | no | UC-RCV-09 + UC-RCV-03 — see ReceiveReturn.damage_info doc. |
 | `data.damage_info.reason_code` | string | yes |  |
 | `data.damage_info.reason_description` | string or null | no |  |
-| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.damage_info.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.damage_info.vendor_responsibility` | boolean | no |  |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.lot_attributes` | object (map) | no |  |
@@ -7556,7 +7556,7 @@ Receive an additional line on an existing Customer Return (multi-line F3).
 | `data.to_loc` | string | yes |  |
 | `data.to_lpn` | string or null | no | Legacy LPN-string input. |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at return. |
+| `data.uom_received` | string or null | no |  |
 
 **Result**
 
@@ -7785,14 +7785,14 @@ Report damage on a receipt detail (D-26).
 | `data` | object (ReportDamage) | yes |  |
 | `data.acknowledged_overrides` | array of integer (int16) | no |  |
 | `data.damaged_qty` | number (double) | yes |  |
-| `data.dest_loc` | string or null | no | Optional destination location for an auto-triggered Move primitive (Move Spec §0 D-9, Kanban M-115). |
+| `data.dest_loc` | string or null | no | Where the damaged units are set apart to (owner action Hold or Reject). |
 | `data.idempotency_key` | string (uuid) | yes |  |
-| `data.photo_attachment_ids` | array of string or null | no | Object keys of photos the operator already uploaded with the signed links (`receipt_damage_photo_upload_url`). |
+| `data.photo_attachment_ids` | array of string or null | no |  |
 | `data.reason_code` | string | yes |  |
 | `data.reason_description` | string or null | no |  |
 | `data.receipt_detail_id` | integer (int64) | yes |  |
 | `data.receipt_id` | integer (int64) | yes |  |
-| `data.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
+| `data.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
 | `data.vendor_responsibility` | boolean | no | Operator's assessment: true = vendor responsible (drives ERP vendor-claim event downstream); false (default) = warehouse-eaten / undecided. |
 
 **Result**
@@ -7803,9 +7803,10 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.action_taken` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Per Decisions Log D-26 + T-062 (migration 148). |
+| `data.action_taken` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Action triggered by ReportDamage based on severity + OwnerConfig. |
 | `data.damage_record_id` | integer (int64) | yes |  |
-| `data.holds_applied` | array of object (HoldInfo) | no | Holds applied as a side-effect of severity-mapped action (e.g. |
+| `data.damaged_lpn` | string or null | no | The LPN the damaged units now stand on, when the action set them apart. |
+| `data.holds_applied` | array of object (HoldInfo) | no | Holds on the LPN the damaged units were set apart onto (`Hold` → code='Damaged'). |
 | `data.holds_applied[].code` | string | yes |  |
 | `data.holds_applied[].reason` | string | yes |  |
 | `data.holds_applied[].scope` | object | yes |  |
@@ -7902,7 +7903,7 @@ Set damage disposition marker (Repurpose \| Destroyed) — no physical effect, j
 | `data` | object (SetDamageDisposition) | yes |  |
 | `data.damage_record_id` | integer (int64) | yes |  |
 | `data.disposition` | one of: Repurpose \| Destroyed | yes | Lightweight disposition kinds — explicit enum so callers can't accidentally pass arbitrary strings into the `disposition` column. |
-| `data.expected_damage_version` | integer (int32) | yes | Per-row OCC version (Slice #3, migration 157). |
+| `data.expected_damage_version` | integer (int32) | yes | Per-row OCC version. |
 | `data.idempotency_key` | string (uuid) | yes |  |
 | `data.reason_code` | string | yes |  |
 | `data.reason_description` | string or null | no |  |
@@ -7917,7 +7918,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 |---|---|---|---|
 | `data.damage_record_id` | integer (int64) | yes |  |
 | `data.disposition` | string | yes |  |
-| `data.new_damage_version` | integer (int32) | yes | Post-bump damage_record version (Slice #3). |
+| `data.new_damage_version` | integer (int32) | yes | Post-bump damage_record version. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -8384,7 +8385,7 @@ Add a receipt line atomically while the parent receipt accepts planning changes.
 | `data` | object (ReceiptLinePlanForCreate) | yes | What `create_receipt_detail` receives: the planned line, and optionally the LPN the supplier announced it on (EDI 856 SSCC). |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over or null | no | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over or null | no | Default Pending; updated in recompute_completion. |
 | `data.container_id` | integer (int64) or null | no |  |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string or null | no |  |
@@ -8401,7 +8402,7 @@ Add a receipt line atomically while the parent receipt accepts planning changes.
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26. |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -8414,13 +8415,13 @@ Add a receipt line atomically while the parent receipt accepts planning changes.
 | `data.rma` | string or null | no |  |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold or null | no | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold or null | no |  |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no |  |
 | `data.to_loc` | string or null | no |  |
 | `data.to_lot` | string or null | no |  |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM. |
+| `data.uom_received` | string or null | no | Set by writers via ReceiveLineDefaults resolver. |
 
 **Result**
 
@@ -8432,7 +8433,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string | yes |  |
@@ -8451,7 +8452,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -8464,14 +8465,14 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.rma` | string or null | no |  |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data.to_loc` | string or null | no |  |
 | `data.to_lot` | string or null | no |  |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at receive time (e.g. |
-| `data.version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data.uom_received` | string or null | no | "CS" when receiving 10 cases of 24 EA each). |
+| `data.version` | integer (int32) | yes | Per-line OCC version. |
 
 **Errors**
 
@@ -8608,7 +8609,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string | yes |  |
@@ -8627,7 +8628,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -8640,14 +8641,14 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.rma` | string or null | no |  |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data.to_loc` | string or null | no |  |
 | `data.to_lot` | string or null | no |  |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at receive time (e.g. |
-| `data.version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data.uom_received` | string or null | no | "CS" when receiving 10 cases of 24 EA each). |
+| `data.version` | integer (int32) | yes | Per-line OCC version. |
 
 **Errors**
 
@@ -8708,7 +8709,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string | yes |  |
@@ -8727,7 +8728,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -8740,14 +8741,14 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.rma` | string or null | no |  |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data.to_loc` | string or null | no |  |
 | `data.to_lot` | string or null | no |  |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at receive time (e.g. |
-| `data.version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data.uom_received` | string or null | no | "CS" when receiving 10 cases of 24 EA each). |
+| `data.version` | integer (int32) | yes | Per-line OCC version. |
 
 **Errors**
 
@@ -8808,7 +8809,7 @@ The `result` member of the response is: `{ "data": ReceiptLine }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string | yes |  |
@@ -8828,7 +8829,7 @@ The `result` member of the response is: `{ "data": ReceiptLine }`
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -8842,7 +8843,7 @@ The `result` member of the response is: `{ "data": ReceiptLine }`
 | `data.serial_capture_open` | boolean | yes | A serial capture is open on this line — it can be picked up again. |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data.to_loc` | string or null | no |  |
@@ -8907,7 +8908,7 @@ The `result` member of the response is: `{ "data": ReceiveContext }`
 | Field | Type | Always present | Description |
 |---|---|---|---|
 | `data.base_uom` | string | yes |  |
-| `data.default_location` | string or null | no | The location the receiving window opens with: `owner_config.default_receiving_loc` of the line owner (migration 350). |
+| `data.default_location` | string or null | no |  |
 | `data.expected_lpn` | string or null | no |  |
 | `data.limits` | object (ReceiveLimits) | yes | The over-receipt thresholds in THIS LINE's terms, in base units over the line's open quantity. |
 | `data.limits.approval_possible` | boolean | yes | Between the two, a supervisor's approval (code 27) can clear it. |
@@ -9042,7 +9043,7 @@ The `result` member of the response is: `{ "data": [ReceiptDetail] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].barcode` | string or null | no |  |
 | `data[].best_by_date` | string or null | no |  |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data[].container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data[].delivery_by_date` | string or null | no |  |
 | `data[].effective_date` | string | yes |  |
@@ -9061,7 +9062,7 @@ The `result` member of the response is: `{ "data": [ReceiptDetail] }`
 | `data[].po_detail_id` | integer (int64) or null | no |  |
 | `data[].po_id` | integer (int64) or null | no |  |
 | `data[].qty_adjusted` | number (double) or null | no |  |
-| `data[].qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data[].qty_damaged` | number (double) or null | no |  |
 | `data[].qty_expected` | number (double) or null | no |  |
 | `data[].qty_received` | number (double) or null | no |  |
 | `data[].qty_rejected` | number (double) or null | no |  |
@@ -9074,14 +9075,14 @@ The `result` member of the response is: `{ "data": [ReceiptDetail] }`
 | `data[].rma` | string or null | no |  |
 | `data[].sku` | string | yes |  |
 | `data[].status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data[].target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data[].target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data[].temperature` | number (double) or null | no |  |
 | `data[].to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data[].to_loc` | string or null | no |  |
 | `data[].to_lot` | string or null | no |  |
 | `data[].uom` | string or null | no |  |
-| `data[].uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at receive time (e.g. |
-| `data[].version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data[].uom_received` | string or null | no | "CS" when receiving 10 cases of 24 EA each). |
+| `data[].version` | integer (int32) | yes | Per-line OCC version. |
 
 **Errors**
 
@@ -9192,7 +9193,7 @@ The `result` member of the response is: `{ "data": [ReceiptLine] }`
 | `data[].add_who` | integer (int64) | yes |  |
 | `data[].barcode` | string or null | no |  |
 | `data[].best_by_date` | string or null | no |  |
-| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data[].completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data[].container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data[].delivery_by_date` | string or null | no |  |
 | `data[].effective_date` | string | yes |  |
@@ -9212,7 +9213,7 @@ The `result` member of the response is: `{ "data": [ReceiptLine] }`
 | `data[].po_detail_id` | integer (int64) or null | no |  |
 | `data[].po_id` | integer (int64) or null | no |  |
 | `data[].qty_adjusted` | number (double) or null | no |  |
-| `data[].qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data[].qty_damaged` | number (double) or null | no |  |
 | `data[].qty_expected` | number (double) or null | no |  |
 | `data[].qty_received` | number (double) or null | no |  |
 | `data[].qty_rejected` | number (double) or null | no |  |
@@ -9226,7 +9227,7 @@ The `result` member of the response is: `{ "data": [ReceiptLine] }`
 | `data[].serial_capture_open` | boolean | yes | A serial capture is open on this line — it can be picked up again. |
 | `data[].sku` | string | yes |  |
 | `data[].status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data[].target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data[].target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data[].temperature` | number (double) or null | no |  |
 | `data[].to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data[].to_loc` | string or null | no |  |
@@ -9324,7 +9325,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.add_who` | integer (int64) | yes |  |
 | `data.barcode` | string or null | no |  |
 | `data.best_by_date` | string or null | no |  |
-| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes | Per Decisions Log D-05. |
+| `data.completion` | one of: Pending \| Partial \| Full \| Over | yes |  |
 | `data.container_id` | integer (int64) or null | no | The EXPECTED LPN — the container the supplier announced the goods on. |
 | `data.delivery_by_date` | string or null | no |  |
 | `data.effective_date` | string | yes |  |
@@ -9343,7 +9344,7 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.po_detail_id` | integer (int64) or null | no |  |
 | `data.po_id` | integer (int64) or null | no |  |
 | `data.qty_adjusted` | number (double) or null | no |  |
-| `data.qty_damaged` | number (double) or null | no | Per Decisions Log D-26 (ReportDamage Reject action) and D-05 (completion algorithm). |
+| `data.qty_damaged` | number (double) or null | no |  |
 | `data.qty_expected` | number (double) or null | no |  |
 | `data.qty_received` | number (double) or null | no |  |
 | `data.qty_rejected` | number (double) or null | no |  |
@@ -9356,14 +9357,14 @@ The `result` member of the response is: `{ "data": ReceiptDetail }`
 | `data.rma` | string or null | no |  |
 | `data.sku` | string | yes |  |
 | `data.status` | one of: Open \| InProgress \| OnHold \| Closed \| Cancelled | yes | Receipt lifecycle status — 5 clean values. |
-| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Per Decisions Log D-36. |
+| `data.target_disposition` | one of: Stock \| CrossDock \| Hold | yes | Stock \\| CrossDock \\| Hold. |
 | `data.temperature` | number (double) or null | no |  |
 | `data.to_container_id` | integer (int64) or null | no | The ACTUAL LPN — the container receive put the goods into (the supplier's, or one the operator minted). |
 | `data.to_loc` | string or null | no |  |
 | `data.to_lot` | string or null | no |  |
 | `data.uom` | string or null | no |  |
-| `data.uom_received` | string or null | no | ADR-045 §1 — native UOM as entered by the operator at receive time (e.g. |
-| `data.version` | integer (int32) | yes | Per-line OCC version (Slice #2, migration 156). |
+| `data.uom_received` | string or null | no | "CS" when receiving 10 cases of 24 EA each). |
+| `data.version` | integer (int32) | yes | Per-line OCC version. |
 
 **Errors**
 
@@ -10032,12 +10033,14 @@ The `result` member of the response is: `{ "data": ReceiptDetailDamage }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.applied_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Migration 239 — the owner action that ACTUALLY ran when this row was written (`ReportDamage::handle_damage_action`). |
+| `data.applied_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Only `Reject` adds `damaged_qty` to `receipt_detail.qty_damaged`, so this is what tells a later reader which rows are echoed in that column and which are not — the distinction the line's damage ceiling stands on. |
+| `data.damaged_lpn` | string or null | no | The LPN the damaged units were set apart onto by `ReportDamage` (Hold / Reject). |
 | `data.damaged_qty` | number (double) | yes |  |
 | `data.disposition` | string or null | no | Final disposition decision. |
 | `data.disposition_decided_at` | string or null | no |  |
 | `data.disposition_decided_by` | integer (int64) or null | no |  |
 | `data.disposition_reason` | string or null | no |  |
+| `data.echoed_into_line` | boolean | yes | Whether `ReportDamage` added `damaged_qty` to `receipt_detail.qty_damaged` when it wrote this row. |
 | `data.id` | integer (int64) | yes |  |
 | `data.move_failed` | boolean | yes | TRUE if auto-move to QC/Damage/RTV loc failed. |
 | `data.photo_attachment_ids` | any | no | Phase 2+ attachments (see Spec 04 photo attachments). |
@@ -10047,9 +10050,9 @@ The `result` member of the response is: `{ "data": ReceiptDetailDamage }`
 | `data.receipt_id` | integer (int64) | yes |  |
 | `data.reported_at` | string | yes |  |
 | `data.reported_by` | integer (int64) | yes |  |
-| `data.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
-| `data.vendor_responsibility` | boolean | yes | Migration 161 — operator's assessment at receive: true = vendor is responsible for the damage (drives vendor-claim event in ERP); false (default) = warehouse-eaten / undecided. |
-| `data.version` | integer (int32) | yes | Per-row OCC version (Slice #3, migration 157). |
+| `data.severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
+| `data.vendor_responsibility` | boolean | yes | Audit-only — no Quark business logic branches on it; ERP integration consumes via outbox. |
+| `data.version` | integer (int32) | yes | Per-row OCC version. |
 
 **Errors**
 
@@ -10117,12 +10120,14 @@ The `result` member of the response is: `{ "data": [ReceiptDetailDamage] }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data[].applied_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Migration 239 — the owner action that ACTUALLY ran when this row was written (`ReportDamage::handle_damage_action`). |
+| `data[].applied_action` | one of: None \| Hold \| Reject \| WriteOff \| RTV \| Repurpose \| Destroy | yes | Only `Reject` adds `damaged_qty` to `receipt_detail.qty_damaged`, so this is what tells a later reader which rows are echoed in that column and which are not — the distinction the line's damage ceiling stands on. |
+| `data[].damaged_lpn` | string or null | no | The LPN the damaged units were set apart onto by `ReportDamage` (Hold / Reject). |
 | `data[].damaged_qty` | number (double) | yes |  |
 | `data[].disposition` | string or null | no | Final disposition decision. |
 | `data[].disposition_decided_at` | string or null | no |  |
 | `data[].disposition_decided_by` | integer (int64) or null | no |  |
 | `data[].disposition_reason` | string or null | no |  |
+| `data[].echoed_into_line` | boolean | yes | Whether `ReportDamage` added `damaged_qty` to `receipt_detail.qty_damaged` when it wrote this row. |
 | `data[].id` | integer (int64) | yes |  |
 | `data[].move_failed` | boolean | yes | TRUE if auto-move to QC/Damage/RTV loc failed. |
 | `data[].photo_attachment_ids` | any | no | Phase 2+ attachments (see Spec 04 photo attachments). |
@@ -10132,9 +10137,9 @@ The `result` member of the response is: `{ "data": [ReceiptDetailDamage] }`
 | `data[].receipt_id` | integer (int64) | yes |  |
 | `data[].reported_at` | string | yes |  |
 | `data[].reported_by` | integer (int64) | yes |  |
-| `data[].severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Per migration 084 + D-26. |
-| `data[].vendor_responsibility` | boolean | yes | Migration 161 — operator's assessment at receive: true = vendor is responsible for the damage (drives vendor-claim event in ERP); false (default) = warehouse-eaten / undecided. |
-| `data[].version` | integer (int32) | yes | Per-row OCC version (Slice #3, migration 157). |
+| `data[].severity` | one of: Minor \| Major \| Total \| Cosmetic | yes | Damage classification. |
+| `data[].vendor_responsibility` | boolean | yes | Audit-only — no Quark business logic branches on it; ERP integration consumes via outbox. |
+| `data[].version` | integer (int32) | yes | Per-row OCC version. |
 
 **Errors**
 
@@ -10421,9 +10426,9 @@ Ask for a presigned PUT link to upload one damage photo, for a receipt line.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `byte_size` | integer (uint64) | yes | The size of the file in bytes. |
-| `content_type` | string | yes | The `Content-Type` of the file. |
-| `damage_record_id` | integer (int64) or null | no | The damage record, if it already exists (a photo is added to a saved damage record). |
+| `byte_size` | integer (uint64) | yes |  |
+| `content_type` | string | yes |  |
+| `damage_record_id` | integer (int64) or null | no |  |
 | `receipt_detail_id` | integer (int64) | yes |  |
 | `receipt_id` | integer (int64) | yes |  |
 
@@ -10433,12 +10438,12 @@ The `result` member of the response is: `{ "data": DamagePhotoUploadUrlResult }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.content_type` | string | yes | The `Content-Type` that was signed. |
-| `data.expires_in_secs` | integer (uint64) | yes | How many seconds the link is valid. |
-| `data.max_bytes` | integer (uint64) | yes | The limit for one file, in bytes. |
-| `data.max_photos_per_record` | integer (uint) | yes | How many photos one damage record holds. |
-| `data.object_key` | string | yes | The object key. |
-| `data.upload_url` | string | yes | A signed link for `PUT`. |
+| `data.content_type` | string | yes |  |
+| `data.expires_in_secs` | integer (uint64) | yes |  |
+| `data.max_bytes` | integer (uint64) | yes |  |
+| `data.max_photos_per_record` | integer (uint) | yes |  |
+| `data.object_key` | string | yes |  |
+| `data.upload_url` | string | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -10517,10 +10522,10 @@ The `result` member of the response is: `{ "data": DamagePhotoViewUrlsResult }`
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
-| `data.photos` | array of object (DamagePhotoViewLink) | yes | In the order the keys are stored on the record. |
+| `data.photos` | array of object (DamagePhotoViewLink) | yes |  |
 | `data.photos[].expires_in_secs` | integer (uint64) | yes |  |
 | `data.photos[].object_key` | string | yes |  |
-| `data.photos[].view_url` | string | yes | A signed link for `GET`. |
+| `data.photos[].view_url` | string | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -10750,7 +10755,7 @@ The `result` member of the response is: `{ "data": CaseEnvelope }`
 | `data.case_label` | string | yes |  |
 | `data.container_id` | integer (int64) | yes |  |
 | `data.expected_qty` | number (double) | yes |  |
-| `data.lot_policy_attributes` | array of object (LotAttributePrompt) | yes | Lot-attribute prompt for the case's SKU (ADR-050): each shown attribute pre-filled with the line's ASN-expected value (`value`) and locked (`readonly`) when the line is strict-match. |
+| `data.lot_policy_attributes` | array of object (LotAttributePrompt) | yes | Lot-attribute prompt for the case's SKU: each shown attribute pre-filled with the line's ASN-expected value (`value`) and locked (`readonly`) when the line is strict-match. |
 | `data.lot_policy_attributes[].attrib_code` | string | yes |  |
 | `data.lot_policy_attributes[].descr` | string or null | no |  |
 | `data.lot_policy_attributes[].is_date` | boolean | yes | `true` → this slot is a DATE, not free text: one of the four date columns `lot_policy` carries (`DATE_ATTRIBUTE_CODES`), folded in as a synthetic slot so RF and the web prompt for it alongside the custom attributes. |
@@ -10869,7 +10874,7 @@ The `result` member of the response is: `{ "data": AsnDetails }`
 | `data.qty_received_total` | number (double) | yes |  |
 | `data.receipt_number` | string | yes |  |
 | `data.status` | string | yes |  |
-| `data.version` | integer (int32) | yes | OCC version (per CLAUDE.md classifier rules) — receipt is a stateful entity, downstream commands (`receipt_close` / `receipt_cancel` / `receipt_adjust_received_qty`) carry this on submit. |
+| `data.version` | integer (int32) | yes | OCC version (per CLAUDE guide classifier rules) — receipt is a stateful entity, downstream commands (`receipt_close` / `receipt_cancel` / `receipt_adjust_received_qty`) carry this on submit. |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -11320,7 +11325,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### receipt_create_case_level_asn
 
-Load a case-level ASN (D-69, ADR-046).
+Load a case-level ASN.
 
 | | |
 |---|---|
