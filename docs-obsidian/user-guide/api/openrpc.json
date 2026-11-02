@@ -481853,6 +481853,1637 @@
       },
       "x-quark-wire-result-schema-hash": "sha256:7c3245739748ec7284331d096d9254f743756fca7b30b22196081a574d85cb3f",
       "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_order_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundOrderListRow": {
+              "description": "One row of Orders.",
+              "properties": {
+                "customer": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "order_date": {
+                  "type": "string"
+                },
+                "order_number": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "priority": {
+                  "format": "int32",
+                  "type": "integer"
+                },
+                "requested_ship_date": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "order_date",
+                "order_number",
+                "priority",
+                "status",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundOrderListRow"
+          },
+          "title": "Array_of_OutboundOrderListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Orders list: customer and owner by name, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundOrderListRow": {
+            "description": "One row of Orders.",
+            "properties": {
+              "customer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "order_date": {
+                "type": "string"
+              },
+              "order_number": {
+                "type": "string"
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "priority": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "requested_ship_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "order_date",
+              "order_number",
+              "priority",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundOrderListRow"
+        },
+        "title": "Array_of_OutboundOrderListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:beafc53a0ed7d39d6b077570e1af48e40fe5684dad6b40fef415d536540d316c",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:beafc53a0ed7d39d6b077570e1af48e40fe5684dad6b40fef415d536540d316c",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundOrderListRow": {
+            "description": "One row of Orders.",
+            "properties": {
+              "customer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "order_date": {
+                "type": "string"
+              },
+              "order_number": {
+                "type": "string"
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "priority": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "requested_ship_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "order_date",
+              "order_number",
+              "priority",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundOrderListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundOrderListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:26be9c17a435d8cbe99997fa583197a8fa2ec2e84b6157f43e62bd397b95f243",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_wave_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundWaveListRow": {
+              "description": "One row of Waves.",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "policy_code": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "release_at": {
+                  "default": null,
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "station_location": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "code",
+                "id",
+                "status",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundWaveListRow"
+          },
+          "title": "Array_of_OutboundWaveListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Waves list: release time, station and strategy, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundWaveListRow": {
+            "description": "One row of Waves.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "policy_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "release_at": {
+                "default": null,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "station_location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundWaveListRow"
+        },
+        "title": "Array_of_OutboundWaveListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:08ae40daffac3e51046c40ea5ce77abb1ea6bb6c7b206b3181d3621d9111642f",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:08ae40daffac3e51046c40ea5ce77abb1ea6bb6c7b206b3181d3621d9111642f",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundWaveListRow": {
+            "description": "One row of Waves.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "policy_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "release_at": {
+                "default": null,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "station_location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundWaveListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundWaveListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:90fd35e32045698d93741d2f7515579d91ed50b9d0ead864e3edb049a76d9ce5",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_dispatch_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundDispatchListRow": {
+              "description": "One row of Dispatches, with the dispatch's latest plan and load status.",
+              "properties": {
+                "carrier": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "code": {
+                  "type": "string"
+                },
+                "door": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_ref": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "load_status": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "plan_status": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "code",
+                "id",
+                "status",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundDispatchListRow"
+          },
+          "title": "Array_of_OutboundDispatchListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Dispatches list with each latest plan and load status, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundDispatchListRow": {
+            "description": "One row of Dispatches, with the dispatch's latest plan and load status.",
+            "properties": {
+              "carrier": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "code": {
+                "type": "string"
+              },
+              "door": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "load_status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "plan_status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundDispatchListRow"
+        },
+        "title": "Array_of_OutboundDispatchListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:b9eae7d634833de515dd36113a023d84e783e1bb7fd7b4649032e8f98f828642",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:b9eae7d634833de515dd36113a023d84e783e1bb7fd7b4649032e8f98f828642",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundDispatchListRow": {
+            "description": "One row of Dispatches, with the dispatch's latest plan and load status.",
+            "properties": {
+              "carrier": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "code": {
+                "type": "string"
+              },
+              "door": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "load_status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "plan_status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "id",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundDispatchListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundDispatchListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:8aabc064f4351f98659b99a24e76910bf5d0e03adee71bd4d99261783d97e784",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_load_plan_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundLoadPlanListRow": {
+              "description": "One row of Load plans.",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "dispatch_code": {
+                  "type": "string"
+                },
+                "dispatch_id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "mode": {
+                  "type": "string"
+                },
+                "sequence_policy": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "code",
+                "dispatch_code",
+                "dispatch_id",
+                "id",
+                "mode",
+                "sequence_policy",
+                "status",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundLoadPlanListRow"
+          },
+          "title": "Array_of_OutboundLoadPlanListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Load plans list with each dispatch's number, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundLoadPlanListRow": {
+            "description": "One row of Load plans.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dispatch_code": {
+                "type": "string"
+              },
+              "dispatch_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mode": {
+                "type": "string"
+              },
+              "sequence_policy": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "dispatch_code",
+              "dispatch_id",
+              "id",
+              "mode",
+              "sequence_policy",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundLoadPlanListRow"
+        },
+        "title": "Array_of_OutboundLoadPlanListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:0cb7c24bc4d8a73fee2dee89d3647f2e752a10be8ca29daacea7db5648bf0f76",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:0cb7c24bc4d8a73fee2dee89d3647f2e752a10be8ca29daacea7db5648bf0f76",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundLoadPlanListRow": {
+            "description": "One row of Load plans.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dispatch_code": {
+                "type": "string"
+              },
+              "dispatch_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mode": {
+                "type": "string"
+              },
+              "sequence_policy": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "dispatch_code",
+              "dispatch_id",
+              "id",
+              "mode",
+              "sequence_policy",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundLoadPlanListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundLoadPlanListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:302c1eb8f7767e546ef0f671812fe3f6017f979528fbf1560819dc25851ae033",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_load_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundLoadListRow": {
+              "description": "One row of Loads.",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "dispatch_code": {
+                  "type": "string"
+                },
+                "dispatch_id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "sequence_policy": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "transport_external_ref": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "code",
+                "dispatch_code",
+                "dispatch_id",
+                "id",
+                "sequence_policy",
+                "status",
+                "transport_external_ref",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundLoadListRow"
+          },
+          "title": "Array_of_OutboundLoadListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Loads list with each dispatch's number, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundLoadListRow": {
+            "description": "One row of Loads.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dispatch_code": {
+                "type": "string"
+              },
+              "dispatch_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "sequence_policy": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "transport_external_ref": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "dispatch_code",
+              "dispatch_id",
+              "id",
+              "sequence_policy",
+              "status",
+              "transport_external_ref",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundLoadListRow"
+        },
+        "title": "Array_of_OutboundLoadListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:2820fdd1cebf6f3eb2737d206fdd250607d293ed75ccec8017d1a69ccde36a86",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:2820fdd1cebf6f3eb2737d206fdd250607d293ed75ccec8017d1a69ccde36a86",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundLoadListRow": {
+            "description": "One row of Loads.",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "dispatch_code": {
+                "type": "string"
+              },
+              "dispatch_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "sequence_policy": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "transport_external_ref": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "code",
+              "dispatch_code",
+              "dispatch_id",
+              "id",
+              "sequence_policy",
+              "status",
+              "transport_external_ref",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundLoadListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundLoadListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:a457b5caa3ecd41deb7d9a49ce7abd15ca4ce249fad9f209459a2636de23b29c",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_transport_unit_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "filters",
+          "required": false,
+          "schema": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": "Filter criteria"
+        },
+        {
+          "name": "list_options",
+          "required": false,
+          "schema": {
+            "properties": {
+              "limit": {
+                "type": "integer"
+              },
+              "offset": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Pagination/sorting"
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundTransportUnitListRow": {
+              "description": "One row of Transport units. `status` is `Active` / `Inactive`.",
+              "properties": {
+                "carrier": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "external_ref": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "plate": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "version": {
+                  "format": "int32",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "external_ref",
+                "id",
+                "kind",
+                "status",
+                "version"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundTransportUnitListRow"
+          },
+          "title": "Array_of_OutboundTransportUnitListRow",
+          "type": "array"
+        }
+      },
+      "summary": "Filter and page the Transport units list with carrier and status, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundTransportUnitListRow": {
+            "description": "One row of Transport units. `status` is `Active` / `Inactive`.",
+            "properties": {
+              "carrier": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_ref": {
+                "type": "string"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "plate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "external_ref",
+              "id",
+              "kind",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundTransportUnitListRow"
+        },
+        "title": "Array_of_OutboundTransportUnitListRow",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:b6420b69f7bb7bcc5a9f2176298ad02dc1452f9c6badf6f9f6362ea7618cbfa1",
+      "x-quark-request-schema-hash": "sha256:6e530a8f749659ac9d2a87cf53542bfe9dfd9fc09d7769d71214560f52d323aa",
+      "x-quark-response-schema-hash": "sha256:b6420b69f7bb7bcc5a9f2176298ad02dc1452f9c6badf6f9f6362ea7618cbfa1",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundTransportUnitListRow": {
+            "description": "One row of Transport units. `status` is `Active` / `Inactive`.",
+            "properties": {
+              "carrier": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "external_ref": {
+                "type": "string"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "plate": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": "string"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "external_ref",
+              "id",
+              "kind",
+              "status",
+              "version"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundTransportUnitListRow"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundTransportUnitListRow",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:f3c6e11a4a9d548a42601eb0454e1b8e2b2d0837d88a78afa6724d5e277f2259",
+      "x-quark-wire-result-schema-typed": true
+    },
+    {
+      "name": "outbound_list_summary",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "name": "data",
+          "required": true,
+          "schema": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "definitions": {
+              "OutboundList": {
+                "description": "Which list a summary is of.",
+                "enum": [
+                  "orders",
+                  "waves",
+                  "dispatches",
+                  "load_plans",
+                  "loads",
+                  "transport_units"
+                ],
+                "type": "string"
+              }
+            },
+            "properties": {
+              "list": {
+                "$ref": "#/definitions/OutboundList"
+              },
+              "search": {
+                "default": null,
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "list"
+            ],
+            "title": "OutboundListSummaryInput",
+            "type": "object"
+          },
+          "summary": null
+        }
+      ],
+      "result": {
+        "name": "result",
+        "required": true,
+        "schema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "definitions": {
+            "OutboundListStatusCount": {
+              "description": "One status chip: how many rows the list holds in this status, and how many of them match the search.",
+              "properties": {
+                "matching": {
+                  "format": "int64",
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "total": {
+                  "format": "int64",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "matching",
+                "status",
+                "total"
+              ],
+              "type": "object"
+            }
+          },
+          "items": {
+            "$ref": "#/definitions/OutboundListStatusCount"
+          },
+          "title": "Array_of_OutboundListStatusCount",
+          "type": "array"
+        }
+      },
+      "summary": "Count one outbound list's rows per status, and those matching a search, without writing.",
+      "tags": [
+        {
+          "name": "outbound"
+        }
+      ],
+      "x-quark-context": "outbound",
+      "x-quark-default-roles": [
+        "ADMIN",
+        "MANAGER",
+        "SUPERVISOR",
+        "OPERATOR"
+      ],
+      "x-quark-method-class": "read_model",
+      "x-quark-module": "outbound_lists",
+      "x-quark-module-class": "read_model",
+      "x-quark-operation": "read",
+      "x-quark-override-mode": "replace",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundListStatusCount": {
+            "description": "One status chip: how many rows the list holds in this status, and how many of them match the search.",
+            "properties": {
+              "matching": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "total": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "matching",
+              "status",
+              "total"
+            ],
+            "type": "object"
+          }
+        },
+        "items": {
+          "$ref": "#/definitions/OutboundListStatusCount"
+        },
+        "title": "Array_of_OutboundListStatusCount",
+        "type": "array"
+      },
+      "x-quark-payload-schema-hash": "sha256:d3b7ba2bb28ecd87f693061741a483cecac3175ca61c3650bbe0f399bea130b2",
+      "x-quark-request-schema-hash": "sha256:849e987988e948a8080808071e135cd04fa76bb02f1f1d04537470c19cb815d0",
+      "x-quark-response-schema-hash": "sha256:d3b7ba2bb28ecd87f693061741a483cecac3175ca61c3650bbe0f399bea130b2",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "data",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "OutboundListStatusCount": {
+            "description": "One status chip: how many rows the list holds in this status, and how many of them match the search.",
+            "properties": {
+              "matching": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "status": {
+                "type": "string"
+              },
+              "total": {
+                "format": "int64",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "matching",
+              "status",
+              "total"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/definitions/OutboundListStatusCount"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataRpcResult_for_Array_of_OutboundListStatusCount",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:90bb7de25bbace9fb61c0918f840902e49c954c880103b9cbfacb58c213f5c25",
+      "x-quark-wire-result-schema-typed": true
     }
   ],
   "openrpc": "1.3.2",
@@ -481863,7 +483494,7 @@
     }
   ],
   "x-quark-rpc-catalog": {
-    "classified_method_count": 960,
+    "classified_method_count": 967,
     "context_count": 9,
     "contexts": [
       {
@@ -490483,6 +492114,112 @@
             ]
           },
           {
+            "class": "read_model",
+            "id": "outbound_lists",
+            "method_metadata": [
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_order_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_wave_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_dispatch_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_load_plan_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_load_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_transport_unit_list",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              },
+              {
+                "class": "read_model",
+                "default_roles": [
+                  "ADMIN",
+                  "MANAGER",
+                  "SUPERVISOR",
+                  "OPERATOR"
+                ],
+                "name": "outbound_list_summary",
+                "operation": "read",
+                "override_mode": "replace",
+                "transaction_readiness": "replace_only"
+              }
+            ],
+            "methods": [
+              "outbound_order_list",
+              "outbound_wave_list",
+              "outbound_dispatch_list",
+              "outbound_load_plan_list",
+              "outbound_load_list",
+              "outbound_transport_unit_list",
+              "outbound_list_summary"
+            ]
+          },
+          {
             "class": "mixed",
             "id": "outbound_unit_assignment",
             "method_metadata": [
@@ -495408,7 +497145,7 @@
         ]
       }
     ],
-    "method_count": 960,
-    "module_count": 101
+    "method_count": 967,
+    "module_count": 102
   }
 }

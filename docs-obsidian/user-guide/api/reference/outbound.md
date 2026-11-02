@@ -2,7 +2,7 @@
 
 Shipping: shipment orders, allocation, waves, picking, packing, cartonization and replenishment policies.
 
-This page documents 291 methods of the `outbound` context. It is generated from the OpenRPC catalog. Do not edit it by hand.
+This page documents 298 methods of the `outbound` context. It is generated from the OpenRPC catalog. Do not edit it by hand.
 
 How to read a method entry: see [reference/index.md](index.md). Every call is `POST /api/rpc` with a JSON-RPC 2.0 body. See [03-request-and-response-format.md](../03-request-and-response-format.md).
 
@@ -16,6 +16,7 @@ How to read a method entry: see [reference/index.md](index.md). Every call is `P
 - **cartonization_policy**: [get_cartonization_policy](#get_cartonization_policy), [list_cartonization_policy](#list_cartonization_policy), [delete_cartonization_policy](#delete_cartonization_policy), [delete_many_cartonization_policy](#delete_many_cartonization_policy), [count_cartonization_policy](#count_cartonization_policy), [get_cartonization_policy_detail](#get_cartonization_policy_detail), [list_cartonization_policy_detail](#list_cartonization_policy_detail), [count_cartonization_policy_detail](#count_cartonization_policy_detail), [get_cartonization_policy_detail_form](#get_cartonization_policy_detail_form), [cartonization_policy_view](#cartonization_policy_view), [cartonization_policy_template](#cartonization_policy_template), [cartonization_policy_create](#cartonization_policy_create), [cartonization_policy_save](#cartonization_policy_save), [create_cartonization_policy_form](#create_cartonization_policy_form), [update_cartonization_policy_form](#update_cartonization_policy_form), [create_cartonization_policy_detail_form](#create_cartonization_policy_detail_form), [update_cartonization_policy_detail_form](#update_cartonization_policy_detail_form), [delete_cartonization_policy_detail_form](#delete_cartonization_policy_detail_form), [delete_many_cartonization_policy_detail_form](#delete_many_cartonization_policy_detail_form)
 - **wave**: [wave_get](#wave_get), [wave_card_get](#wave_card_get), [wave_list](#wave_list), [wave_header_get](#wave_header_get), [wave_header_list](#wave_header_list), [wave_preview](#wave_preview), [wave_policy_get](#wave_policy_get), [wave_policy_list](#wave_policy_list), [wave_policy_preview](#wave_policy_preview), [wave_policy_last_run](#wave_policy_last_run), [wave_create](#wave_create), [wave_add_order](#wave_add_order), [wave_remove_order](#wave_remove_order), [wave_cancel](#wave_cancel), [wave_release](#wave_release), [wave_retry_blocked](#wave_retry_blocked), [wave_set_station](#wave_set_station), [wave_set_release_at](#wave_set_release_at), [wave_policy_create](#wave_policy_create), [wave_policy_new](#wave_policy_new), [wave_policy_duplicate](#wave_policy_duplicate), [wave_policy_save](#wave_policy_save), [wave_policy_build](#wave_policy_build)
 - **dispatch**: [dispatch_get](#dispatch_get), [dispatch_list](#dispatch_list), [dispatch_header_get](#dispatch_header_get), [dispatch_header_list](#dispatch_header_list), [dispatch_stop_list](#dispatch_stop_list), [dispatch_order_list](#dispatch_order_list), [dispatch_create](#dispatch_create), [dispatch_add_order](#dispatch_add_order), [dispatch_remove_order](#dispatch_remove_order), [dispatch_stop_add](#dispatch_stop_add), [dispatch_stop_update](#dispatch_stop_update), [dispatch_stop_resequence](#dispatch_stop_resequence), [dispatch_plan](#dispatch_plan), [dispatch_set_door](#dispatch_set_door), [dispatch_set_transport_unit](#dispatch_set_transport_unit), [dispatch_cancel](#dispatch_cancel)
+- **outbound_lists**: [outbound_order_list](#outbound_order_list), [outbound_wave_list](#outbound_wave_list), [outbound_dispatch_list](#outbound_dispatch_list), [outbound_load_plan_list](#outbound_load_plan_list), [outbound_load_list](#outbound_load_list), [outbound_transport_unit_list](#outbound_transport_unit_list), [outbound_list_summary](#outbound_list_summary)
 - **outbound_unit_assignment**: [outbound_unit_assignment_get](#outbound_unit_assignment_get), [outbound_unit_assign](#outbound_unit_assign), [outbound_unit_reassign](#outbound_unit_reassign)
 - **shipment_order**: [get_shipment_order](#get_shipment_order), [list_shipment_order](#list_shipment_order), [count_shipment_order](#count_shipment_order), [get_shipment_order_line](#get_shipment_order_line), [list_shipment_order_line](#list_shipment_order_line), [count_shipment_order_line](#count_shipment_order_line), [get_order_type](#get_order_type), [list_order_type](#list_order_type), [count_order_type](#count_order_type), [find_shipment_order_by_number](#find_shipment_order_by_number), [get_shipment_order_full](#get_shipment_order_full), [get_shipment_order_line_lot_requirements](#get_shipment_order_line_lot_requirements), [shipment_order_fulfilment_list](#shipment_order_fulfilment_list), [shipment_order_shipment_history](#shipment_order_shipment_history)
 - **shipment_order_commands**: [shipment_order_validate](#shipment_order_validate), [shipment_order_create](#shipment_order_create), [shipment_order_update](#shipment_order_update), [shipment_order_release](#shipment_order_release), [shipment_order_cancel](#shipment_order_cancel), [shipment_order_close](#shipment_order_close), [shipment_order_ship](#shipment_order_ship), [shipment_order_ship_preview](#shipment_order_ship_preview), [shipment_order_allocate_preview](#shipment_order_allocate_preview), [shipment_order_allocate](#shipment_order_allocate), [shipment_order_cancel_allocation](#shipment_order_cancel_allocation), [pick_detail_delete](#pick_detail_delete), [shipment_order_line_upsert](#shipment_order_line_upsert), [shipment_order_line_remove](#shipment_order_line_remove), [shipment_order_line_set_lot_requirements](#shipment_order_line_set_lot_requirements), [shipment_order_line_cancel_qty](#shipment_order_line_cancel_qty), [shipment_order_line_adjust_qty](#shipment_order_line_adjust_qty)
@@ -31958,6 +31959,497 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "params": {
     "data": {
       "station_location": "<station_location>"
+    }
+  }
+}'
+```
+
+
+## Module: outbound_lists
+
+### outbound_order_list
+
+Filter and page the Orders list: customer and owner by name, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_order_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundOrderListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].customer` | string or null | no |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].order_date` | string | yes |  |
+| `data[].order_number` | string | yes |  |
+| `data[].owner` | string or null | no |  |
+| `data[].priority` | integer (int32) | yes |  |
+| `data[].requested_ship_date` | string or null | no |  |
+| `data[].status` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_order_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_wave_list
+
+Filter and page the Waves list: release time, station and strategy, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_wave_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundWaveListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].code` | string | yes |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].policy_code` | string or null | no |  |
+| `data[].release_at` | string or null | no |  |
+| `data[].station_location` | string or null | no |  |
+| `data[].status` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_wave_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_dispatch_list
+
+Filter and page the Dispatches list with each latest plan and load status, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_dispatch_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundDispatchListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].carrier` | string or null | no |  |
+| `data[].code` | string | yes |  |
+| `data[].door` | string or null | no |  |
+| `data[].external_ref` | string or null | no |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].load_status` | string or null | no |  |
+| `data[].plan_status` | string or null | no |  |
+| `data[].status` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_dispatch_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_load_plan_list
+
+Filter and page the Load plans list with each dispatch's number, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_load_plan_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundLoadPlanListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].code` | string | yes |  |
+| `data[].dispatch_code` | string | yes |  |
+| `data[].dispatch_id` | integer (int64) | yes |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].mode` | string | yes |  |
+| `data[].sequence_policy` | string | yes |  |
+| `data[].status` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_load_plan_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_load_list
+
+Filter and page the Loads list with each dispatch's number, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_load_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundLoadListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].code` | string | yes |  |
+| `data[].dispatch_code` | string | yes |  |
+| `data[].dispatch_id` | integer (int64) | yes |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].sequence_policy` | string | yes |  |
+| `data[].status` | string | yes |  |
+| `data[].transport_external_ref` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_load_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_transport_unit_list
+
+Filter and page the Transport units list with carrier and status, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_transport_unit_list` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+- In `filters`, a plain value means equals. An object such as `{"$gt": 5}` uses an operator. See 03-request-and-response-format.md.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `filters` | array of object | no | Filter criteria |
+| `list_options` | object | no | Pagination/sorting |
+| `list_options.limit` | integer | no |  |
+| `list_options.offset` | integer | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundTransportUnitListRow] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].carrier` | string or null | no |  |
+| `data[].external_ref` | string | yes |  |
+| `data[].id` | integer (int64) | yes |  |
+| `data[].kind` | string | yes |  |
+| `data[].plate` | string or null | no |  |
+| `data[].status` | string | yes |  |
+| `data[].version` | integer (int32) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 500 | SERVICE_ERROR | `list_options.limit` is above 5000 (the code maps this refusal to the general error). |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_transport_unit_list",
+  "params": {
+    "list_options": {
+      "limit": 10,
+      "offset": 0
+    }
+  }
+}'
+```
+
+### outbound_list_summary
+
+Count one outbound list's rows per status, and those matching a search, without writing.
+
+| | |
+|---|---|
+| Context / module | outbound / outbound_lists |
+| Category | query (read operation; not declared in the catalog) |
+| Operation | read (read_model) |
+| Permission | RBAC resource type `api`, resource code `outbound_list_summary` |
+| Roles that have it by default | ADMIN, MANAGER, SUPERVISOR, OPERATOR |
+
+**Notes**
+
+- This method only reads. It changes nothing and needs no idempotency key.
+
+**Parameters** (the keys of `params`)
+
+| Name | Type | Required | Description |
+|---|---|---|---|
+| `data` | object (OutboundListSummaryInput) | yes |  |
+| `data.list` | one of: orders \| waves \| dispatches \| load_plans \| loads \| transport_units | yes | Which list a summary is of. |
+| `data.search` | string or null | no |  |
+
+**Result**
+
+The `result` member of the response is: `{ "data": [OutboundListStatusCount] }`
+
+| Field | Type | Always present | Description |
+|---|---|---|---|
+| `data[].matching` | integer (int64) | yes |  |
+| `data[].status` | string | yes |  |
+| `data[].total` | integer (int64) | yes |  |
+
+**Errors**
+
+| HTTP | Error | When |
+|---|---|---|
+| 400 | RPC_PARAMS_INVALID | A parameter is missing or has the wrong type. |
+| 401 | NO_AUTH | No valid cookie, API key or service token. |
+| 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
+| 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+
+**Example**
+
+```bash
+curl -s -X POST "$BASE_URL/api/rpc" \
+  -H "Authorization: Bearer $WMS_API_KEY" \
+  -H "X-Warehouse-Id: $WAREHOUSE_ID" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "outbound_list_summary",
+  "params": {
+    "data": {
+      "list": "orders"
     }
   }
 }'

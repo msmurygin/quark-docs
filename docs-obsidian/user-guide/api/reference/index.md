@@ -1,7 +1,7 @@
 # API reference index
 
-This reference lists **960** JSON-RPC methods. It is generated from the production OpenRPC catalog (`openrpc.json`). The catalog holds 960 methods.
-The catalog is the production catalog. No registered method is hidden: the server routes all 960 methods it registers for discovery.
+This reference lists **967** JSON-RPC methods. It is generated from the production OpenRPC catalog (`openrpc.json`). The catalog holds 967 methods.
+The catalog is the production catalog. No registered method is hidden: the server routes all 967 methods it registers for discovery.
 
 ## How to read a method entry
 
@@ -17,7 +17,7 @@ The catalog is the production catalog. No registered method is hidden: the serve
 | Category | Methods |
 |---|---|
 | query | 33 |
-| query (read method, type not declared) | 439 |
+| query (read method, type not declared) | 446 |
 | stateful_command | 137 |
 | stateless_command | 183 |
 | write method, type not declared | 168 |
@@ -539,7 +539,7 @@ The catalog is the production catalog. No registered method is hidden: the serve
 | [update_sku_pick_location](inventory.md#update_sku_pick_location) | stateful_command | Edit a pick location of a SKU on the version read. |
 | [update_sku_serial_config](inventory.md#update_sku_serial_config) | not declared* | Update serial-tracking settings without changing their SKU identity. |
 
-### Outbound (291)
+### Outbound (298)
 
 [outbound.md](outbound.md). Shipping: shipment orders, allocation, waves, picking, packing, cartonization and replenishment policies.
 
@@ -679,9 +679,16 @@ The catalog is the production catalog. No registered method is hidden: the serve
 | [order_control_report_missing](outbound.md#order_control_report_missing) | stateless_command | Report a container of an order's control set missing at the control station. |
 | [order_control_scan](outbound.md#order_control_scan) | stateless_command | Count a container scanned at the control station; the last one completes the order. |
 | [order_control_station_get](outbound.md#order_control_station_get) | query | Read a control station and the orders waiting there for order control. |
+| [outbound_dispatch_list](outbound.md#outbound_dispatch_list) | query* | Filter and page the Dispatches list with each latest plan and load status, without writing. |
+| [outbound_list_summary](outbound.md#outbound_list_summary) | query* | Count one outbound list's rows per status, and those matching a search, without writing. |
+| [outbound_load_list](outbound.md#outbound_load_list) | query* | Filter and page the Loads list with each dispatch's number, without writing. |
+| [outbound_load_plan_list](outbound.md#outbound_load_plan_list) | query* | Filter and page the Load plans list with each dispatch's number, without writing. |
+| [outbound_order_list](outbound.md#outbound_order_list) | query* | Filter and page the Orders list: customer and owner by name, without writing. |
+| [outbound_transport_unit_list](outbound.md#outbound_transport_unit_list) | query* | Filter and page the Transport units list with carrier and status, without writing. |
 | [outbound_unit_assign](outbound.md#outbound_unit_assign) | stateful_command | Assign an unassigned physical root from the confirmed current Order plan (version 0). |
 | [outbound_unit_assignment_get](outbound.md#outbound_unit_assignment_get) | query* | Get unit transport intent, current Order plan and explicit change history. |
 | [outbound_unit_reassign](outbound.md#outbound_unit_reassign) | stateful_command | Explicitly align an assigned physical root with its confirmed current Order plan; no stock movement. |
+| [outbound_wave_list](outbound.md#outbound_wave_list) | query* | Filter and page the Waves list: release time, station and strategy, without writing. |
 | [packing_add](outbound.md#packing_add) | stateless_command | Move picked goods from the pallet being repacked into an open output carton. |
 | [packing_carton_close](outbound.md#packing_carton_close) | stateful_command | Close a package or an output carton with its measured weight; prints its shipping label. |
 | [packing_carton_open](outbound.md#packing_carton_open) | stateless_command | Open the next output carton for a pallet being repacked, by the box's label. |
