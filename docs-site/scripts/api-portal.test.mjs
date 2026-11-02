@@ -36,6 +36,40 @@ test('commands get meta.idempotency_key, queries do not; key is not repeated in 
   assert.equal(q.requestExample.params.meta, undefined);
 });
 
+test('aggregate master-data create examples repeat the validated key in data', () => {
+  for (const name of ['create_owner_full', 'create_pack_with_items', 'create_sku_full']) {
+    const cmd = buildMethodRecord({
+      name,
+      'x-quark-command-type': 'stateless_command',
+      'x-quark-context': 'master_data',
+      'x-quark-module': 'm',
+      'x-quark-operation': 'execute',
+      params: [{
+        name: 'data',
+        required: true,
+        schema: { type: 'object', properties: { idempotency_key: { type: 'string', format: 'uuid' } } },
+      }],
+      result: { schema: { type: 'object' } },
+    });
+    assert.equal(cmd.requestExample.params.meta.idempotency_key, SAMPLE_UUID);
+    assert.equal(cmd.requestExample.params.data.idempotency_key, SAMPLE_UUID);
+  }
+});
+
+test('published aggregate master-data schemas require both idempotency keys', () => {
+  const catalog = JSON.parse(readFileSync(resolve(here, '../../docs-obsidian/user-guide/api/openrpc.json'), 'utf8'));
+  for (const name of ['create_owner_full', 'create_pack_with_items', 'create_sku_full']) {
+    const method = catalog.methods.find((candidate) => candidate.name === name);
+    assert.ok(method, name);
+    const meta = method.params.find((param) => param.name === 'meta');
+    const data = method.params.find((param) => param.name === 'data');
+    assert.equal(meta.required, true, `${name} meta parameter`);
+    assert.ok(meta.schema.required.includes('idempotency_key'), `${name} meta key`);
+    assert.equal(data.required, true, `${name} data parameter`);
+    assert.ok(data.schema.required.includes('idempotency_key'), `${name} data key`);
+  }
+});
+
 test('hoistSchema shares identical definitions and rewrites refs', () => {
   const components = new Map();
   const byHash = new Map();

@@ -1,7 +1,6 @@
 # API reference index
 
-This reference lists **932** JSON-RPC methods. It is generated from the production OpenRPC catalog (`openrpc.json`). The catalog holds 932 methods.
-The catalog is the production catalog. No registered method is hidden: the server routes all 932 methods it registers for discovery.
+This customer reference lists **932** WMS JSON-RPC methods from the published OpenRPC snapshot (`openrpc.json`). Service-internal and non-WMS product surfaces are not included.
 
 ## How to read a method entry
 
@@ -19,8 +18,8 @@ The catalog is the production catalog. No registered method is hidden: the serve
 | query | 23 |
 | query (read method, type not declared) | 438 |
 | stateful_command | 124 |
-| stateless_command | 173 |
-| write method, type not declared | 174 |
+| stateless_command | 175 |
+| write method, type not declared | 172 |
 
 "Type not declared" means the method has no `x-quark-command-type` in the catalog. For a read method the reference still shows the category `query`, inferred from the operation. For a write method it shows `not declared`.
 
@@ -144,10 +143,10 @@ The catalog is the production catalog. No registered method is hidden: the serve
 | [create_owner_address](master_data.md#create_owner_address) | not declared* | Create a new owner_address — CRUD. |
 | [create_owner_bank_account](master_data.md#create_owner_bank_account) | not declared* | Create a new owner_bank_account — CRUD. |
 | [create_owner_config](master_data.md#create_owner_config) | stateless_command | Create the optional configuration owned by one owner. |
-| [create_owner_full](master_data.md#create_owner_full) | not declared* | Create owner with addresses and config in one call |
+| [create_owner_full](master_data.md#create_owner_full) | stateless_command | Create owner with addresses and config in one call |
 | [create_pack](master_data.md#create_pack) | not declared* | Create a pack (header only) |
 | [create_pack_item](master_data.md#create_pack_item) | not declared* | Create a single pack item |
-| [create_pack_with_items](master_data.md#create_pack_with_items) | not declared* | Create a pack with child items |
+| [create_pack_with_items](master_data.md#create_pack_with_items) | stateless_command | Create a pack with child items |
 | [create_putawayzone](master_data.md#create_putawayzone) | not declared* | Create a new putawayzone — CRUD. |
 | [create_putawayzone_lot_commingle](master_data.md#create_putawayzone_lot_commingle) | not declared* | Create a putawayzone lot commingle rule |
 | [create_sku](master_data.md#create_sku) | stateless_command | Create a SKU master-data root after validating its packaging UOM. |

@@ -1760,22 +1760,29 @@ Create a pack with child items.
 | | |
 |---|---|
 | Context / module | master_data / pack |
-| Category | not declared |
+| Category | stateless_command |
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_pack_with_items` |
 | Roles that have it by default | ADMIN, MANAGER, OPERATOR |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (PackForCreate) | yes |  |
+| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
+| `data` | object (CreatePackWithItems) | yes | One immutable create intent. |
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
+| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
 | `data.items` | array of object (PackItemForCreate) | yes |  |
 | `data.items[].cartonize` | boolean or null | no |  |
 | `data.items[].catch_weight_uom` | string or null | no |  |
@@ -1805,7 +1812,9 @@ Create a pack with child items.
 
 **Result**
 
-The `result` member of the response is: `{ "data": Pack }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": Pack }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -1814,43 +1823,43 @@ The `result` member of the response is: `{ "data": Pack }`
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
 | `data.id` | integer (int64) | yes |  |
-| `data.items` | array of object (PackItem) | yes |  |
-| `data.items[].add_when` | string | yes |  |
-| `data.items[].add_who` | integer (int64) | yes |  |
-| `data.items[].base_qty` | number (double) | yes |  |
-| `data.items[].cartonize` | boolean | yes |  |
-| `data.items[].catch_weight_uom` | string or null | no |  |
-| `data.items[].child_pack_item_id` | integer (int64) or null | no |  |
-| `data.items[].cube` | number (double) | yes |  |
-| `data.items[].height` | number (double) | yes |  |
-| `data.items[].hierarchy_level` | integer (int32) | yes |  |
-| `data.items[].id` | integer (int64) | yes |  |
-| `data.items[].is_active` | boolean | yes | ADR-045 §3 — append-only convention. |
-| `data.items[].is_catch_weight` | boolean | yes |  |
-| `data.items[].is_dual_uom` | boolean | yes |  |
-| `data.items[].length` | number (double) | yes |  |
-| `data.items[].max_weight` | number (double) or null | no |  |
-| `data.items[].min_weight` | number (double) or null | no |  |
-| `data.items[].mod_when` | string | yes |  |
-| `data.items[].mod_who` | integer (int64) | yes |  |
-| `data.items[].nominal_weight` | number (double) or null | no |  |
-| `data.items[].pack_id` | integer (int64) | yes |  |
-| `data.items[].pack_revision_id` | integer (int64) | yes |  |
-| `data.items[].pallet_hi` | number (double) | yes |  |
-| `data.items[].pallet_ti` | number (double) | yes |  |
-| `data.items[].pallet_wood_height` | number (double) | yes |  |
-| `data.items[].pallet_wood_length` | number (double) | yes |  |
-| `data.items[].pallet_wood_width` | number (double) | yes |  |
-| `data.items[].qty_per_child` | number (double) or null | no |  |
-| `data.items[].replenish` | boolean | yes |  |
-| `data.items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
-| `data.items[].secondary_uom` | string or null | no |  |
-| `data.items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
-| `data.items[].uom` | string | yes |  |
-| `data.items[].weight` | number (double) | yes |  |
-| `data.items[].width` | number (double) | yes |  |
 | `data.mod_when` | string | yes |  |
 | `data.mod_who` | integer (int64) | yes |  |
+| `data.pack_items` | array of object (PackItem) | yes |  |
+| `data.pack_items[].add_when` | string | yes |  |
+| `data.pack_items[].add_who` | integer (int64) | yes |  |
+| `data.pack_items[].base_qty` | number (double) | yes |  |
+| `data.pack_items[].cartonize` | boolean | yes |  |
+| `data.pack_items[].catch_weight_uom` | string or null | no |  |
+| `data.pack_items[].child_pack_item_id` | integer (int64) or null | no |  |
+| `data.pack_items[].cube` | number (double) | yes |  |
+| `data.pack_items[].height` | number (double) | yes |  |
+| `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
+| `data.pack_items[].id` | integer (int64) | yes |  |
+| `data.pack_items[].is_active` | boolean | yes | Inactive levels stay available to warehouse records that already reference them. |
+| `data.pack_items[].is_catch_weight` | boolean | yes |  |
+| `data.pack_items[].is_dual_uom` | boolean | yes |  |
+| `data.pack_items[].length` | number (double) | yes |  |
+| `data.pack_items[].max_weight` | number (double) or null | no |  |
+| `data.pack_items[].min_weight` | number (double) or null | no |  |
+| `data.pack_items[].mod_when` | string | yes |  |
+| `data.pack_items[].mod_who` | integer (int64) | yes |  |
+| `data.pack_items[].nominal_weight` | number (double) or null | no |  |
+| `data.pack_items[].pack_id` | integer (int64) | yes |  |
+| `data.pack_items[].pack_revision_id` | integer (int64) | yes |  |
+| `data.pack_items[].pallet_hi` | number (double) | yes |  |
+| `data.pack_items[].pallet_ti` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_height` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_length` | number (double) | yes |  |
+| `data.pack_items[].pallet_wood_width` | number (double) | yes |  |
+| `data.pack_items[].qty_per_child` | number (double) or null | no |  |
+| `data.pack_items[].replenish` | boolean | yes |  |
+| `data.pack_items[].rotation_rule` | one of: All90 \| None \| UprightOnly | yes | How this level may be turned when it is packed into a box. |
+| `data.pack_items[].secondary_uom` | string or null | no |  |
+| `data.pack_items[].ship_as_is` | boolean | yes | Explicit factory packaging. |
+| `data.pack_items[].uom` | string | yes |  |
+| `data.pack_items[].weight` | number (double) | yes |  |
+| `data.pack_items[].width` | number (double) | yes |  |
 
 Example response. It shows the shape only. The required fields have placeholder values:
 
@@ -1859,13 +1868,18 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "add_when": "<add_when>",
       "add_who": 1,
       "code": "<code>",
       "descr": "<descr>",
       "id": 1,
-      "items": [
+      "mod_when": "<mod_when>",
+      "mod_who": 1,
+      "pack_items": [
         {
           "add_when": "<add_when>",
           "add_who": 1,
@@ -1895,9 +1909,7 @@ Example response. It shows the shape only. The required fields have placeholder 
           "weight": 1,
           "width": 1
         }
-      ],
-      "mod_when": "<mod_when>",
-      "mod_who": 1
+      ]
     }
   }
 }
@@ -1911,6 +1923,8 @@ Example response. It shows the shape only. The required fields have placeholder 
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -1925,7 +1939,11 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_pack_with_items",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "code": "<code>",
       "descr": "<descr>",
       "items": [
@@ -3625,20 +3643,26 @@ Create owner with addresses and config in one call.
 | | |
 |---|---|
 | Context / module | master_data / owner |
-| Category | not declared |
+| Category | stateless_command |
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_owner_full` |
 | Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (OwnerFullForCreate) | yes |  |
+| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
+| `data` | object (CreateOwnerFull) | yes | Caller-owned create intent. |
 | `data.addresses` | array of object (OwnerAddressForCreateInner) or null | no |  |
 | `data.addresses[].address1` | string or null | no |  |
 | `data.addresses[].address2` | string or null | no |  |
@@ -3697,6 +3721,7 @@ Create owner with addresses and config in one call.
 | `data.config.track_inventory_by` | string or null | no |  |
 | `data.config.weight_uom` | string or null | no |  |
 | `data.config.write_off_gl_account_hint` | string or null | no |  |
+| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
 | `data.owner` | object (OwnerForCreate) | yes |  |
 | `data.owner.code` | string | yes |  |
 | `data.owner.company` | string | yes |  |
@@ -3713,7 +3738,9 @@ Create owner with addresses and config in one call.
 
 **Result**
 
-The `result` member of the response is: `{ "data": OwnerFull }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": OwnerFull }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -3772,6 +3799,8 @@ The `result` member of the response is: `{ "data": OwnerFull }`
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -3786,7 +3815,11 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_owner_full",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "owner": {
         "code": "<code>",
         "company": "<company>",
@@ -9380,18 +9413,23 @@ Create a SKU and optional serial configuration atomically.
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_sku_full` |
 | Roles that have it by default | ADMIN, MANAGER |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog does not say whether this method needs an idempotency key.
+- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (SkuFullForCreate) | yes |  |
+| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
+| `data` | object (CreateSkuFull) | yes | Caller-owned create intent for one SKU aggregate. |
+| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
 | `data.serial_config` | object (SkuSerialConfigForCreateInner) or null | no |  |
 | `data.serial_config.allow_asn_pre_advised` | boolean or null | no |  |
 | `data.serial_config.allow_deferred_capture` | boolean or null | no |  |
@@ -9472,7 +9510,9 @@ Create a SKU and optional serial configuration atomically.
 
 **Result**
 
-The `result` member of the response is: `{ "data": SkuFull }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": SkuFull }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -9531,6 +9571,8 @@ The `result` member of the response is: `{ "data": SkuFull }`
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -9545,7 +9587,11 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_sku_full",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "sku": {
         "code": "<code>",
         "descr": "<descr>",

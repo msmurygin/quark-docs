@@ -1485,7 +1485,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -3655,7 +3655,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -4356,7 +4356,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -5145,7 +5145,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -6202,12 +6202,12 @@
           "properties": {
             "duration_ms": {
               "format": "uint128",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "updated_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -6308,7 +6308,7 @@
                 },
                 "hierarchyLevel": {
                   "format": "uint8",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "hierarchyPath": {
@@ -6678,12 +6678,12 @@
           "properties": {
             "touched_roles": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "upserted": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -9527,7 +9527,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -10413,6 +10413,53 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": true,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "required": [
+              "idempotency_key"
+            ]
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
@@ -10453,7 +10500,7 @@
                     ]
                   },
                   "is_active": {
-                    "description": "ADR-045 §3 — defaults to true on INSERT.",
+                    "description": "Defaults to active when omitted.",
                     "type": [
                       "boolean",
                       "null"
@@ -10556,7 +10603,7 @@
                         "type": "null"
                       }
                     ],
-                    "description": "Как этот уровень разрешено поворачивать. Не прислали — `All90`, умолчание колонки: пока правила не было, класть упаковку как угодно ничто не запрещало."
+                    "description": "How this packaging level may be rotated. Defaults to `All90`."
                   },
                   "secondary_uom": {
                     "type": [
@@ -10596,21 +10643,21 @@
               "RotationRule": {
                 "oneOf": [
                   {
-                    "description": "Все шесть ориентаций.",
+                    "description": "All six right-angle orientations are allowed.",
                     "enum": [
                       "All90"
                     ],
                     "type": "string"
                   },
                   {
-                    "description": "Только естественное положение.",
+                    "description": "Only the natural orientation is allowed.",
                     "enum": [
                       "None"
                     ],
                     "type": "string"
                   },
                   {
-                    "description": "«Этой стороной вверх».",
+                    "description": "Keep this side up.",
                     "enum": [
                       "UprightOnly"
                     ],
@@ -10619,11 +10666,16 @@
                 ]
               }
             },
+            "description": "Pack header, UOM levels, and replay-protection key for this create action.",
             "properties": {
               "code": {
                 "type": "string"
               },
               "descr": {
+                "type": "string"
+              },
+              "idempotency_key": {
+                "format": "uuid",
                 "type": "string"
               },
               "items": {
@@ -10636,9 +10688,10 @@
             "required": [
               "code",
               "descr",
-              "items"
+              "items",
+              "idempotency_key"
             ],
-            "title": "PackForCreate",
+            "title": "CreatePackWithItems",
             "type": "object"
           },
           "summary": null
@@ -10696,7 +10749,7 @@
                   "type": "integer"
                 },
                 "is_active": {
-                  "description": "ADR-045 §3 — append-only convention. UI dropdowns filter to `is_active=true`; FK lookups from receipt_detail / inventory_balances* continue to resolve regardless. Editing a pack means inserting a new row + flipping the old one's flag, not UPDATE-ing master values.",
+                  "description": "Pack items are append-only. User-interface lists show active rows, while existing warehouse records continue to resolve inactive rows.",
                   "type": "boolean"
                 },
                 "is_catch_weight": {
@@ -10781,7 +10834,7 @@
                       "$ref": "#/definitions/RotationRule"
                     }
                   ],
-                  "description": "Как этот уровень разрешено поворачивать при укладке в коробку. Правило стоит здесь, а не на товаре: в коробку кладут упаковку, и «этой стороной вверх» пишут на ней."
+                  "description": "How this packaging level may be rotated when placed in a carton."
                 },
                 "secondary_uom": {
                   "type": [
@@ -10839,21 +10892,21 @@
             "RotationRule": {
               "oneOf": [
                 {
-                  "description": "Все шесть ориентаций.",
+                  "description": "All six right-angle orientations are allowed.",
                   "enum": [
                     "All90"
                   ],
                   "type": "string"
                 },
                 {
-                  "description": "Только естественное положение.",
+                  "description": "Only the natural orientation is allowed.",
                   "enum": [
                     "None"
                   ],
                   "type": "string"
                 },
                 {
-                  "description": "«Этой стороной вверх».",
+                  "description": "Keep this side up.",
                   "enum": [
                     "UprightOnly"
                   ],
@@ -10880,18 +10933,18 @@
               "format": "int64",
               "type": "integer"
             },
-            "items": {
-              "items": {
-                "$ref": "#/definitions/PackItem"
-              },
-              "type": "array"
-            },
             "mod_when": {
               "type": "string"
             },
             "mod_who": {
               "format": "int64",
               "type": "integer"
+            },
+            "pack_items": {
+              "items": {
+                "$ref": "#/definitions/PackItem"
+              },
+              "type": "array"
             }
           },
           "required": [
@@ -10900,9 +10953,9 @@
             "code",
             "descr",
             "id",
-            "items",
             "mod_when",
-            "mod_who"
+            "mod_who",
+            "pack_items"
           ],
           "title": "Pack",
           "type": "object"
@@ -10914,6 +10967,7 @@
           "name": "master_data"
         }
       ],
+      "x-quark-command-type": "stateless_command",
       "x-quark-context": "master_data",
       "x-quark-default-roles": [
         "ADMIN",
@@ -10925,9 +10979,560 @@
       "x-quark-module-class": "mixed",
       "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:969595c5091249376fcc66bd63f498de0701a4d7e693ad94d81ed60614378d56",
-      "x-quark-response-schema-hash": "sha256:f45cb5d96635af870ba877a4bd54bdf0129cc1bf2f2ce6f8685fdcb830a624f1",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "PackItem": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "base_qty": {
+                "format": "double",
+                "type": "number"
+              },
+              "cartonize": {
+                "type": "boolean"
+              },
+              "catch_weight_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "child_pack_item_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "cube": {
+                "format": "double",
+                "type": "number"
+              },
+              "height": {
+                "format": "double",
+                "type": "number"
+              },
+              "hierarchy_level": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "is_active": {
+                "description": "Pack items are append-only. User-interface lists show active rows, while existing warehouse records continue to resolve inactive rows.",
+                "type": "boolean"
+              },
+              "is_catch_weight": {
+                "type": "boolean"
+              },
+              "is_dual_uom": {
+                "type": "boolean"
+              },
+              "length": {
+                "format": "double",
+                "type": "number"
+              },
+              "max_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "min_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "nominal_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "pack_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pack_revision_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pallet_hi": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_ti": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_height": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_length": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_width": {
+                "format": "double",
+                "type": "number"
+              },
+              "qty_per_child": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "replenish": {
+                "type": "boolean"
+              },
+              "rotation_rule": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/RotationRule"
+                  }
+                ],
+                "description": "How this packaging level may be rotated when placed in a carton."
+              },
+              "secondary_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "ship_as_is": {
+                "description": "Explicit factory packaging. Mutually exclusive with `cartonize`.",
+                "type": "boolean"
+              },
+              "uom": {
+                "type": "string"
+              },
+              "weight": {
+                "format": "double",
+                "type": "number"
+              },
+              "width": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "base_qty",
+              "cartonize",
+              "cube",
+              "height",
+              "hierarchy_level",
+              "id",
+              "is_active",
+              "is_catch_weight",
+              "is_dual_uom",
+              "length",
+              "mod_when",
+              "mod_who",
+              "pack_id",
+              "pack_revision_id",
+              "pallet_hi",
+              "pallet_ti",
+              "pallet_wood_height",
+              "pallet_wood_length",
+              "pallet_wood_width",
+              "replenish",
+              "rotation_rule",
+              "ship_as_is",
+              "uom",
+              "weight",
+              "width"
+            ],
+            "type": "object"
+          },
+          "RotationRule": {
+            "oneOf": [
+              {
+                "description": "All six right-angle orientations are allowed.",
+                "enum": [
+                  "All90"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Only the natural orientation is allowed.",
+                "enum": [
+                  "None"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Keep this side up.",
+                "enum": [
+                  "UprightOnly"
+                ],
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "properties": {
+          "add_when": {
+            "type": "string"
+          },
+          "add_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "descr": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "mod_when": {
+            "type": "string"
+          },
+          "mod_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "pack_items": {
+            "items": {
+              "$ref": "#/definitions/PackItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "add_when",
+          "add_who",
+          "code",
+          "descr",
+          "id",
+          "mod_when",
+          "mod_who",
+          "pack_items"
+        ],
+        "title": "Pack",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:51eae99862a3032023359a11e6083c72965594617404407eeb04a303e37f066e",
+      "x-quark-request-schema-hash": "sha256:14746064a9a09e2dcfd6985eeca84975e2c37982a715f6290ac8109592658074",
+      "x-quark-requires-idempotency": true,
+      "x-quark-response-schema-hash": "sha256:51eae99862a3032023359a11e6083c72965594617404407eeb04a303e37f066e",
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "PackItem": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "base_qty": {
+                "format": "double",
+                "type": "number"
+              },
+              "cartonize": {
+                "type": "boolean"
+              },
+              "catch_weight_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "child_pack_item_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "cube": {
+                "format": "double",
+                "type": "number"
+              },
+              "height": {
+                "format": "double",
+                "type": "number"
+              },
+              "hierarchy_level": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "is_active": {
+                "description": "Pack items are append-only. User-interface lists show active rows, while existing warehouse records continue to resolve inactive rows.",
+                "type": "boolean"
+              },
+              "is_catch_weight": {
+                "type": "boolean"
+              },
+              "is_dual_uom": {
+                "type": "boolean"
+              },
+              "length": {
+                "format": "double",
+                "type": "number"
+              },
+              "max_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "min_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "nominal_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "pack_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pack_revision_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pallet_hi": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_ti": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_height": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_length": {
+                "format": "double",
+                "type": "number"
+              },
+              "pallet_wood_width": {
+                "format": "double",
+                "type": "number"
+              },
+              "qty_per_child": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "replenish": {
+                "type": "boolean"
+              },
+              "rotation_rule": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/RotationRule"
+                  }
+                ],
+                "description": "How this packaging level may be rotated when placed in a carton."
+              },
+              "secondary_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "ship_as_is": {
+                "description": "Explicit factory packaging. Mutually exclusive with `cartonize`.",
+                "type": "boolean"
+              },
+              "uom": {
+                "type": "string"
+              },
+              "weight": {
+                "format": "double",
+                "type": "number"
+              },
+              "width": {
+                "format": "double",
+                "type": "number"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "base_qty",
+              "cartonize",
+              "cube",
+              "height",
+              "hierarchy_level",
+              "id",
+              "is_active",
+              "is_catch_weight",
+              "is_dual_uom",
+              "length",
+              "mod_when",
+              "mod_who",
+              "pack_id",
+              "pack_revision_id",
+              "pallet_hi",
+              "pallet_ti",
+              "pallet_wood_height",
+              "pallet_wood_length",
+              "pallet_wood_width",
+              "replenish",
+              "rotation_rule",
+              "ship_as_is",
+              "uom",
+              "weight",
+              "width"
+            ],
+            "type": "object"
+          },
+          "ResultMeta": {
+            "description": "Response control fields. `idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          },
+          "RotationRule": {
+            "oneOf": [
+              {
+                "description": "All six right-angle orientations are allowed.",
+                "enum": [
+                  "All90"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Only the natural orientation is allowed.",
+                "enum": [
+                  "None"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Keep this side up.",
+                "enum": [
+                  "UprightOnly"
+                ],
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "code": {
+                "type": "string"
+              },
+              "descr": {
+                "type": "string"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pack_items": {
+                "items": {
+                  "$ref": "#/definitions/PackItem"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "code",
+              "descr",
+              "id",
+              "mod_when",
+              "mod_who",
+              "pack_items"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_Pack",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:dff0e9e40d4a28bb2168d5b27d267c06804489a63b0010407c47573e1753eafd",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "create_pack_item",
@@ -16489,14 +17094,60 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": true,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "required": [
+              "idempotency_key"
+            ]
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "additionalProperties": false,
             "definitions": {
               "DamageAction": {
-                "description": "Per Decisions Log D-26 + T-062 (migration 148). Action triggered by ReportDamage based on severity + OwnerConfig. The first three are the original on-report actions (just-record / hold-LPN / bump-qty-damaged). The four added in T-062 represent owner policy for auto-routing damage to a final disposition without manual intervention: * WriteOff  — auto-call WriteOffDamage on report (decrement inventory). * RTV       — auto-call MoveDamageToRtv on report (move to RTV staging). * Repurpose — flag disposition='Repurpose' (Phase 2 wires SKU substitute). * Destroy   — flag disposition='Destroyed' (Phase 3 wires regulated paths).",
+                "description": "Action taken when damage of the configured severity is reported: record it, hold or reject the container, write off stock, route it for return, repurpose it or destroy it.",
                 "enum": [
                   "None",
                   "Hold",
@@ -16985,6 +17636,7 @@
                 "type": "string"
               }
             },
+            "description": "Owner, addresses, configuration, and replay-protection key for this create action.",
             "properties": {
               "addresses": {
                 "items": {
@@ -17005,14 +17657,19 @@
                   }
                 ]
               },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              },
               "owner": {
                 "$ref": "#/definitions/OwnerForCreate"
               }
             },
             "required": [
-              "owner"
+              "owner",
+              "idempotency_key"
             ],
-            "title": "OwnerFullForCreate",
+            "title": "CreateOwnerFull",
             "type": "object"
           },
           "summary": null
@@ -17033,7 +17690,7 @@
               "type": "string"
             },
             "DamageAction": {
-              "description": "Per Decisions Log D-26 + T-062 (migration 148). Action triggered by ReportDamage based on severity + OwnerConfig. The first three are the original on-report actions (just-record / hold-LPN / bump-qty-damaged). The four added in T-062 represent owner policy for auto-routing damage to a final disposition without manual intervention: * WriteOff  — auto-call WriteOffDamage on report (decrement inventory). * RTV       — auto-call MoveDamageToRtv on report (move to RTV staging). * Repurpose — flag disposition='Repurpose' (Phase 2 wires SKU substitute). * Destroy   — flag disposition='Destroyed' (Phase 3 wires regulated paths).",
+              "description": "Action taken when damage of the configured severity is reported: record it, hold or reject the container, write off stock, route it for return, repurpose it or destroy it.",
               "enum": [
                 "None",
                 "Hold",
@@ -17046,7 +17703,7 @@
               "type": "string"
             },
             "InventoryTrackingGranularity": {
-              "description": "ADR-046 D-69b — per-receipt inventory tracking granularity. Frozen at receipt creation, never changes after.\n\n- **Aggregate** (default) — pre-case-level behaviour: scan pallet, type qty, single inventory_balances row per pallet. Status quo for non-regulated owners. - **Pallet** — operator scans every case (audit trail in receipt_detail_case) but inventory_balances stays per-pallet. - **Case** — every case becomes its own inventory_balances row. Full case-level traceability for pharma / food / regulated industries.\n\nStored as PG enum `inventory_tracking_granularity` (created in migration 126).",
+              "description": "Inventory tracking granularity copied to each receipt when it is created: aggregate balances, pallet-level case scanning or separate case balances.",
               "enum": [
                 "Aggregate",
                 "Pallet",
@@ -17242,7 +17899,7 @@
                   ]
                 },
                 "confirm_empty_on_move": {
-                  "description": "Count spec Appendix L (wms-app 116): a manual move that takes the last stock of this owner out of its source location asks the operator whether the location is empty.",
+                  "description": "When a manual move takes the owner's last stock from a location, ask the operator to confirm that the location is empty.",
                   "type": "boolean"
                 },
                 "cube_uom": {
@@ -17275,7 +17932,7 @@
                   ]
                 },
                 "default_discard_loc": {
-                  "description": "E.2 (migration 162). Discard-condition returns deposit destination. NULL → write-off without deposit (current behavior, no inventory row); set → deposit through DepositService into this loc.",
+                  "description": "Destination for discarded stock. Leave empty to write off without depositing a new inventory balance.",
                   "type": [
                     "string",
                     "null"
@@ -17319,7 +17976,7 @@
                   ]
                 },
                 "default_receiving_loc": {
-                  "description": "Миграция 350. Ячейка, которую окно приёмки подставляет по умолчанию. NULL = не задана: оператор выбирает сам, как выбирал до 350.",
+                  "description": "Default receiving location shown to the operator. Leave empty to require a manual choice.",
                   "type": [
                     "string",
                     "null"
@@ -17339,7 +17996,7 @@
                   ]
                 },
                 "default_rtv_loc": {
-                  "description": "T-062 (migration 148). Falls back to `default_returns_loc` when NULL; if both NULL, MoveDamageToRtv returns NoRtvLocConfigured error.",
+                  "description": "Return-to-vendor destination. When empty, the default returns location is used; the action is refused when neither location is configured.",
                   "type": [
                     "string",
                     "null"
@@ -17438,7 +18095,7 @@
                   ]
                 },
                 "rtv_gl_account_hint": {
-                  "description": "T-062 (migration 148). ERP GL account hint passed in `damage.rtv_initiated` outbox event (e.g. SAP `1450-RTV-Receivable`).",
+                  "description": "Optional ERP general-ledger account hint included when a return-to-vendor action starts.",
                   "type": [
                     "string",
                     "null"
@@ -17461,7 +18118,7 @@
                   ]
                 },
                 "write_off_gl_account_hint": {
-                  "description": "T-062 (migration 148). ERP GL account hint passed in `damage.written_off` outbox event. ERP may use directly or map through its own table.",
+                  "description": "Optional ERP general-ledger account hint included when damaged stock is written off.",
                   "type": [
                     "string",
                     "null"
@@ -17587,7 +18244,7 @@
               ]
             },
             "picking_toloc": {
-              "description": "Delivery location of this owner's orders for a pick carrier (ADR-091).",
+              "description": "Delivery location for this owner's orders on a pick carrier.",
               "type": [
                 "string",
                 "null"
@@ -17633,6 +18290,7 @@
           "name": "master_data"
         }
       ],
+      "x-quark-command-type": "stateless_command",
       "x-quark-context": "master_data",
       "x-quark-default-roles": [
         "ADMIN",
@@ -17643,9 +18301,1250 @@
       "x-quark-module-class": "mixed",
       "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:a8415181709dd6cb8386e4ec3e3c105760dfb11b57f42a3348991ba2f43a0636",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AllowError": {
+            "enum": [
+              "Allow",
+              "HardError",
+              "Warning"
+            ],
+            "type": "string"
+          },
+          "DamageAction": {
+            "description": "Action taken when damage of the configured severity is reported: record it, hold or reject the container, write off stock, route it for return, repurpose it or destroy it.",
+            "enum": [
+              "None",
+              "Hold",
+              "Reject",
+              "WriteOff",
+              "RTV",
+              "Repurpose",
+              "Destroy"
+            ],
+            "type": "string"
+          },
+          "InventoryTrackingGranularity": {
+            "description": "Inventory tracking granularity copied to each receipt when it is created: aggregate balances, pallet-level case scanning or separate case balances.",
+            "enum": [
+              "Aggregate",
+              "Pallet",
+              "Case"
+            ],
+            "type": "string"
+          },
+          "OwnerAddress": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "address1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address3": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address4": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address_type": {
+                "type": "string"
+              },
+              "city": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "company": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "country": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "is_default": {
+                "type": "boolean"
+              },
+              "iso_country_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "owner_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "phone1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "state": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "zip": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "address_type",
+              "id",
+              "is_default",
+              "mod_when",
+              "mod_who",
+              "owner_id"
+            ],
+            "type": "object"
+          },
+          "OwnerConfig": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "allow_commingled_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_duplicate_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_mixed_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_system_generated_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_close_asn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_close_po": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_print_lpn_on_receive": {
+                "type": "boolean"
+              },
+              "carton_group": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "confirm_empty_on_move": {
+                "description": "When a manual move takes the owner's last stock from a location, ask the operator to confirm that the location is empty.",
+                "type": "boolean"
+              },
+              "cube_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "damage_major_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "damage_minor_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "damage_total_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "default_allocation_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_cartonization_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_discard_loc": {
+                "description": "Destination for discarded stock. Leave empty to write off without depositing a new inventory balance.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_inventory_tracking_granularity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InventoryTrackingGranularity"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "default_lot_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_putaway_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_qc_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_receipt_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_receiving_loc": {
+                "description": "Default receiving location shown to the operator. Leave empty to require a manual choice.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_replenishment_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_returns_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_rtv_loc": {
+                "description": "Return-to-vendor destination. When empty, the default returns location is used; the action is refused when neither location is configured.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_sku_rotation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/SkuRotation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "default_unplanned_case_on_asn": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/AllowError"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dimension_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "hide_expected_qty_from_operator": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lpn_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "lpn_rollback_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "lpn_start_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "next_lpn_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "owner_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pick_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "putaway_reservation_ttl_min": {
+                "description": "Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it.\n\n`None` is not \"no TTL\": it means INHERIT, and `PendingMoveInBmc::resolve_ttl_minutes` falls through to the `system_settings` key `PUTAWAY_RESERVATION_TTL_MIN`. Owner-level because the number is really a walking distance — a deep warehouse needs a longer hold than a two-aisle one.\n\n`chk_owner_config_putaway_ttl` forbids 0 and negatives: a reservation born already expired is not a short hold, it is an insert that always fails (`chk_inventory_pending_move_in_expiry_after_add`).",
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "roll_receipt": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "rtv_gl_account_hint": {
+                "description": "Optional ERP general-ledger account hint included when a return-to-vendor action starts.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "shelf_life_warning_multiplier_pct": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "track_inventory_by": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "weight_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "write_off_gl_account_hint": {
+                "description": "Optional ERP general-ledger account hint included when damaged stock is written off.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "auto_print_lpn_on_receive",
+              "confirm_empty_on_move",
+              "damage_major_action",
+              "damage_minor_action",
+              "damage_total_action",
+              "hide_expected_qty_from_operator",
+              "id",
+              "mod_when",
+              "mod_who",
+              "owner_id",
+              "shelf_life_warning_multiplier_pct"
+            ],
+            "type": "object"
+          },
+          "OwnerType": {
+            "enum": [
+              "Sup",
+              "Cus",
+              "Trn",
+              "Rec",
+              "Con",
+              "Own",
+              "Man",
+              "Dst",
+              "Vnd",
+              "Brk"
+            ],
+            "type": "string"
+          },
+          "SkuRotation": {
+            "description": "Represents SKU rotation policy, determining the order in which stock is picked.\n\n- `Fifo`: First-In-First-Out rotation. - `Lifo`: Last-In-First-Out rotation.\n\nUsed to specify how items are rotated in inventory management.\n\n# Examples\n\n``` use crate::model::sku::SkuRotation; let rotation = SkuRotation::Fifo; assert_eq!(rotation.to_string(), \"Fifo\"); ``` `PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `SkuRotation` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "Fifo",
+              "Lifo",
+              "Fefo"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "add_when": {
+            "type": "string"
+          },
+          "add_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "addresses": {
+            "items": {
+              "$ref": "#/definitions/OwnerAddress"
+            },
+            "type": "array"
+          },
+          "code": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          },
+          "config": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/OwnerConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "credit_limit": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "currency_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "locale": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mod_when": {
+            "type": "string"
+          },
+          "mod_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "owner_type": {
+            "$ref": "#/definitions/OwnerType"
+          },
+          "parent_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "picking_toloc": {
+            "description": "Delivery location for this owner's orders on a pick carrier.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "timezone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "vat": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "add_when",
+          "add_who",
+          "addresses",
+          "code",
+          "company",
+          "id",
+          "mod_when",
+          "mod_who",
+          "owner_type"
+        ],
+        "title": "OwnerFull",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:a05bb0c04ce7e84b0c634a9b7d58bb8c35d93f9f850611a09bf4f214e56d757b",
+      "x-quark-request-schema-hash": "sha256:0fc6a90c79f9c1f879f2ff75e0b28c9f53a76483a92c9c82135390adbfe1f608",
+      "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:a05bb0c04ce7e84b0c634a9b7d58bb8c35d93f9f850611a09bf4f214e56d757b",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AllowError": {
+            "enum": [
+              "Allow",
+              "HardError",
+              "Warning"
+            ],
+            "type": "string"
+          },
+          "DamageAction": {
+            "description": "Action taken when damage of the configured severity is reported: record it, hold or reject the container, write off stock, route it for return, repurpose it or destroy it.",
+            "enum": [
+              "None",
+              "Hold",
+              "Reject",
+              "WriteOff",
+              "RTV",
+              "Repurpose",
+              "Destroy"
+            ],
+            "type": "string"
+          },
+          "InventoryTrackingGranularity": {
+            "description": "Inventory tracking granularity copied to each receipt when it is created: aggregate balances, pallet-level case scanning or separate case balances.",
+            "enum": [
+              "Aggregate",
+              "Pallet",
+              "Case"
+            ],
+            "type": "string"
+          },
+          "OwnerAddress": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "address1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address3": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address4": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "address_type": {
+                "type": "string"
+              },
+              "city": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "company": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "country": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "email": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "is_default": {
+                "type": "boolean"
+              },
+              "iso_country_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "owner_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "phone1": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "phone2": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "state": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "zip": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "address_type",
+              "id",
+              "is_default",
+              "mod_when",
+              "mod_who",
+              "owner_id"
+            ],
+            "type": "object"
+          },
+          "OwnerConfig": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "allow_commingled_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_duplicate_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_mixed_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "allow_system_generated_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_close_asn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_close_po": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "auto_print_lpn_on_receive": {
+                "type": "boolean"
+              },
+              "carton_group": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "confirm_empty_on_move": {
+                "description": "When a manual move takes the owner's last stock from a location, ask the operator to confirm that the location is empty.",
+                "type": "boolean"
+              },
+              "cube_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "damage_major_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "damage_minor_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "damage_total_action": {
+                "$ref": "#/definitions/DamageAction"
+              },
+              "default_allocation_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_cartonization_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_discard_loc": {
+                "description": "Destination for discarded stock. Leave empty to write off without depositing a new inventory balance.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_inventory_tracking_granularity": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/InventoryTrackingGranularity"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "default_lot_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_putaway_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_qc_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_receipt_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_receiving_loc": {
+                "description": "Default receiving location shown to the operator. Leave empty to require a manual choice.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_replenishment_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "default_returns_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_rtv_loc": {
+                "description": "Return-to-vendor destination. When empty, the default returns location is used; the action is refused when neither location is configured.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "default_sku_rotation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/SkuRotation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "default_unplanned_case_on_asn": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/AllowError"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "dimension_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "hide_expected_qty_from_operator": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lpn_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "lpn_rollback_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "lpn_start_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "next_lpn_number": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "owner_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pick_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "putaway_reservation_ttl_min": {
+                "description": "Minutes a directed-putaway location reservation (`inventory_pending_move_in`) is held for this owner's stock before the TTL sweeper releases it.\n\n`None` is not \"no TTL\": it means INHERIT, and `PendingMoveInBmc::resolve_ttl_minutes` falls through to the `system_settings` key `PUTAWAY_RESERVATION_TTL_MIN`. Owner-level because the number is really a walking distance — a deep warehouse needs a longer hold than a two-aisle one.\n\n`chk_owner_config_putaway_ttl` forbids 0 and negatives: a reservation born already expired is not a short hold, it is an insert that always fails (`chk_inventory_pending_move_in_expiry_after_add`).",
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "roll_receipt": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "rtv_gl_account_hint": {
+                "description": "Optional ERP general-ledger account hint included when a return-to-vendor action starts.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "shelf_life_warning_multiplier_pct": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "track_inventory_by": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "weight_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "write_off_gl_account_hint": {
+                "description": "Optional ERP general-ledger account hint included when damaged stock is written off.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "auto_print_lpn_on_receive",
+              "confirm_empty_on_move",
+              "damage_major_action",
+              "damage_minor_action",
+              "damage_total_action",
+              "hide_expected_qty_from_operator",
+              "id",
+              "mod_when",
+              "mod_who",
+              "owner_id",
+              "shelf_life_warning_multiplier_pct"
+            ],
+            "type": "object"
+          },
+          "OwnerType": {
+            "enum": [
+              "Sup",
+              "Cus",
+              "Trn",
+              "Rec",
+              "Con",
+              "Own",
+              "Man",
+              "Dst",
+              "Vnd",
+              "Brk"
+            ],
+            "type": "string"
+          },
+          "ResultMeta": {
+            "description": "Response control fields. `idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          },
+          "SkuRotation": {
+            "description": "Represents SKU rotation policy, determining the order in which stock is picked.\n\n- `Fifo`: First-In-First-Out rotation. - `Lifo`: Last-In-First-Out rotation.\n\nUsed to specify how items are rotated in inventory management.\n\n# Examples\n\n``` use crate::model::sku::SkuRotation; let rotation = SkuRotation::Fifo; assert_eq!(rotation.to_string(), \"Fifo\"); ``` `PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `SkuRotation` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "Fifo",
+              "Lifo",
+              "Fefo"
+            ],
+            "type": "string"
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "addresses": {
+                "items": {
+                  "$ref": "#/definitions/OwnerAddress"
+                },
+                "type": "array"
+              },
+              "code": {
+                "type": "string"
+              },
+              "company": {
+                "type": "string"
+              },
+              "config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/OwnerConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "credit_limit": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "locale": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "owner_type": {
+                "$ref": "#/definitions/OwnerType"
+              },
+              "parent_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "picking_toloc": {
+                "description": "Delivery location for this owner's orders on a pick carrier.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "timezone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "vat": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "addresses",
+              "code",
+              "company",
+              "id",
+              "mod_when",
+              "mod_who",
+              "owner_type"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_OwnerFull",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:ad3391ef2a1410dc5924b6b4c6ba86d99f0524d4447d55b943ef12d993fec768",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "update_owner_full",
@@ -21773,7 +23672,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -28254,7 +30153,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -28403,12 +30302,12 @@
                 "properties": {
                   "end": {
                     "format": "uint",
-                    "minimum": 0.0,
+                    "minimum": 0,
                     "type": "integer"
                   },
                   "start": {
                     "format": "uint",
-                    "minimum": 0.0,
+                    "minimum": 0,
                     "type": "integer"
                   }
                 },
@@ -29164,12 +31063,12 @@
                 "properties": {
                   "end": {
                     "format": "uint",
-                    "minimum": 0.0,
+                    "minimum": 0,
                     "type": "integer"
                   },
                   "start": {
                     "format": "uint",
-                    "minimum": 0.0,
+                    "minimum": 0,
                     "type": "integer"
                   }
                 },
@@ -29799,7 +31698,7 @@
           "properties": {
             "excluded_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "pattern": {
@@ -29813,7 +31712,7 @@
             },
             "total_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -31779,11 +33678,57 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": true,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object",
+            "required": [
+              "idempotency_key"
+            ]
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "additionalProperties": false,
             "definitions": {
               "AbcRotationSpeed": {
                 "description": "Loc/Sku Abc - dependent type, code_list_value\n\n`PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too.",
@@ -31803,7 +33748,7 @@
                 "type": "string"
               },
               "SerialParseMode": {
-                "description": "Per Decisions Log D-32. How serial is extracted from a scanned barcode.",
+                "description": "How a serial number is extracted from a scanned barcode.",
                 "enum": [
                   "None",
                   "Fixed",
@@ -31987,7 +33932,7 @@
                     ]
                   },
                   "pick_instruction": {
-                    "description": "Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`).",
+                    "description": "Standing instruction shown and acknowledged before each pick of this item is confirmed.",
                     "type": [
                       "string",
                       "null"
@@ -32334,7 +34279,12 @@
                 "type": "object"
               }
             },
+            "description": "SKU, optional serial configuration, and replay-protection key for this create action.",
             "properties": {
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              },
               "serial_config": {
                 "anyOf": [
                   {
@@ -32350,9 +34300,10 @@
               }
             },
             "required": [
-              "sku"
+              "sku",
+              "idempotency_key"
             ],
-            "title": "SkuFullForCreate",
+            "title": "CreateSkuFull",
             "type": "object"
           },
           "summary": null
@@ -32382,7 +34333,7 @@
               "type": "string"
             },
             "SerialParseMode": {
-              "description": "Per Decisions Log D-32. How serial is extracted from a scanned barcode.",
+              "description": "How a serial number is extracted from a scanned barcode.",
               "enum": [
                 "None",
                 "Fixed",
@@ -32490,7 +34441,7 @@
                   "type": "string"
                 },
                 "profile_mode": {
-                  "description": "Movement/capture coupling policy (ADR-090).",
+                  "description": "Movement and serial-capture coupling policy.",
                   "type": "string"
                 },
                 "require_unique_global": {
@@ -32557,7 +34508,7 @@
                   ]
                 },
                 "serial_scope": {
-                  "description": "Migration 153 — serial granularity. Tells receive_against_asn / capture_serial how to compute `serials_to_collect_qty` from the operator's submitted qty: - `PerUnit`      → 1 serial per atomic EA (qty_base from pack hierarchy) - `PerCase`      → 1 serial per submitted UOM (typical SSCC) - `PerPallet`    → 1 serial per pack_item.uom='PL' tier - `PerInnerPack` → 1 serial per pack_item.uom='IP' tier Default `PerUnit`. Stored as VARCHAR with CHECK constraint.",
+                  "description": "Serial capture granularity: one serial per unit, submitted case, pallet or inner pack. Defaults to `PerUnit`.",
                   "type": "string"
                 },
                 "serials_per_barcode": {
@@ -32797,7 +34748,7 @@
               ]
             },
             "pick_instruction": {
-              "description": "Standing pick instruction for this item (wms-app 044): shown on every pick of it and acknowledged before the pick commits (RF `PICKINS`).",
+              "description": "Standing instruction shown and acknowledged before each pick of this item is confirmed.",
               "type": [
                 "string",
                 "null"
@@ -32977,9 +34928,1236 @@
       "x-quark-module-class": "mixed",
       "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:5a9c1200642bb93d27964069c160d82837e1269df1c148db3adef8f414b859b4",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AbcRotationSpeed": {
+            "description": "Loc/Sku Abc - dependent type, code_list_value\n\n`PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too.",
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ],
+            "type": "string"
+          },
+          "PutawayClass": {
+            "description": "`PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `PutawayClass` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "None",
+              "NoMix"
+            ],
+            "type": "string"
+          },
+          "SerialParseMode": {
+            "description": "How a serial number is extracted from a scanned barcode.",
+            "enum": [
+              "None",
+              "Fixed",
+              "Bounded"
+            ],
+            "type": "string"
+          },
+          "SkuRotation": {
+            "description": "Represents SKU rotation policy, determining the order in which stock is picked.\n\n- `Fifo`: First-In-First-Out rotation. - `Lifo`: Last-In-First-Out rotation.\n\nUsed to specify how items are rotated in inventory management.\n\n# Examples\n\n``` use crate::model::sku::SkuRotation; let rotation = SkuRotation::Fifo; assert_eq!(rotation.to_string(), \"Fifo\"); ``` `PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `SkuRotation` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "Fifo",
+              "Lifo",
+              "Fefo"
+            ],
+            "type": "string"
+          },
+          "SkuSerialConfig": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "allow_asn_pre_advised": {
+                "type": "boolean"
+              },
+              "allow_deferred_capture": {
+                "description": "Explicit permission to receive inventory before serial capture is complete. Deliberately separate from `allow_receive_capture`, which merely enables capture at the receive checkpoint.",
+                "type": "boolean"
+              },
+              "allow_receive_capture": {
+                "type": "boolean"
+              },
+              "anomaly_block_severity": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "anomaly_max_per_lpn": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anomaly_velocity_threshold_min": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anomaly_vendor_surge_factor": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "check_digit_algorithm": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continuous_serial_tracking": {
+                "description": "Master flag. If false — other fields ignored.",
+                "type": "boolean"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "industry_profile": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "multi_serial_delimiter": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "multi_serial_fixed_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "pick_episode_reassignment_mode": {
+                "description": "Behaviour when a different operator resumes a Pick with an unfinished serial episode.",
+                "type": "string"
+              },
+              "profile_mode": {
+                "description": "Movement and serial-capture coupling policy.",
+                "type": "string"
+              },
+              "require_unique_global": {
+                "type": "boolean"
+              },
+              "serial_auto_increment": {
+                "type": "boolean"
+              },
+              "serial_format": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "serial_increment_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_increment_source_position": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_mask_format": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "serial_parse_frequency": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_parse_mode": {
+                "$ref": "#/definitions/SerialParseMode"
+              },
+              "serial_parse_start_after": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_parse_start_position": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_scope": {
+                "description": "Serial capture granularity: one serial per unit, submitted case, pallet or inner pack. Defaults to `PerUnit`.",
+                "type": "string"
+              },
+              "serials_per_barcode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "sku_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "warranty_period_days": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "allow_asn_pre_advised",
+              "allow_deferred_capture",
+              "allow_receive_capture",
+              "continuous_serial_tracking",
+              "id",
+              "mod_when",
+              "mod_who",
+              "pick_episode_reassignment_mode",
+              "profile_mode",
+              "require_unique_global",
+              "serial_auto_increment",
+              "serial_parse_mode",
+              "serial_scope",
+              "serials_per_barcode",
+              "sku_id"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "Represents a Stock Keeping Unit (SKU), the core entity for inventory items.\n\nEach SKU contains information about the item, its ownership, packaging, classification, fulfillment parameters, and policy references. Timestamps track creation and modification.\n\n# Fields - `id`: Unique SKU identifier. - `external_id`: Optional external reference. - `owner_id`: Owner's identifier. - `code`: SKU code, unique per owner. - `descr`: Description of the SKU. - `pack_id`: Reference to packaging. - `gross_wgt`, `net_wgt`, `cube`: Physical characteristics. - `abc`: ABC rotation speed classification. - `class`, `active`, `sku_group`: Classification and grouping. - `*_policy_id`: Various policy references (allocation, replenishment, etc.). - `on_rec_copy_receipt_number`: Copy receipt number on receipt. - `putaway_loc`, `putawayzone`, `receipt_qc_loc`: Putaway Location details. - `putaway_class`: Putaway class. - `rotation`: SKU rotation policy. - `shelf_life`, `min_shelf_life_on_pick`, `min_shelf_life_on_rec`: Shelf life parameters. - `receipt_hold_code`, `expire_days`, `deliver_by_days`, `best_by_days`: Expiry and delivery codes. - `allow_multi_lot_on_lpn`: Allow multiple lots on license plate number. - `force_separate_lpn_per_lot`: This SKU demands its own container per lot. - `add_who`, `add_when`, `mod_who`, `mod_when`: Audit fields for creation and modification.",
+        "properties": {
+          "abc": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/AbcRotationSpeed"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "add_when": {
+            "type": "string"
+          },
+          "add_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "allocation_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "allow_multi_lot_on_lpn": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "barcode_format_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "best_by_days": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "cartonization_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "class": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "cube": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "default_uom": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "deliver_by_days": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "descr": {
+            "type": "string"
+          },
+          "expire_days": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "force_separate_lpn_per_lot": {
+            "description": "The same prohibition as `allow_multi_lot_on_lpn = false`, asked of the ARRIVING SKU instead of the ones already on the pallet. See [`DEFAULT_FORCE_SEPARATE_LPN_PER_LOT`] for why both exist.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "gross_wgt": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "lot_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "max_age_on_rec": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "max_temperature": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "min_shelf_life_on_pick": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "min_shelf_life_on_rec": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "min_temperature": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "mod_when": {
+            "type": "string"
+          },
+          "mod_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "net_wgt": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "on_rec_copy_receipt_number": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "owner_id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "pack_id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "pack_location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pick_instruction": {
+            "description": "Standing instruction shown and acknowledged before each pick of this item is confirmed.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "positions_required": {
+            "description": "How many adjacent positions of one section this item occupies. `1` is an ordinary item; more means the whole section must be free and its dimensions are measured together.",
+            "format": "int16",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "putaway_class": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/PutawayClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "putaway_loc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "putaway_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "putawayzone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "receipt_hold_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "receipt_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "receipt_qc_loc": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "replenishment_policy_id": {
+            "format": "int64",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "requires_temperature_capture": {
+            "type": "boolean"
+          },
+          "return_location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rotate_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rotation": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/SkuRotation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "serial_config": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/SkuSerialConfig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "shelf_life": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "sku_group": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "stack_limit": {
+            "description": "How high this item may be stacked, whatever the rack allows. `0` is no opinion; the engine takes the minimum of this and `location.stack_limit`, so an item may lower the rack's limit and never raise it.",
+            "format": "int16",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tare_weight": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "warning_temperature_max": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "warning_temperature_min": {
+            "format": "double",
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "add_when",
+          "add_who",
+          "code",
+          "descr",
+          "id",
+          "mod_when",
+          "mod_who",
+          "owner_id",
+          "pack_id",
+          "requires_temperature_capture"
+        ],
+        "title": "SkuFull",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:54034efd9fefca572cb4707e279b21c90588dcf7e578bb6697dff6c3ee926ead",
+      "x-quark-request-schema-hash": "sha256:75296819f479cb39e28ad80dac15a800091693dd731a845db0cd5467e1b85471",
+      "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:54034efd9fefca572cb4707e279b21c90588dcf7e578bb6697dff6c3ee926ead",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AbcRotationSpeed": {
+            "description": "Loc/Sku Abc - dependent type, code_list_value\n\n`PartialEq`/`Eq` are unconditional (not `cfg(test)`) because `CandidateFilter::loc_abc` (phase 2a) holds a `PropRule<AbcRotationSpeed>`, and `CandidateFilter` derives `PartialEq, Eq` outside test code too.",
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ],
+            "type": "string"
+          },
+          "PutawayClass": {
+            "description": "`PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `PutawayClass` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "None",
+              "NoMix"
+            ],
+            "type": "string"
+          },
+          "ResultMeta": {
+            "description": "Response control fields. `idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          },
+          "SerialParseMode": {
+            "description": "How a serial number is extracted from a scanned barcode.",
+            "enum": [
+              "None",
+              "Fixed",
+              "Bounded"
+            ],
+            "type": "string"
+          },
+          "SkuRotation": {
+            "description": "Represents SKU rotation policy, determining the order in which stock is picked.\n\n- `Fifo`: First-In-First-Out rotation. - `Lifo`: Last-In-First-Out rotation.\n\nUsed to specify how items are rotated in inventory management.\n\n# Examples\n\n``` use crate::model::sku::SkuRotation; let rotation = SkuRotation::Fifo; assert_eq!(rotation.to_string(), \"Fifo\"); ``` `PartialEq`/`Eq` are unconditional (not `cfg(test)`): a putaway step now compares `SkuRotation` values outside tests too, via `PropRule::matches` (phase 2b product criteria).",
+            "enum": [
+              "Fifo",
+              "Lifo",
+              "Fefo"
+            ],
+            "type": "string"
+          },
+          "SkuSerialConfig": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "allow_asn_pre_advised": {
+                "type": "boolean"
+              },
+              "allow_deferred_capture": {
+                "description": "Explicit permission to receive inventory before serial capture is complete. Deliberately separate from `allow_receive_capture`, which merely enables capture at the receive checkpoint.",
+                "type": "boolean"
+              },
+              "allow_receive_capture": {
+                "type": "boolean"
+              },
+              "anomaly_block_severity": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "anomaly_max_per_lpn": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anomaly_velocity_threshold_min": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "anomaly_vendor_surge_factor": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "check_digit_algorithm": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "continuous_serial_tracking": {
+                "description": "Master flag. If false — other fields ignored.",
+                "type": "boolean"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "industry_profile": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "multi_serial_delimiter": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "multi_serial_fixed_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "pick_episode_reassignment_mode": {
+                "description": "Behaviour when a different operator resumes a Pick with an unfinished serial episode.",
+                "type": "string"
+              },
+              "profile_mode": {
+                "description": "Movement and serial-capture coupling policy.",
+                "type": "string"
+              },
+              "require_unique_global": {
+                "type": "boolean"
+              },
+              "serial_auto_increment": {
+                "type": "boolean"
+              },
+              "serial_format": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "serial_increment_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_increment_source_position": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_length": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_mask_format": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "serial_parse_frequency": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_parse_mode": {
+                "$ref": "#/definitions/SerialParseMode"
+              },
+              "serial_parse_start_after": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_parse_start_position": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "serial_scope": {
+                "description": "Serial capture granularity: one serial per unit, submitted case, pallet or inner pack. Defaults to `PerUnit`.",
+                "type": "string"
+              },
+              "serials_per_barcode": {
+                "format": "int32",
+                "type": "integer"
+              },
+              "sku_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "warranty_period_days": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "allow_asn_pre_advised",
+              "allow_deferred_capture",
+              "allow_receive_capture",
+              "continuous_serial_tracking",
+              "id",
+              "mod_when",
+              "mod_who",
+              "pick_episode_reassignment_mode",
+              "profile_mode",
+              "require_unique_global",
+              "serial_auto_increment",
+              "serial_parse_mode",
+              "serial_scope",
+              "serials_per_barcode",
+              "sku_id"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "description": "Represents a Stock Keeping Unit (SKU), the core entity for inventory items.\n\nEach SKU contains information about the item, its ownership, packaging, classification, fulfillment parameters, and policy references. Timestamps track creation and modification.\n\n# Fields - `id`: Unique SKU identifier. - `external_id`: Optional external reference. - `owner_id`: Owner's identifier. - `code`: SKU code, unique per owner. - `descr`: Description of the SKU. - `pack_id`: Reference to packaging. - `gross_wgt`, `net_wgt`, `cube`: Physical characteristics. - `abc`: ABC rotation speed classification. - `class`, `active`, `sku_group`: Classification and grouping. - `*_policy_id`: Various policy references (allocation, replenishment, etc.). - `on_rec_copy_receipt_number`: Copy receipt number on receipt. - `putaway_loc`, `putawayzone`, `receipt_qc_loc`: Putaway Location details. - `putaway_class`: Putaway class. - `rotation`: SKU rotation policy. - `shelf_life`, `min_shelf_life_on_pick`, `min_shelf_life_on_rec`: Shelf life parameters. - `receipt_hold_code`, `expire_days`, `deliver_by_days`, `best_by_days`: Expiry and delivery codes. - `allow_multi_lot_on_lpn`: Allow multiple lots on license plate number. - `force_separate_lpn_per_lot`: This SKU demands its own container per lot. - `add_who`, `add_when`, `mod_who`, `mod_when`: Audit fields for creation and modification.",
+            "properties": {
+              "abc": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/AbcRotationSpeed"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "active": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "allocation_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "allow_multi_lot_on_lpn": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "barcode_format_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "best_by_days": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "cartonization_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "class": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "code": {
+                "type": "string"
+              },
+              "cube": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "default_uom": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "deliver_by_days": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "descr": {
+                "type": "string"
+              },
+              "expire_days": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "force_separate_lpn_per_lot": {
+                "description": "The same prohibition as `allow_multi_lot_on_lpn = false`, asked of the ARRIVING SKU instead of the ones already on the pallet. See [`DEFAULT_FORCE_SEPARATE_LPN_PER_LOT`] for why both exist.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "gross_wgt": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "lot_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "max_age_on_rec": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "max_temperature": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "min_shelf_life_on_pick": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "min_shelf_life_on_rec": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "min_temperature": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "net_wgt": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "on_rec_copy_receipt_number": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "owner_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pack_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "pack_location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "pick_instruction": {
+                "description": "Standing instruction shown and acknowledged before each pick of this item is confirmed.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "positions_required": {
+                "description": "How many adjacent positions of one section this item occupies. `1` is an ordinary item; more means the whole section must be free and its dimensions are measured together.",
+                "format": "int16",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "putaway_class": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/PutawayClass"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "putaway_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "putaway_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "putawayzone": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "receipt_hold_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "receipt_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "receipt_qc_loc": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "replenishment_policy_id": {
+                "format": "int64",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "requires_temperature_capture": {
+                "type": "boolean"
+              },
+              "return_location": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rotate_by": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "rotation": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/SkuRotation"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "serial_config": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/SkuSerialConfig"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "shelf_life": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "sku_group": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "stack_limit": {
+                "description": "How high this item may be stacked, whatever the rack allows. `0` is no opinion; the engine takes the minimum of this and `location.stack_limit`, so an item may lower the rack's limit and never raise it.",
+                "format": "int16",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "tare_weight": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "warning_temperature_max": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "warning_temperature_min": {
+                "format": "double",
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "code",
+              "descr",
+              "id",
+              "mod_when",
+              "mod_who",
+              "owner_id",
+              "pack_id",
+              "requires_temperature_capture"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_SkuFull",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:599a4a0cd1b964e828b8e3217e85e3acc5fa2e45950c6d99e2a1c9c9e78b91fa",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "update_sku_full",
@@ -38531,7 +41709,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -39376,7 +42554,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -40703,7 +43881,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -40918,7 +44096,7 @@
             "default": null,
             "description": "Output width. Existing callers omit it and retain the ten-digit format.",
             "format": "uint",
-            "minimum": 0.0,
+            "minimum": 0,
             "type": [
               "integer",
               "null"
@@ -41751,7 +44929,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -46288,7 +49466,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -47823,7 +51001,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -50166,7 +53344,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -57395,7 +60573,7 @@
             "serials_to_collect_qty": {
               "description": "How many serials the operator must collect to satisfy the just- received line. `qty as u32` (floored — serial-tracked SKUs are always integer-unit). Zero when `collect_serials` is `false`.\n\nTHIS call's obligation. The episode may hold more — see `open_episode`.",
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "sku_code": {
@@ -57697,7 +60875,7 @@
           "properties": {
             "details_held": {
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "new_version": {
@@ -57836,7 +61014,7 @@
           "properties": {
             "details_released": {
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "new_version": {
@@ -58297,7 +61475,7 @@
             "holds_released": {
               "description": "Number of Damaged-code holds released as part of write-off.",
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "transaction_log_id": {
@@ -59296,7 +62474,7 @@
             "serials_to_collect_qty": {
               "description": "Number of serials the operator must collect to satisfy this line. `floor(qty)` for serial-tracked SKUs (always integer-unit); zero when `collect_serials` is `false`. THIS call's obligation — the episode may hold more, see `open_episode`.",
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -59886,7 +63064,7 @@
             "serials_to_collect_qty": {
               "description": "Number of serials the operator must collect; `floor(qty)` for serial-tracked SKUs (always integer-unit), zero otherwise. THIS call's obligation — the episode may hold more, see `open_episode`.",
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -65373,7 +68551,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -66764,7 +69942,7 @@
           "schema": {
             "description": "Размер файла в байтах.",
             "format": "uint64",
-            "minimum": 0.0,
+            "minimum": 0,
             "type": "integer"
           },
           "summary": null
@@ -66824,19 +70002,19 @@
             "expires_in_secs": {
               "description": "Сколько секунд ссылка действительна. Не «до какого времени»: часы терминала и сервера расходятся, а разница длительностей — нет.",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "max_bytes": {
               "description": "Предел на один файл, в байтах.",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "max_photos_per_record": {
               "description": "Сколько фотографий держит одна запись о повреждении.",
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "object_key": {
@@ -66905,7 +70083,7 @@
               "properties": {
                 "expires_in_secs": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "object_key": {
@@ -68254,7 +71432,7 @@
           "properties": {
             "case_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "effective_granularity": {
@@ -68278,12 +71456,12 @@
             },
             "line_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "pallet_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "receipt_id": {
@@ -69383,7 +72561,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -72854,7 +76032,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -73368,7 +76546,7 @@
             },
             "fragments_processed": {
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "holds_added": {
@@ -82175,7 +85353,7 @@
               },
               "count": {
                 "format": "uint32",
-                "minimum": 0.0,
+                "minimum": 0,
                 "type": "integer"
               },
               "handling_unit_type_id": {
@@ -107814,7 +110992,7 @@
             },
             "loaded_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "manifest": {
@@ -107825,12 +111003,12 @@
             },
             "remaining_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "required_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "transport": {
@@ -108218,7 +111396,7 @@
             },
             "loaded_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "manifest": {
@@ -108229,12 +111407,12 @@
             },
             "remaining_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "required_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "transport": {
@@ -108518,7 +111696,7 @@
             },
             "serial_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "unit": {
@@ -118205,7 +121383,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -121108,7 +124286,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -122170,7 +125348,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -126453,7 +129631,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -138297,7 +141475,7 @@
                   ]
                 },
                 "contention_deferred": {
-                  "default": 0.0,
+                  "default": 0,
                   "description": "Quantity deferred because another transaction held the inventory lock. Default preserves idempotent results stored by older builds.",
                   "format": "double",
                   "type": "number"
@@ -138377,7 +141555,7 @@
               "properties": {
                 "cartons": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "master_data_divergences": {
@@ -138390,7 +141568,7 @@
                 },
                 "placements": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "plan_id": {
@@ -138399,7 +141577,7 @@
                 },
                 "unplaced": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
@@ -139175,7 +142353,7 @@
               "properties": {
                 "candidate_count": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "input_need": {
@@ -139241,43 +142419,43 @@
               "properties": {
                 "customer_requirement_failed": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "fit_failed": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "held": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "location_not_allocatable": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "lpn_rule_failed": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "pack_mismatch": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "shelf_life_failed": {
                   "description": "Lots rejected on their dates: expired, below the reserve boundary (today + max(`min_shelf_life_on_pick`, `shelf_life`)), or missing an expiration the SKU requires.",
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "step_location_filter_failed": {
                   "format": "uint64",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
@@ -139489,7 +142667,7 @@
               "properties": {
                 "cartons": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "master_data_divergences": {
@@ -139502,7 +142680,7 @@
                 },
                 "placements": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 },
                 "plan_id": {
@@ -139511,7 +142689,7 @@
                 },
                 "unplaced": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
@@ -139555,7 +142733,7 @@
               ]
             },
             "contention_deferred": {
-              "default": 0.0,
+              "default": 0,
               "description": "Quantity deferred because another transaction held the inventory lock. Default preserves idempotent results stored by older builds.",
               "format": "double",
               "type": "number"
@@ -141154,7 +144332,7 @@
           "properties": {
             "children_disposed": {
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "container_id": {
@@ -143529,7 +146707,7 @@
             "balances_moved": {
               "description": "Balances moved; 0 on an `already_closed` answer.",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "drop_code": {
@@ -147487,7 +150665,7 @@
               "max_picks": {
                 "description": "Maximum number of stops to claim in this portion (1..100).",
                 "format": "uint16",
-                "minimum": 0.0,
+                "minimum": 0,
                 "type": "integer"
               },
               "wave_code": {
@@ -149597,7 +152775,7 @@
             },
             "required_serial_count": {
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "sku_code": {
@@ -149975,7 +153153,7 @@
                 },
                 "count": {
                   "format": "uint",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
@@ -150039,7 +153217,7 @@
             },
             "issue_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "issues": {
@@ -158466,7 +161644,7 @@
             "balances_moved": {
               "description": "Balance rows with stock that moved into the new box (0 on `already_replaced`: nothing moved this time).",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "damage_hold_id": {
@@ -172794,12 +175972,12 @@
             },
             "open_positions": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "pending_facts": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "return_blocked_until_count_complete": {
@@ -173140,7 +176318,7 @@
           "properties": {
             "free": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "positions": {
@@ -173154,7 +176332,7 @@
             },
             "total": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -173798,7 +176976,7 @@
           "properties": {
             "free": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "positions": {
@@ -173812,7 +176990,7 @@
             },
             "total": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -174532,7 +177710,7 @@
             "picks": {
               "description": "The picks that left in the box (0: an empty box stayed on the freed position).",
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "position_freed": {
@@ -174693,7 +177871,7 @@
             "picks": {
               "description": "The picks that left in the box (0: an empty box stayed on the freed position).",
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "position_freed": {
@@ -179048,7 +182226,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -179096,7 +182274,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -179618,13 +182796,13 @@
             "deactivated": {
               "description": "Operators whose user lost RF login, went inactive or left the warehouse — deactivated, never deleted (`task.assignee` refers to them).",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "upserted": {
               "description": "Operators created, or refreshed from a user whose login, name or active state had changed.",
               "format": "uint64",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -180418,7 +183596,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -185371,7 +188549,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -185603,7 +188781,7 @@
             "bytes": {
               "items": {
                 "format": "uint8",
-                "minimum": 0.0,
+                "minimum": 0,
                 "type": "integer"
               },
               "type": "array"
@@ -185690,7 +188868,7 @@
           "properties": {
             "row_count": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "rows": {
@@ -186778,7 +189956,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -187590,7 +190768,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -187807,7 +190985,7 @@
             "zpl_bytes": {
               "items": {
                 "format": "uint8",
-                "minimum": 0.0,
+                "minimum": 0,
                 "type": "integer"
               },
               "type": "array"
@@ -187867,7 +191045,7 @@
               "printer_port": {
                 "default": 9100,
                 "format": "uint16",
-                "minimum": 0.0,
+                "minimum": 0,
                 "type": "integer"
               }
             },
@@ -187891,7 +191069,7 @@
           "properties": {
             "bytes_sent": {
               "format": "uint",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             },
             "label_name": {
@@ -188439,7 +191617,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -189296,7 +192474,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -190063,7 +193241,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
@@ -190464,7 +193642,7 @@
                 "screen": true,
                 "ttl": {
                   "format": "uint32",
-                  "minimum": 0.0,
+                  "minimum": 0,
                   "type": "integer"
                 }
               },
@@ -190562,7 +193740,7 @@
             },
             "ttl": {
               "format": "uint32",
-              "minimum": 0.0,
+              "minimum": 0,
               "type": "integer"
             }
           },
@@ -197157,7 +200335,7 @@
         "schema": {
           "$schema": "http://json-schema.org/draft-07/schema#",
           "format": "uint64",
-          "minimum": 0.0,
+          "minimum": 0,
           "title": "uint64",
           "type": "integer"
         }
