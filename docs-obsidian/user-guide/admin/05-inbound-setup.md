@@ -10,6 +10,8 @@ updated: 2026-10-10
 
 Inbound covers receipts (ASN and other receiving documents), quantity tolerances, damage handling, holds and putaway.
 
+After goods have been received and the supplier, prices and currency are complete, issue a goods receipt note from the Receipts list. See [Warehouse Documents](14-warehouse-documents.md).
+
 ## 1. Receipts
 
 ### What you will do
