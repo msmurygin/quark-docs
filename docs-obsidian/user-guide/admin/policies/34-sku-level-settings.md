@@ -59,7 +59,7 @@ are frozen once the warehouse exists.
 | `cartonization_policy_id` | Cartonization Policy | Yes |
 | `receipt_policy_id` | Receipt Policy | Yes |
 | `lot_policy_id` | Lot Policy | Yes |
-| `replenishment_policy_id` | Replenishment Policy | **No. Stored only.** |
+| `replenishment_policy_id` | Replenishment Policy | Yes (min/max planning and task priority) |
 | `barcode_format_id` | API only | **No. Stored only.** |
 | `putaway_loc`, `putawayzone` | Putaway Location, Putaway Zone | Yes (steps "from SKU") |
 | `receipt_qc_loc`, `return_location`, `pack_location` | API only | **No. Stored only.** |
@@ -91,14 +91,16 @@ default (`owner_config.default_*_policy_id`), else none.
 | Allocation | `allocation_policy_id` (nullable) | `default_allocation_policy_id` | `SkuBmc::resolve_allocation_policy`, `sku.rs:950-970` |
 | Putaway | `putaway_policy_id` (nullable) | `default_putaway_policy_id` | `SkuBmc::resolve_putaway_policy`, `sku.rs:867-900` |
 | Cartonization | `cartonization_policy_id` (nullable) | `default_cartonization_policy_id` | `SkuBmc::resolve_cartonization_policy`, `sku.rs:908-923` |
-| Receipt | `receipt_policy_id` (**not null, default 1**) | `default_receipt_policy_id` | `ReceiptValidationService::new`, `wms-inbound/.../validation_service.rs:43-60` |
+| Receipt | `receipt_policy_id` | `default_receipt_policy_id` | receiving validation |
 | Lot | `lot_policy_id` (**not null, default 1**) | `default_lot_policy_id` (no reader) | `deposit.rs:710` |
-| Replenishment | `replenishment_policy_id` (**not null, default 1**) | `default_replenishment_policy_id` (no reader) | none |
+| Replenishment | `replenishment_policy_id` (**not null, default 1**) | `default_replenishment_policy_id` (no reader) | min/max planner |
 
-Important: for Receipt, Lot and Replenishment the SKU column is `NOT NULL DEFAULT 1`. The first step of the
-ladder is therefore never empty, and the owner default never gets a turn.
-For Allocation, Putaway and Cartonization the default was removed in later
-migrations (009 for cartonization) and the owner default works.
+Receipt validation contains a three-step resolver: the SKU policy, the owner's
+default receipt policy when the SKU value is absent, then an error. The standard
+SKU schema and screen currently require the SKU value and default it to policy
+1, so ordinary saved SKUs stop at the first step. Lot and replenishment use the
+policy assigned to the SKU; their owner defaults are not used by the current
+processes.
 
 On the SKU screen all six policy pickers are marked **required**
 (baseline form rows, `is_required = true`; for Putaway it is not required).
@@ -144,10 +146,13 @@ default null. Empty falls to the owner default, then to "no carton".
 - **Column**: `sku.receipt_policy_id`, bigint, not null, default 1, foreign key.
 - **Meaning**: The receiving validation rules (quantity tolerance, date check
   mode, and so on).
-- **Affects**: `validation_service.rs:43-60`.
-- **Interactions**: The owner default is coded as the fallback, but the SKU
-  column can never be null, so the fallback is unreachable.
-- **When empty**: Not possible in the database.
+- **Affects**: Receiving validation.
+- **Interactions**: The resolver gives the SKU policy priority and contains an
+  owner-default fallback. Standard SKU records always have the SKU value, so
+  current UI work does not reach that fallback.
+- **When empty**: The standard database does not allow this state. If a
+  compatible input supplies an SKU without the value, the resolver uses the
+  owner default and stops with an error when that is also absent.
 - **If you change it**: Next receive.
 
 ### Lot Policy
@@ -159,8 +164,8 @@ dates and no attributes.
 ### Replenishment Policy
 
 See [35-replenishment-status.md](35-replenishment-status.md). Column
-`sku.replenishment_policy_id`, not null, default 1. Stored only. It has no
-effect today.
+`sku.replenishment_policy_id`, not null, default 1. The min/max planner uses
+the policy to assign urgency to replenishment work.
 
 ## Part 2: Identity and status
 

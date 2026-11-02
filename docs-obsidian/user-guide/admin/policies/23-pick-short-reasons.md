@@ -257,7 +257,7 @@ What each code causes:
 
 | Effect | `SHORT` | `LPN_NOT_FOUND` | `WRONG_LOCATION` |
 |---|---|---|---|
-| Replenishment | None (there is no replenishment in this version). | None. | None. |
+| Replenishment | None. | None. | None. |
 | Cycle-count trigger | Yes: an Event count of the location, source `ShortPick:SHORT`. | Yes: source `ShortPick:LPN_NOT_FOUND`. | Yes: source `ShortPick:WRONG_LOCATION`. |
 | Hold | No inventory hold. The location is **blocked** by the flag `CycleCountActive`. The count lifts it. | Same. | Same. |
 | Re-allocation | Yes, for the current order and the orders that lost a reservation. | Same. | Same. |
@@ -266,6 +266,10 @@ What each code causes:
 | Zero allowed | Yes. | Yes. | Yes. |
 
 The meaning of the reason codes is the operator's story, not a different treatment:
+
+Pick-short actions do not create replenishment work. Min/max replenishment is
+planned separately, and a partial replenishment confirmation uses its own
+short reason.
 
 - `SHORT`: stock is there but less than the system says.
 - `LPN_NOT_FOUND`: the reserved pallet is not in the location. A pallet is there or not, so no partial quantity.

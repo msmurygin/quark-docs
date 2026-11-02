@@ -29,7 +29,7 @@ The order is left to right. The first level that has a value wins.
 
 | Policy | 1st level | 2nd level | 3rd level or result when nothing is found | Read in code |
 |---|---|---|---|---|
-| **Receipt policy** | `sku.receipt_policy_id` | `owner_config.default_receipt_policy_id` | Refuse the receive: `Receipt Validation Policy for sku <SKU> not found: …` | `wms-inbound/src/service/receipt/validation/validation_service.rs:37-62` |
+| **Receipt policy** | `sku.receipt_policy_id` | `owner_config.default_receipt_policy_id` when the SKU value is absent | Refuse the receive: `Receipt Validation Policy for sku <SKU> not found: …`. The standard SKU schema currently requires the first value. | `wms-inbound/src/service/receipt/validation/validation_service.rs:37-62` |
 | **Putaway policy** | `sku.putaway_policy_id` | `owner_config.default_putaway_policy_id` | No policy: the putaway engine reports `no putaway policy on the SKU or the owner default` | `wms-lib-core/src/model/sku.rs:869-883`, `wms-inventory/src/putaway/policy.rs:144` |
 | **Allocation policy** (looked up when an order line is **created or changed**, then frozen on the line) | `sku.allocation_policy_id` | `owner_config.default_allocation_policy_id` | Refuse the order line: `sku '<sku>' (owner <id>) has no allocation policy — neither the sku nor its owner's default names one; assign one before allocating` | `wms-lib-core/src/model/sku.rs:952-962`, `wms-outbound/src/allocation/policy.rs:118-126`, `:164-195` (new line), `:200-228` (frozen), `service/order/create.rs:177`, `service/order_line/upsert.rs:108` |
 | **Cartonization policy** | `sku.cartonization_policy_id` | `owner_config.default_cartonization_policy_id` | The pick is left out of the carton plan (reason `NoPolicy`); it ships without a planned carton | `wms-lib-core/src/model/sku.rs:910-920`, `wms-outbound/src/cartonization/read_from_db.rs:199`, `reservation.rs:154-160` |
@@ -40,10 +40,10 @@ The order is left to right. The first level that has a value wins.
 | **Count policy** | chosen when a count policy is run (or by its schedule) | none | none | `wms-inventory/src/service/inventory_count_policy/` |
 | **Serial rules** | `sku_serial_config` of the SKU | none (no owner level) | the SKU is not serial tracked | `wms-lib-core/src/model/sku_serial_config.rs` |
 
-Owner and SKU lookups use one SQL statement of the form
-`COALESCE(sku.<x>, owner_config.<x>)` over a `LEFT JOIN` to `owner_config`. A
-missing `owner_config` row therefore behaves like an owner with empty defaults,
-and the SKU's own policy is still used.
+Policy resolution always prefers the SKU value. Receipt validation then checks
+the owner's default when the SKU has no receipt policy. A missing owner
+configuration behaves like an owner with empty defaults, and the SKU's own
+policy is still used.
 
 ## A.2 Why the owner default does not always work
 
@@ -54,7 +54,7 @@ The owner level only works when the SKU column can be empty.
 | `putaway_policy_id` | yes (nullable, no default) | owner default works |
 | `allocation_policy_id` | yes | owner default works |
 | `cartonization_policy_id` | yes | owner default works |
-| `receipt_policy_id` | **no**: `NOT NULL DEFAULT 1` | owner default **never used**. A new SKU gets policy id 1. |
+| `receipt_policy_id` | **no**: `NOT NULL DEFAULT 1` | the resolver supports the owner default when the value is absent, but the standard persisted SKU cannot enter that state |
 | `lot_policy_id` | **no**: `NOT NULL DEFAULT 1` (`001_baseline.sql:2149`) | owner default is not read at all |
 | `replenishment_policy_id` | **no**: `NOT NULL DEFAULT 1` (`001_baseline.sql:2145`) | owner default is not read at all |
 
@@ -224,9 +224,12 @@ These eight fields were meant to drive LPN numbering and LPN content rules. Only
 #### `default_receipt_policy_id` - `Receipt Policy`
 - **Column and type**: bigint → `receipt_policy.id`, `ON DELETE RESTRICT` (wms-app 108). Empty by default.
 - **Meaning**: the receipt policy for this owner's SKUs that have no policy of their own.
-- **Affects**: see A.1 and A.2. **Today it is never reached** because `sku.receipt_policy_id`
-  is never empty.
-- **When you change it**: no effect on current behaviour.
+- **Affects**: the receiving resolver reads this as the second step after the
+  SKU policy. The current standard schema requires the SKU value, so ordinary
+  saved SKUs do not reach the second step.
+- **When you change it**: no standard UI-created SKU changes behaviour. The new
+  default applies if compatible input supplies an SKU without its own receipt
+  policy.
 
 #### `default_putaway_policy_id` - `Putaway Policy`
 - **Column and type**: bigint → `putaway_policy.id`, `ON DELETE RESTRICT`. Empty by default. The dev seed fills it with `STD`.
@@ -369,8 +372,8 @@ not checked against the location table when you save.
 
 There are 42 owner settings (48 columns with `id`, `owner_id` and the four audit columns).
 
-**22 are read by the server**: `allow_mixed_lpn`, `default_receipt_policy_id` (read, but
-never reached, see A.2), `default_putaway_policy_id`, `default_allocation_policy_id`,
+**22 are read by the server**: `allow_mixed_lpn`, `default_receipt_policy_id`,
+`default_putaway_policy_id`, `default_allocation_policy_id`,
 `default_cartonization_policy_id`, `putaway_reservation_ttl_min`, `default_returns_loc`,
 `default_rtv_loc`, `default_discard_loc`, `default_receiving_loc`, `weight_uom`,
 `dimension_uom`, `cube_uom`, `auto_print_lpn_on_receive`,
@@ -390,10 +393,9 @@ never reached, see A.2), `default_putaway_policy_id`, `default_allocation_policy
 
 | # | Finding | Where |
 |---|---|---|
-| 1 | Owner default receipt policy cannot be reached because the SKU column is `NOT NULL DEFAULT 1`. | `001_baseline.sql:2148` |
-| 2 | Owner defaults for lot and replenishment policy have no reader. | search over `*.rs` |
-| 3 | `allow_commingled_lpn` is never read; the checker for code 57 has no caller. | `operations.rs:551-566` |
-| 4 | `default_returns_loc` is not used for returns, only as RTV fallback. | `move_damage_to_rtv.rs:148-156` |
-| 5 | The SKU form marks cartonization and allocation policy as required although the database and the lookup treat empty as "inherit". | `wms-meta-ui 001_baseline.sql:7370`, `:7390` |
-| 6 | The `printer_assignments` column comment says the order is `User → Zone → Owner → Warehouse`; the code does `Zone → User → Owner → Warehouse`. | `001_baseline.sql:3892`, `printer_assignments.rs:170-184` |
-| 7 | A `PUTAWAY_RESERVATION_TTL_MIN` value with letters skips `default_value` and falls to 15. | `pending_move_in.rs:736-741` |
+| 1 | Owner defaults for lot and replenishment policy have no reader. | current policy resolution |
+| 2 | `allow_commingled_lpn` is not used by warehouse work. | owner settings |
+| 3 | `default_returns_loc` is used as an RTV fallback, not as the general returns destination. | damage and RTV handling |
+| 4 | The SKU form marks cartonization and allocation policy as required although an empty value can inherit from the owner. | SKU policy setup |
+| 5 | Printer assignment uses Zone → User → Owner → Warehouse. | printer assignment |
+| 6 | An invalid putaway reservation time falls back to 15 minutes. | putaway reservation |
