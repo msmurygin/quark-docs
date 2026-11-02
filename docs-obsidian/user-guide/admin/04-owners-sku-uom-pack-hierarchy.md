@@ -3,7 +3,7 @@ title: "Administrator Guide - Owners, SKU, UOM, Pack Hierarchy, Lot and Serial R
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-11-02
 ---
 
 # Owners, SKU, UOM, Pack Hierarchy, Lot and Serial Rules
@@ -51,6 +51,10 @@ Form `owner_general_form`:
 | `Company` (required) | Company name. | Up to 45 characters. | `ABC Manufacturing` |
 | `Description` | Free text. | Up to 50 characters. | |
 | `VAT` | Tax number. | Up to 18 characters. | `VAT111222333` |
+| `EIK / BULSTAT` | Bulgarian company identifier used on warehouse documents. | 9 or 13 digits. | `123456789` |
+| `EORI` | Customs identifier. | Two country letters followed by up to 15 letters or digits. | `BG123456789` |
+| `Legal entity of this warehouse` | Makes this owner the issuer on warehouse documents. | On or off. Only one owner per warehouse can be on. | off |
+| `GS1 company prefix` | Prefix used to generate 18-digit SSCCs for this owner's shipping units. | 4 to 12 digits. | `1234567` |
 | `Credit Limit` | Credit limit. | Number. | 500000 |
 | `Currency` | Currency code. | Up to 3 characters (code list `CURRENCY`, 30 values). | `USD` |
 | `Locale` | Language of the partner. | A code from the `locale` registry (`en`, `ru`, `kk`). | `en` |
@@ -97,6 +101,8 @@ Bank account (`owner_bank_acct_edit`): `Bank Name` (required), `Description`, `B
 - Every SKU, receipt, order and stock row belongs to one owner.
 - `Sup` and `Trn` owners are chosen on receipts as `Supplier` and `Carrier`.
 - The carrier's `Delivery location (picker carrier)` is where picked carrier goods are left.
+- Warehouse documents use the legal entity and identifiers from the owner cards. See [Warehouse Documents](14-warehouse-documents.md).
+- An owner without a `GS1 company prefix` can still ship, but its shipping units do not receive an SSCC.
 
 ## 2. Owner settings for the warehouse (tab `WH Settings`)
 

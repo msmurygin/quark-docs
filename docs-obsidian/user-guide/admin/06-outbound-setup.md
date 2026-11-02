@@ -10,6 +10,8 @@ updated: 2026-10-30
 
 Outbound covers shipment orders, allocation, release, picking, cartonization, packing, dispatch planning, loading, Goods Issue and replenishment. The packing action `Repack` is available on the RF terminal (see section 8).
 
+The Shipment Orders list can issue packing lists, pick lists, goods issue notes and CMR documents. See [Warehouse Documents](14-warehouse-documents.md) for prerequisites, PDF download and document printing.
+
 ## 1. Order flow in one picture
 
 ```text
@@ -736,6 +738,7 @@ The terminal validates each decision before changing the Load. A wrong Load numb
 - A newly opened Load has a read-only `LD########` number in the list, card breadcrumb and composition header.
 - `Loading` keeps planned and actual loading facts separate.
 - Goods Issue records shipment history, deducts picked stock, updates serials and order counters, and marks the Load and Dispatch shipped in one transaction.
+- After Goods Issue, issue the final goods issue note from the Shipment Orders list. The issued document is a permanent snapshot and does not change if the order is edited later.
 
 ![Light-theme Shipment tab after Goods Issue](../assets/screens/shipping-goods-issue.jpg)
 

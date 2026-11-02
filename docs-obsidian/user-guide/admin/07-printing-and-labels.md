@@ -3,7 +3,7 @@ title: "Administrator Guide - Printing and Labels"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-30
+updated: 2026-11-02
 ---
 
 # Printing and Labels
@@ -16,8 +16,11 @@ updated: 2026-10-30
 | Label templates | The label layout. | Yes, in the label designer. |
 | Zone printer settings | Default printers in a putaway zone. | Yes. `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`. |
 | Barcode formats | Rules to read scanned barcodes (GS1 and others). | Yes. `Sidebar > Warehouse Configuration > Product Data > Barcode Formats`. |
+| Warehouse documents | Issue, download and print order and receipt PDFs. | Yes, from the Shipment Orders and Receipts lists. |
 
 Labels are made in ZPL for Zebra printers. The server sends the ZPL to the printer's network port (default 9100).
+
+Warehouse documents are PDFs and use printers of kind `Document`, sent over IPP. They are separate from ZPL label printers. Follow [Warehouse Documents](14-warehouse-documents.md) for prerequisites, routing and error messages.
 
 Your site installer connects the printer network and label renderer. Label design has a web screen: open `Sidebar > Overview > Reports`, then click **Label designer**. If the button is not available, ask an Enterprise administrator for label-designer access.
 
