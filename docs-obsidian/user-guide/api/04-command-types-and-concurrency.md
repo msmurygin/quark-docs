@@ -36,18 +36,18 @@ The project rule asks one question:
 | `pick_commit` | stateful | The operator decides on the card they see (the task version). |
 | `shipment_order_release` | stateful | You release the order you reviewed. |
 
-The thought experiment is the rule in `.claude/rules/api-versioning-and-idempotency.md`. The classifier lives on the **method**. A client does not choose it.
+The classifier belongs to the **method**. A client does not choose it.
 
 ### What the catalog declares
 
 | Declared command type | Methods |
 |---|---|
-| `query` | 17 |
-| `stateless_command` | 125 |
-| `stateful_command` | 68 |
-| Not declared | 546 |
+| `query` | 23 |
+| `stateless_command` | 175 |
+| `stateful_command` | 124 |
+| Not declared | 610 |
 
-The 546 methods with no declared type are mostly standard reference-data CRUD: 372 read methods (`get_*`, `list_*`, `count_*`, and read models) and 174 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
+The 610 methods with no declared type are mostly standard reference-data CRUD: 438 read methods (`get_*`, `list_*`, `count_*`, and read models) and 172 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
 
 - Treat an undeclared **read** as a `query`. It is safe to repeat.
 - For an undeclared **write**, the catalog gives no idempotency key and no version check. A repeat can run twice, and two editors can overwrite each other (last write wins). Write such calls so that a repeat is harmless, or check the result before you retry. For example, retry `create_*` only after a `list_*` shows the row is missing.
@@ -89,6 +89,49 @@ More facts from the code:
 - The store belongs to the warehouse you selected (decision D-06 in the code comments). A key is not shared across warehouses.
 - The key must be a valid UUID. Another text gives `RPC_PARAMS_INVALID`.
 - For some "create" commands a missing key is allowed: the server makes one. That protects nothing on a retry. Always send your own key.
+
+### Atomic owner, pack and SKU creation
+
+These aggregate create methods now require replay protection:
+
+| Method | Creates in one transaction |
+|---|---|
+| `create_owner_full` | Owner, addresses and owner configuration |
+| `create_pack_with_items` | Pack header and every UOM level |
+| `create_sku_full` | SKU and its optional serial configuration |
+
+For these three methods, generate one non-zero UUID for the business action and send that same UUID in both places:
+
+```json
+"params": {
+  "meta": {
+    "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+  },
+  "data": {
+    "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
+    "...": "method-specific fields"
+  }
+}
+```
+
+The request is rejected when either value is missing, is the zero UUID, or the two values differ. Do not send `expected_version` or overrides: these are new aggregate creates, not edits of data that you previously read.
+
+If the connection drops, repeat the complete request with the same UUID and unchanged data. A completed first call returns its stored owner, pack or SKU and sets `meta.idempotency_replayed` to `true`. For a genuinely new create action, generate a new UUID.
+
+```mermaid
+flowchart TD
+    A[Start one owner, pack or SKU create action] --> B[Generate one UUID]
+    B --> C[Put the UUID in meta and data]
+    C --> D[Send the aggregate create command]
+    D --> E{Did the client receive a final answer?}
+    E -->|Yes| F[Keep the returned aggregate]
+    E -->|No or unknown| G[Repeat unchanged with the same UUID]
+    G --> H[Server returns the stored result or finishes the action once]
+    H --> F
+    F --> I{Start another create action?}
+    I -->|Yes| B
+    I -->|No| J[End]
+```
 
 ### Example: a safe repeat
 
