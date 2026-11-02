@@ -1,218 +1,159 @@
-# Replenishment: what exists today
+# Replenishment
 
-**Short answer: there is no replenishment engine.** No process looks at pick
-face levels, no process decides that a pick face needs stock, no process
-creates a replenishment task, and no policy says how to do it. A few fields and
-names exist. They are placeholders. This page lists them all so you do not
-look for a switch that is not there.
+Replenishment keeps pick locations supplied from reserve stock. The planner
+checks eligible pick locations, creates work when stock reaches the minimum,
+and sends the work to an operator's RF terminal.
 
-The code says the same. The database comment on the policy table reads:
-"Reserved identity placeholder. No executable replenishment strategy exists
-yet.".
-The meta-ui migration 048 is titled "replenishment is an honest placeholder".
-The dashboard code says: "`replenishment_policy` is a placeholder, nothing
-defines one".
+This guide covers min/max replenishment. It explains the setup, the planning
+rule, the supervisor screen, and the operator flow.
 
-How to read a card: **Screen** is the label and path. **Column** gives the type
-and range. **Affects** states what reads it. Paths are under `crates/libs`
-unless noted.
+## How the process works
 
-## What you can do today
+```mermaid
+flowchart LR
+    A[Check eligible pick locations] --> B{Stock plus stock on the way<br/>at or below minimum?}
+    B -- No --> A
+    B -- Yes --> C{Eligible reserve stock available?}
+    C -- No --> D[Report no source]
+    C -- Yes --> E[Create replenishment work]
+    E --> F[Operator takes the next task]
+    F --> G[Scan source and enter quantity]
+    G --> H[Scan destination]
+    H --> I{Full quantity moved?}
+    I -- Yes --> J[Done]
+    I -- No, with a reason --> K[Shorted]
+```
 
-- Create, list and delete a replenishment policy that has only a code.
-- Select such a policy on a SKU or as an owner default. Nothing happens.
-- Move stock from a bulk location into a pick location with an ordinary
-  **Move**. The system does not suggest it or schedule it.
-- Choose the move label `replenishment` through the API (see below). It only
-  labels the transaction and applies a destination check.
+The planner creates work when the quantity already in the pick location plus
+the quantity already on the way is at or below the location minimum. It plans
+enough stock to move toward the maximum, in whole units of the location UOM.
 
-## What you cannot do
+Stock already on the way counts toward the level. Running the planner again
+does not create a duplicate for the same shortage.
 
-- Set a minimum or maximum level for a pick face.
-- Set a trigger (threshold, time, wave, demand).
-- Get replenishment tasks on the RF.
-- Generate let-down moves.
-- Order the sources of replenishment.
+## Before you start
 
-## Part 1: The policy table
+Configure all of the following:
 
-### Replenishment Policy (`replenishment_policy`)
+1. Give the pick location a **Min Qty**, **Max Qty**, and **UOM**.
+2. Open the location's putaway zone and select **Replenishment Allowed**.
+3. Assign a **Replenishment Policy** to the SKU.
+4. Keep eligible reserve stock for the same owner and SKU in a **Case**,
+   **Pick**, or **SpeedPick** location. The source must be available, have no
+   blocking location flag, and must not be one of that SKU's pick locations.
+5. Give the operator access to replenishment work in the applicable work area.
 
-- **Screen**: Main menu **Policy** > **Replenishment Policy**. The list form
-  `replenishment_policy_list_form` has create, list and delete. The edit form
-  has one field: the code. Existing rows have no edit door because the code
-  is the only field and it cannot change.
-- **Columns**: `id` bigint, `code` varchar(10) not null (unique), plus audit
-  columns. Nothing else.
-- **Default**: no default. Seed: one row, `STD`, id 1 (baseline:8696-8698).
-- **Meaning**: An identity only. It names nothing executable.
-- **Affects**: Nothing reads it to make a decision. Search: `grep -rn
-  "replenishment_policy" crates --include=*.rs` outside the model, the RPC and
-  the SKU and owner field lists returns only comments.
-  Stored only. It has no effect today.
-- **Example**: Create `FAST`. Nothing changes in any process.
-- **Interactions**: Delete is refused while a SKU points at it (foreign key
-  restrict). Owner config references are cleared on delete (set null).
-- **When empty**: n/a.
-- **If you change it**: Nothing happens to stock or orders.
-- **RPCs**: `create_replenishment_policy` (Admin, Manager),
-  `get_replenishment_policy`, `list_replenishment_policy`,
-  `count_replenishment_policy` (Admin, Manager, Operator, Viewer), delete and
-  delete-many (Admin, Manager).
+The location UOM must still exist in the SKU's active pack. If it does not,
+the planner cannot convert the minimum and maximum to base units and skips the
+location.
 
-### Replenishment policy detail (`replenishment_policy_detail`)
+Continuously serial-tracked SKUs are not included in min/max planning.
 
-- **Screen**: None. The screens and writes were removed (meta-ui migration 048).
-- **Columns**: `id`, `replenishment_policy_id` (cascade on delete),
-  `step_num` varchar(5), audit columns.
-- **Meaning**: A "retired compatibility read model". `step_num` alone is not an
-  executable step (table comment, wms-app migration 024).
-- **Affects**: Read-only RPCs only: `get_replenishment_policy_detail`,
-  `list_replenishment_policy_detail`, `count_replenishment_policy_detail`.
-  No writer exists. Stored only. It has no
-  effect today.
-- **If you change it**: Cannot be changed through the API.
+## Configure the replenishment policy
 
-## Part 2: Fields that point at a policy
+Open **Policy > Replenishment Policy**, then open a policy from the list.
 
-### SKU: Replenishment Policy
+The policy controls task priority:
 
-- **Screen**: SKU > Policies > **Replenishment Policy** (picker, required on
-  screen).
-- **Column**: `sku.replenishment_policy_id`, bigint, **not null, default 1**,
-  foreign key to `replenishment_policy`, delete restricted
-  (`001_baseline.sql:2145`).
-- **Affects**: Stored only. It has no effect today. Search: `grep -rn
-  "replenishment_policy_id" crates --include=*.rs` returns the model, the SKU
-  and owner RPCs, test fixtures and nothing that decides anything.
-- **Example**: Set `FAST` on SKU A. Nothing changes.
-- **Interactions**: The owner default cannot take over, because this column
-  is never empty.
-- **When empty**: Not possible.
-- **If you change it**: Nothing.
+| Field | Meaning |
+|---|---|
+| **Urgent (1) from reserved, %** | Priority 1 when some stock is reserved and at least this share of stock in the pick location is reserved. |
+| **Important (2) from reserved, %** | Priority 2 when some stock is reserved and at least this share is reserved. Lower reserved shares, including no reservation, use priority 3. |
+| **Empty location is urgent** | Gives an empty pick location priority 1. When cleared, an empty location uses priority 3. |
 
-### Owner default: Replenishment Policy
+Both percentages must be between 0 and 100. The urgent percentage cannot be
+lower than the important percentage.
 
-- **Screen**: Owner configuration > **Replenishment Policy** (picker).
-- **Column**: `owner_config.default_replenishment_policy_id`, bigint, null
-  allowed, foreign key, delete sets null.
-- **Affects**: Stored only. It has no effect today.
-- **When empty**: n/a.
-- **If you change it**: Nothing.
+The SKU's **Replenishment Policy** is the policy used by the planner. The
+owner's default replenishment policy is not used as a fallback in the current
+version, so assign the policy on every replenished SKU.
 
-## Part 3: Zone and pack fields
+## Enable a zone
 
-### Putaway zone: Replenishment Allowed
+Open **Warehouse Configuration > Topology > Putaway Zones**, open the zone,
+and select **Replenishment Allowed**.
 
-- **Screen**: Warehouse Configuration > Topology > Putaway Zones > open a zone > **Replenishment Allowed**
-  (checkbox, form `putawayzone_edit_form`).
-- **Column**: `putawayzone.replenishment_allowed`, boolean, not null, default
-  `false` (`001_baseline.sql:4182`).
-- **Affects**: Stored only. It has no effect today. Search: `grep -rn
-  replenishment_allowed crates clients ui --include=*.rs --include=*.go
-  --include=*.ts` returns the zone model, the zone RPC and the form row.
-- **Example**: Tick it for zone PICK1. No task is created. Putaway into PICK1
-  is not affected.
-- **If you change it**: Nothing.
+Only pick locations in enabled zones are included in min/max planning.
+Clearing the checkbox prevents new replenishment work from being planned for
+the zone. It does not cancel work that already exists.
 
-### Putaway zone: Replenishment Threshold
+The zone's **Replenishment Threshold** field is saved for future use. The
+current min/max planner uses each location's **Min Qty** and **Max Qty**, not
+the zone threshold.
 
-- **Screen**: same form > **Replenishment Threshold** (whole number).
-- **Column**: `putawayzone.replenishment_threshold`, integer, not null, default
-  0, check `>= 0` (`001_baseline.sql:4183,4200`).
-- **Affects**: Stored only. It has no effect today. No job compares stock to
-  this number.
-- **Example**: 20. Nothing happens when the zone has 5 units left.
-- **If you change it**: Nothing.
+## Plan and monitor work
 
-### Pack item: Replenish
+Open **Inventory > Replenishment**.
 
-- **Screen**: Packs > open a pack > pack item > **Replenish** (checkbox, basic
-  form).
-- **Column**: `pack_item.replenish`, boolean, not null, default `false`
-  (`001_baseline.sql:3623`).
-- **Affects**: Stored only. It has no effect today. Copied between pack
-  revisions and shown in the
-  pack hierarchy view. No process reads it for a decision.
-- **Example**: Tick `replenish` on the `CS` level. No case is moved on demand.
-- **If you change it**: Nothing.
+The list shows the destination pick location, SKU, lot, source location,
+quantity, UOM, priority, status, short reason, and planning time.
 
-## Part 4: Names in code
+- Select **Replenish Now** to run a planning pass immediately.
+- Select an open row and choose **Call Off** to cancel that work.
+- Select **Refresh** to reload the list.
 
-### Move source type `Replenishment`
+The background planner also checks the warehouse regularly, so the button is
+mainly useful after setup changes or when a supervisor wants to plan without
+waiting for the next pass.
 
-- **Screen**: None. Not offered on any RF screen or form. API only: the move
-  command `move_execute` takes a context with `source_type` (JSON value
-  `replenishment`).
-- **What it is**: A label on a manual move. The source type is written to the
-  transaction log (`transaction_log.source_type`). It supports the "category"
-  `Replenishment` for reports.
-- **What it checks**: The destination location type must be `Pick`,
-  `SpeedPick` or `Pickto`. A partial
-  quantity is not allowed: the whole stock record moves. No hold is added or removed. It is a supported "phase 1" type.
-- **What it does not do**: It does not look at levels, policies, zones or
-  thresholds. It does not create tasks. It does not decide anything.
-- **To verify** (needs a running system): call `move_execute` with
-  `source_type: "replenishment"` to a `Pick` location: it succeeds. Send the
-  same to a storage location of another type: it fails with an allowed-types
-  message.
+The planner uses free stock and follows the SKU's rotation rule when ordering
+candidate sources. A source must be in **Ok** status with no location flag,
+must not be one of the SKU's own pick locations, and must have free stock after
+reservations, picked stock, holds, and quantities already promised to open
+replenishments are deducted. If one source cannot supply the whole need, the
+planner can create work from more than one source. If no eligible source has
+at least one whole location UOM, the pick location is reported without a
+source and no task is created for that pass.
 
-### Move source type `LetDown`
+## Complete replenishment on the RF terminal
 
-- **Screen**: None. API value `let_down`.
-- **What it does**: Nothing. The move is refused with `UnsupportedSourceType`. It is
-  listed so the name is reserved.
-- **To verify**: call `move_execute` with `source_type: "let_down"`. Expect the
-  error `UnsupportedSourceType`.
+1. Open **Inventory > Replenish**. The terminal assigns the next eligible
+   task. A task already assigned to you is returned first.
+2. At the displayed source location, scan the location.
+3. Check the planned quantity and enter the quantity taken.
+4. If you took less than planned, enter a short reason.
+5. At the displayed pick location, scan the location.
+6. The terminal moves the confirmed quantity and closes the task. Press
+   **Enter** for the next task.
 
-### Pending move-in source `Replenishment`
+The terminal rejects the wrong source or destination. A confirmed quantity
+must be above zero and cannot exceed the planned quantity. A partial quantity
+is accepted only with a reason.
 
-- **Screen**: None.
-- **What it is**: A value of the source list of `pending_move_in`: "Held by
-  replenishment for the pick face it is topping up".
-- **Affects**: Nothing writes it except tests. The only real writer of
-  pending move-ins is putaway.
+Leaving the flow does not immediately release an assigned task. While its task
+lease is still active, opening **Replenish** again offers the same task first.
+After the lease expires, the task can return to the shared work pool.
 
-### Task type `Replenish`
+## Statuses
 
-- **Screen**: None. No form field lists task types with this value. The only
-  form field that uses the word **Replenish** is the pack item checkbox in
-  Part 3 (label id 1781, form `pack_item_basic_form`).
-- **Column**: enum value `Replenish` in the task type enum.
-- **What it does**: The generic task framework can hold a task of this type
-  and treats it as not source-owned.
-  Rights can be granted per work area for it.
-- **Affects**: **Nothing creates a task of this type.** Search: `grep -rn
-  "TaskType::Replenish" crates --include=*.rs` returns only the enum,
-  the aggregate's `match` and a test. The RF has no screen for it.
-- **If you grant it**: A work area right for `Replenish` gives access to tasks
-  that cannot exist.
+| Status | Meaning |
+|---|---|
+| **Open** | Planned and waiting, or assigned to an operator. |
+| **Done** | The full planned quantity reached the pick location. |
+| **Shorted** | The operator moved less than planned and entered a reason. |
+| **Cancelled** | A supervisor called off the open work. |
 
-## Fields that are stored only (full list)
+## When no work is created
 
-| Field | Where | Screen label |
-|---|---|---|
-| `replenishment_policy.code` | the policy | Code (Warehouse Configuration > Policies > Replenishment Policy) |
-| `replenishment_policy_detail.*` | retired | none |
-| `sku.replenishment_policy_id` | SKU | Replenishment Policy (SKU > Policies) |
-| `owner_config.default_replenishment_policy_id` | owner config | Replenishment Policy |
-| `putawayzone.replenishment_allowed` | zone | Replenishment Allowed |
-| `putawayzone.replenishment_threshold` | zone | Replenishment Threshold |
-| `pack_item.replenish` | pack level | Replenish |
+Check these conditions:
 
-Each of these has been searched in the Rust code, SQL, the Go RF client and
-the UI source. None changes a decision.
+- **Replenishment Allowed** is selected on the pick location's zone.
+- Stock in the pick location plus stock on the way is at or below **Min Qty**.
+- **Max Qty** is above the current level by at least one whole location UOM.
+- The location UOM belongs to the SKU's active pack.
+- The SKU has a replenishment policy.
+- Eligible reserve stock is free and available.
+- The SKU is not continuously serial tracked.
 
-Three names do something small but are not an engine: `MoveSourceType::Replenishment`
-(a label and a destination-type check), `MoveSourceType::LetDown` (refused),
-`PendingMoveInSource::Replenishment` and `TaskType::Replenish` (names with no
-producer).
+## Production rollout check
 
-## What to do in a real warehouse today
+The min/max engine and its service-level database scenarios cover planning,
+duplicate prevention, zone eligibility, full and short confirmation, policy
+priority, and cancellation. A complete clean-database General Distribution
+journey from configuration through RF confirmation has not yet been verified
+as one end-to-end scenario.
 
-1. Use cycle counts and reports to find low pick faces (this is a person's job).
-2. Move stock with the normal **Move** command.
-3. Keep policies and zone thresholds blank or consistent with your plan, but
-   know they are not enforced.
-4. When an engine is built, expect these fields to become real. Do not rely on
-   what you type in them now.
+Before production rollout, run one isolated warehouse pilot with your real
+location UOMs, work-area permissions, source location types, and operator RF
+profile. Confirm one full task, one partial task with a reason, and one
+supervisor cancellation.

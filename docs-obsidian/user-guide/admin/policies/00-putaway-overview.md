@@ -314,7 +314,7 @@ These are real behaviours of the current code. File and line are given.
 5. **Turning `Cube` or `Weight` off in a step does not stop the move from checking them**. Putaway may offer a place the move then refuses.
 6. **`Quantity` ignores quantity promised by reservations.** Cube, weight and positions do not.
 7. **Location `Mix SKU` and `Mix Lot` do not see reservations.** Only the step rule `Mixed SKU` / `Mixed lot` does.
-8. **`Stored only` fields.** Zone: `Inbound Location`, `Outbound Location`, `RF Pick Strategy`, `Replenishment Allowed`, `Replenishment Threshold`, `Default Label Printer`,
+8. **`Stored only` fields.** Zone: `Inbound Location`, `Outbound Location`, `RF Pick Strategy`, `Replenishment Threshold`, `Default Label Printer`,
    `Default Report Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`. Location: `Cube`, `Check Digit`. SKU `Putaway Class = NoMix` does nothing unless a step has a `Putaway class` condition.
 9. **Stale comments.** `predicate.rs:197-218` says putaway does not exclude `Discard LPN` locations, but the candidate SQL does.
    The column comment on `location.loc_flag` says moves need flag `None`, but moves ignore flags.

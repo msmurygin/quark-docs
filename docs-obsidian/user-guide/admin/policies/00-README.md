@@ -45,7 +45,7 @@ Paths such as `wms-inbound/src/...` are under `crates/libs/`.
 | **Cartonization** | Which boxes to use and how to pack the picks into them. | [30-cartonization-overview.md](./30-cartonization-overview.md), [31-cartonization-policy-settings.md](./31-cartonization-policy-settings.md) |
 | **Lot policy** | Lot dates, attributes, when a new lot is made. | [32-lot-policy-and-attributes.md](./32-lot-policy-and-attributes.md) |
 | **Serial rules** | Serial tracking per SKU. | [33-serial-configuration.md](./33-serial-configuration.md) |
-| **Replenishment** | Placeholder only. No engine exists. | [35-replenishment-status.md](./35-replenishment-status.md) |
+| **Replenishment** | Min/max planning, supervisor monitoring, and RF task completion. | [35-replenishment-status.md](./35-replenishment-status.md) |
 
 ## 2. What decides what: from receipt to shipment
 
@@ -54,7 +54,7 @@ Each row is a stage. "Decided by" is the setting or policy that changes the resu
 
 | # | Stage | What happens | Decided by | Looked up from | Files |
 |---|---|---|---|---|---|
-| 1 | **Receive** | The operator receives goods against an ASN, blind, or as a return. The server accepts, asks a question, or refuses. | **Receipt policy**; owner flags; SKU hold, shelf-life and temperature fields; lot policy; serial rules; hold codes on the destination | SKU `receipt_policy_id` (the owner default is never reached today) | 40, 32, 33, 34, 43 |
+| 1 | **Receive** | The operator receives goods against an ASN, blind, or as a return. The server accepts, asks a question, or refuses. | **Receipt policy**; owner flags; SKU hold, shelf-life and temperature fields; lot policy; serial rules; hold codes on the destination | SKU receipt policy. The resolver also supports the owner's default when the SKU value is absent, but the standard SKU setup currently requires and defaults that value. | 40, 32, 33, 34, 43 |
 | 2 | **Close the receipt** | The receipt closes, or a discrepancy needs a supervisor. | system setting `ALLOW_CLOSE_WITH_DISCREPANCY`; supervisor right `receipt.override_close_discrepancy` | system setting | 40 section 7, 42 |
 | 3 | **Putaway** | The system suggests a location for the LPN. | **Putaway policy** (steps, conditions); zone and location settings; owner reservation time | SKU `putaway_policy_id`, then owner default | 00 to 03, 41 |
 | 4 | **Stock becomes available** | Holds, lot dates and location status decide if stock can be reserved. | **Hold codes** (taking direction); location status | hold code table | 43 |
@@ -117,13 +117,11 @@ Terms:
 
 The full list with file and line is at the end of each file. The most important ones:
 
-1. **The owner default receipt policy is never used.** `sku.receipt_policy_id` cannot be empty
-   (file 40 section 1.1, file 41 A.2).
-2. **Availability ignores `Enforce` and `Overridable` of a hold code** (file 43 note A).
-3. **15 of 26 receipt policy columns and 20 of 42 owner settings do nothing.**
-4. **Four owner damage actions are accepted but do nothing** (file 40 section 8.1).
-5. **`return_reason_code` is required by the return commands and thrown away** (file 43 section 7.2).
-6. ~~Time-out keys accepted 0, which means "wait for ever".~~ Fixed (P-13, commit `420b6746a`): a lock time-out of 0 or less is read as 5000 ms (file 42 section 1.1).
+1. **Availability ignores `Enforce` and `Overridable` of a hold code** (file 43 note A).
+2. **15 of 26 receipt policy columns and 20 of 42 owner settings do nothing.**
+3. **Four owner damage actions are accepted but do nothing** (file 40 section 8.1).
+4. **`return_reason_code` is required by the return commands and thrown away** (file 43 section 7.2).
+5. A lock time-out of 0 or less is read as 5000 ms (file 42 section 1.1).
 
 See also the shorter guides one level up: `../05-inbound-setup.md`, `../06-outbound-setup.md`,
 `../07-printing-and-labels.md`, `../04-owners-sku-uom-pack-hierarchy.md`.

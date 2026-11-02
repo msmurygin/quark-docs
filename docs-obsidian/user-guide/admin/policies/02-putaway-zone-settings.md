@@ -162,12 +162,12 @@ The error is a database foreign-key error that names the constraint, for example
 | Column | `putawayzone.replenishment_allowed` |
 | Type and values | true or false. NOT NULL. |
 | Default | false. Seeds: false. |
-| What it does | Nothing today. |
-| Affects | Stored only. It has no effect today. The form only enables the field `Replenishment Threshold` when this box is ticked. No engine reads it. |
-| Example | Ticked. Nothing happens. |
-| Interacts with | Pairs with 1.9 in the form. Replenishment is a placeholder in the product (`wms-meta-ui` migration 048). |
+| What it does | Includes pick locations in this zone in min/max replenishment planning. |
+| Affects | The planner checks only pick locations whose zone allows replenishment. |
+| Example | Ticked for zone `PICK`: eligible low pick locations in the zone can generate replenishment work. |
+| Interacts with | Pairs with each location's **Min Qty**, **Max Qty**, and **UOM**. The form also enables 1.9 while this box is ticked. |
 | When empty | Not possible. NOT NULL. |
-| If you change it | Nothing else changes. |
+| If you change it | The next planning pass uses the new value. Existing work is not cancelled. |
 
 ### 1.9 Replenishment Threshold
 
@@ -380,5 +380,5 @@ Steps: (1) Give SKU W1 a lot policy with attribute `ALLERGEN`. (2) Add zone rule
 ## 5. Count of zone settings
 
 20 columns on the zone (plus the id and audit stamps) and 3 on the zone rule.
-Of the 20, these are **stored only**: `Inbound Location`, `Outbound Location`, `RF Pick Strategy`, `Replenishment Allowed`,
+Of the 20, these are **stored only**: `Inbound Location`, `Outbound Location`, `RF Pick Strategy`,
 `Replenishment Threshold`, `Default Label Printer`, `Default Report Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`.

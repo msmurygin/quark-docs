@@ -39,10 +39,12 @@ The server picks the policy for one SKU like this:
 
    `Receipt Validation Policy for sku <SKU> not found: sku.receipt_policy_id is NULL and owner_config.default_receipt_policy_id is also NULL (owner_id=<id>)`
 
-**Important.** In the database `sku.receipt_policy_id` is `NOT NULL DEFAULT 1`. No later migration
-changes that. So step 1 always finds a value. Step 2 (the owner default) is never
-reached today. A new SKU that you do not configure gets policy id 1 (`STD`), not
-its owner's default. See [41-owner-settings-and-policy-resolution.md](./41-owner-settings-and-policy-resolution.md).
+The receiving resolver implements the full order above. The standard SKU
+schema and screen currently require a receipt policy and default it to policy
+1, so ordinary saved SKUs stop at step 1. The owner fallback is a supported
+resolver path for compatible input in which the SKU value is absent; it is not
+a substitute for assigning a receipt policy on the current SKU screen. See
+[41-owner-settings-and-policy-resolution.md](./41-owner-settings-and-policy-resolution.md).
 
 ### 1.2 Where to edit it
 
