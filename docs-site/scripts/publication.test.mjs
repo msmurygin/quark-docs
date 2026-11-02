@@ -75,6 +75,9 @@ test('inline code never wraps and wide tables scroll instead of splitting codes'
  const tableRule=/\.markdown table\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
  assert.match(tableRule,/overflow-x:\s*auto/);
  assert.match(css,/\.markdown \.table-cell--nowrap\s*\{[^}]*white-space:\s*nowrap/);
+ assert.match(css,/\.markdown \.table-cell--identifier-list\s*\{[^}]*white-space:\s*normal/);
+ assert.match(css,/\.markdown \.table-cell--wrap code\s*\{[^}]*white-space:\s*normal/);
+ assert.match(css,/\.markdown \.table-cell--wrap code\s*\{[^}]*overflow-wrap:\s*anywhere/);
  assert.match(css,/table:has\(\.table-cell--nowrap\)[^{]*:not\(\.table-cell--nowrap\)\{[^}]*min-width:\s*11rem/);
 });
 
@@ -86,10 +89,12 @@ test('Field, Code and Class table columns never wrap',()=>{
  ]}]};
  markNonWrappingTableColumns(tree);
  const [header,row]=tree.children[0].children;
- for(const index of [0,2,3]){
+ for(const index of [2,3]){
   assert.deepEqual(header.children[index].data.hProperties.className,['table-cell--nowrap']);
   assert.deepEqual(row.children[index].data.hProperties.className,['table-cell--nowrap']);
  }
+ assert.deepEqual(header.children[0].data.hProperties.className,['table-cell--identifier-list']);
+ assert.deepEqual(row.children[0].data.hProperties.className,['table-cell--identifier-list']);
  assert.equal(row.children[1].data,undefined);
 
  const typed={type:'table',children:[
@@ -97,7 +102,7 @@ test('Field, Code and Class table columns never wrap',()=>{
   {type:'tableRow',children:['Code, Name (required)','Identity'].map(cell)},
  ]};
  markNonWrappingTableColumns(typed);
- assert.deepEqual(typed.children[1].children[0].data.hProperties.className,['table-cell--nowrap']);
+ assert.deepEqual(typed.children[1].children[0].data.hProperties.className,['table-cell--identifier-list']);
 });
 
 test('reference tables get separate Required and Error code columns',()=>{
@@ -115,6 +120,7 @@ test('reference tables get separate Required and Error code columns',()=>{
   ]},
  ]};
  normalizeReferenceTables(tree);
+ markNonWrappingTableColumns(tree);
  const [fields,errors]=tree.children;
  assert.deepEqual(fields.children[0].children.map(node=>node.children[0].value),['Field (type)','Required','Meaning']);
  assert.equal(fields.children[1].children[0].children[0].value,'Serial Scope');
@@ -123,6 +129,8 @@ test('reference tables get separate Required and Error code columns',()=>{
  assert.deepEqual(errors.children[0].children.map(node=>node.children[0].value),['Error code','Message','Meaning','Fix']);
  assert.equal(errors.children[1].children[0].children[0].value,'65');
  assert.equal(errors.children[1].children[1].children[0].value,'SerialRequired');
+ assert.deepEqual(errors.children[1].children[0].data.hProperties.className,['table-cell--nowrap']);
+ assert.deepEqual(errors.children[1].children[1].data.hProperties.className,['table-cell--wrap']);
  assert.equal(errors.children[2].children[0].children[0].value,'—');
 });
 

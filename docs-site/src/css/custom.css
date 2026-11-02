@@ -88,6 +88,8 @@ a{text-underline-offset:3px}
 .markdown td{border:0;border-bottom:1px solid var(--qd-line-2);padding:14px 20px 14px 0;vertical-align:top}
 .markdown td:first-child,.markdown th:first-child{padding-left:0}
 .markdown .table-cell--nowrap{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.markdown .table-cell--identifier-list{white-space:normal;overflow-wrap:normal;word-break:normal}
+.markdown .table-cell--wrap code{display:inline;max-width:none;overflow-x:visible;white-space:normal;overflow-wrap:anywhere;word-break:normal}
 .markdown table:has(.table-cell--nowrap) :is(th,td):not(.table-cell--nowrap){min-width:11rem}
 
 /* Images and screen captions */

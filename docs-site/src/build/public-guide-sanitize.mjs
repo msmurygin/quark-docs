@@ -162,11 +162,11 @@ function nodeText(node) {
   return Array.isArray(node.children) ? node.children.map(nodeText).join('') : '';
 }
 
-const NON_WRAPPING_TABLE_HEADERS = new Set(['field', 'fields', 'code', 'codes', 'class', 'classes', 'required', 'error code']);
+const NON_WRAPPING_TABLE_HEADERS = new Set(['code', 'codes', 'class', 'classes', 'required', 'error code']);
 
 function isIdentifierTableHeader(value) {
   const label = value.trim().toLowerCase();
-  return NON_WRAPPING_TABLE_HEADERS.has(label) || /^(?:fields?|codes?|classes?)\s*\([^)]*\)$/.test(label);
+  return NON_WRAPPING_TABLE_HEADERS.has(label) || /^(?:codes?|classes?)\s*\([^)]*\)$/.test(label);
 }
 
 function isFieldTableHeader(value) {
@@ -191,10 +191,24 @@ export function markNonWrappingTableColumns(node) {
     const columns = header
       .map((cell, index) => isIdentifierTableHeader(nodeText(cell)) ? index : -1)
       .filter((index) => index >= 0);
+    const identifierListColumns = header
+      .map((cell, index) => isFieldTableHeader(nodeText(cell)) ? index : -1)
+      .filter((index) => index >= 0);
+    const wrappingColumns = header
+      .map((cell, index) => nodeText(cell).trim().toLowerCase() === 'message' ? index : -1)
+      .filter((index) => index >= 0);
     for (const row of rows) {
       for (const column of columns) {
         const cell = row.children?.[column];
         if (cell) addClass(cell, 'table-cell--nowrap');
+      }
+      for (const column of identifierListColumns) {
+        const cell = row.children?.[column];
+        if (cell) addClass(cell, 'table-cell--identifier-list');
+      }
+      for (const column of wrappingColumns) {
+        const cell = row.children?.[column];
+        if (cell) addClass(cell, 'table-cell--wrap');
       }
     }
   }
