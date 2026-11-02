@@ -18,8 +18,8 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | query | 23 |
 | query (read method, type not declared) | 438 |
 | stateful_command | 124 |
-| stateless_command | 175 |
-| write method, type not declared | 172 |
+| stateless_command | 176 |
+| write method, type not declared | 171 |
 
 "Type not declared" means the method has no `x-quark-command-type` in the catalog. For a read method the reference still shows the category `query`, inferred from the operation. For a write method it shows `not declared`.
 
@@ -590,7 +590,7 @@ This customer reference lists **932** WMS JSON-RPC methods from the published Op
 | [create_allocation_policy](outbound.md#create_allocation_policy) | stateless_command | Create an allocation policy whose steps are owned by the allocation pipeline. |
 | [create_cartonization_policy_detail_form](outbound.md#create_cartonization_policy_detail_form) | stateless_command | Add one carton candidate through the metadata detail form. |
 | [create_cartonization_policy_form](outbound.md#create_cartonization_policy_form) | stateless_command | Create a cartonization policy from the metadata form. |
-| [create_replenishment_policy](outbound.md#create_replenishment_policy) | not declared* | Create a new replenishment_policy — CRUD. |
+| [create_replenishment_policy](outbound.md#create_replenishment_policy) | stateless_command | Create a replenishment-policy root with replay protection. |
 | [delete_allocation_policy](outbound.md#delete_allocation_policy) | stateless_command | Delete an unreferenced allocation policy and all of its owned steps. |
 | [delete_cartonization_policy](outbound.md#delete_cartonization_policy) | stateless_command | Delete an unreferenced cartonization policy and all of its owned cartons. |
 | [delete_cartonization_policy_detail_form](outbound.md#delete_cartonization_policy_detail_form) | stateless_command | Delete one carton candidate through the metadata detail form. |

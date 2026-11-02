@@ -5675,30 +5675,39 @@ curl -s -X POST "$BASE_URL/api/rpc" \
 
 ### create_replenishment_policy
 
-Create a new replenishment_policy — CRUD.
+Create a replenishment-policy root with replay protection.
 
 | | |
 |---|---|
 | Context / module | outbound / replenishment_policy |
-| Category | not declared |
-| Operation | create (reference_crud) |
+| Category | stateless_command |
+| Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_replenishment_policy` |
 | Roles that have it by default | ADMIN, MANAGER |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog gives no command type for this method. It does not say whether an idempotency key or a version is needed.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
+- There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (ReplenishmentPolicyForCreate) | yes |  |
+| `meta` | object | no | Control fields for replay protection. |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreateReplenishmentPolicy) | yes | Replenishment-policy root for this create action. |
 | `data.code` | string | yes |  |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 
 **Result**
 
-The `result` member of the response is: `{ "data": ReplenishmentPolicy }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ReplenishmentPolicy }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -5720,6 +5729,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "add_when": "<add_when>",
       "add_who": 1,
@@ -5744,7 +5756,9 @@ Example response. It shows the shape only. The required fields have placeholder 
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
-| 400 | UNIQUE_VIOLATION or INVALID_DATA | The code already exists, or a value breaks a rule. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
+| 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
 
@@ -5758,6 +5772,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_replenishment_policy",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>"
     }

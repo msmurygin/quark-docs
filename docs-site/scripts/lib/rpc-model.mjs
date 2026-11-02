@@ -15,14 +15,6 @@ export const CONTEXTS = [
 
 export const SAMPLE_UUID = '7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f';
 
-// These transitional aggregate-create contracts validate the same caller-owned
-// key in both the command envelope and data payload.
-const DUAL_IDEMPOTENCY_METHODS = new Set([
-  'create_owner_full',
-  'create_pack_with_items',
-  'create_sku_full',
-]);
-
 /**
  * Category as the guide defines it (api/04-command-types-and-concurrency.md):
  * the declared command type, else `query` inferred from a read operation,
@@ -159,11 +151,10 @@ export function buildMethodRecord(m, extra = {}) {
       reqParams[p.name] = exampleOf(p.schema, defsOf(p.schema), p.name);
     }
   }
-  // The key normally travels only in `meta`. Three aggregate creates retain a
-  // validated data copy for compatibility, so their examples must show both.
+  // The recommended wire shape carries the key in `meta`. Some data schemas
+  // retain an optional compatibility field; omit it from generated examples.
   if (idem && reqParams.data && typeof reqParams.data === 'object' && !Array.isArray(reqParams.data)) {
-    if (DUAL_IDEMPOTENCY_METHODS.has(m.name)) reqParams.data.idempotency_key = SAMPLE_UUID;
-    else delete reqParams.data.idempotency_key;
+    delete reqParams.data.idempotency_key;
   }
   // A command that needs a key but declares no `meta` parameter still gets one.
   if (idem && !('meta' in reqParams)) reqParams.meta = { idempotency_key: SAMPLE_UUID };

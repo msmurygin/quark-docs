@@ -43,11 +43,11 @@ The classifier belongs to the **method**. A client does not choose it.
 | Declared command type | Methods |
 |---|---|
 | `query` | 23 |
-| `stateless_command` | 175 |
+| `stateless_command` | 176 |
 | `stateful_command` | 124 |
-| Not declared | 610 |
+| Not declared | 609 |
 
-The 610 methods with no declared type are mostly standard reference-data CRUD: 438 read methods (`get_*`, `list_*`, `count_*`, and read models) and 172 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
+The 609 methods with no declared type are mostly standard reference-data CRUD: 438 read methods (`get_*`, `list_*`, `count_*`, and read models) and 171 write methods (`create_*`, `update_*`, `delete_*`, and some commands).
 
 - Treat an undeclared **read** as a `query`. It is safe to repeat.
 - For an undeclared **write**, the catalog gives no idempotency key and no version check. A repeat can run twice, and two editors can overwrite each other (last write wins). Write such calls so that a repeat is harmless, or check the result before you retry. For example, retry `create_*` only after a `list_*` shows the row is missing.
@@ -90,7 +90,7 @@ More facts from the code:
 - The key must be a valid UUID. Another text gives `RPC_PARAMS_INVALID`.
 - For some "create" commands a missing key is allowed: the server makes one. That protects nothing on a retry. Always send your own key.
 
-### Atomic owner, pack and SKU creation
+### Atomic onboarding creates
 
 These aggregate create methods now require replay protection:
 
@@ -99,8 +99,11 @@ These aggregate create methods now require replay protection:
 | `create_owner_full` | Owner, addresses and owner configuration |
 | `create_pack_with_items` | Pack header and every UOM level |
 | `create_sku_full` | SKU and its optional serial configuration |
+| `lot_policy_config_create` | Lot-policy root and its first complete attribute set |
+| `create_receipt_policy` | Complete receipt policy |
+| `create_replenishment_policy` | Replenishment-policy root |
 
-For these three methods, generate one non-zero UUID for the business action and send that same UUID in both places:
+For these six methods, generate one non-zero UUID for the business action and send it in `meta.idempotency_key`:
 
 ```json
 "params": {
@@ -108,20 +111,19 @@ For these three methods, generate one non-zero UUID for the business action and 
     "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
   },
   "data": {
-    "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
     "...": "method-specific fields"
   }
 }
 ```
 
-The request is rejected when either value is missing, is the zero UUID, or the two values differ. Do not send `expected_version` or overrides: these are new aggregate creates, not edits of data that you previously read.
+Older clients may send the key as `data.idempotency_key` instead. The server accepts either location. If you send both, the values must match. The request is rejected when no key is supplied, the key is the zero UUID, or the two supplied values differ. Do not send `expected_version` or overrides: these are new creates, not edits of data that you previously read.
 
-If the connection drops, repeat the complete request with the same UUID and unchanged data. A completed first call returns its stored owner, pack or SKU and sets `meta.idempotency_replayed` to `true`. For a genuinely new create action, generate a new UUID.
+If the connection drops, repeat the complete request with the same UUID and unchanged data. A completed first call returns its stored created result and sets `meta.idempotency_replayed` to `true`. For a genuinely new create action, generate a new UUID.
 
 ```mermaid
 flowchart TD
-    A[Start one owner, pack or SKU create action] --> B[Generate one UUID]
-    B --> C[Put the UUID in meta and data]
+    A[Start one onboarding create action] --> B[Generate one UUID]
+    B --> C[Put the UUID in meta]
     C --> D[Send the aggregate create command]
     D --> E{Did the client receive a final answer?}
     E -->|Yes| F[Keep the returned aggregate]

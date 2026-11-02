@@ -1214,26 +1214,33 @@ Create a complete lot-policy configuration atomically.
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `lot_policy_config_create` |
 | Roles that have it by default | ADMIN, MANAGER |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog does not say whether this method needs an idempotency key.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (LotPolicyAggregateForCreate) | yes |  |
+| `meta` | object | no | Control fields for replay protection. |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreateLotPolicyConfig) | yes | Complete lot-policy configuration for this create action. |
 | `data.code` | string | yes |  |
 | `data.data` | object (LotPolicyAggregateDraft) | yes |  |
 | `data.data.attributes` | array of object (LotPolicyAttributeDraft) | yes |  |
 | `data.data.policy` | object (LotPolicyRootDraft) | yes |  |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 
 **Result**
 
-The `result` member of the response is: `{ "data": LotPolicyAggregateView }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": LotPolicyAggregateView }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -1290,6 +1297,9 @@ Example response. It shows the shape only. The required fields have placeholder 
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
+    "meta": {
+      "idempotency_replayed": false
+    },
     "data": {
       "attributes": [
         {
@@ -1346,6 +1356,8 @@ Example response. It shows the shape only. The required fields have placeholder 
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -1360,6 +1372,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "lot_policy_config_create",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "code": "<code>",
       "data": {
@@ -2196,18 +2211,22 @@ Create a complete receipt-policy configuration.
 | Operation | execute (domain_command) |
 | Permission | RBAC resource type `api`, resource code `create_receipt_policy` |
 | Roles that have it by default | ADMIN, MANAGER |
-| Idempotency key | not stated in the catalog |
+| Idempotency key | required |
 
 **Notes**
 
-- The catalog does not say whether this method needs an idempotency key.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `data` | object (ReceiptPolicyForCreate) | yes |  |
+| `meta` | object | no | Control fields for replay protection. |
+| `meta.acknowledged_overrides` | array of integer or object | no |  |
+| `meta.expected_version` | integer (int64) | no |  |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreateReceiptPolicy) | yes | Complete receipt policy for this create action. |
 | `data.asn_po_qty_discrepancy` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.code` | string | yes |  |
 | `data.date_deviation_check` | one of: Allow \| HardError \| Warning or null | no |  |
@@ -2217,6 +2236,7 @@ Create a complete receipt-policy configuration.
 | `data.excess_message` | boolean or null | no |  |
 | `data.excess_override` | boolean or null | no |  |
 | `data.excess_override_percent` | integer (int32) or null | no |  |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 | `data.no_sku_on_asn` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.no_sku_on_po` | one of: Allow \| HardError \| Warning | yes |  |
 | `data.po_excess_error` | boolean or null | no |  |
@@ -2239,7 +2259,9 @@ Create a complete receipt-policy configuration.
 
 **Result**
 
-The `result` member of the response is: `{ "data": ReceiptPolicy }`
+The `result` member of the response is: `{ "meta": { "idempotency_replayed": boolean }, "data": ReceiptPolicy }`
+
+`meta.idempotency_replayed` is `true` when the answer is a stored copy of an earlier call with the same key.
 
 | Field | Type | Always present | Description |
 |---|---|---|---|
@@ -2286,6 +2308,8 @@ The `result` member of the response is: `{ "data": ReceiptPolicy }`
 | 401 | NO_AUTH | No valid cookie, API key or service token. |
 | 403 | RBAC_FORBIDDEN / RBAC_NO_ROLE | Your role may not call this method, or you have no role in the warehouse. |
 | 400 / 403 | WAREHOUSE_REQUIRED, WAREHOUSE_NOT_AVAILABLE, WAREHOUSE_SELECTOR_INVALID | The `X-Warehouse-Id` header is missing, wrong or not yours. |
+| 400 | RF_ERROR, return_code 42 | The idempotency key was used before with different data. Make a new key. |
+| 400 | RF_ERROR, return_code 44 | The first call with this key is still running. Send the same call again. |
 | 400 | RF_ERROR (other return codes) | A business rule refused the command. Read `detail.message`, `detail.return_code` and `detail.class`. |
 
 **Example**
@@ -2300,6 +2324,9 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   "id": 1,
   "method": "create_receipt_policy",
   "params": {
+    "meta": {
+      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
+    },
     "data": {
       "asn_po_qty_discrepancy": "Allow",
       "code": "<code>",
