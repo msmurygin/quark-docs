@@ -1768,28 +1768,28 @@ Create a pack with child items.
 
 **Notes**
 
-- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta` | object | no | Control fields for replay protection. |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
-| `data` | object (CreatePackWithItems) | yes | One immutable create intent. |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreatePackWithItems) | yes | Pack header and UOM levels for this create action. |
 | `data.code` | string | yes |  |
 | `data.descr` | string | yes |  |
-| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 | `data.items` | array of object (PackItemForCreate) | yes |  |
 | `data.items[].cartonize` | boolean or null | no |  |
 | `data.items[].catch_weight_uom` | string or null | no |  |
 | `data.items[].child_uom` | string or null | no |  |
 | `data.items[].cube` | number (double) or null | no |  |
 | `data.items[].height` | number (double) or null | no |  |
-| `data.items[].is_active` | boolean or null | no | ADR-045 §3 — defaults to true on INSERT. |
+| `data.items[].is_active` | boolean or null | no | Defaults to active when omitted. |
 | `data.items[].is_catch_weight` | boolean or null | no |  |
 | `data.items[].is_dual_uom` | boolean or null | no |  |
 | `data.items[].length` | number (double) or null | no |  |
@@ -1836,7 +1836,7 @@ The `result` member of the response is: `{ "meta": { "idempotency_replayed": boo
 | `data.pack_items[].height` | number (double) | yes |  |
 | `data.pack_items[].hierarchy_level` | integer (int32) | yes |  |
 | `data.pack_items[].id` | integer (int64) | yes |  |
-| `data.pack_items[].is_active` | boolean | yes | Inactive levels stay available to warehouse records that already reference them. |
+| `data.pack_items[].is_active` | boolean | yes | Inactive levels remain available to warehouse records that already reference them. |
 | `data.pack_items[].is_catch_weight` | boolean | yes |  |
 | `data.pack_items[].is_dual_uom` | boolean | yes |  |
 | `data.pack_items[].length` | number (double) | yes |  |
@@ -1943,7 +1943,6 @@ curl -s -X POST "$BASE_URL/api/rpc" \
       "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
     },
     "data": {
-      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "code": "<code>",
       "descr": "<descr>",
       "items": [
@@ -3651,18 +3650,18 @@ Create owner with addresses and config in one call.
 
 **Notes**
 
-- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta` | object | no | Control fields for replay protection. |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
-| `data` | object (CreateOwnerFull) | yes | Caller-owned create intent. |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreateOwnerFull) | yes | Owner, addresses and configuration for this create action. |
 | `data.addresses` | array of object (OwnerAddressForCreateInner) or null | no |  |
 | `data.addresses[].address1` | string or null | no |  |
 | `data.addresses[].address2` | string or null | no |  |
@@ -3721,7 +3720,7 @@ Create owner with addresses and config in one call.
 | `data.config.track_inventory_by` | string or null | no |  |
 | `data.config.weight_uom` | string or null | no |  |
 | `data.config.write_off_gl_account_hint` | string or null | no |  |
-| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 | `data.owner` | object (OwnerForCreate) | yes |  |
 | `data.owner.code` | string | yes |  |
 | `data.owner.company` | string | yes |  |
@@ -3819,7 +3818,6 @@ curl -s -X POST "$BASE_URL/api/rpc" \
       "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
     },
     "data": {
-      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "owner": {
         "code": "<code>",
         "company": "<company>",
@@ -9417,19 +9415,19 @@ Create a SKU and optional serial configuration atomically.
 
 **Notes**
 
-- Send the same non-zero UUID in `meta.idempotency_key` and `data.idempotency_key`. Both fields are required for this method. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
+- Send a non-zero UUID in `meta.idempotency_key`. For compatibility, the server also accepts it in `data.idempotency_key`. If both are present, they must match. Repeat an unchanged request with the same key to get the first answer without running the create again.
 - There is no version check.
 
 **Parameters** (the keys of `params`)
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `meta` | object | yes | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
+| `meta` | object | no | Control fields for replay protection. |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
 | `meta.expected_version` | integer (int64) | no |  |
-| `meta.idempotency_key` | string (uuid) | yes | Must equal `data.idempotency_key`. |
-| `data` | object (CreateSkuFull) | yes | Caller-owned create intent for one SKU aggregate. |
-| `data.idempotency_key` | string (uuid) | yes | Must equal `meta.idempotency_key`. |
+| `meta.idempotency_key` | string (uuid) | no | Recommended key location. |
+| `data` | object (CreateSkuFull) | yes | SKU and optional serial configuration for this create action. |
+| `data.idempotency_key` | string (uuid) | no | Compatibility key location. If both locations are present, they must match. |
 | `data.serial_config` | object (SkuSerialConfigForCreateInner) or null | no |  |
 | `data.serial_config.allow_asn_pre_advised` | boolean or null | no |  |
 | `data.serial_config.allow_deferred_capture` | boolean or null | no |  |
@@ -9591,7 +9589,6 @@ curl -s -X POST "$BASE_URL/api/rpc" \
       "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f"
     },
     "data": {
-      "idempotency_key": "7f1c2d4e-5a6b-4c8d-9e0f-1a2b3c4d5e6f",
       "sku": {
         "code": "<code>",
         "descr": "<descr>",

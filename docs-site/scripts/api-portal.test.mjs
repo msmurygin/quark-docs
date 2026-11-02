@@ -1,6 +1,7 @@
 // Sanity tests for the API portal generator. Run: npm run test:api
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,6 +10,28 @@ import { hoistSchema } from './lib/openapi.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const out = (p) => JSON.parse(readFileSync(resolve(here, '../static/api', p), 'utf8'));
+
+const canonicalJson = (value) => {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value && typeof value === 'object') {
+    const fields = Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`);
+    return `{${fields.join(',')}}`;
+  }
+  return JSON.stringify(value);
+};
+
+const requestSchemaHash = (method) => {
+  const properties = {};
+  const required = [];
+  for (const parameter of method.params ?? []) {
+    properties[parameter.name] = parameter.schema ?? null;
+    if (parameter.required === true) required.push(parameter.name);
+  }
+  const schema = { type: 'object', properties, required };
+  return `sha256:${createHash('sha256').update(canonicalJson(schema)).digest('hex')}`;
+};
 
 test('categoryOf: declared, inferred query, not declared', () => {
   assert.deepEqual(categoryOf({ 'x-quark-command-type': 'stateful_command' }), { category: 'stateful_command', declared: true });
@@ -36,8 +59,17 @@ test('commands get meta.idempotency_key, queries do not; key is not repeated in 
   assert.equal(q.requestExample.params.meta, undefined);
 });
 
-test('aggregate master-data create examples repeat the validated key in data', () => {
-  for (const name of ['create_owner_full', 'create_pack_with_items', 'create_sku_full']) {
+const COMPATIBLE_DATA_KEY_METHODS = [
+  'create_owner_full',
+  'create_pack_with_items',
+  'create_sku_full',
+  'lot_policy_config_create',
+  'create_receipt_policy',
+  'create_replenishment_policy',
+];
+
+test('onboarding create examples use the recommended meta key only', () => {
+  for (const name of COMPATIBLE_DATA_KEY_METHODS) {
     const cmd = buildMethodRecord({
       name,
       'x-quark-command-type': 'stateless_command',
@@ -52,21 +84,23 @@ test('aggregate master-data create examples repeat the validated key in data', (
       result: { schema: { type: 'object' } },
     });
     assert.equal(cmd.requestExample.params.meta.idempotency_key, SAMPLE_UUID);
-    assert.equal(cmd.requestExample.params.data.idempotency_key, SAMPLE_UUID);
+    assert.equal(cmd.requestExample.params.data.idempotency_key, undefined);
   }
 });
 
-test('published aggregate master-data schemas require both idempotency keys', () => {
+test('published onboarding create schemas accept either key location without a zero default', () => {
   const catalog = JSON.parse(readFileSync(resolve(here, '../../docs-obsidian/user-guide/api/openrpc.json'), 'utf8'));
-  for (const name of ['create_owner_full', 'create_pack_with_items', 'create_sku_full']) {
+  for (const name of COMPATIBLE_DATA_KEY_METHODS) {
     const method = catalog.methods.find((candidate) => candidate.name === name);
     assert.ok(method, name);
     const meta = method.params.find((param) => param.name === 'meta');
     const data = method.params.find((param) => param.name === 'data');
-    assert.equal(meta.required, true, `${name} meta parameter`);
-    assert.ok(meta.schema.required.includes('idempotency_key'), `${name} meta key`);
     assert.equal(data.required, true, `${name} data parameter`);
-    assert.ok(data.schema.required.includes('idempotency_key'), `${name} data key`);
+    assert.notEqual(meta.required, true, `${name} meta remains optional on the wire`);
+    assert.ok(!meta.schema.required?.includes('idempotency_key'), `${name} meta key remains optional on the wire`);
+    assert.ok(!data.schema.required?.includes('idempotency_key'), `${name} data key remains optional on the wire`);
+    assert.equal(data.schema.properties.idempotency_key.default, undefined, `${name} must not advertise the rejected zero UUID`);
+    assert.equal(method['x-quark-request-schema-hash'], requestSchemaHash(method), `${name} request schema hash`);
   }
 });
 

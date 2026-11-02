@@ -10414,7 +10414,7 @@
       "params": [
         {
           "name": "meta",
-          "required": true,
+          "required": false,
           "schema": {
             "properties": {
               "acknowledged_overrides": {
@@ -10452,10 +10452,7 @@
                 "type": "string"
               }
             },
-            "type": "object",
-            "required": [
-              "idempotency_key"
-            ]
+            "type": "object"
           },
           "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
         },
@@ -10688,8 +10685,7 @@
             "required": [
               "code",
               "descr",
-              "items",
-              "idempotency_key"
+              "items"
             ],
             "title": "CreatePackWithItems",
             "type": "object"
@@ -11240,7 +11236,7 @@
         "type": "object"
       },
       "x-quark-payload-schema-hash": "sha256:51eae99862a3032023359a11e6083c72965594617404407eeb04a303e37f066e",
-      "x-quark-request-schema-hash": "sha256:14746064a9a09e2dcfd6985eeca84975e2c37982a715f6290ac8109592658074",
+      "x-quark-request-schema-hash": "sha256:dcf083cf74d20834efc4906bef421c8fe78a2f52c75db8265bd88e6df75f1ac3",
       "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:51eae99862a3032023359a11e6083c72965594617404407eeb04a303e37f066e",
       "x-quark-result-contract-version": 2,
@@ -17095,7 +17091,7 @@
       "params": [
         {
           "name": "meta",
-          "required": true,
+          "required": false,
           "schema": {
             "properties": {
               "acknowledged_overrides": {
@@ -17133,10 +17129,7 @@
                 "type": "string"
               }
             },
-            "type": "object",
-            "required": [
-              "idempotency_key"
-            ]
+            "type": "object"
           },
           "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
         },
@@ -17666,8 +17659,7 @@
               }
             },
             "required": [
-              "owner",
-              "idempotency_key"
+              "owner"
             ],
             "title": "CreateOwnerFull",
             "type": "object"
@@ -18907,7 +18899,7 @@
         "type": "object"
       },
       "x-quark-payload-schema-hash": "sha256:a05bb0c04ce7e84b0c634a9b7d58bb8c35d93f9f850611a09bf4f214e56d757b",
-      "x-quark-request-schema-hash": "sha256:0fc6a90c79f9c1f879f2ff75e0b28c9f53a76483a92c9c82135390adbfe1f608",
+      "x-quark-request-schema-hash": "sha256:d0b0c7206a80b4d53e97401acd63af6612a85a344812438178d32ea181ea0698",
       "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:a05bb0c04ce7e84b0c634a9b7d58bb8c35d93f9f850611a09bf4f214e56d757b",
       "x-quark-result-contract-version": 2,
@@ -33679,7 +33671,7 @@
       "params": [
         {
           "name": "meta",
-          "required": true,
+          "required": false,
           "schema": {
             "properties": {
               "acknowledged_overrides": {
@@ -33717,10 +33709,7 @@
                 "type": "string"
               }
             },
-            "type": "object",
-            "required": [
-              "idempotency_key"
-            ]
+            "type": "object"
           },
           "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
         },
@@ -34300,8 +34289,7 @@
               }
             },
             "required": [
-              "sku",
-              "idempotency_key"
+              "sku"
             ],
             "title": "CreateSkuFull",
             "type": "object"
@@ -35527,7 +35515,7 @@
         "type": "object"
       },
       "x-quark-payload-schema-hash": "sha256:54034efd9fefca572cb4707e279b21c90588dcf7e578bb6697dff6c3ee926ead",
-      "x-quark-request-schema-hash": "sha256:75296819f479cb39e28ad80dac15a800091693dd731a845db0cd5467e1b85471",
+      "x-quark-request-schema-hash": "sha256:76839481be1d7ae0292d47d12931b7cea3f05c106b73a677ec2a7ab348c2936c",
       "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:54034efd9fefca572cb4707e279b21c90588dcf7e578bb6697dff6c3ee926ead",
       "x-quark-result-contract-version": 2,
@@ -46231,30 +46219,73 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": false,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "additionalProperties": false,
             "definitions": {
               "LotCreationPolicy": {
                 "oneOf": [
                   {
-                    "description": "Как было до миграции 351: искать партию по атрибутам, и завести новую только если ничего не подошло. Два физически разных прихода с одинаковыми атрибутами попадают в ОДНУ партию.",
+                    "description": "Reuse an existing lot when its tracked attributes match; otherwise create a new lot.",
                     "enum": [
                       "Existing"
                     ],
                     "type": "string"
                   },
                   {
-                    "description": "Одна партия на приёмку: все приёмы одного документа кладутся в неё.",
+                    "description": "Use one lot for all receiving events on the same receipt.",
                     "enum": [
                       "PerReceipt"
                     ],
                     "type": "string"
                   },
                   {
-                    "description": "Своя партия на КАЖДЫЙ физический приход. Остатки разных приходов не сольются: партия входит в ключ слияния наравне с владельцем, товаром, упаковкой, единицей, ячейкой и контейнером.",
+                    "description": "Create a separate lot for every physical receiving event.",
                     "enum": [
                       "PerReceiveEvent"
                     ],
@@ -46494,19 +46525,24 @@
                 "type": "object"
               }
             },
+            "description": "Create the root and first complete attribute set in one transaction.",
             "properties": {
               "code": {
                 "type": "string"
               },
               "data": {
                 "$ref": "#/definitions/LotPolicyAggregateDraft"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
               }
             },
             "required": [
               "code",
               "data"
             ],
-            "title": "LotPolicyAggregateForCreate",
+            "title": "CreateLotPolicyConfig",
             "type": "object"
           },
           "summary": null
@@ -46521,21 +46557,21 @@
             "LotCreationPolicy": {
               "oneOf": [
                 {
-                  "description": "Как было до миграции 351: искать партию по атрибутам, и завести новую только если ничего не подошло. Два физически разных прихода с одинаковыми атрибутами попадают в ОДНУ партию.",
+                  "description": "Reuse an existing lot when its tracked attributes match; otherwise create a new lot.",
                   "enum": [
                     "Existing"
                   ],
                   "type": "string"
                 },
                 {
-                  "description": "Одна партия на приёмку: все приёмы одного документа кладутся в неё.",
+                  "description": "Use one lot for all receiving events on the same receipt.",
                   "enum": [
                     "PerReceipt"
                   ],
                   "type": "string"
                 },
                 {
-                  "description": "Своя партия на КАЖДЫЙ физический приход. Остатки разных приходов не сольются: партия входит в ключ слияния наравне с владельцем, товаром, упаковкой, единицей, ячейкой и контейнером.",
+                  "description": "Create a separate lot for every physical receiving event.",
                   "enum": [
                     "PerReceiveEvent"
                   ],
@@ -46627,7 +46663,7 @@
                       "$ref": "#/definitions/LotCreationPolicy"
                     }
                   ],
-                  "description": "КОГДА рождается новая партия (миграция 351).\n\nЭто единственное место, где такое решение записано. До 351 его не принимал никто: партия бралась по совпадению атрибутов, и совпадение молча означало «это тот же товар из того же прихода»."
+                  "description": "Controls when the system creates a new lot."
                 },
                 "mod_when": {
                   "type": "string"
@@ -46670,7 +46706,7 @@
                   "type": "boolean"
                 },
                 "show_on_pick_manufactured_date": {
-                  "description": "Shown on the pick card (spec 2026-10-04 §8). Only a date captured on receipt can be shown: `chk_lot_policy_pick_dates_need_receipt`.",
+                  "description": "Shown on the pick card when the date is captured during receiving.",
                   "type": "boolean"
                 },
                 "verification_best_by_date": {
@@ -46688,7 +46724,7 @@
                       "$ref": "#/definitions/LotPhysicalVerification"
                     }
                   ],
-                  "description": "How the operator can check the date on the goods. Anything but `NotVerifiable` needs the date shown on pick: `chk_lot_policy_verified_dates_are_shown`."
+                  "description": "How the operator can verify the date on the goods. A verified date must also be shown on the pick card."
                 },
                 "version": {
                   "format": "int32",
@@ -46763,7 +46799,7 @@
                   "type": "integer"
                 },
                 "override_allowed": {
-                  "description": "Phase 1 (migration 083). Per Decisions Log D-27.",
+                  "description": "Whether an operator may override this attribute.",
                   "type": "boolean"
                 },
                 "physical_verification": {
@@ -46772,7 +46808,7 @@
                       "$ref": "#/definitions/LotPhysicalVerification"
                     }
                   ],
-                  "description": "How the operator can check the value on the goods. Anything but `NotVerifiable` needs `show_on_pick`: `chk_lot_policy_attribute_verified_is_shown`."
+                  "description": "How the operator can verify the value on the goods. A verified value must also be shown on the pick card."
                 },
                 "required": {
                   "type": "boolean"
@@ -46781,7 +46817,7 @@
                   "type": "boolean"
                 },
                 "show_on_pick": {
-                  "description": "Shown on the pick card (spec 2026-10-04 §8). Needs `show`: `chk_lot_policy_attribute_pick_needs_receipt`.",
+                  "description": "Shown on the pick card. This option requires the attribute to be visible.",
                   "type": "boolean"
                 }
               },
@@ -46838,9 +46874,650 @@
       "x-quark-module-class": "mixed",
       "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:651a2996fb4dbc31e6fc069cc2301dd77bfd694ceb83ee69beff4cfd0aafbeb9",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "LotCreationPolicy": {
+            "oneOf": [
+              {
+                "description": "Reuse an existing lot when its tracked attributes match; otherwise create a new lot.",
+                "enum": [
+                  "Existing"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Use one lot for all receiving events on the same receipt.",
+                "enum": [
+                  "PerReceipt"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Create a separate lot for every physical receiving event.",
+                "enum": [
+                  "PerReceiveEvent"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "LotPhysicalVerification": {
+            "oneOf": [
+              {
+                "description": "The operator cannot check this value on the floor; the card may show it, nothing is asked.",
+                "enum": [
+                  "NotVerifiable"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "The operator compares the value printed on the goods with the card.",
+                "enum": [
+                  "Visual"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "The value is read from a barcode on the goods.",
+                "enum": [
+                  "Barcode"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Either of the two.",
+                "enum": [
+                  "VisualOrBarcode"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "LotPolicy": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "code": {
+                "type": "string"
+              },
+              "descr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "label_best_by_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_delivery_by_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_expiration_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_manufactured_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lot_creation": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotCreationPolicy"
+                  }
+                ],
+                "description": "Controls when the system creates a new lot."
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "required_best_by_date": {
+                "type": "boolean"
+              },
+              "required_delivery_by_date": {
+                "type": "boolean"
+              },
+              "required_expiration_date": {
+                "type": "boolean"
+              },
+              "required_manufactured_date": {
+                "type": "boolean"
+              },
+              "show_best_by_date": {
+                "type": "boolean"
+              },
+              "show_delivery_by_date": {
+                "type": "boolean"
+              },
+              "show_expiration_date": {
+                "type": "boolean"
+              },
+              "show_manufactured_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_best_by_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_delivery_by_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_expiration_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_manufactured_date": {
+                "description": "Shown on the pick card when the date is captured during receiving.",
+                "type": "boolean"
+              },
+              "verification_best_by_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_delivery_by_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_expiration_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_manufactured_date": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotPhysicalVerification"
+                  }
+                ],
+                "description": "How the operator can verify the date on the goods. A verified date must also be shown on the pick card."
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "code",
+              "id",
+              "lot_creation",
+              "mod_when",
+              "mod_who",
+              "required_best_by_date",
+              "required_delivery_by_date",
+              "required_expiration_date",
+              "required_manufactured_date",
+              "show_best_by_date",
+              "show_delivery_by_date",
+              "show_expiration_date",
+              "show_manufactured_date",
+              "show_on_pick_best_by_date",
+              "show_on_pick_delivery_by_date",
+              "show_on_pick_expiration_date",
+              "show_on_pick_manufactured_date",
+              "verification_best_by_date",
+              "verification_delivery_by_date",
+              "verification_expiration_date",
+              "verification_manufactured_date",
+              "version"
+            ],
+            "type": "object"
+          },
+          "LotPolicyAttribute": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "attrib_code": {
+                "type": "string"
+              },
+              "descr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lot_policy_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "override_allowed": {
+                "description": "Whether an operator may override this attribute.",
+                "type": "boolean"
+              },
+              "physical_verification": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotPhysicalVerification"
+                  }
+                ],
+                "description": "How the operator can verify the value on the goods. A verified value must also be shown on the pick card."
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "show": {
+                "type": "boolean"
+              },
+              "show_on_pick": {
+                "description": "Shown on the pick card. This option requires the attribute to be visible.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "attrib_code",
+              "id",
+              "lot_policy_id",
+              "mod_when",
+              "mod_who",
+              "override_allowed",
+              "physical_verification",
+              "required",
+              "show",
+              "show_on_pick"
+            ],
+            "type": "object"
+          }
+        },
+        "properties": {
+          "attributes": {
+            "items": {
+              "$ref": "#/definitions/LotPolicyAttribute"
+            },
+            "type": "array"
+          },
+          "policy": {
+            "$ref": "#/definitions/LotPolicy"
+          }
+        },
+        "required": [
+          "attributes",
+          "policy"
+        ],
+        "title": "LotPolicyAggregateView",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:58b6e24003e0777da8032e322909a6bd9b50af1f2c3c59551f6d1d4f599b2abf",
+      "x-quark-request-schema-hash": "sha256:202447128269999c5d97f79ae67a6373648dcf665e9b1f2069cc6193a057a199",
+      "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:58b6e24003e0777da8032e322909a6bd9b50af1f2c3c59551f6d1d4f599b2abf",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "LotCreationPolicy": {
+            "oneOf": [
+              {
+                "description": "Reuse an existing lot when its tracked attributes match; otherwise create a new lot.",
+                "enum": [
+                  "Existing"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Use one lot for all receiving events on the same receipt.",
+                "enum": [
+                  "PerReceipt"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Create a separate lot for every physical receiving event.",
+                "enum": [
+                  "PerReceiveEvent"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "LotPhysicalVerification": {
+            "oneOf": [
+              {
+                "description": "The operator cannot check this value on the floor; the card may show it, nothing is asked.",
+                "enum": [
+                  "NotVerifiable"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "The operator compares the value printed on the goods with the card.",
+                "enum": [
+                  "Visual"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "The value is read from a barcode on the goods.",
+                "enum": [
+                  "Barcode"
+                ],
+                "type": "string"
+              },
+              {
+                "description": "Either of the two.",
+                "enum": [
+                  "VisualOrBarcode"
+                ],
+                "type": "string"
+              }
+            ]
+          },
+          "LotPolicy": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "code": {
+                "type": "string"
+              },
+              "descr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "label_best_by_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_delivery_by_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_expiration_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "label_manufactured_date": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lot_creation": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotCreationPolicy"
+                  }
+                ],
+                "description": "Controls when the system creates a new lot."
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "required_best_by_date": {
+                "type": "boolean"
+              },
+              "required_delivery_by_date": {
+                "type": "boolean"
+              },
+              "required_expiration_date": {
+                "type": "boolean"
+              },
+              "required_manufactured_date": {
+                "type": "boolean"
+              },
+              "show_best_by_date": {
+                "type": "boolean"
+              },
+              "show_delivery_by_date": {
+                "type": "boolean"
+              },
+              "show_expiration_date": {
+                "type": "boolean"
+              },
+              "show_manufactured_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_best_by_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_delivery_by_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_expiration_date": {
+                "type": "boolean"
+              },
+              "show_on_pick_manufactured_date": {
+                "description": "Shown on the pick card when the date is captured during receiving.",
+                "type": "boolean"
+              },
+              "verification_best_by_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_delivery_by_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_expiration_date": {
+                "$ref": "#/definitions/LotPhysicalVerification"
+              },
+              "verification_manufactured_date": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotPhysicalVerification"
+                  }
+                ],
+                "description": "How the operator can verify the date on the goods. A verified date must also be shown on the pick card."
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "code",
+              "id",
+              "lot_creation",
+              "mod_when",
+              "mod_who",
+              "required_best_by_date",
+              "required_delivery_by_date",
+              "required_expiration_date",
+              "required_manufactured_date",
+              "show_best_by_date",
+              "show_delivery_by_date",
+              "show_expiration_date",
+              "show_manufactured_date",
+              "show_on_pick_best_by_date",
+              "show_on_pick_delivery_by_date",
+              "show_on_pick_expiration_date",
+              "show_on_pick_manufactured_date",
+              "verification_best_by_date",
+              "verification_delivery_by_date",
+              "verification_expiration_date",
+              "verification_manufactured_date",
+              "version"
+            ],
+            "type": "object"
+          },
+          "LotPolicyAttribute": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "attrib_code": {
+                "type": "string"
+              },
+              "descr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "label": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "lot_policy_id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "override_allowed": {
+                "description": "Whether an operator may override this attribute.",
+                "type": "boolean"
+              },
+              "physical_verification": {
+                "allOf": [
+                  {
+                    "$ref": "#/definitions/LotPhysicalVerification"
+                  }
+                ],
+                "description": "How the operator can verify the value on the goods. A verified value must also be shown on the pick card."
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "show": {
+                "type": "boolean"
+              },
+              "show_on_pick": {
+                "description": "Shown on the pick card. This option requires the attribute to be visible.",
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "attrib_code",
+              "id",
+              "lot_policy_id",
+              "mod_when",
+              "mod_who",
+              "override_allowed",
+              "physical_verification",
+              "required",
+              "show",
+              "show_on_pick"
+            ],
+            "type": "object"
+          },
+          "ResultMeta": {
+            "description": "`idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "properties": {
+              "attributes": {
+                "items": {
+                  "$ref": "#/definitions/LotPolicyAttribute"
+                },
+                "type": "array"
+              },
+              "policy": {
+                "$ref": "#/definitions/LotPolicy"
+              }
+            },
+            "required": [
+              "attributes",
+              "policy"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_LotPolicyAggregateView",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:7d3bb776bf4c105898f16fe42e88c2c462aabec250dfd009794f3db737344d22",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "lot_policy_config_save",
@@ -49497,11 +50174,54 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": false,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "additionalProperties": false,
             "definitions": {
               "AllowError": {
                 "enum": [
@@ -49512,6 +50232,7 @@
                 "type": "string"
               }
             },
+            "description": "Complete receipt policy and optional compatibility key for this create action.",
             "properties": {
               "asn_po_qty_discrepancy": {
                 "$ref": "#/definitions/AllowError"
@@ -49566,6 +50287,10 @@
                   "integer",
                   "null"
                 ]
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
               },
               "no_sku_on_asn": {
                 "$ref": "#/definitions/AllowError"
@@ -49684,7 +50409,7 @@
               "receipt_without_lpn",
               "receipt_without_po"
             ],
-            "title": "ReceiptPolicyForCreate",
+            "title": "CreateReceiptPolicy",
             "type": "object"
           },
           "summary": null
@@ -49890,9 +50615,398 @@
       "x-quark-module-class": "mixed",
       "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:e51d83e8ffbffc781054e9cba654457afaa262f83220e503236e0b836dee4e64",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AllowError": {
+            "enum": [
+              "Allow",
+              "HardError",
+              "Warning"
+            ],
+            "type": "string"
+          }
+        },
+        "properties": {
+          "add_when": {
+            "type": "string"
+          },
+          "add_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "asn_po_qty_discrepancy": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "code": {
+            "type": "string"
+          },
+          "date_deviation_check": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "descr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "excess_error": {
+            "type": "boolean"
+          },
+          "excess_error_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "excess_message": {
+            "type": "boolean"
+          },
+          "excess_override": {
+            "type": "boolean"
+          },
+          "excess_override_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "mod_when": {
+            "type": "string"
+          },
+          "mod_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "no_sku_on_asn": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "no_sku_on_po": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "po_excess_error": {
+            "type": "boolean"
+          },
+          "po_excess_error_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "po_excess_message": {
+            "type": "boolean"
+          },
+          "po_excess_override": {
+            "type": "boolean"
+          },
+          "po_excess_override_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "po_qty_validation": {
+            "type": "string"
+          },
+          "po_shortage_message": {
+            "type": "boolean"
+          },
+          "po_shortage_override": {
+            "type": "boolean"
+          },
+          "po_shortage_override_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "qty_pack_multiple_check": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "qty_validation": {
+            "type": "string"
+          },
+          "receipt_without_asn": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "receipt_without_lpn": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "receipt_without_po": {
+            "$ref": "#/definitions/AllowError"
+          },
+          "shortage_message": {
+            "type": "boolean"
+          },
+          "shortage_override": {
+            "type": "boolean"
+          },
+          "shortage_override_percent": {
+            "format": "int32",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "version": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "add_when",
+          "add_who",
+          "asn_po_qty_discrepancy",
+          "code",
+          "date_deviation_check",
+          "excess_error",
+          "excess_message",
+          "excess_override",
+          "id",
+          "mod_when",
+          "mod_who",
+          "no_sku_on_asn",
+          "no_sku_on_po",
+          "po_excess_error",
+          "po_excess_message",
+          "po_excess_override",
+          "po_qty_validation",
+          "po_shortage_message",
+          "po_shortage_override",
+          "qty_pack_multiple_check",
+          "qty_validation",
+          "receipt_without_asn",
+          "receipt_without_lpn",
+          "receipt_without_po",
+          "shortage_message",
+          "shortage_override",
+          "version"
+        ],
+        "title": "ReceiptPolicy",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:292ec5d02ed97cad86a32e001bb428097c65a950405cc707911387f6f7339bed",
+      "x-quark-request-schema-hash": "sha256:ac2a5ef030699a2cc8cac27edfa128126c0c7e4f4c43f6877a5040b02661a018",
+      "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:292ec5d02ed97cad86a32e001bb428097c65a950405cc707911387f6f7339bed",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "AllowError": {
+            "enum": [
+              "Allow",
+              "HardError",
+              "Warning"
+            ],
+            "type": "string"
+          },
+          "ResultMeta": {
+            "description": "`idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "asn_po_qty_discrepancy": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "code": {
+                "type": "string"
+              },
+              "date_deviation_check": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "descr": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "excess_error": {
+                "type": "boolean"
+              },
+              "excess_error_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "excess_message": {
+                "type": "boolean"
+              },
+              "excess_override": {
+                "type": "boolean"
+              },
+              "excess_override_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "no_sku_on_asn": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "no_sku_on_po": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "po_excess_error": {
+                "type": "boolean"
+              },
+              "po_excess_error_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "po_excess_message": {
+                "type": "boolean"
+              },
+              "po_excess_override": {
+                "type": "boolean"
+              },
+              "po_excess_override_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "po_qty_validation": {
+                "type": "string"
+              },
+              "po_shortage_message": {
+                "type": "boolean"
+              },
+              "po_shortage_override": {
+                "type": "boolean"
+              },
+              "po_shortage_override_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "qty_pack_multiple_check": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "qty_validation": {
+                "type": "string"
+              },
+              "receipt_without_asn": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "receipt_without_lpn": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "receipt_without_po": {
+                "$ref": "#/definitions/AllowError"
+              },
+              "shortage_message": {
+                "type": "boolean"
+              },
+              "shortage_override": {
+                "type": "boolean"
+              },
+              "shortage_override_percent": {
+                "format": "int32",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "asn_po_qty_discrepancy",
+              "code",
+              "date_deviation_check",
+              "excess_error",
+              "excess_message",
+              "excess_override",
+              "id",
+              "mod_when",
+              "mod_who",
+              "no_sku_on_asn",
+              "no_sku_on_po",
+              "po_excess_error",
+              "po_excess_message",
+              "po_excess_override",
+              "po_qty_validation",
+              "po_shortage_message",
+              "po_shortage_override",
+              "qty_pack_multiple_check",
+              "qty_validation",
+              "receipt_without_asn",
+              "receipt_without_lpn",
+              "receipt_without_po",
+              "shortage_message",
+              "shortage_override",
+              "version"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_ReceiptPolicy",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:6aeae7eb84479ad9d626495c85290aa2e58e6228921463a89d40b5e75c434e70",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "get_receipt_policy",
@@ -123703,19 +124817,68 @@
       "paramStructure": "by-name",
       "params": [
         {
+          "name": "meta",
+          "required": false,
+          "schema": {
+            "properties": {
+              "acknowledged_overrides": {
+                "items": {
+                  "oneOf": [
+                    {
+                      "description": "Bare override code (receipt / dimensionless).",
+                      "type": "integer"
+                    },
+                    {
+                      "description": "Move override pair (dimension code + hold-code subject).",
+                      "properties": {
+                        "code": {
+                          "type": "integer"
+                        },
+                        "subject": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code"
+                      ],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "expected_version": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "idempotency_key": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "summary": "Control fields for replay protection, version checks and acknowledged overrides. Send only the fields required by the method."
+        },
+        {
           "name": "data",
           "required": true,
           "schema": {
             "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Replenishment-policy root and optional compatibility key for this create action.",
             "properties": {
               "code": {
+                "type": "string"
+              },
+              "idempotency_key": {
+                "format": "uuid",
                 "type": "string"
               }
             },
             "required": [
               "code"
             ],
-            "title": "ReplenishmentPolicyForCreate",
+            "title": "CreateReplenishmentPolicy",
             "type": "object"
           },
           "summary": null
@@ -123780,25 +124943,169 @@
           "type": "object"
         }
       },
-      "summary": "Create a new replenishment_policy — CRUD.",
+      "summary": "Create a replenishment-policy root with durable caller-key replay.",
       "tags": [
         {
           "name": "outbound"
         }
       ],
+      "x-quark-command-type": "stateless_command",
       "x-quark-context": "outbound",
       "x-quark-default-roles": [
         "ADMIN",
         "MANAGER"
       ],
-      "x-quark-method-class": "reference_crud",
+      "x-quark-method-class": "domain_command",
       "x-quark-module": "replenishment_policy",
       "x-quark-module-class": "mixed",
-      "x-quark-operation": "create",
+      "x-quark-operation": "execute",
       "x-quark-override-mode": "replace",
-      "x-quark-request-schema-hash": "sha256:907ab6df63eb1c08ca8750ee9388b5288de71e5de4a953a545c3b197ada7b5b4",
+      "x-quark-payload-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "properties": {
+          "add_when": {
+            "type": "string"
+          },
+          "add_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "code": {
+            "type": "string"
+          },
+          "empty_is_urgent": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "important_reserved_pct": {
+            "format": "double",
+            "type": "number"
+          },
+          "mod_when": {
+            "type": "string"
+          },
+          "mod_who": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "urgent_reserved_pct": {
+            "format": "double",
+            "type": "number"
+          },
+          "version": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "add_when",
+          "add_who",
+          "code",
+          "empty_is_urgent",
+          "id",
+          "important_reserved_pct",
+          "mod_when",
+          "mod_who",
+          "urgent_reserved_pct",
+          "version"
+        ],
+        "title": "ReplenishmentPolicy",
+        "type": "object"
+      },
+      "x-quark-payload-schema-hash": "sha256:c8574c46e78c3e333db6a6710c5cd58ca5b97c305d6df4d83ef8e934f799082c",
+      "x-quark-request-schema-hash": "sha256:f787f5edb7eee0696efed61f9967827b351d32315ea7720259b59a051173d0fb",
+      "x-quark-requires-idempotency": true,
       "x-quark-response-schema-hash": "sha256:c8574c46e78c3e333db6a6710c5cd58ca5b97c305d6df4d83ef8e934f799082c",
-      "x-quark-transaction-readiness": "replace_only"
+      "x-quark-result-contract-version": 2,
+      "x-quark-result-envelope": "command",
+      "x-quark-transaction-readiness": "replace_only",
+      "x-quark-wire-result-schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+          "ResultMeta": {
+            "description": "`idempotency_replayed` is true when the result came from an earlier call with the same key.",
+            "properties": {
+              "idempotency_replayed": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "idempotency_replayed"
+            ],
+            "type": "object"
+          }
+        },
+        "description": "Command response containing replay metadata and typed result data.",
+        "properties": {
+          "data": {
+            "properties": {
+              "add_when": {
+                "type": "string"
+              },
+              "add_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "code": {
+                "type": "string"
+              },
+              "empty_is_urgent": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "important_reserved_pct": {
+                "format": "double",
+                "type": "number"
+              },
+              "mod_when": {
+                "type": "string"
+              },
+              "mod_who": {
+                "format": "int64",
+                "type": "integer"
+              },
+              "urgent_reserved_pct": {
+                "format": "double",
+                "type": "number"
+              },
+              "version": {
+                "format": "int32",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "add_when",
+              "add_who",
+              "code",
+              "empty_is_urgent",
+              "id",
+              "important_reserved_pct",
+              "mod_when",
+              "mod_who",
+              "urgent_reserved_pct",
+              "version"
+            ],
+            "type": "object"
+          },
+          "meta": {
+            "$ref": "#/definitions/ResultMeta"
+          }
+        },
+        "required": [
+          "data",
+          "meta"
+        ],
+        "title": "CommandResult_for_ReplenishmentPolicy",
+        "type": "object"
+      },
+      "x-quark-wire-result-schema-hash": "sha256:dcaf791134ad5ef25891177ae8bb58f681bff7282a73843cca9cd9e9e9d56d46",
+      "x-quark-wire-result-schema-typed": true
     },
     {
       "name": "replenishment_policy_save",
