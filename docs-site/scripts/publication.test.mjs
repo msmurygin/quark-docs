@@ -4,7 +4,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync,readd
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {PUBLIC_FORBIDDEN_PATTERNS,sanitizePublicGuideTree,sanitizePublicMarkdownSource,sanitizePublicObject,sanitizePublicText} from '../src/build/public-guide-sanitize.mjs';
+import {markNonWrappingTableColumns,normalizeReferenceTables,PUBLIC_FORBIDDEN_PATTERNS,sanitizePublicGuideTree,sanitizePublicMarkdownSource,sanitizePublicObject,sanitizePublicText} from '../src/build/public-guide-sanitize.mjs';
 const site=resolve(import.meta.dirname,'..');
 for(const mode of ['production','preview'])test(`${mode} output has the right robots and API canonical metadata`,()=>{
  const dir=mkdtempSync(join(tmpdir(),'quark-docs-test-'));try{
@@ -63,6 +63,67 @@ test('web screenshots fill the article while RF screenshots stay compact',()=>{
  assert.match(css,/max-width:\s*min\(100%,\s*300px\)/);
  assert.doesNotMatch(css,/:not\(\[width='1280'\]\)/);
  assert.doesNotMatch(css,/:not\(\[width='2880'\]\)/);
+});
+
+test('inline code never wraps and wide tables scroll instead of splitting codes',()=>{
+ const css=readFileSync(join(site,'src/css/custom.css'),'utf8');
+ const rules=[...css.matchAll(/\.markdown\s+:not\(pre\)\s*>\s*code\s*\{([^}]*)\}/g)].map((match)=>match[1]);
+ assert.equal(rules.length,1,'keep one authoritative inline-code rule');
+ assert.match(rules[0],/white-space:\s*nowrap/);
+ assert.match(rules[0],/overflow-wrap:\s*normal/);
+ assert.match(rules[0],/word-break:\s*normal/);
+ const tableRule=/\.markdown table\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+ assert.match(tableRule,/overflow-x:\s*auto/);
+ assert.match(css,/\.markdown \.table-cell--nowrap\s*\{[^}]*white-space:\s*nowrap/);
+ assert.match(css,/table:has\(\.table-cell--nowrap\)[^{]*:not\(\.table-cell--nowrap\)\{[^}]*min-width:\s*11rem/);
+});
+
+test('Field, Code and Class table columns never wrap',()=>{
+ const cell=(value)=>({type:'tableCell',children:[{type:'text',value}]});
+ const tree={type:'root',children:[{type:'table',children:[
+  {type:'tableRow',children:['Field','Meaning','Code','Class'].map(cell)},
+  {type:'tableRow',children:['owner_carrier_list_form','Picker','CARR001','Trn'].map(cell)},
+ ]}]};
+ markNonWrappingTableColumns(tree);
+ const [header,row]=tree.children[0].children;
+ for(const index of [0,2,3]){
+  assert.deepEqual(header.children[index].data.hProperties.className,['table-cell--nowrap']);
+  assert.deepEqual(row.children[index].data.hProperties.className,['table-cell--nowrap']);
+ }
+ assert.equal(row.children[1].data,undefined);
+
+ const typed={type:'table',children:[
+  {type:'tableRow',children:['Field (type)','Meaning'].map(cell)},
+  {type:'tableRow',children:['Code, Name (required)','Identity'].map(cell)},
+ ]};
+ markNonWrappingTableColumns(typed);
+ assert.deepEqual(typed.children[1].children[0].data.hProperties.className,['table-cell--nowrap']);
+});
+
+test('reference tables get separate Required and Error code columns',()=>{
+ const cell=(children)=>({type:'tableCell',children:Array.isArray(children)?children:[{type:'text',value:children}]});
+ const tree={type:'root',children:[
+  {type:'table',align:[null,null],children:[
+   {type:'tableRow',children:[cell('Field (type)'),cell('Meaning')]},
+   {type:'tableRow',children:[cell([{type:'inlineCode',value:'Serial Scope'},{type:'text',value:' (required)'}]),cell('Serial identity')]},
+   {type:'tableRow',children:[cell([{type:'inlineCode',value:'Serial Format'}]),cell('Format rules')]},
+  ]},
+  {type:'table',align:[null,null,null],children:[
+   {type:'tableRow',children:[cell('Message'),cell('Meaning'),cell('Fix')]},
+   {type:'tableRow',children:[cell([{type:'text',value:'Code 65 '},{type:'inlineCode',value:'SerialRequired'}]),cell('A serial is needed'),cell('Scan it')]},
+   {type:'tableRow',children:[cell('Another message'),cell('Something else'),cell('Retry')]},
+  ]},
+ ]};
+ normalizeReferenceTables(tree);
+ const [fields,errors]=tree.children;
+ assert.deepEqual(fields.children[0].children.map(node=>node.children[0].value),['Field (type)','Required','Meaning']);
+ assert.equal(fields.children[1].children[0].children[0].value,'Serial Scope');
+ assert.equal(fields.children[1].children[1].children[0].value,'Yes');
+ assert.equal(fields.children[2].children[1].children[0].value,'No');
+ assert.deepEqual(errors.children[0].children.map(node=>node.children[0].value),['Error code','Message','Meaning','Fix']);
+ assert.equal(errors.children[1].children[0].children[0].value,'65');
+ assert.equal(errors.children[1].children[1].children[0].value,'SerialRequired');
+ assert.equal(errors.children[2].children[0].children[0].value,'—');
 });
 
 test('publication sanitizer hides author evidence without damaging customer instructions',()=>{

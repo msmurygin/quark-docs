@@ -162,6 +162,105 @@ function nodeText(node) {
   return Array.isArray(node.children) ? node.children.map(nodeText).join('') : '';
 }
 
+const NON_WRAPPING_TABLE_HEADERS = new Set(['field', 'fields', 'code', 'codes', 'class', 'classes', 'required', 'error code']);
+
+function isIdentifierTableHeader(value) {
+  const label = value.trim().toLowerCase();
+  return NON_WRAPPING_TABLE_HEADERS.has(label) || /^(?:fields?|codes?|classes?)\s*\([^)]*\)$/.test(label);
+}
+
+function isFieldTableHeader(value) {
+  return /^fields?(?:\s*\([^)]*\))?$/.test(value.trim().toLowerCase());
+}
+
+function addClass(node, name) {
+  node.data ??= {};
+  node.data.hProperties ??= {};
+  const value = node.data.hProperties.className;
+  const classes = Array.isArray(value) ? value : typeof value === 'string' ? value.split(/\s+/).filter(Boolean) : [];
+  if (!classes.includes(name)) classes.push(name);
+  node.data.hProperties.className = classes;
+}
+
+/** Keep identifier columns intact; the table itself provides horizontal scrolling. */
+export function markNonWrappingTableColumns(node) {
+  if (!node || typeof node !== 'object') return;
+  if (node.type === 'table') {
+    const rows = node.children ?? [];
+    const header = rows[0]?.children ?? [];
+    const columns = header
+      .map((cell, index) => isIdentifierTableHeader(nodeText(cell)) ? index : -1)
+      .filter((index) => index >= 0);
+    for (const row of rows) {
+      for (const column of columns) {
+        const cell = row.children?.[column];
+        if (cell) addClass(cell, 'table-cell--nowrap');
+      }
+    }
+  }
+  for (const child of node.children ?? []) markNonWrappingTableColumns(child);
+}
+
+const tableCell = (value) => ({type: 'tableCell', children: [{type: 'text', value}]});
+
+function stripRequiredLabel(node) {
+  if (typeof node?.value === 'string') node.value = node.value.replace(/\s*\(\s*required\s*\)/gi, '');
+  for (const child of node?.children ?? []) stripRequiredLabel(child);
+}
+
+function stripLeadingText(node, length) {
+  if (length <= 0 || !node || typeof node !== 'object') return length;
+  if (typeof node.value === 'string') {
+    const removed = Math.min(length, node.value.length);
+    node.value = node.value.slice(removed);
+    return length - removed;
+  }
+  for (const child of node.children ?? []) {
+    length = stripLeadingText(child, length);
+    if (length <= 0) break;
+  }
+  node.children = (node.children ?? []).filter((child) => child.type !== 'text' || child.value !== '');
+  return length;
+}
+
+/** Turn prose annotations in reference tables into scannable columns. */
+export function normalizeReferenceTables(node) {
+  if (!node || typeof node !== 'object') return;
+  if (node.type === 'table') {
+    const rows = node.children ?? [];
+    const header = rows[0]?.children ?? [];
+    const labels = header.map((cell) => nodeText(cell).trim().toLowerCase());
+    const fieldColumn = labels.findIndex(isFieldTableHeader);
+    if (fieldColumn >= 0 && rows.slice(1).some((row) => /\(\s*required\s*\)/i.test(nodeText(row.children?.[fieldColumn])))) {
+      header.splice(fieldColumn + 1, 0, tableCell('Required'));
+      if (Array.isArray(node.align)) node.align.splice(fieldColumn + 1, 0, 'center');
+      for (const row of rows.slice(1)) {
+        const field = row.children?.[fieldColumn];
+        const required = /\(\s*required\s*\)/i.test(nodeText(field));
+        if (field) stripRequiredLabel(field);
+        row.children?.splice(fieldColumn + 1, 0, tableCell(required ? 'Yes' : 'No'));
+      }
+    }
+
+    const updatedHeader = rows[0]?.children ?? [];
+    const messageColumn = updatedHeader.findIndex((cell) => nodeText(cell).trim().toLowerCase() === 'message');
+    const codeRows = messageColumn < 0 ? [] : rows.slice(1).map((row) => {
+      const message = row.children?.[messageColumn];
+      const match = /^Code\s+(\d+(?:\s*\/\s*\d+)*)\b\s*/i.exec(nodeText(message));
+      return {row, message, match};
+    });
+    if (codeRows.some(({match}) => match)) {
+      updatedHeader.splice(messageColumn, 0, tableCell('Error code'));
+      if (Array.isArray(node.align)) node.align.splice(messageColumn, 0, 'center');
+      for (const {row, message, match} of codeRows) {
+        if (message && match) stripLeadingText(message, match[0].length);
+        row.children?.splice(messageColumn, 0, tableCell(match ? match[1].replace(/\s+/g, ' ') : '—'));
+      }
+    }
+  }
+  for (const child of node.children ?? []) normalizeReferenceTables(child);
+}
+
 function findParenthetical(text, at) {
   let depth = 0;
   let left = -1;
