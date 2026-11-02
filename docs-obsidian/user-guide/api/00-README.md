@@ -9,7 +9,7 @@ The guide focuses on supported request formats, responses and operational workfl
 - The API is **JSON-RPC 2.0 over HTTP**. All business calls go to one URL: `POST /api/rpc`.
 - A call names a **method** (for example `receipt_close`) and sends **params** (a JSON object).
 - The server is `app-server`. It is a Rust program built on Axum.
-- The API has **960 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
+- The API has **967 methods** in 9 contexts. The full list is in [reference/index.md](reference/index.md).
 
 ## Base URL
 
@@ -66,7 +66,7 @@ There is **no version number in the URL**. The path is always `/api/rpc`. A chan
 | `master_data` | 127 | Owners, SKUs, locations, packs, policies, barcode formats |
 | `inbound` | 119 | ASNs, receipts, receipt lines, damage, receipt policies |
 | `inventory` | 161 | Moves, putaway, holds, serials, adjustments, counts, transaction log |
-| `outbound` | 263 | Shipment orders, allocation, waves, picking, packing, cartonization |
+| `outbound` | 298 | Shipment orders, allocation, waves, picking, packing, cartonization |
 | `tasks` | 48 | Work areas, operators, equipment profiles, task claim and finish |
 | `reporting` | 51 | Reports, labels, templates, printers |
 | `rf` | 11 | Handheld (RF) screen definitions |
