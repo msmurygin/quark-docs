@@ -103,6 +103,13 @@ test('Field, Code and Class table columns never wrap',()=>{
  ]};
  markNonWrappingTableColumns(typed);
  assert.deepEqual(typed.children[1].children[0].data.hProperties.className,['table-cell--identifier-list']);
+
+ const messages={type:'table',children:[
+  {type:'tableRow',children:['Message or symptom','Meaning'].map(cell)},
+  {type:'tableRow',children:['location {code} not found or does not accept handling units','Unavailable'].map(cell)},
+ ]};
+ markNonWrappingTableColumns(messages);
+ assert.deepEqual(messages.children[1].children[0].data.hProperties.className,['table-cell--wrap']);
 });
 
 test('reference tables get separate Required and Error code columns',()=>{

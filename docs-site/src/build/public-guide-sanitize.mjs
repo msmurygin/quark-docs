@@ -173,6 +173,10 @@ function isFieldTableHeader(value) {
   return /^fields?(?:\s*\([^)]*\))?$/.test(value.trim().toLowerCase());
 }
 
+function isMessageTableHeader(value) {
+  return /^message(?:\s|$)/.test(value.trim().toLowerCase());
+}
+
 function addClass(node, name) {
   node.data ??= {};
   node.data.hProperties ??= {};
@@ -195,7 +199,7 @@ export function markNonWrappingTableColumns(node) {
       .map((cell, index) => isFieldTableHeader(nodeText(cell)) ? index : -1)
       .filter((index) => index >= 0);
     const wrappingColumns = header
-      .map((cell, index) => nodeText(cell).trim().toLowerCase() === 'message' ? index : -1)
+      .map((cell, index) => isMessageTableHeader(nodeText(cell)) ? index : -1)
       .filter((index) => index >= 0);
     for (const row of rows) {
       for (const column of columns) {
