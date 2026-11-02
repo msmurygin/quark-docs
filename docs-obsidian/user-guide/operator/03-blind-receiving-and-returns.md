@@ -9,10 +9,14 @@
 ## Before you start
 
 - For **Receive Blind** and **Receive Return**, know the owner code.
-- For **Receive Return**, know the RMA number. An open customer return must exist.
+- For **Receive Return**, know the RMA number. The first accepted line creates
+  the customer-return receipt; you do not need to create that receipt first.
 - For **Receive Case-Level**, the ASN must be a case-level ASN. Each case has a label.
 - Know the location for the goods. The defaults are `STAGE` (blind) and `RETURN` (return).
 - The operator role may use blind and return receiving. Case-level cancel (**Cancel Planned Case**) needs a supervisor, a manager or an administrator.
+- Do not use **Receive Return** for a serial-tracked SKU. This terminal flow
+  does not capture the returned unit's serial number. Ask a supervisor to use a
+  controlled inventory process instead.
 
 The screen puts `RETURN` in **To Loc**, the location the standard warehouse set-up creates. If your warehouse uses another return location, change **To Loc** to the one your supervisor names. A location that does not exist is refused (see **Invalid location {code}** below).
 
@@ -160,7 +164,10 @@ On **Scan Case**, press `F6` (**Move**).
 *Screen RCRTN01: Owner, RMA #, SKU. Focus: 1 Owner, 2 RMA #, 3 SKU.*
 
 2. On **Receive Return**, in **Owner**, type the owner code. `F2` opens a list.
-3. In **RMA #**, type the RMA number. `F2` lists open customer returns. The hint says **Type RMA reference or F2 to pick from open Customer Returns.**
+3. In **RMA #**, type the RMA number. `F2` lists RMA references from open
+   customer-return receipts. The hint says **Type RMA reference or F2 to pick
+   from open Customer Returns.** Selecting a reference fills the field; it does
+   not reopen that receipt.
 4. In **SKU**, scan the returned item.
 
 ![RCRTN01LINE - Return Line](../assets/screens/RCRTN01LINE.png)
@@ -200,6 +207,11 @@ On **Scan Case**, press `F6` (**Move**).
    - **Status**
 10. The status line says **Enter → next SKU on this return**. Press `Enter` for the next SKU. Press `F8` (**Close**) to close the receipt. Press `Esc` to go to **Receiving**.
 
+The first accepted line creates a new receipt of type **Customer Return** and
+stores the RMA on it. Add every other SKU through **Enter → next SKU** in the
+same terminal session. Starting **Receive Return** again creates another return
+receipt, even when you enter the same RMA.
+
 For the next SKU, the terminal shows **Scan SKU** with **Receipt** and **RMA**.
 
 ![RCRTN02SKU - Scan SKU](../assets/screens/RCRTN02SKU.png)
@@ -223,6 +235,7 @@ For the next SKU, the terminal shows **Scan SKU** with **Receipt** and **RMA**.
 | **asn {number} not found** | No ASN has this number. | Check the number. Press `F2`. |
 | **case_label is blank** | You sent the cancel form without a case. | Scan the case label. |
 | **ReceiveReturnLine: receipt {id} is type {type}, must be CustomerReturn** | The receipt is not a customer return. | Tell your supervisor. |
+| A serial-tracked SKU is returned | This terminal flow has no serial-capture step for returns. | Stop before accepting the line. Ask a supervisor to receive it through a controlled serial-aware process. |
 | **Receipt without LPN is not allowed by owner policy** | **To LPN** is empty, and the owner requires one. | Scan an LPN. |
 | **qty {qty} is not a multiple of pack {pack_qty}** | The quantity does not fit the pack. | Check the quantity and unit. |
 | **receipt id={id} is OnHold — release the hold before receiving** | The receipt is on hold. | Tell your supervisor. |
@@ -258,5 +271,6 @@ Blind and return receipts are created when you receive the first line. The recei
 
 - [02 Receiving against an ASN](02-receiving-against-asn.md)
 - [04 Damage and receipt close](04-damage-and-receipt-close.md)
+- [Administrator: Inbound setup](../admin/05-inbound-setup.md)
 - [05 Putaway](05-putaway.md)
 - [12 Troubleshooting and messages](12-troubleshooting-and-messages.md)

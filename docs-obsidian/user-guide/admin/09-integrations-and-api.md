@@ -23,6 +23,25 @@ This chapter lists only what exists today. It is short on purpose.
 
 The platform includes connector and flow templates for supported integration patterns. A template is a starting point: you still enter the address and credentials for your own environment, test the connector and activate the resulting flow.
 
+### Barcode, serial and marking boundaries
+
+- The standard barcode formats read GS1-128 and GS1 DataMatrix scans. RF
+  receiving can take the item, lot and expiry date from one supported label;
+  serial capture remains a separate step when the SKU requires it. Configure
+  formats under **Warehouse Configuration > Product Data > Barcode Formats**.
+- Continuous serial tracking records a serial's warehouse history. This is
+  WMS traceability; it is not an EPCIS exchange endpoint.
+- The API catalogue includes marking and SGTIN operations. They work only when
+  the deployment has a marking provider configured. Without that provider the
+  call is refused as an unavailable integration; it is not a successful stub.
+- A trading-partner EDI translator is not built into these screens. Use a
+  tested Integration Platform flow or an external EDI service when a partner
+  requires a specific EDI standard.
+
+See [Printing and Labels](07-printing-and-labels.md#4-barcode-formats) for GS1
+format setup and [Serial configuration](policies/33-serial-configuration.md)
+for serial tracking.
+
 ## 2. Call the API
 
 ### What you will do

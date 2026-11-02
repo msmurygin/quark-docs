@@ -108,6 +108,19 @@ For a truly informational code, switch off **Enforce**, **Blocks putting** and *
 | Goods are waiting for destruction | Container (LPN) or lot | Block taking and do not allow an override. |
 | A temporary operational note must remain visible | Lot or LPN | Informational combination: all blocking settings off. |
 
+## QC quarantine: what is recorded
+
+`QcRequired` and `QcQuarantine` are inventory holds. They make the stock wait
+for a quality decision and can keep it out of allocation and picking. A `QC`
+location is a place where that stock can wait.
+
+The current web workflow records the hold, its scope, comments and release. It
+does not provide a separate inspection form, checklist or pass/fail result. Put
+the inspection reference and decision in **Comments**, and release the hold
+only after the warehouse's quality procedure allows the stock to continue.
+Moving stock to or from the QC location does not by itself release a hold;
+check the active hold separately.
+
 ## If an operation is refused
 
 | What you see | What to check |

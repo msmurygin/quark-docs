@@ -75,7 +75,11 @@ On **Station Stop**, the terminal shows:
 
 1. Go to **From**.
 2. Complete every source check the terminal asks for. Depending on the picking policy, this can include the location, item, source LPN, lot or a lot attribute.
-3. If the goods are on a valid LPN other than the reserved one, follow the substitute-LPN prompt. Do not move goods from an unconfirmed source.
+3. If the goods are on another LPN of the same lot, scan that LPN. Press `F8`
+   (**Use this LPN**) only when the terminal offers it. The replacement must be
+   at the same source location, contain enough free stock and have no outbound
+   hold. See [Use another LPN of the same lot](09-picking.md#use-another-lpn-of-the-same-lot).
+   Do not move goods from an unconfirmed source.
 4. Put the goods into the shared tote.
 5. Enter **Collect** and press `Enter`.
 6. Continue with the next stop.
