@@ -76,18 +76,21 @@ a{text-underline-offset:3px}
 .markdown ol>li::marker{font:500 12px var(--qd-mono);color:var(--qd-teal)}
 .markdown li+li{margin-top:6px}
 .markdown hr{margin-block:48px}
-.markdown :not(pre)>code{border:1px solid var(--qd-line-2);border-bottom-width:2px;background:var(--qd-raise);font-weight:500;color:var(--qd-ink);vertical-align:.06em;white-space:nowrap}
+.markdown :not(pre)>code{display:inline-block;max-width:100%;overflow-x:auto;border:1px solid var(--qd-line-2);border-bottom-width:2px;background:var(--qd-raise);font-weight:500;color:var(--qd-ink);vertical-align:middle;white-space:nowrap;overflow-wrap:normal;word-break:normal}
 .hash-link{color:var(--qd-mint);opacity:0;padding-left:8px}
 *:hover>.hash-link{opacity:1}
 
 /* Tables: editorial, no vertical rules */
-.markdown table{display:table;width:100%;border-collapse:collapse;font-size:14.5px;line-height:1.55;margin-block:24px 32px}
+.markdown table{display:block;width:100%;max-width:100%;overflow-x:auto;border-collapse:collapse;font-size:14.5px;line-height:1.55;margin-block:24px 32px}
 .markdown thead tr{border-bottom:1px solid var(--qd-ink)}
 .markdown th{font:500 11px/1.4 var(--qd-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--qd-mute);text-align:left;background:transparent;border:0;padding:0 20px 12px 0}
 .markdown tr{border:0;background:transparent!important}
 .markdown td{border:0;border-bottom:1px solid var(--qd-line-2);padding:14px 20px 14px 0;vertical-align:top}
 .markdown td:first-child,.markdown th:first-child{padding-left:0}
-@media(max-width:996px){.markdown table{display:block;overflow-x:auto}}
+.markdown .table-cell--nowrap{white-space:nowrap;overflow-wrap:normal;word-break:normal}
+.markdown .table-cell--identifier-list{white-space:normal;overflow-wrap:normal;word-break:normal}
+.markdown .table-cell--wrap code{display:inline;max-width:none;overflow-x:visible;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+.markdown table:has(.table-cell--nowrap) :is(th,td):not(.table-cell--nowrap){min-width:11rem}
 
 /* Images and screen captions */
 .markdown img{border:1px solid var(--qd-line-2);background:var(--qd-raise);display:block}
@@ -203,7 +206,6 @@ a{text-underline-offset:3px}
 
 /* Adapters for the existing Markdown renderer; preserve the designer's layout. */
 .theme-doc-markdown, .markdown, article { min-width: 0; }
-.markdown :not(pre) > code { white-space: normal; overflow-wrap: anywhere; }
 .markdown td { overflow-wrap: anywhere; }
 .doc-figure { margin: 2rem 0; }
 .doc-figure img { margin-inline: auto; cursor: zoom-in; width: 100%; height: auto; max-width: 100%; }

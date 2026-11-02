@@ -15,7 +15,7 @@
 import type {MarkdownConfig} from '@docusaurus/types';
 import {existsSync, readFileSync} from 'node:fs';
 import path from 'node:path';
-import {sanitizePublicGuideTree, sanitizePublicMarkdownSource} from './public-guide-sanitize.mjs';
+import {markNonWrappingTableColumns, normalizeReferenceTables, sanitizePublicGuideTree, sanitizePublicMarkdownSource} from './public-guide-sanitize.mjs';
 
 function relToGuide(guideDir: string, filePath: string): string | null {
   const rel = path.relative(guideDir, filePath).split(path.sep).join('/');
@@ -240,6 +240,8 @@ export default function remarkGuide(options: GuideRemarkOptions) {
       if (first?.type === 'text') first.value = String(first.value).replace(/^\d+\s+/, '');
     }
     const publication = sanitizePublicGuideTree(tree);
+    normalizeReferenceTables(tree);
+    markNonWrappingTableColumns(tree);
     if (publication.sections || publication.blocks || publication.inlineEvidence || publication.tableColumns) {
       console.warn(`[guide] ${path.basename(file.path ?? '')}: author evidence hidden from public output (${publication.sections} sections, ${publication.blocks} blocks, ${publication.inlineEvidence} inline references, ${publication.tableColumns} table columns)`);
     }

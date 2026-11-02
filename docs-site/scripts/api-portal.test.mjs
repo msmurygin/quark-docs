@@ -11,6 +11,14 @@ import { hoistSchema } from './lib/openapi.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
 const out = (p) => JSON.parse(readFileSync(resolve(here, '../static/api', p), 'utf8'));
 
+test('API inline code never wraps', () => {
+  const css = readFileSync(resolve(here, '../static/api/portal.css'), 'utf8');
+  const rule = /(?:^|\n)code\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+  assert.match(rule, /white-space:\s*nowrap/);
+  assert.match(rule, /overflow-wrap:\s*normal/);
+  assert.match(rule, /word-break:\s*normal/);
+});
+
 const canonicalJson = (value) => {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
   if (value && typeof value === 'object') {
