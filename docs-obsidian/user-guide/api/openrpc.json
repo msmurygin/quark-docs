@@ -259084,6 +259084,16 @@
           "entity": "load_plan",
           "id_field": "load_plan_id",
           "version_field": "expected_plan_version"
+        },
+        {
+          "entity": "outbound_flow_unit",
+          "id_field": "units[].outbound_flow_unit_id",
+          "version_field": "units[].expected_unit_version"
+        },
+        {
+          "entity": "outbound_unit_assignment",
+          "id_field": "units[].outbound_flow_unit_id",
+          "version_field": "units[].expected_assignment_version"
         }
       ],
       "x-quark-wire-result-schema": {
