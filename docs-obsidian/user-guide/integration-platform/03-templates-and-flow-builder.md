@@ -148,3 +148,54 @@ Deleting a flow also removes its schedules, webhooks and run history. Export any
 Use **Undo** and **Redo** while the builder is open. Before a larger change, select **Export JSON** and keep the reviewed file with the change record. If you need to return to that design later, import it as a separate draft flow, compare it with the current flow and test it before replacing any production trigger.
 
 If a run fails because of a credential or remote outage, fix and test the connector instead of changing an unchanged flow.
+
+## Speedy and Econt shipment labels
+
+The template catalogue contains four manual Bulgarian-carrier flows:
+
+| Template | Result |
+| --- | --- |
+| **Speedy: Create Shipment & Label** | Creates one Speedy shipment, then requests its PDF or ZPL label. |
+| **Econt: Create Shipment & Label** | Creates one Econt shipment and returns its shipment number and waybill PDF URL. |
+| **Speedy: Cancel Shipment** | Cancels a prepared Speedy shipment before pickup is ordered. A cancellation reason is required. |
+| **Econt: Cancel Shipment** | Deletes a prepared Econt shipping label before courier acceptance. |
+
+### Create a shipment and label
+
+1. Set up and test the matching carrier connector. See [Connectors and API keys](02-connectors-and-api-keys.md#set-up-speedy-or-econt-for-bulgarian-shipments).
+2. Open **Templates**, find the carrier's **Create Shipment & Label** template and select **Use Template**.
+3. Select the tested carrier connector and create the draft.
+4. Review the flow, validate it and activate it.
+5. Select **Run**. Enter a unique **Shipment reference**, recipient details, contents and **Weight (kg)**.
+6. For Speedy, also choose **Label format** (`PDF` or `ZPL`) and **Paper size** (`A6`, `A4` or `A4 (4 × A6)`).
+7. Open the run in **Monitor**. Confirm that the run succeeded and record the returned shipment number and label result.
+
+Speedy returns label data in the run result. The template calls Speedy's label operation; it does not send the result to a local warehouse printer. Econt returns a waybill PDF URL. Download or print the returned label through the approved process for your site.
+
+The shipment reference is the repeat-protection key. Reusing a reference after a successful run returns that existing run instead of creating another carrier shipment. A carrier rejection fails the run and remains visible in **Monitor**. Shipment creation is not retried automatically because repeating a remote write could create a duplicate.
+
+Do not immediately repeat a failed create run. A timeout or lost response can leave the run failed even though the carrier accepted the shipment. First check the run steps and search the carrier account by **Shipment reference**. If the run is **outcome_unknown**, follow [the reconciliation procedure](05-monitoring-and-notifications.md#if-the-status-is-outcome_unknown) and do not retry until the external result is known.
+
+### Cancel a prepared shipment
+
+1. Use the matching **Cancel Shipment** template to create, validate and activate a separate cancellation flow.
+2. Select **Run** and enter the shipment number returned by the creation flow.
+3. For Speedy, also enter **Cancellation reason**.
+4. Check the terminal run in **Monitor**. A provider refusal leaves the run failed with the carrier's explanation.
+
+The shipment number is the cancellation repeat-protection key. Repeating a successful cancellation returns the existing successful run and does not call the carrier again. Cancellation itself is not automatically retried.
+
+Before repeating a failed cancellation, check the carrier account to see whether the shipment was already cancelled. A lost provider response can make the local run look failed while the external cancellation succeeded. Reconcile **outcome_unknown** runs instead of retrying them.
+
+```mermaid
+flowchart LR
+    A[Run create-shipment flow] --> B{Carrier accepts?}
+    B -->|No| C[Failed run in Monitor]
+    B -->|Yes| D[Shipment number and label result]
+    D --> E{Shipment still prepared and must be cancelled?}
+    E -->|No| F[Continue the shipping process]
+    E -->|Yes| G[Run matching cancellation flow]
+    G --> H{Carrier accepts cancellation?}
+    H -->|No| C
+    H -->|Yes| I[Successful cancellation run]
+```
