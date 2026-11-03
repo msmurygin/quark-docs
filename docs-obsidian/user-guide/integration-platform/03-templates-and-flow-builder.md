@@ -151,27 +151,41 @@ If a run fails because of a credential or remote outage, fix and test the connec
 
 ## Carrier shipment labels and cancellation
 
-The template catalogue contains ready-made manual flows for Bulgarian shipment labels and carrier cancellation:
+The template catalogue contains ready-made manual flows for shipment labels and carrier cancellation:
 
 | Template | Result |
 | --- | --- |
 | **Speedy: Create Shipment & Label** | Creates one Speedy shipment, then requests its PDF or ZPL label. |
 | **Econt: Create Shipment & Label** | Creates one Econt shipment and returns its shipment number and waybill PDF URL. |
+| **DHL Express: Create Shipment & Label** | Creates one DHL Express shipment and returns its tracking number and PDF or ZPL label. |
+| **FedEx: Create Shipment & Label** | Creates one FedEx shipment and returns its tracking number and PDF or ZPL label. |
 | **Speedy: Cancel Shipment** | Cancels a prepared Speedy shipment before pickup is ordered. A cancellation reason is required. |
 | **Econt: Cancel Shipment** | Deletes a prepared Econt shipping label before courier acceptance. |
 | **FedEx: Cancel Shipment** | Cancels a complete FedEx shipment by its master tracking number, including every package in a multi-piece shipment. |
 
 ### Create a shipment and label
 
-1. Set up and test the matching carrier connector. See [Connectors and API keys](02-connectors-and-api-keys.md#set-up-speedy-or-econt-for-bulgarian-shipments).
+1. Set up and test the matching carrier connector. For Speedy or Econt, see [Bulgarian shipment setup](02-connectors-and-api-keys.md#set-up-speedy-or-econt-for-bulgarian-shipments). For DHL Express or FedEx, see [DHL Express or FedEx setup](02-connectors-and-api-keys.md#set-up-dhl-express-or-fedex).
 2. Open **Templates**, find the carrier's **Create Shipment & Label** template and select **Use Template**.
 3. Select the tested carrier connector and create the draft.
 4. Review the flow, validate it and activate it.
 5. Select **Run**. Enter a unique **Shipment reference**, recipient details, contents and **Weight (kg)**.
-6. For Speedy, also choose **Label format** (`PDF` or `ZPL`) and **Paper size** (`A6`, `A4` or `A4 (4 × A6)`).
-7. Open the run in **Monitor**. Confirm that the run succeeded and record the returned shipment number and label result.
+6. For DHL Express or FedEx, also enter the recipient country and address, package dimensions and **Carrier service code**, then choose **Label format**. The connector's **Pickup mode** decides whether this shipment requests a courier, uses an existing scheduled pickup or will be dropped off.
+7. For Speedy, choose **Label format** (`PDF` or `ZPL`) and **Paper size** (`A6`, `A4` or `A4 (4 × A6)`).
+8. Open the run in **Monitor**. Confirm that the run succeeded, record the returned tracking or shipment number and label result, and verify the expected pickup arrangement with the carrier.
 
-Speedy returns label data in the run result. The template calls Speedy's label operation; it does not send the result to a local warehouse printer. Econt returns a waybill PDF URL. Download or print the returned label through the approved process for your site.
+Speedy returns label data in the run result. The template calls Speedy's label operation; it does not send the result to a local warehouse printer. Econt returns a waybill PDF URL. DHL Express and FedEx return the carrier response that contains the tracking and label result. Download or print the returned label through the approved process for your site.
+
+```mermaid
+flowchart LR
+    A[Choose DHL Express or FedEx pickup mode] --> B{How will the package reach the carrier?}
+    B -->|Warehouse requests a courier| C[Request courier pickup]
+    B -->|Regular collection already exists| D[Use regular scheduled pickup]
+    B -->|Warehouse takes the package| E[Drop off at carrier location]
+    C --> F[Create shipment and send pickup request]
+    D --> G[Create shipment without another pickup request]
+    E --> G
+```
 
 The shipment reference is the repeat-protection key. Reusing a reference after a successful run returns that existing run instead of creating another carrier shipment. A carrier rejection fails the run and remains visible in **Monitor**. Shipment creation is not retried automatically because repeating a remote write could create a duplicate.
 
