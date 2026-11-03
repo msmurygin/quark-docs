@@ -95,11 +95,21 @@ Use the system connector template that matches the carrier:
 
 The connection test proves only that the account can authenticate. Shipment creation, label generation and cancellation use separate carrier operations and can still be refused by the carrier. See [Templates and Flow Builder](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
 
-## Set up FedEx cancellation
+## Set up DHL Express or FedEx
 
-Use the **FedEx REST APIs** connector template. In **Connection setup**, enter the FedEx **Project API key**, **Project secret key** and **Carrier account number**. Complete the required sender name, phone, email, country, postal code, city and address fields, then select **Save carrier setup & test**. Use credentials and an account number from the same FedEx environment.
+Use the **DHL Express MyDHL API** or **FedEx REST APIs** connector template. In **Connection setup**, enter the carrier credentials and **Carrier account number**. Complete the required sender name, phone, email, country, postal code, city and address fields, then select **Save carrier setup & test**. Use credentials and an account number from the same carrier environment.
 
-The connection test proves authentication only. Before using cancellation in production, run **FedEx: Cancel Shipment** with a controlled test shipment and its master tracking number. The flow cancels the complete shipment, including every package in a multi-piece shipment. See [Carrier shipment labels and cancellation](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
+Choose **Pickup mode** before creating a shipment:
+
+| Pickup mode | Use it when | What the shipment flow does |
+| --- | --- | --- |
+| **Drop off at carrier location** | Your team takes the package to a carrier location. This is the default. | Creates the shipment without asking for a courier. |
+| **Request courier pickup** | This shipment needs a new courier pickup request. | Sends the carrier's request-pickup value with the shipment. |
+| **Use regular scheduled pickup** | Your site already has a recurring carrier collection. | Creates the shipment without requesting another pickup. |
+
+**Pickup mode** is available only on the DHL Express and FedEx connector templates. Speedy and Econt use their own carrier workflow and do not show this setting.
+
+The FedEx connection test proves authentication. The DHL Express test proves authentication and access to the configured address-validation endpoint. Neither test proves shipment creation, label generation or pickup behavior. Run one controlled **Create Shipment & Label** flow in the carrier's test environment and confirm the pickup outcome before using the connector in production. Before using FedEx cancellation in production, also run **FedEx: Cancel Shipment** with a controlled test shipment and its master tracking number. The cancellation flow cancels the complete shipment, including every package in a multi-piece shipment. See [Carrier shipment labels and cancellation](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
 
 ## Replace connector credentials safely
 
