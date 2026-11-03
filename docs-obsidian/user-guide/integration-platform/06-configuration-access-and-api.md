@@ -59,7 +59,7 @@ The **API Keys** page does not create a platform login key or a WMS event key.
 
 ## Access the platform
 
-Protected management API requests use the `X-Api-Key` header. A valid platform key determines the tenant. The `admin` scope is additionally required for **System Config** operations and for creating, listing or revoking WMS event keys. Other tenant routes use the tenant boundary and do not currently enforce fine-grained scopes. A tenant number in a request body cannot move a request into another tenant.
+Protected management API requests use the `X-Api-Key` header. A valid platform key determines the tenant. The `admin` scope is additionally required for **System Config** operations, reviewed template setup, and creating, listing or revoking WMS event keys. Other tenant routes use the tenant boundary and do not currently enforce fine-grained scopes. A tenant number in a request body cannot move a request into another tenant.
 
 WMS event delivery uses `X-Event-Key` on `POST /api/v1/events/emit`. The platform resolves the tenant from this key. An event key cannot authenticate the UI or ordinary API routes, and sending it as `X-Api-Key` is rejected.
 
@@ -114,6 +114,7 @@ Main endpoint groups:
 | Runs | `/api/v1/flow-runs` | List run details and retry a failed run. |
 | Credential definitions | `/api/v1/keys` | Create, bind and revoke connector credentials. |
 | Templates | `/api/v1/templates` | List templates and create tenant drafts from them. |
+| Reviewed template setup | `/api/v1/onboarding/integration-setups` | Create one inactive tenant draft from a reviewed system template, with replay protection. |
 | Events | `/api/v1/events/emit` | Submit a named event to the tenant queue. |
 | WMS event keys | `/api/v1/event-ingress-keys` | Create, list and revoke tenant-scoped event-only keys. |
 | Configuration | `/api/v1/system-config`, `/api/v1/tenant-config` | Manage flow variables. |
@@ -127,6 +128,39 @@ curl -s "$PLATFORM_URL/api/v1/flows" \
 ```
 
 Keep the key in a secret manager or process environment. Do not put it in source code, shell history, screenshots or documentation.
+
+## Create a reviewed template draft from automation
+
+Use `POST /api/v1/onboarding/integration-setups` when an approved onboarding tool must install a reviewed system template. The request requires a platform key with the `admin` scope. It creates an inactive tenant flow and validates it. For each template connector that is not mapped explicitly, it also creates or reuses the tenant's clone of that connector template. It does not store credentials, test an external connection, activate the flow or enable a schedule.
+
+Send:
+
+- the system `template_id`;
+- a caller-generated `idempotency_key` between 1 and 200 characters;
+- the target warehouse schema name, such as `wh1`;
+- `owner_id` or `ship_to_id` when the selected template needs them;
+- an optional connector mapping and the setup values declared by the template.
+
+An owner or ship-to ID must be a positive number when supplied. The warehouse must use the schema-name rules described in [Templates and Flow Builder](03-templates-and-flow-builder.md#restrict-a-flow-to-an-owner-or-warehouse). The platform rejects setup values that the template did not declare.
+
+Treat the idempotency key as the identity of one complete setup request. If the connection drops before you receive the answer, send the same request with the same key. The first successful call returns a newly created draft; an unchanged replay returns the same draft and marks the response as replayed. It does not create a second flow or schedule.
+
+Do not reuse that key for different setup values. The platform rejects a changed request. It also rejects a replay if the draft, its steps, graph connections, schedule or the system-template origin of its connectors has been changed or deleted since creation. In either case, inspect the existing tenant flow and reconcile it; do not keep changing the request under the old key.
+
+```mermaid
+flowchart TD
+    A[Send reviewed template setup] --> B{Answer received?}
+    B -->|Yes| C{Setup accepted?}
+    B -->|No| D[Repeat the identical request with the same key]
+    D --> C
+    C -->|New or unchanged replay| E[Review validation, connector clones and the inactive draft]
+    C -->|Input or access error| F[Correct the input or access before trying again]
+    C -->|Key reused or recorded setup changed| G[Stop and reconcile the existing tenant flow]
+    E --> H[Configure credentials and test each connector]
+    H --> I[Activate only after review]
+```
+
+The response includes the draft flow, its validation result and a setup receipt. Store the receipt with the onboarding record, without copying credentials into it.
 
 ## Webhook and event receivers
 
@@ -143,7 +177,7 @@ The deployment administrator should verify all of these before users activate pr
 - anonymous access is disabled;
 - each user or integration has a separate platform key for the intended tenant and environment;
 - each WMS environment has its own event key, with a tested rotation and immediate-revocation procedure;
-- only administrators who manage **System Config** receive a key with the `admin` scope;
+- only authorized administrators and approved automation that performs a documented administrator-only operation, such as reviewed template setup, receive a key with the `admin` scope;
 - browser origins are restricted to the real HTTPS application origins;
 - the public webhook address uses HTTPS and is reachable only as intended;
 - database backups and key rotation procedures are tested;
@@ -158,7 +192,7 @@ The deployment administrator should verify all of these before users activate pr
 | `Missing X-Api-Key header` | Supply the tenant platform key in the header or open the administrator-provided access link. |
 | `Invalid API key` | Check that the key belongs to this environment and has not expired or been deactivated. Request a replacement; do not retry with a connector credential. |
 | `Invalid event key` | The `X-Event-Key` value is unknown, expired or revoked. Create or select an active key for the intended tenant and update the WMS subscriber. |
-| `Admin scope required` | The operation requires an administrator, for example **System Config** or WMS event-key management. Use an administrator key or ask an administrator to perform it. |
+| `Admin scope required` | The operation requires an administrator, for example **System Config**, reviewed template setup or WMS event-key management. Use an administrator key or ask an administrator to perform it. |
 | The WMS event secret is no longer visible | This is expected after the one-time confirmation is closed. Revoke the unusable key and create a replacement. |
 | Browser reports a cross-origin error | Ask the deployment administrator to allow the exact UI origin. |
 | Config value is rejected | Enter valid JSON; quote text values and check brackets and commas. |
