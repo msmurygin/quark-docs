@@ -149,9 +149,9 @@ Use **Undo** and **Redo** while the builder is open. Before a larger change, sel
 
 If a run fails because of a credential or remote outage, fix and test the connector instead of changing an unchanged flow.
 
-## Speedy and Econt shipment labels
+## Carrier shipment labels and cancellation
 
-The template catalogue contains four manual Bulgarian-carrier flows:
+The template catalogue contains ready-made manual flows for Bulgarian shipment labels and carrier cancellation:
 
 | Template | Result |
 | --- | --- |
@@ -159,6 +159,7 @@ The template catalogue contains four manual Bulgarian-carrier flows:
 | **Econt: Create Shipment & Label** | Creates one Econt shipment and returns its shipment number and waybill PDF URL. |
 | **Speedy: Cancel Shipment** | Cancels a prepared Speedy shipment before pickup is ordered. A cancellation reason is required. |
 | **Econt: Cancel Shipment** | Deletes a prepared Econt shipping label before courier acceptance. |
+| **FedEx: Cancel Shipment** | Cancels a complete FedEx shipment by its master tracking number, including every package in a multi-piece shipment. |
 
 ### Create a shipment and label
 
@@ -179,13 +180,14 @@ Do not immediately repeat a failed create run. A timeout or lost response can le
 ### Cancel a prepared shipment
 
 1. Use the matching **Cancel Shipment** template to create, validate and activate a separate cancellation flow.
-2. Select **Run** and enter the shipment number returned by the creation flow.
-3. For Speedy, also enter **Cancellation reason**.
-4. Check the terminal run in **Monitor**. A provider refusal leaves the run failed with the carrier's explanation.
+2. Select **Run**. For Speedy or Econt, enter the shipment number returned by the creation flow.
+3. For FedEx, enter the shipment's master tracking number in **Tracking number**. Cancelling it cancels the complete shipment, not one package.
+4. For Speedy, also enter **Cancellation reason**.
+5. Check the terminal run in **Monitor**. A provider refusal leaves the run failed with the carrier's explanation.
 
 The shipment number is the cancellation repeat-protection key. Repeating a successful cancellation returns the existing successful run and does not call the carrier again. Cancellation itself is not automatically retried.
 
-Before repeating a failed cancellation, check the carrier account to see whether the shipment was already cancelled. A lost provider response can make the local run look failed while the external cancellation succeeded. Reconcile **outcome_unknown** runs instead of retrying them.
+Before repeating a failed cancellation, check the carrier account to see whether the shipment was already cancelled. A lost or incomplete provider response can make the result uncertain even after the carrier received the request. Reconcile **outcome_unknown** runs instead of retrying them. A FedEx run is successful only when FedEx explicitly confirms that the shipment was cancelled.
 
 ```mermaid
 flowchart LR
@@ -195,7 +197,10 @@ flowchart LR
     D --> E{Shipment still prepared and must be cancelled?}
     E -->|No| F[Continue the shipping process]
     E -->|Yes| G[Run matching cancellation flow]
-    G --> H{Carrier accepts cancellation?}
-    H -->|No| C
-    H -->|Yes| I[Successful cancellation run]
+    G --> H{Cancellation outcome known?}
+    H -->|No| J[Verify with carrier and reconcile]
+    J --> H
+    H -->|Yes| K{Carrier accepts cancellation?}
+    K -->|No| C
+    K -->|Yes| I[Successful cancellation run]
 ```
