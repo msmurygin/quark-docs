@@ -102,11 +102,13 @@ Select **Edit** to change authentication, the secret or token, delivery ID heade
 
 ## Trigger from an event
 
-An event-triggered flow matches its configured event name. An authenticated producer sends the event to the Integration Platform event endpoint with at least:
+An event-triggered flow matches its configured event name. Only `event_name` and `payload` are required. For a flow restricted to one owner and warehouse, an authenticated producer sends a targeted event such as:
 
 ```json
 {
   "event_name": "orders.created",
+  "owner_id": 1000,
+  "warehouse": "wh1",
   "payload": {
     "order_number": "TEST-1001"
   }
@@ -114,6 +116,31 @@ An event-triggered flow matches its configured event name. An authenticated prod
 ```
 
 Use a stable `source_event_id` and `source_scope` when the producer can provide them. Together they let the platform recognize a repeated delivery without confusing events from different producers. The authentication key determines the tenant; a tenant number supplied in the JSON body does not change routing.
+
+### How owner and warehouse targets match
+
+The platform first matches the tenant and exact `event_name`. It then applies the flow's optional targets:
+
+- a blank flow **Owner** accepts any event owner; a set owner accepts only the same `owner_id`;
+- a blank flow **Warehouse** accepts any event warehouse; a set warehouse accepts only the same `warehouse` schema name;
+- a flow with both targets set requires both values to match.
+
+Put `warehouse` at the top level of the event. A value inside `payload` does not choose the warehouse and cannot override the top-level target. `owner_id` may be supplied at the top level; for compatibility, the platform also reads it from an object payload when the top-level field is absent. Use the top-level fields for new producers so that the routing decision is visible and unambiguous.
+
+An event with no owner or warehouse does not start a flow restricted to that missing value. It can still start a tenant-wide flow whose corresponding target is blank. This prevents an event for one warehouse or owner from entering another target's flow.
+
+```mermaid
+flowchart TD
+    A[Authenticated event arrives] --> B{Tenant and event name match?}
+    B -->|No| X[Do not start the flow]
+    B -->|Yes| C{Flow owner is blank or equals event owner?}
+    C -->|No| X
+    C -->|Yes| D{Flow warehouse is blank or equals event warehouse?}
+    D -->|No| X
+    D -->|Yes| E[Start the flow with the matched target]
+```
+
+Manual runs, schedules and incoming webhooks use the target saved on their flow. A subflow receives the same owner and warehouse target as its parent and must be compatible with both. The run record keeps the resolved target for audit and retry.
 
 For Quark WMS, use a dedicated event key rather than a normal platform access key. The event key can submit events only; it cannot open the platform UI, read flows or call the normal tenant API.
 
@@ -226,6 +253,6 @@ sequenceDiagram
 | Webhook says the delivery ID header is missing | Send exactly one header using the configured name and a non-empty stable value. |
 | Webhook is accepted but no flow runs | Confirm that the webhook and flow are active, then check **Monitor** and the flow trigger. |
 | **Invalid event key** | The `X-Event-Key` value is unknown, expired or revoked. Replace the WMS subscriber header with an active key from the intended tenant. |
-| The WMS delivery is accepted but no flow runs | Confirm that the flow is active and its event trigger matches the exact `event_name`; then check **Monitor** in the tenant that owns the key. |
+| The WMS delivery is accepted but no flow runs | Confirm that the flow is active, its event trigger matches the exact `event_name`, and its Owner and Warehouse targets are blank or match the event. Then check **Monitor** in the tenant that owns the key. |
 | WMS keeps retrying after a key change | Confirm that the subscriber saved the new `X-Event-Key`, then verify one delivery before revoking the old key. |
-| Event reaches the wrong tenant or flow | Check where the event key was created and the exact event name, owner and source identity. The tenant value in the JSON body cannot override the key. |
+| Event reaches the wrong tenant or flow | Check where the event key was created and the exact event name, top-level owner, top-level warehouse and source identity. The tenant value in the JSON body cannot override the key, and payload values cannot override the routing target. |

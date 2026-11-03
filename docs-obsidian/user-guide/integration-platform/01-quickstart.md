@@ -13,6 +13,7 @@ Have these items ready:
 - access to the correct Integration Platform tenant;
 - the external system's base URL and credentials;
 - the Quark WMS goods owner ID used by this integration, when the template asks for it;
+- the target warehouse schema name, such as `wh1`, when the flow must run for one warehouse only;
 - the marketplace ship-to ID for an order-import template, when requested;
 - one harmless test record that you can identify in both systems.
 
@@ -64,13 +65,15 @@ Check the base URL, environment, credential value and any provider-specific acco
 
 1. Open **Flows** and find the new flow.
 2. Select **Builder**.
-3. Check the trigger, connector and any owner, ship-to or other setup values.
+3. Check the trigger, connector and any owner, ship-to or other setup values shown in the flow.
 4. For a schedule-triggered flow, keep the flow in **draft** and open **Schedules**. Review the paused schedule copied from the template. Create one only if the template did not provide it, then return to **Builder**.
 5. Select **Validate flow**.
 6. Resolve every error. Review warnings before continuing.
 7. Select **Save snapshot**.
 
 Leave a scheduled, webhook or event flow in **draft** status until its trigger is configured and under your control.
+
+If an administrator restricted the flow to an owner or warehouse through the management API, verify those target values in the API response before activation. A blank owner or warehouse target means that the flow is not restricted by that field.
 
 ## 4. Run a controlled test
 
