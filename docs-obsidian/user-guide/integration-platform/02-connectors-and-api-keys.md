@@ -111,6 +111,32 @@ Choose **Pickup mode** before creating a shipment:
 
 The FedEx connection test proves authentication. The DHL Express test proves authentication and access to the configured address-validation endpoint. Neither test proves shipment creation, label generation or pickup behavior. Run one controlled **Create Shipment & Label** flow in the carrier's test environment and confirm the pickup outcome before using the connector in production. Before using FedEx cancellation in production, also run **FedEx: Cancel Shipment** with a controlled test shipment and its master tracking number. The cancellation flow cancels the complete shipment, including every package in a multi-piece shipment. See [Carrier shipment labels and cancellation](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
 
+## What changes after a carrier-template upgrade
+
+When the platform starts after an upgrade, it refreshes the **Connection setup** form of every tenant carrier connector that was created from a system template. Existing Speedy, Econt, DHL Express and FedEx clones therefore receive the same current field list as a newly created clone.
+
+The refresh changes the form definition, not the tenant's saved carrier values, API keys or connector address. The carrier credential inputs described above remain in the form. Other, non-secret carrier settings are shown only when the matching shipment flow consumes them:
+
+| Carrier | Non-secret carrier settings kept in the current setup form |
+| --- | --- |
+| Speedy | Default service code |
+| Econt | Sender name, phone, postal code, city, street and street number |
+| DHL Express | Account number, sender name, phone, email, country, postal code, city and address; Pickup mode |
+| FedEx | Account number, sender name, phone, email, country, postal code, city and address; Pickup mode |
+
+If an older connector showed a generic shipment default that is not in this table, the field can disappear after the upgrade because the carrier flow does not read it. Do not recreate the connector or move the value into a flow variable. Open **Connection setup**, review the supported fields that remain, select **Save carrier setup & test**, and run one controlled shipment.
+
+A connector created manually with **+ New Connector** is not a clone of a carrier template and does not receive this setup-form refresh.
+
+```mermaid
+flowchart TD
+    A[Platform starts after an upgrade] --> B{Tenant connector was cloned from a carrier template?}
+    B -->|No| C[Leave its setup form unchanged]
+    B -->|Yes| D[Refresh the supported setup fields]
+    D --> E[Keep tenant values, credentials and connector address]
+    E --> F[Administrator reviews, tests and runs one controlled shipment]
+```
+
 ## Replace connector credentials safely
 
 1. Open the connector and enter the replacement values in **Connection setup**.
@@ -149,6 +175,7 @@ The platform refuses a revocation that would leave an active flow without a usab
 | Selecting **Use** on **Generic HTTP API** does not create a connector or show an error | The template does not have the service-specific Base URL needed for an HTTP connector | Do not select **Use** repeatedly. Select **+ New Connector**, choose **HTTP**, enter the provider's **Base URL** and authentication method, then save and test it. |
 | Connection test cannot reach the service | Wrong URL, DNS, firewall or remote outage | Confirm the environment URL and network route; retry only after reachability is restored. |
 | Authentication is rejected | Wrong auth type, expired secret or mismatched account fields | Compare the connector fields with the provider's credential type; save and test the replacement. |
+| A carrier setup field disappeared after an upgrade | The refreshed template no longer exposes a generic setting that its shipment flow does not consume | Review the supported carrier fields above, save and test the existing connector, then run one controlled shipment. Do not recreate the connector merely to restore the unused field. |
 | **Connection test failed: ... Previous credentials were kept.** | The replacement credentials could not authenticate or reach the provider | Leave the previous key active, correct the replacement values and select **Save credentials & test** again. |
 | API key shows **expired** | Its configured validity period ended | Create and bind a replacement, test the connector, then revoke the old key if it is still active in storage. |
 | Rate-limit errors appear in runs | Request volume exceeds the provider limit | Review the connector rate limit and the trigger frequency; do not add retries blindly. |
