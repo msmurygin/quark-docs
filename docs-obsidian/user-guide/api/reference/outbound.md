@@ -1078,6 +1078,7 @@ Open Load from a reviewed Frozen plan and registered transport.
 
 - Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - Send the current version of the row in `expected_plan_version`, `expected_transport_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+- Omit `meta.expected_version`. This command checks the two named versions in `data` and rejects the ambiguous scalar field.
 
 **Parameters** (the keys of `params`)
 
@@ -1085,7 +1086,7 @@ Open Load from a reviewed Frozen plan and registered transport.
 |---|---|---|---|
 | `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
-| `meta.expected_version` | integer (int64) | no |  |
+| `meta.expected_version` | integer (int64) | no | Omit for this command; supplying it is rejected. |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (OpenLoad) | yes |  |
 | `data.door_location_code` | string or null | no | The door the truck stands at, named as it arrives. |
@@ -2196,11 +2197,14 @@ Freeze the reviewed complete unit set with per-unit/assignment version echoes; n
 | Roles that have it by default | ADMIN, MANAGER, SUPERVISOR |
 | Idempotency key | required |
 | Version check | entity `load_plan`: send `expected_plan_version` for row `load_plan_id` |
+| Version check | entity `outbound_flow_unit`: send `units[].expected_unit_version` for each `units[].outbound_flow_unit_id` |
+| Version check | entity `outbound_unit_assignment`: send `units[].expected_assignment_version` for each `units[].outbound_flow_unit_id` |
 
 **Notes**
 
 - Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
-- Send the current version of the row in `expected_plan_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+- Send the current plan version in `expected_plan_version`. For every reviewed unit, also send its current `expected_unit_version` and `expected_assignment_version`. If any row changed in between, the complete freeze is refused with return code 40; read the plan and all members again before deciding again.
+- Omit `meta.expected_version`. This command checks the named plan and member versions in `data` and rejects the ambiguous scalar field.
 
 **Parameters** (the keys of `params`)
 
@@ -2208,7 +2212,7 @@ Freeze the reviewed complete unit set with per-unit/assignment version echoes; n
 |---|---|---|---|
 | `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
-| `meta.expected_version` | integer (int64) | no |  |
+| `meta.expected_version` | integer (int64) | no | Omit for this command; supplying it is rejected. |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (FreezeLoadPlan) | yes |  |
 | `data.expected_plan_version` | integer (int32) | yes |  |
@@ -4027,6 +4031,7 @@ Assign a ready physical root to an exact Stage without moving stock.
 
 - Send `meta.idempotency_key`. If you send the same call again with the same key and the same data, you get the first answer back and nothing runs twice.
 - Send the current version of the row in `expected_stage_version`, `expected_assignment_version`. If the row changed in between, the call fails with return code 40 and tells you the current state.
+- Omit `meta.expected_version`. This command checks the two named versions in `data` and rejects the ambiguous scalar field.
 
 **Parameters** (the keys of `params`)
 
@@ -4034,7 +4039,7 @@ Assign a ready physical root to an exact Stage without moving stock.
 |---|---|---|---|
 | `meta` | object | no | Control-plane envelope (idempotency_key, expected_version, acknowledged_overrides — bare integer codes for receipt, or {code, subject} override pairs for move). |
 | `meta.acknowledged_overrides` | array of integer or object | no |  |
-| `meta.expected_version` | integer (int64) | no |  |
+| `meta.expected_version` | integer (int64) | no | Omit for this command; supplying it is rejected. |
 | `meta.idempotency_key` | string (uuid) | no |  |
 | `data` | object (AssignStageUnit) | yes |  |
 | `data.expected_assignment_version` | integer (int32) | yes |  |

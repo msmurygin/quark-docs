@@ -608,13 +608,13 @@ Plan the Dispatch before hand-off when possible, so its route and stop intent is
 | Register transport | `transport_unit_register` | A transport resource is not a warehouse container. Keep its id, version and exact `external_ref`. |
 | Plan departure | `dispatch_create`, `dispatch_stop_add`, `dispatch_add_order`, `dispatch_plan` | Add stops before orders. Send the latest Dispatch version after every mutation. Planning moves no stock. |
 | Stage ready units | `stage_unit_assign`, `stage_unit_confirm` | Assignment is intent; confirmation moves the complete physical root to the reviewed Stage. Skip only when the Load policy does not require staging. |
-| Build the plan | `load_plan_create`, `load_plan_generate`, `load_plan_get`, `load_plan_freeze` | Freeze the exact reviewed units and their versions. A frozen plan is not loading authorization. |
+| Build the plan | `load_plan_create`, `load_plan_generate`, `load_plan_get`, `load_plan_freeze` | Freeze the exact reviewed plan, units and assignments. Echo `expected_plan_version` and both member versions for every unit. A frozen plan is not loading authorization. |
 | Open the Load | `load_open` | Bind one unused active transport to the frozen plan. |
 | Start and load | `load_start`, then `load_unit_review` and `load_unit_confirm` for every root | Review is read-only. Confirm only after the physical act. |
 | Complete loading | `load_complete` | Every required unit must be loaded and its immutable content must still match. Status becomes `Loaded`; stock is still in the warehouse. |
 | Goods Issue | `confirm_shipment` | Ships the complete Load atomically and marks the Load and Dispatch `Shipped`. |
 
-Every state-changing method uses a fresh idempotency key and the current version returned by the preceding step. Do not retry a version conflict by changing only the version: read the current card and review the decision again.
+Every state-changing method uses a fresh idempotency key and the current version returned by the preceding step. A command that names several versions needs all of them in `data`; do not replace them with one `meta.expected_version`. Do not retry a version conflict by changing only the version: read the current card and review the complete decision again.
 
 The final call has this compact shape:
 

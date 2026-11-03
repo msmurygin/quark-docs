@@ -199,6 +199,23 @@ Every row that a person reads and later changes has a `version` number. Each cha
 
 For a list such as `allocation_steps_save`, the version is a field of **each** element: `steps[].expected_version`. Every element must carry it. An empty list or one element without a version is refused.
 
+Some decisions cover several versioned rows at once. Send every version in its named `data` field and omit `meta.expected_version`; these commands reject that ambiguous scalar even when every required `data` version is present. For example:
+
+- `stage_unit_assign` checks both `expected_stage_version` and `expected_assignment_version`.
+- `load_open` checks `expected_plan_version` and `expected_transport_version`.
+- `load_plan_freeze` checks `expected_plan_version` plus `units[].expected_unit_version` and `units[].expected_assignment_version` for every reviewed unit.
+
+If any one of those rows changed, the whole command is refused with return code 40. Nothing is partially assigned, opened or frozen. Read every affected row again and review the complete decision. Reuse the failed call's key when the corrected request represents the same decision; use a new key when the reread changes what you intend to do.
+
+```mermaid
+flowchart LR
+    A[Read every row used by the decision] --> B[Copy each version into its named data field]
+    B --> C{Command accepted?}
+    C -->|Yes| D[Commit the complete reviewed change]
+    C -->|Return code 40| E[Read and review every affected row again]
+    E --> B
+```
+
 Versions are **per row**, not per document. A receipt header and a receipt line have separate versions. Two people can work on two lines of one receipt without a conflict.
 
 ### Where to get the version
@@ -250,9 +267,9 @@ What `current_state` holds depends on the domain:
 
 ### What to do on a conflict
 
-1. Take the new `version` from `context.current_state`. You do not need a second read to get it.
+1. For a single-row command, take the new `version` from `context.current_state`; you do not need a second read merely to obtain that version. For a multi-row command, read every affected row again because one conflict response does not refresh the whole reviewed decision.
 2. Look at the rest of the state. Is your action still right? "Close the receipt" may be pointless if the receipt is already `Closed`.
-3. If yes, send the call again with the new version. You may keep the same idempotency key, because the failed call released it and the version is not part of the hash.
+3. If yes, send the call again with the current version or complete version set. You may keep the same idempotency key for a corrected retry of the same decision because the failed call released it and versions are not part of the hash; use a new key when the reread changes what you intend to do.
 4. If no, tell the user and stop.
 
 Do not loop: retrying 40 with the same old version fails again.
