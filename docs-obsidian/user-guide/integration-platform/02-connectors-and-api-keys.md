@@ -79,6 +79,22 @@ The key list shows metadata such as provider, type, environment, status and vers
 
 The connector test checks connection and authentication. It does not prove that every operation in every flow is permitted. Run a controlled flow after the connector test passes.
 
+## Set up Speedy or Econt for Bulgarian shipments
+
+Use the system connector template that matches the carrier:
+
+| Carrier | Connector template | Required setup for shipment creation |
+| --- | --- | --- |
+| Speedy | **Speedy Bulgaria Web API** | **API username**, **API password** and **Default service code**. Speedy uses the sender registered for that account. |
+| Econt | **Econt Bulgaria JSON API** | **e-Econt username**, **e-Econt password**, **Sender name**, **Sender phone**, **Sender postal code**, **Sender city**, **Sender street** and **Sender street number**. |
+
+1. Create the connector from its template.
+2. Keep the production carrier URL unless the carrier gave you a test environment.
+3. Complete the required fields and select **Save carrier setup & test**.
+4. Run a controlled shipment in the carrier's test account before activating a production flow.
+
+The connection test proves only that the account can authenticate. Shipment creation, label generation and cancellation use separate carrier operations and can still be refused by the carrier. See [Templates and Flow Builder](03-templates-and-flow-builder.md#speedy-and-econt-shipment-labels).
+
 ## Replace connector credentials safely
 
 1. Open the connector and enter the replacement values in **Connection setup**.
