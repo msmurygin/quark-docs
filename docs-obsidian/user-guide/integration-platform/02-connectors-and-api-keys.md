@@ -93,7 +93,13 @@ Use the system connector template that matches the carrier:
 3. Complete the required fields and select **Save carrier setup & test**.
 4. Run a controlled shipment in the carrier's test account before activating a production flow.
 
-The connection test proves only that the account can authenticate. Shipment creation, label generation and cancellation use separate carrier operations and can still be refused by the carrier. See [Templates and Flow Builder](03-templates-and-flow-builder.md#speedy-and-econt-shipment-labels).
+The connection test proves only that the account can authenticate. Shipment creation, label generation and cancellation use separate carrier operations and can still be refused by the carrier. See [Templates and Flow Builder](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
+
+## Set up FedEx cancellation
+
+Use the **FedEx REST APIs** connector template. In **Connection setup**, enter the FedEx **Project API key**, **Project secret key** and **Carrier account number**. Complete the required sender name, phone, email, country, postal code, city and address fields, then select **Save carrier setup & test**. Use credentials and an account number from the same FedEx environment.
+
+The connection test proves authentication only. Before using cancellation in production, run **FedEx: Cancel Shipment** with a controlled test shipment and its master tracking number. The flow cancels the complete shipment, including every package in a multi-piece shipment. See [Carrier shipment labels and cancellation](03-templates-and-flow-builder.md#carrier-shipment-labels-and-cancellation).
 
 ## Replace connector credentials safely
 
