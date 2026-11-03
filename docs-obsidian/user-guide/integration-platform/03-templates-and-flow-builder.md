@@ -46,6 +46,14 @@ For a new flow, enter **Code**, **Name**, **Trigger** and an optional **Descript
 
 Import the file into a test tenant first. Review its connectors, variables, mappings and trigger before activation; an exported flow design does not include a guarantee that the destination tenant has matching credentials or configuration.
 
+### Restrict a flow to an owner or warehouse
+
+A flow can have an optional **Owner** target, an optional **Warehouse** target, or both. A blank target is a wildcard: the flow can run for any value of that field inside its tenant. When a target is set, an event or parent flow must carry the same value.
+
+Use the flow management API to set `owner_id` and `warehouse` when creating or updating a flow. The warehouse value is the WMS schema name, for example `wh1`: it is 1–50 characters long, starts with a lowercase letter and contains only lowercase letters, numbers and underscores. The reserved names `enterprise`, `public` and `information_schema`, and names beginning with `pg_`, are not accepted. Do not enter a warehouse display name. API requests that fork a template or import a bundle also accept these target fields, so choose the destination target explicitly instead of assuming that it is copied from another tenant.
+
+Use a target for flows that read or write warehouse-specific records. Leave a field blank only when one reviewed flow is deliberately shared across all owners or warehouses in the tenant.
+
 ## Edit in Flow Builder
 
 Select **Builder** for a flow. An active flow is read-only; use **Pause to edit** before changing it.

@@ -219,7 +219,7 @@ A result is stored in the event's `internal_result`.
 
 The Integration Platform is a separate service with its own tenant access and REST API. It can receive provider webhooks at `/webhooks/{path}` and authenticated business events at `POST /api/v1/events/emit`.
 
-Connect WMS through a normal `webhook` subscriber whose destination is `<platform>/api/v1/events/emit`. Create a tenant-scoped event key in **Config > WMS Events** and send it in `X-Event-Key`. The event-only key can submit events but cannot open the platform or call ordinary APIs. The platform selects matching active flows by `event_name`; the event key, not a tenant number in the body, determines the tenant.
+Connect WMS through a normal `webhook` subscriber whose destination is `<platform>/api/v1/events/emit`. Create a tenant-scoped event key in **Config > WMS Events** and send it in `X-Event-Key`. The event-only key can submit events but cannot open the platform or call ordinary APIs. The platform selects matching active flows by `event_name`, then by the flow's optional owner and warehouse targets. A blank flow target is a wildcard; a set target must equal the event's `owner_id` or `warehouse`. The event key, not a tenant number in the body, determines the tenant. Put new routing values at the top level: `owner_id` in an object payload is only a compatibility fallback, and payload values cannot override an explicit top-level target.
 
 See [Triggers, schedules and webhooks](../integration-platform/04-triggers-schedules-and-webhooks.md) for the platform side and [Configuration, access and API](../integration-platform/06-configuration-access-and-api.md) for its access boundary.
 
