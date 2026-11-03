@@ -677,7 +677,7 @@ The dispatch card is the working screen for the whole journey. Its header keeps 
 1. Open `Sidebar > Management & Control > Shipping > Transport Resources`. Click `Register`, enter `Transport reference`, `Kind`, optional `Carrier` and `Plate`, then click `Register` in the dialog. The kinds are `Truck`, `Trailer`, `Container`, `SwapBody` and `CourierCage`.
 2. Open `Sidebar > Management & Control > Shipping > Dispatches`. Click `New Dispatch`, enter the optional external reference, carrier and door, then click `Create`.
 3. Open the dispatch and stay on `Stops & orders`. Click `Add stop…`, choose the end of the route or a gap between existing stops, and enter the destination. Stop numbers use gaps of 10 so an early route can be adjusted without renumbering every stop.
-4. Click `Add order…` and assign each order to its delivery stop and preferred Stage location. Check the stop, order, stage and readiness columns before planning. This is a route preference; the physical unit can still require an explicit supervisor Stage choice after picking.
+4. Click `Add order…` and assign each order to its delivery stop and preferred Stage location. To create the last stop at the same time, choose the `… · new stop at the end` option and enter its destination. This choice appears only while the route still accepts additions. Check the stop, order, stage and readiness columns before planning. This is a route preference; the physical unit can still require an explicit supervisor Stage choice after picking.
 5. If picking finished before this dispatch was planned, open `More > Assign LPN…`. Select the ready root LPN, review its order, current location, dispatch and stop, enter the reason, and confirm. This records the transport decision; it does not move stock.
 6. If a unit still has no Stage, a supervisor uses `RF > Stage > Choose Stage (Supervisor)`. The operator then uses `RF > Stage > Confirm Stage`, scans the unit, reviews the proposed move, and scans the destination Stage. Choosing a Stage and moving the unit are separate actions.
 7. If the truck and door are already known, use `More > Transport unit…` and `More > Door…`. The transport must be registered. The door is optional; when supplied, it must be a warehouse location of type `Door`. Create it under `Warehouse Configuration > Topology > Locations` when the site needs a door that is not listed.
@@ -698,7 +698,14 @@ Opening the Load assigns its permanent number in the form `LD` plus eight digits
 
 Loading-order choices are `Last delivery stop first`, `First delivery stop first`, `Any stop group`, `Manual unit order`, and `Any eligible unit (no stop priority)`. Use the review screen to resolve invalid or unplanned units before Freeze.
 
-The header shows the dispatch `Departure` when a planned route time is present. Each stop owns its own arrival and departure schedule, and the `ETA · status` column keeps that timing beside the destination. Treat the schedule as a route fact: changing a planned route returns it to Draft and invalidates the working Load Plan. Once Stage, Freeze or Load commitment has started, ordinary route edits are blocked. Before Freeze, an urgent stop can be appended to the end of a staged route; it cannot be inserted into the middle.
+The header shows the dispatch `Departure` when a planned route time is present. Each stop owns its own arrival and departure schedule, and the `ETA · status` column keeps that timing beside the destination. Treat the schedule as a route fact: changing a planned route returns it to Draft and invalidates the working Load Plan. Once Stage, Freeze or Load commitment has started, ordinary route edits are blocked. Before Freeze, an urgent stop can be appended to the end of a staged route; it cannot be inserted into the middle. When the route no longer accepts additions, `Add stop…`, `Add order…` and the `… · new stop at the end` choice are unavailable together.
+
+```mermaid
+flowchart LR
+    A{Route state} -->|Editable| B[Add or insert stops and orders]
+    A -->|Staged but still appendable| C[Add an order to a stop or append a new stop at the end]
+    A -->|Frozen, Load opened or committed, cancelled or shipped| D[No new stop or order]
+```
 
 ### Load and ship in the web UI
 
@@ -755,6 +762,7 @@ The terminal validates each decision before changing the Load. A wrong Load numb
 | The scanned Load does not exist (`LD_NOT_FOUND`) | Check the complete `LD########` number and scan again. An older open Load can still have its original `LOAD-...` code. |
 | The scanned transport does not match the Load | Keep the Load in its loading area. Scan the transport shown on **Confirm Transport**; if the physical truck differs, stop and ask the planner to reconcile it. |
 | The observed version changed | Cancel the decision, refresh or rescan, and review the current state. Do not retry with only a new version number. |
+| `… · new stop at the end` is not offered in `Add order…` | The route no longer accepts additions. Close the dialog, refresh or reopen the Dispatch, then review its current Dispatch and Load Plan state. Do not try to add the order through an older open window. |
 | The unit is not in this plan (`LD_NOT_IN_PLAN`) | Leave it unloaded. Scan a unit from the reviewed Load Plan, or ask the planner to resolve the membership before loading continues. |
 | The unit is not ready (`LD_UNIT_NOT_READY`) | Leave it unloaded. Complete its required picking or packing state, then review the unit again. |
 | Staging says the unit needs transport intent | Plan the Dispatch, add the order to a valid stop, then assign the ready LPN to that Dispatch. Rescan the unit after the transport decision is recorded. |
