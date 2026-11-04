@@ -419,7 +419,10 @@ Define what happens when a picker cannot find the full quantity.
 ### Before you start
 
 - Role: `ADMIN`, `MANAGER`, `SUPERVISOR` (write).
-- Reasons available by default: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` (revision 1, published). Each has six actions.
+- A new warehouse has no business-specific short reasons. For a General
+  Distribution warehouse, create, review and publish `SHORT`, `LPN_NOT_FOUND`
+  and `WRONG_LOCATION` as described below. Another warehouse may use different
+  approved codes.
 
 ### Steps
 

@@ -120,7 +120,7 @@ should not confirm a shortage for a shelf that is closed anyway.
 | Group | Columns | Used today |
 |---|---|---|
 | Identity | `id`, `code`, `descr`, `version`, audit columns | yes |
-| Document gates | `receipt_without_po`, `receipt_without_asn`, `receipt_without_lpn`, `no_sku_on_po`, `no_sku_on_asn`, `asn_po_qty_discrepancy` | only `receipt_without_lpn` and `no_sku_on_asn` |
+| Document gates | `receipt_without_po`, `receipt_without_asn`, `receipt_without_lpn`, `no_sku_on_po`, `no_sku_on_asn`, `asn_po_qty_discrepancy` | `receipt_without_asn`, `receipt_without_lpn` and `no_sku_on_asn` |
 | Checks | `qty_pack_multiple_check`, `date_deviation_check` | both |
 | ASN quantity | `qty_validation`, `excess_message`, `excess_override`, `excess_override_percent`, `excess_error`, `excess_error_percent`, `shortage_message`, `shortage_override`, `shortage_override_percent` | all except the two `*_message` flags |
 | PO quantity | `po_qty_validation`, `po_excess_message`, `po_excess_override`, `po_excess_override_percent`, `po_excess_error`, `po_excess_error_percent`, `po_shortage_message`, `po_shortage_override`, `po_shortage_override_percent` | none |
@@ -128,11 +128,11 @@ should not confirm a shortage for a shelf that is closed anyway.
 Total: 34 columns. 26 are settings. 8 are identity and bookkeeping (`id`, `code`,
 `descr`, `version`, `add_who`, `add_when`, `mod_who`, `mod_when`).
 
-Of the 26 settings, **11 are used** by the server today: `receipt_without_lpn`,
-`no_sku_on_asn`, `qty_pack_multiple_check`, `date_deviation_check`, `qty_validation`,
+Of the 26 settings, **12 are used** by receiving today: `receipt_without_asn`,
+`receipt_without_lpn`, `no_sku_on_asn`, `qty_pack_multiple_check`, `date_deviation_check`, `qty_validation`,
 `excess_override`, `excess_override_percent`, `excess_error`, `excess_error_percent`,
-`shortage_override`, `shortage_override_percent`. **15 are stored only**:
-`receipt_without_po`, `receipt_without_asn`, `no_sku_on_po`, `asn_po_qty_discrepancy`,
+`shortage_override`, `shortage_override_percent`. **14 are stored only**:
+`receipt_without_po`, `no_sku_on_po`, `asn_po_qty_discrepancy`,
 `excess_message`, `shortage_message` and all 9 `po_*` columns.
 
 ## 4. Field reference
@@ -217,9 +217,14 @@ The **dev seed** changes the `STD` row on a development database only:
 ### 4.4 `receipt_without_asn`
 - **UI**: `General` tab, `Receipt Without ASN`.
 - **Column and type**: `receipt_without_asn`, `allow_error`, not null. Default `Allow`.
-- **Affects**: **Stored only. It has no effect today.** Same search as 4.2. A blind
-  receive is not checked against it. The code `22` (`ReceiptWithoutAsnDoc`) exists
-  in the code table but nothing raises it.
+- **Meaning**: what happens when receiving starts or continues without an ASN.
+- **Affects**: blind receiving and later receipts against a document that was
+  created as **No ASN**. The check happens before the receive is committed.
+- **Messages**:
+  - `Warning`: `This receive has no ASN`. The operator can choose **Receive Anyway**.
+  - `HardError`: `Receipt without ASN is not allowed by owner policy`.
+- **When you change it**: future receives without an ASN follow the new setting.
+  Existing receipts keep their document type.
 
 ### 4.5 `no_sku_on_asn`
 - **UI**: `General` tab, `No SKU on ASN`.
@@ -691,10 +696,12 @@ Settings are in file 41.
 ### 8.3 Blind receipts
 `receipt_receive_blind` and `receipt_receive_blind_line` create or extend a receipt
 with no plan.
+- `receipt_without_asn` is checked before the receive. `Warning` asks the operator
+  to continue; `HardError` refuses the receive.
 - The quantity rule is skipped. Lines have expected quantity 0.
 - All the other rules still run: LPN (25), held location (76), pack multiple (30),
   dates, temperature, serials, lot attributes, auto holds.
-- `receipt_without_asn`, `receipt_without_po` and `no_sku_on_asn` are not used.
+- `receipt_without_po` and `no_sku_on_asn` are not used.
 - The owner flag `hide_expected_qty_from_operator` (`Hide Expected Qty (Blind)`) has
   no effect today (file 41).
 ## 10. Recipes
@@ -703,6 +710,7 @@ with no plan.
 | Accept all goods, check nothing | seed `STD`: everything `Allow`, `qty_validation = None` |
 | Confirm over 5%, refuse over 20%, ask a reason for a shortage over 5% | `qty_validation = Sku`; `excess_override` on 5; `excess_error` on 20; `shortage_override` on 5 |
 | Never receive a SKU that is not on the ASN | `no_sku_on_asn = HardError` |
+| Require an ASN | `receipt_without_asn = HardError` |
 | Require an LPN | `receipt_without_lpn = HardError` |
 | Receive in whole pallets only | `qty_pack_multiple_check = HardError` and a pack whose largest tier is the pallet |
 | Refuse goods that expire too soon | `date_deviation_check = HardError` and SKU `Min Shelf Life on Receive` |

@@ -143,7 +143,7 @@ These fields are stored and shown, but no code reads them to make a decision.
 |---|---|
 | Putaway zone | `inbound_loc`, `outbound_loc`, `rf_pick_strategy`, `replenishment_allowed`, `replenishment_threshold`, `default_label_printer`, `default_report_printer`, `auto_print_addr_label`, `auto_print_carton_label` |
 | Location | `cube` (the location's own volume; the checks read `max_cube_capacity`), `check_digit` (written once when a location is created) |
-| Receipt policy | `receipt_without_po`, `receipt_without_asn`, `no_sku_on_po`, `asn_po_qty_discrepancy`, `po_qty_validation`, `excess_message`, `shortage_message` and the `po_*` fields. See [13-receive-checks-and-policy.md](13-receive-checks-and-policy.md). |
+| Receipt policy | `receipt_without_po`, `no_sku_on_po`, `asn_po_qty_discrepancy`, `po_qty_validation`, `excess_message`, `shortage_message` and the `po_*` fields. The active `receipt_without_asn` gate is described on [page 13](13-receive-checks-and-policy.md). |
 ## Related pages
 
 - [Putaway pipeline, step by step](21-putaway-engine-steps.md)

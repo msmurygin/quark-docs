@@ -107,7 +107,8 @@ Reading notes:
 - The quantity check is skipped when the counted quantity equals the planned case quantity, or when the planned case quantity is 0 or less.
 - Codes 27 and 28 need the capability for the code (supervisor), or a supervisor grant for the line of the case. The grant must name `receipt:<id>/line:<detail id>`.
 - There is no shortage error percent. A case that is short is refused only through `shortage_override`.
-- `receipt_without_asn`, `receipt_without_po` and the PO fields are not read here either (page 13).
+- `receipt_without_po`, `receipt_without_asn` and the PO fields are not read in
+  this case-level path. See page 13 for the aggregate and blind-receive checks.
 ## Diagram 5. Exceptions: move cases, cancel a case
 
 **What this shows:** the two exception commands and what each one changes.
