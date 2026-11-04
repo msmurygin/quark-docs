@@ -154,11 +154,14 @@ These receipt policy fields are stored and shown, but no receiving code reads th
 | Field | Note |
 |---|---|
 | `receipt_without_po` | Nothing reads it. |
-| `receipt_without_asn` | Nothing reads it. A blind receive is not judged by it. |
 | `no_sku_on_po` | Nothing reads it. |
 | `asn_po_qty_discrepancy` | Nothing reads it. |
 | `po_qty_validation`, `po_excess_message`, `po_excess_override`, `po_excess_override_percent`, `po_excess_error`, `po_excess_error_percent`, `po_shortage_message`, `po_shortage_override`, `po_shortage_override_percent` | The purchase order checks do not exist. |
 | `excess_message`, `shortage_message` | Only the policy form enables or disables them. The server does not read them. |
+
+`receipt_without_asn` is active. `Allow` accepts a receive without an ASN,
+`Warning` asks **Receive Anyway**, and `HardError` refuses it. The check applies
+to blind receiving and to later work on a receipt created as **No ASN**.
 ## Related pages
 
 - [Policy reference: receipt policy settings](../../admin/policies/40-receipt-policy-settings.md)

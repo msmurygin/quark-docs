@@ -193,7 +193,10 @@ What changes if you change a setting:
 4. Operators synced. For each: `Task Permissions` row with `Task Type` = `Pick`, the area, and **`Pick Execution` ticked**.
 5. Policy: use `DISCRETE` for pallet picking. For carts, make a policy with `Unit` = `PlannedTarget` and publish it. Assign it to the area or to the area and equipment.
 6. Carrier types in `Handling Unit Registry` with `Positions`.
-7. Short reasons: check that `SHORT`, `LPN_NOT_FOUND` and `WRONG_LOCATION` are published and tell operators the codes.
+7. Short reasons: a new warehouse has no business-specific reasons. For General
+   Distribution, create, review and publish `SHORT`, `LPN_NOT_FOUND` and
+   `WRONG_LOCATION`; otherwise publish the warehouse's approved codes. Tell
+   operators which codes to use.
 8. Count: decide whether you want `Count an Emptied Location`, a cycle policy, or the count action in short reasons.
 9. Test the complete physical route with one order before you give the new work area to more operators. Confirm that the task, source checks, destination and follow-up process all behave as planned.
 

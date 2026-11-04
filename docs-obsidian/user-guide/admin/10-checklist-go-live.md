@@ -79,7 +79,7 @@ Legend: **Included** = present in the initial setup. **Create** = you must creat
 | 29 | Allocation policy. | Seeded: `STD` (published, one `Firm` step) | `Warehouse Configuration > Policies > Allocation Policy` | Duplicate it to change it. |
 | 30 | Cartonization policy. | Seeded: `STD` with `BOX-S`, `BOX-M`, `BOX-L` | `Warehouse Configuration > Policies > Cartonization Policy` | Match the boxes to your real boxes. |
 | 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Warehouse Configuration > Policies > Picking Policies` | |
-| 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
+| 32 | Pick short reasons. | A new warehouse has no business-specific reasons. For General Distribution, create, review and publish `SHORT`, `LPN_NOT_FOUND` and `WRONG_LOCATION`. Otherwise publish the codes approved for the warehouse. | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
 | 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
 | 34 | Waves and wave strategies. | None | `Management & Control > Orders & Waves` | Create a manual test wave, then preview one active strategy without confirming the run. Verify its filters, limits, station, schedule and release mode. |
 

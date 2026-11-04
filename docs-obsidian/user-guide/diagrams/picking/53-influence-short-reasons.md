@@ -15,7 +15,7 @@ flowchart LR
 
 ## Reading the diagram
 
-- **Allow Partial and Allow Zero** are checked at once, in the short itself. A reason that does not allow the quantity refuses it: `selected short reason does not allow partial Pick` or `... zero Pick`. The seeded `LPN_NOT_FOUND` has `Allow Partial` off.
+- **Allow Partial and Allow Zero** are checked at once, in the short itself. A reason that does not allow the quantity refuses it: `selected short reason does not allow partial Pick` or `... zero Pick`. In the General Distribution baseline, configure `LPN_NOT_FOUND` with `Allow Partial` off.
 - **ReleaseCurrentRemainder** must be enabled or the reason cannot be published. It runs in the short itself.
 - **BlockSourceLocation** runs in the short itself. It blocks the whole location, whatever its `Scope`. The answer of the short carries `location_blocked`. The next dispatch skips tasks from that location (`LOCATION_BLOCKED`). A count of the location lifts the flag again.
 - **ReleaseRelatedReservations.** The `Scope` selects the picks: `EntireLocation` every live pick at the location, `CurrentSkuAtLocation` the same owner and SKU, `SameSourceStock` the same owner, SKU, lot and source container, `CurrentPick` or empty none. Of those, only picks whose task is `Created` with nothing done, or that have no task, and with nothing picked, are released. A pick whose task is held stays and its operator finishes it at the blocked location.

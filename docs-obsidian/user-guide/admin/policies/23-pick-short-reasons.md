@@ -10,16 +10,17 @@ updated: 2026-10-10
 
 A pick is "short" when the operator finds less stock than the pick asks for. The operator types a **reason code**. The code selects a **pick short reason**. The reason says what the system does next with the stock, the location and the orders.
 
-This page lists every field of a reason and of its actions, the three seeded reasons, and exactly what each action does.
-
-Paths in the "Affects" lines are relative to `crates/libs/` unless they start with another crate name.
+This page explains every field and action, then shows a recommended baseline
+for a **General Distribution** warehouse. Another warehouse may use different
+approved reasons.
 
 ## 1. Where and who
 
 - Menu path: `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`.
 - Roles that change reasons: `Admin`, `Manager`. `Supervisor` can only read. `Operator` cannot read the list, but the RF short command works for them.
 - A reason has revisions with the status `Draft`, `Published`, `Retired`. Only one revision of a code can be `Published`. Only a `Published` revision is used on the floor. A short that names a code with no published revision is refused.
-- The reason is **not** a code list value. It is its own record so that actions have typed meaning. Table `pick_short_reason` (header) and `pick_short_reason_action` (one row per action).
+- The reason is **not** a code-list value. It has its own revision and a set of
+  actions, so administrators can control what follows a shortage.
 - Reasons are frozen into each short: the published revision and its enabled actions are copied into the event that starts the clean-up. Changing a reason later does not change a short that already happened.
 
 ## 2. How the operator uses it (RF)
@@ -40,14 +41,16 @@ Menu: `Sidebar > Warehouse Configuration > Reason Codes > Pick Short Reasons`, l
 ### `Code` (`code`)
 
 - UI label: `Code` (required). Column `varchar(20)`; the database wants upper case and not empty (`chk_pick_short_reason_code`). The service upper-cases and trims it.
-- Default: none. Seed: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION`.
+- Default: none. A new warehouse has no business-specific reasons. For General
+  Distribution, create, review and publish `SHORT`, `LPN_NOT_FOUND` and
+  `WRONG_LOCATION` before picking starts.
 - What it does: the word the operator types. All revisions of one reason share the code.
 - Message when empty: `Enter a reason code first` (screen) or `Pick short reason code cannot be empty` (service).
 - Open work: not applicable.
 
 ### `Revision` (`revision_no`)
 
-- UI label: `Revision`, read-only. `integer`. The system gives `max + 1` for the code. Seed 1.
+- UI label: `Revision`, read-only. `integer`. The system gives `max + 1` for the code. A newly created reason starts at revision 1.
 - **`New Revision` starts from the published actions.** When the code you type has a published revision, the new draft gets a copy of its actions; `Description`, `Partial` and `Zero` are what you type. A code with nothing published starts with no actions: add at least `ReleaseCurrentRemainder` before you can publish. Through the API, actions sent with the new draft are used instead of the copy (`CreatePickShortReasonDraft`, `PickShortReasonBmc::published_actions`).
 
 ### `Status` (`status`)
@@ -232,9 +235,12 @@ The event is delivered to the internal subscriber `quark_outbound_execution`. It
 
 If a step fails, the worker repeats. Steps already done replay without doing twice.
 
-## 7. The three seeded reasons
+## 7. General Distribution baseline reasons
 
-Seeds: `wms-lib-sql/sql/wms-app/migrations/036_pick_short_reason.sql` (`SHORT`) and `071_count_on_scan_and_putaway_exceptions.sql` (the other two). All are revision 1, `Published`.
+A new warehouse contains no business-specific short reasons. For General
+Distribution, create these three reasons, review their actions and publish them
+before enabling picking. A warehouse may instead maintain its own approved
+reason policy.
 
 | Code | Description | `Allow Partial` | `Allow Zero` |
 |---|---|---|---|
@@ -242,7 +248,7 @@ Seeds: `wms-lib-sql/sql/wms-app/migrations/036_pick_short_reason.sql` (`SHORT`) 
 | `LPN_NOT_FOUND` | `The pallet the pick names is not in the location` | **off** | on |
 | `WRONG_LOCATION` | `The stock the pick names is not where the system says` | on | on |
 
-All three have the same six actions:
+For this baseline, configure the same six actions on all three reasons:
 
 | Action | Enabled | Scope | Required | Other fields |
 |---|---|---|---|---|
