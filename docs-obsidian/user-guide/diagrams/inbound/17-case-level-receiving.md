@@ -46,7 +46,7 @@ Reading notes:
 
 - `RCCASE01` refuses a receipt whose granularity is not exactly `Case`. A `Pallet` receipt is told to use "Receive Against ASN".
 - After each scan the screen goes back to `RCCASE02`. When the response says `line_complete`, it goes to `RCCASE_DONE` first.
-- On `RCCASE02`, `F2` on the Case field lists the receipt's unreceived cases (`find_unreceived_cases`). The picker `RCCASE_LIST`, which nothing opened, was removed.
+- On `RCCASE02`, `F2` on the **Case** field lists the receipt's unreceived cases.
 - Closing uses the normal close screens (page 16).
 ## Diagram 3. What one scan does
 

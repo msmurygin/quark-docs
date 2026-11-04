@@ -247,7 +247,7 @@ Outbound flow units: `STATION_UNKNOWN`, `UNIT_UNKNOWN`, `UNIT_NOT_PENDING`, `UNI
 
 Moves and containers: `CONTAINER_STANDS_ELSEWHERE` (with `stands_at`), `CONTAINER_HELD_BY_PICKING` (with `stands_at`), `IN_TRANSIT_LOCATION` (with `side`), `MOVE_LOCATION_CHANGED` (with `side`).
 
-Task sets (`task_claim_set`, and release of a held set): the refusal lists each task in `context.refusals` with a reason: `CONTENDED`, `NOT_FOUND`, `NOT_IN_POOL`, `TOO_HEAVY`, and others.
+When a command claims or releases several tasks together, the refusal lists each task in `context.refusals` with a reason such as `CONTENDED`, `NOT_FOUND`, `NOT_IN_POOL` or `TOO_HEAVY`.
 
 These lists are **not complete**. Each rule defines its own codes next to the code that raises them. More codes exist in `crates/libs/wms-outbound/src/domain/pick_assignment/` (aggregate, route, delivery, tare), in `picking/infrastructure/holder_change.rs` (`SERIAL_EPISODE_OPEN`, `SERIAL_EPISODE_ABANDONED`, `PICK_ASSIGNMENT_LIVE`) and in `cartonization/repair.rs` (`CARTON_REPLAN_*`, `SOLVER_BUDGET_EXCEEDED`). Putaway adds no `context.code` strings. A client must handle an unknown `context.code` by its `return_code` and `class`.
 

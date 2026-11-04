@@ -209,7 +209,7 @@ Rules (`dashboard_metric_threshold` checks):
 | Transactions | `Sidebar > Management & Control > History > Transactions` | The ledger of stock moves, with before and after values. |
 | Pending Move-In | `Sidebar > Management & Control > Inventory > Pending Move-In` | Reserved putaway destinations. |
 | Audit Log | `Enterprise > Audit` | Permission changes and denials. |
-| Event Monitor | `Enterprise > Integrations > Events` | Business events and their status. |
+| Events | `Enterprise > Integrations > Events` | Business events and their status. |
 
 ![Balances page with the By Location tab selected](../assets/screens/inventory-balances.png)
 

@@ -13,13 +13,14 @@ The menu item is `ent_translations`. It opens the form `translations_tabbed` wit
 
 ## Languages
 
-The languages are the active rows of the table `locale` of the metadata database. The product ships three:
+The standard installation includes three interface languages. The table below
+uses English descriptions; the screen can show each language's own name.
 
 | Code | Name | Is the original |
 |---|---|---|
 | `en` | English | Yes |
-| `ru` | Русский | No |
-| `kk` | Қазақша | No |
+| `ru` | Russian | No |
+| `kk` | Kazakh | No |
 
 Each text has one slot for each active language except the original. The slots are made by database triggers: `label_fanout` when a label is made and `locale_backfill` when a language is switched on. For messages, every key has a row for every active language.
 

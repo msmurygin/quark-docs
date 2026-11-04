@@ -25,7 +25,7 @@ The fields are in four blocks: the main block, `STATUS`, `AUDIT` and `PREFERENCE
 | `Full name` | `full_name` | Text, up to 200 characters | Yes (screen). The column accepts empty. | Any text. | Shown in the Users list and as the person's name. The login is shown when it is empty. |
 | `Email` | `email` | Text, up to 120 characters | Yes | Any text. Not checked for format by the database. | Contact address. |
 | `Employee ID` | `employee_id` | Text, up to 50 characters | No | Any text. | Stored only. It has no effect today. |
-| `Language` | `locale` | Drop-down of active languages | Yes in the database | The active rows of `locale`: `en` English, `ru` Русский, `kk` Қазақша. | The language of the screens for this user. |
+| `Language` | `locale` | Drop-down of active languages | Yes in the database | The active languages, for example `en` English, `ru` Russian and `kk` Kazakh. | The language of the screens for this user. |
 | `Password` | `pwd` | Password field | No on the screen | Any text. Empty means "keep the current password". | Sets a new password. The stored value is an Argon2id hash. The field is always empty when the card opens, because the hash is never sent to the screen. See [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md). |
 | `Type` | `typ` | Drop-down | Yes | `User` (default), `Admin` (Administrator), `Sys` (System), `Agent`. | `Admin` and `Sys` skip permission checks. Only such a user may set the field. See [User types and statuses](90-user-types-and-statuses.md). |
 

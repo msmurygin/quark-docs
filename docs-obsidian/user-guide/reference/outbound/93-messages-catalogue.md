@@ -3,7 +3,10 @@
 This page lists the messages that the order screens show, grouped by the page that explains them.
 A part in `{braces}` is replaced by a value. The page linked in the heading says when the message appears and what to do.
 
-Messages are reproduced exactly as they appear in the application. A message may begin with a lower-case letter.
+Messages are reproduced exactly as they appear in the application unless an
+entry is marked **English meaning**. Those entries explain a refusal that the
+current application can show in another language. A message may begin with a
+lower-case letter.
 
 ## [Creating an order](30-creating-an-order.md) and [Editing an order](31-editing-an-order.md)
 
@@ -118,7 +121,7 @@ Messages are reproduced exactly as they appear in the application. A message may
 - `cannot delete a reservation from an order in status {status}`
 - `pick_detail {id} belongs to order {a}, not order {b}`
 - `pick_detail {id} already has {qty} picked — a started pick cannot be deleted; short it or cancel the pick itself (picking-phase operations)`
-- `pick_detail {id} взята в работу (task {id} is in work) — снять её может только фаза отбора`
+- **English meaning:** `Pick {pick_id} cannot be released here because task {task_id} is in work; use the picking flow.`
 
 ## [Cancelling part of a line](39-cancelling-part-of-a-line.md)
 

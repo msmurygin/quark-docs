@@ -22,7 +22,12 @@ Check that a new tenant has the minimum data to run the full path:
 
 ## 3. Configuration and data checklist
 
-Legend: **Included** = present in the initial setup. **Create** = you must create it. **N/A** = not available.
+Legend: **Included** = supplied by the standard installation or warehouse
+bootstrap. **Create** = you must create or assign it for the customer.
+**Review** = check the supplied configuration and approve it for the site.
+**Optional** = configure it only when the process needs it. **Install step** =
+load it through the approved installation procedure. **Demo only** = sample
+data that is not part of a new customer warehouse. **N/A** = not available.
 
 ### 3.1 People
 
@@ -38,26 +43,26 @@ Legend: **Included** = present in the initial setup. **Create** = you must creat
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 6 | Putaway zones. | Seeded: `DOCK`, `RACK` | `Warehouse Configuration > Topology > Putaway Zones` | Replace or add your own. New locations default to zone `DOCK`. |
-| 7 | Special locations. | Seeded: `STAGE`, `PICKTO`, `LOST`, `QC`, `DAMAGE`, `RTV`, `RETURN`, `INTRANSIT`, `UNKNOWN`, `DOCK` | `Warehouse Configuration > Topology > Locations` | Do not delete `STAGE`, `PICKTO`, `LOST`, `DAMAGE`, `INTRANSIT`: zones and code refer to them by name. |
-| 8 | Storage locations. | Seeded demo: 96 locations `A-01-0` to `D-06-3` (types `Case`, `Pick`) | `Warehouse Configuration > Topology > Locations` | Replace with your real map: use `Generate`. |
-| 9 | A `Door` location (dock door). | Create | `Locations` | No `Door` location is seeded. Needed only if you choose `Door` as a drop type. |
-| 10 | A `Pack` location for each pack station. | Create | `Locations` | No `Pack` location is seeded. |
-| 11 | Work area with zones and a pack station. | Create | `Warehouse Configuration > Work Areas & Equipment > Work Areas` | None is seeded. |
-| 12 | Equipment profiles (if lifts are used). | Create | `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | None is seeded. |
+| 6 | Putaway zones. | Included: `DOCK` | `Warehouse Configuration > Topology > Putaway Zones` | Create the customer's storage zones. `RACK` is not included automatically. |
+| 7 | Special locations. | Included: `DAMAGE`, `DOCK`, `LOST`, `PICKTO`, `QC`, `RETURN`, `RTV`, `STAGE`, `UNKNOWN` | `Warehouse Configuration > Topology > Locations` | Review these locations before activation. Discrete picking also needs exactly one location of type `InTransit`; it is not included automatically. |
+| 8 | Storage locations. | Create | `Warehouse Configuration > Topology > Locations` | Generate or import the approved warehouse map. The sample `A-01-0` to `D-06-3` map is demo data only. |
+| 9 | A `Door` location (dock door). | Included: `DOCK` | `Locations` | Create additional doors when the physical warehouse needs them. |
+| 10 | A `Pack` location for each pack station. | Create | `Locations` | Bootstrap does not create pack stations. |
+| 11 | Work area with zones and a pack station. | Create | `Warehouse Configuration > Work Areas & Equipment > Work Areas` | Create each operational area and connect it to its zones and stations. |
+| 12 | Equipment profiles (if lifts are used). | Create | `Warehouse Configuration > Work Areas & Equipment > Equipment Profiles` | Create the profiles used by the site's equipment. |
 | 13 | Operator task rights. | Create | `Warehouse Configuration > Operator Permissions > Operators` | One row per operator, task type and area. Without it: "you have no right to take Pick tasks ...". |
 
 ### 3.3 Master data
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 14 | Owners, suppliers, carriers, customers. | Seeded demo: `OWNER001/002`, `SUPP001-003`, `CARR001/002`, `CUST001/002` | `Owners` | Replace the demo names. |
-| 15 | Owner `WH Settings`. | Seeded for the owners that have a row | owner card | Set the default putaway policy. |
-| 16 | Units of measure. | Seeded: 32 | `Warehouse Configuration > Settings & Reference Data > Code List` (`UOM`) | `Not available` as a screen for classes and factors. |
-| 17 | Pack hierarchy. | Seeded: `STD` (PL > CS > IP > EA) | `Packs` | Create your own packs. |
-| 18 | SKUs with weight, cube and pack. | Seeded demo: `NOLOT` | `SKU` | Weight and cube are needed for cartonization. |
+| 14 | Owners, suppliers, carriers, customers. | Create | `Owners` | `OWNER001`, `SUPP001`, `CARR001` and `CUST001` are demo examples, not customer records. |
+| 15 | Owner `WH Settings`. | Create | owner card | Set the policies and receiving rules for each owner. |
+| 16 | Units of measure. | Included: 32 | `Warehouse Configuration > Settings & Reference Data > Code List` (`UOM`) | Review the supplied codes and use the ones approved for the customer. |
+| 17 | Pack hierarchy. | Create | `Packs` | Create the real pallet, case, inner-pack and each-level relationships. `STD` is demo data. |
+| 18 | SKUs with weight, cube and pack. | Create | `SKU` | `NOLOT` is demo data, not a customer SKU. Weight and cube are needed for cartonization. |
 | 19 | SKU barcodes. | Create | SKU barcode list | RF scanning needs them. |
-| 20 | Lot policy. | Seeded: `STD`, `NOLOT` | `Warehouse Configuration > Policies > Lot Policy` | Set dates and attributes you need. |
+| 20 | Lot policy. | Create | `Warehouse Configuration > Policies > Lot Policy` | Create the policies required by the customer's lot, date and attribute rules. `STD` and `NOLOT` are not included automatically. |
 | 21 | Serial config for serial SKUs. | Create | SKU tab `Serial Tracking` | Only when needed. |
 | 22 | Custom attributes. | Optional | `Attributes` | |
 
@@ -65,40 +70,40 @@ Legend: **Included** = present in the initial setup. **Create** = you must creat
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 23 | Receipt policy. | Seeded: `STD` (allows everything, no quantity check) | `Warehouse Configuration > Policies > Receipt Policy` | Make a stricter one if needed. |
-| 24 | Hold codes. | Seeded: 16 | `Warehouse Configuration > Reason Codes > Hold Codes` | |
-| 25 | Damage actions per owner. | Seeded: Minor `None`, Major `Hold`, Total `Reject` | owner `WH Settings > Receiving` | |
-| 26 | **Putaway policy with steps.** | Seeded policy `STD` has **no steps** | `Warehouse Configuration > Policies > Putaway Policy` | **You must add at least one step**, then set it as the owner default. |
-| 27 | Settings: `PUTAWAY_RESERVATION_TTL_MIN`, `ALLOW_CLOSE_WITH_DISCREPANCY`, `MOVE_HOLD_POLICY`. | Seeded | `System Settings` | |
+| 23 | Receipt policy. | Create | `Warehouse Configuration > Policies > Receipt Policy` | Create, save and assign the checks required by the customer. `STD` is demo data. |
+| 24 | Hold codes. | Included: 16 | `Warehouse Configuration > Reason Codes > Hold Codes` | Review which codes block inbound work, outbound work or both. |
+| 25 | Damage actions per owner. | Review | owner `WH Settings > Receiving` | New owners default to `None` for minor damage, `Hold` for major damage and `Reject` for total damage. Review and change these actions for the customer's process. |
+| 26 | **Putaway policy with steps.** | Create | `Warehouse Configuration > Policies > Putaway Policy` | Add at least one step, publish the policy and set it as the owner default. |
+| 27 | Settings: `PUTAWAY_RESERVATION_TTL_MIN`, `ALLOW_CLOSE_WITH_DISCREPANCY`, `MOVE_HOLD_POLICY`. | Included | `System Settings` | Review the values before activation. |
 
 ### 3.5 Outbound
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 28 | Order type. | Seeded: `SO` | n/a | No screen or API creates more. |
-| 29 | Allocation policy. | Seeded: `STD` (published, one `Firm` step) | `Warehouse Configuration > Policies > Allocation Policy` | Duplicate it to change it. |
-| 30 | Cartonization policy. | Seeded: `STD` with `BOX-S`, `BOX-M`, `BOX-L` | `Warehouse Configuration > Policies > Cartonization Policy` | Match the boxes to your real boxes. |
-| 31 | Picking policy. | Seeded: `DISCRETE` (published) | `Warehouse Configuration > Policies > Picking Policies` | |
-| 32 | Pick short reasons. | Seeded: `SHORT`, `LPN_NOT_FOUND`, `WRONG_LOCATION` | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
-| 33 | Replenishment policy. | Seeded `STD` | `Replenishment Policy` | Verify urgency thresholds and `Empty location is urgent`. |
-| 34 | Waves and wave strategies. | None | `Management & Control > Orders & Waves` | Create a manual test wave, then preview one active strategy without confirming the run. Verify its filters, limits, station, schedule and release mode. |
+| 28 | Order type. | Create | Approved onboarding or API workflow | Create the active order type required by the outbound process. `SO` is not included automatically. |
+| 29 | Allocation policy. | Create | `Warehouse Configuration > Policies > Allocation Policy` | Create at least one effective step and publish the policy. `STD` is demo data. |
+| 30 | Cartonization policy. | Create | `Warehouse Configuration > Policies > Cartonization Policy` | Create the policy and real carton types. `STD`, `BOX-S`, `BOX-M` and `BOX-L` are demo conventions, not included customer data. |
+| 31 | Picking policy. | Create | `Warehouse Configuration > Policies > Picking Policies` | Create and publish the policy used by each work area and equipment profile. `DISCRETE` is not included customer data. |
+| 32 | Pick short reasons. | A new warehouse has no business-specific reasons. For General Distribution, create, review and publish `SHORT`, `LPN_NOT_FOUND` and `WRONG_LOCATION`. Otherwise publish the codes approved for the warehouse. | `Warehouse Configuration > Reason Codes > Pick Short Reasons` | |
+| 33 | Replenishment policy. | Create | `Warehouse Configuration > Policies > Replenishment Policy` | Set the urgency rules. Set `Min Qty`, `Max Qty` and UOM on each pick location to control the replenishment quantity. `STD` is demo data. |
+| 34 | Waves and wave strategies. | Create | `Management & Control > Orders & Waves` | If the site uses waves, create and configure an active strategy. Preview it without confirming the run, then verify its filters, limits, station, schedule and release mode. |
 
 ### 3.6 Printing
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 35 | Label definitions and templates. | Seeded: 6 | API | `lpn_id_label`, `handling_unit_label`, `shipping_label` are used by code. |
-| 36 | A printer configuration. | None | API | Needed to print. |
-| 37 | A `Warehouse` printer assignment. | None | API / form not in menu | Without it: no label prints. |
+| 35 | Label definitions and templates. | Install step | approved label setup workflow | Create the required label definitions and templates. Demo labels are not installed in a customer warehouse. |
+| 36 | A printer configuration. | Create | approved printer setup workflow | Needed to print. |
+| 37 | A `Warehouse` printer assignment. | Create | approved printer setup workflow | Assign the printer to the warehouse; without the assignment, no label prints. |
 
 ### 3.7 Integration and reports
 
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
-| 38 | Internal subscribers on. | Seeded on | `Enterprise > Integrations > Subscribers` | Keep `quark_outbound_execution` and `quark_inventory_count` active. |
-| 39 | IPaaS subscriber. | Seeded **off** | Subscribers | Turn on after IPaaS runs. |
-| 40 | Report catalogue loaded. | Install step | report service | 16 reports. |
-| 41 | Dashboard rail. | Seeded row with empty rail | `Warehouse Configuration > Dashboards > Board Settings` | Pick six metrics. |
+| 38 | Internal subscribers on. | Included and active | `Enterprise > Integrations > Subscribers` | Keep `quark_outbound_execution` and `quark_inventory_count` active. |
+| 39 | IPaaS subscriber. | Included and inactive | Subscribers | Turn on after IPaaS runs. |
+| 40 | Report catalogue loaded. | Install step | report service | The standard catalogue contains 20 report definitions. |
+| 41 | Dashboard rail. | Create | `Warehouse Configuration > Dashboards > Board Settings` | Select the metrics the operation will monitor. Demo board settings are not customer configuration. |
 
 ### 3.8 Load the customer's data
 

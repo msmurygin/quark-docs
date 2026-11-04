@@ -6,7 +6,7 @@ Use this page to give a screen text in another language, or to correct a text.
 
 - You hold the role `ADMIN` and can open Enterprise.
 - You know whether the text is a **label** (a caption on a screen, a field, a button, a menu) or a **message** (a sentence such as an error or a notice). Labels are on the `Labels` tab, messages on the `Messages` tab.
-- You know the language code you will write: `ru` for Русский, `kk` for Қазақша.
+- You know the language code you will write: `ru` for Russian, `kk` for Kazakh.
 - The person who will read the text has this language set in `Language` on the [user card](11-user-general-tab.md).
 
 ## Steps: translate a label

@@ -145,7 +145,7 @@ Other facts about types:
 | Type and values | `None`, `CycleCountActive`, `SanitationActive`, `MaintenanceActive`, `ReceivingHoldoff`. Code list `LOCFLAG`. |
 | Default | `None`. |
 | What it does | A temporary operational block. It takes the location out of automatic work while it is set. |
-| Affects | Putaway candidate gate (flag must be `None`). Allocation. Pick dispatch: a flagged location blocks a pick, except `CycleCountActive` when the caller allows a pick under a running count (`cycle_count_block_tolerated`). Count start: a count freezes `Ok` locations with flag `None` and sets `CycleCountActive`; it lifts only that value afterwards. |
+| Affects | Putaway candidate gate (flag must be `None`). Allocation. Pick dispatch: a flagged location blocks new pick work. An operator who already holds the task may finish it while its source is under an active count. Count start freezes `Ok` locations with flag `None` and sets `CycleCountActive`; finishing the count lifts only that value. |
 | Example | Set `MaintenanceActive` while a beam is repaired. Putaway and allocation skip the bay. |
 | Interacts with | **A flag does not block a move.** Owner decision 2026-07-26. An operator can still move stock in or out. Only `Status` (holds) blocks moves. Do not trust the column comment `Move primitive U4/U5 require loc_flag=None` (`BASELINE` comment on `location.loc_flag`). It is out of date. |
 | When empty | Not possible. NOT NULL. |
@@ -524,7 +524,7 @@ Query `location_checks`, list form `location_checks_list_form` (wms-meta-ui 151)
 | `Operation` | A count: its number and attempt (`CNT… / 2`). An answer: the operation that asked (`PickCommit #<pick>`, or `Move #<transaction_log row>`); a report, what it named (`Report: LPN … / SKU …`). |
 
 A cycle-count policy with `Trust Empty Confirmations` takes the latest `ConfirmedEmpty` here for a check of the location.
-The album report `Подтверждения пустоты` lists the answers of a period and the share the stock contradicted.
+The empty-location confirmation report lists the answers for a period and the share that the stock record contradicted.
 
 ## 5. The Generate wizard
 
