@@ -35,7 +35,7 @@ Reading notes:
 sequenceDiagram
     autonumber
     participant RF as RF screen RCSN01
-    participant API as app-server RPC
+    participant API as Quark API
     participant CS as capture_serial
     participant DB as Database
 
@@ -67,7 +67,7 @@ Reading notes:
 - The registered serials take the lot and the LPN stored on the episode.
 ## Diagram 3. What the SKU serial config changes
 
-**What this shows:** for each serial setting that code reads at receive time, the decision it changes.
+**What this shows:** how receiving uses the serial settings that affect the operator flow.
 
 ```mermaid
 flowchart LR
@@ -81,30 +81,16 @@ flowchart LR
     S8["anomaly_max_per_lpn"] --> D8["Too many serials on one LPN?"]
 ```
 
-| Setting | What it changes | What the operator sees | Source |
-|---|---|---|---|
-| `continuous_serial_tracking` | Turns the whole serial path on. | Serial prompts and codes 65 and 67. | `crates/libs/wms-serial/src/service/serial_policy.rs:225-230` |
-| `allow_deferred_capture` | Off: serials must come with the receive (code 65). On: the receive can finish and the operator scans later. | `collect_serials = true`, screen `RCSN01`. | `crates/libs/wms-serial/src/service/serial_policy.rs:235-240`, `crates/libs/wms-inbound/src/service/receipt/validation/validation_serial.rs:67-81` |
-| `serial_scope` | The count due: `PerUnit` = base units. `PerCase` = the quantity typed. `PerPallet` and `PerInnerPack` = base units divided by the size of the `PL` or `IP` level of the pack hierarchy. A missing level falls back to the `PerUnit` count. | "Progress 1 of N" on `RCSN01`; the refusal text "expected N serials". | `crates/libs/wms-serial/src/service/serial_policy.rs:611-646` |
-| `serial_length`, `serial_mask_format` | Checked on every serial in the deferred path. In the inline path only the mask is checked (see the findings file). | Code 66 (format invalid). | `crates/libs/wms-serial/src/service/serial_policy.rs:561-592`, `crates/libs/wms-inbound/src/service/receipt/validation/validation_serial.rs:112-138` |
-| `serial_parse_mode` (`None`, `Fixed`, `Bounded`), `serial_parse_start_position`, `serial_parse_start_after` | Cuts the serial out of a longer barcode. Deferred path only. | Code 66 when the scan is too short or the config is incomplete. | `crates/libs/wms-serial/src/service/serial_policy.rs:290-329` |
-| `serials_per_barcode`, `multi_serial_delimiter`, `multi_serial_fixed_length` | One scan holds several serials. The count must match exactly. | Code 66 with both numbers. | `crates/libs/wms-serial/src/service/serial_policy.rs:358-431` |
-| `serial_auto_increment`, `serial_increment_source_position`, `serial_increment_length` | The scan is a starter. The server makes the other serials by adding 1 in a numeric window. | Code 66 if the window is not numeric or overflows. | `crates/libs/wms-serial/src/service/serial_policy.rs:375-382`, `:448-525` |
-| `allow_asn_pre_advised` | If on, and the line has pre-advised serials, a scan outside the list is refused. | Code 95 (`SerialAsnNotAdvised`). | `crates/libs/wms-serial/src/service/serial/commands/capture_serial.rs:343-370` |
-| `anomaly_max_per_lpn` | A save that would put more active serials on the LPN than this number is refused. The refusal is marked overridable, but the save code reads no acknowledged codes, so an approval does not help (see the findings file). | Code 91 (`SerialMassAnomaly`). | `crates/libs/wms-serial/src/service/serial_service.rs:257-276`, `:606-616` |
-
-### Stored only. It has no effect today.
-
-These `sku_serial_config` columns are not read by any receiving code. The rest of the code base reads only what is noted.
-
-| Column | Note |
-|---|---|
-| `allow_receive_capture` | Only test code and seed code mention it. |
-| `require_unique_global` | Nothing reads it. |
-| `check_digit_algorithm`, `warranty_period_days`, `industry_profile`, `serial_parse_frequency`, `anomaly_block_severity`, `serial_format` | Nothing reads them. Registration always saves `serial_format = None`. |
-| `anomaly_vendor_surge_factor` | Not read at receive. A background scan reads it. |
-| `anomaly_velocity_threshold_min` | Not read at receive. The ship check reads it. |
-| `profile_mode`, `pick_episode_reassignment_mode` | Not read at receive. Move and pick read them. |
+| Setting | What it changes | What the operator sees |
+|---|---|---|
+| `continuous_serial_tracking` | Turns the serial path on. | Serial prompts and codes 65 and 67. |
+| `allow_deferred_capture` | Off: serials must come with the receive. On: receiving can finish and the operator captures serials later. | Code 65 when serials are required; deferred capture opens `RCSN01`. |
+| `serial_scope` | Sets how many serials are due for a unit, case, inner pack or pallet. | Progress `1 of N` and the expected count. |
+| `serial_length`, `serial_mask_format` | Validates the serial format. | Code 66 when the format is invalid. |
+| `serial_parse_mode` (`None`, `Fixed`, `Bounded`) and parse positions | Extracts the serial from a longer barcode during deferred capture. | Code 66 when the scan or configuration is invalid. |
+| Multiple-serial and auto-increment settings | Lets one scan carry several serials or generate a numeric sequence. | Code 66 when the count, delimiter or numeric sequence is invalid. |
+| `allow_asn_pre_advised` | Requires the scanned serial to be present on the ASN when pre-advised serials exist. | Code 95 (`SerialAsnNotAdvised`). |
+| `anomaly_max_per_lpn` | Limits the number of active serials on one LPN. | Code 91 (`SerialMassAnomaly`) when the limit is exceeded. |
 
 ## Diagram 4. Which lot does the stock get?
 
