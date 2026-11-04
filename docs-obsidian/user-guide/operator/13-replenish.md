@@ -24,6 +24,17 @@ Bring stock from storage to a pick location that is running low. The system give
 
 `Esc` on the first two screens goes back to the Inventory menu. The task stays yours and comes back first next time.
 
+## RF screen map
+
+| Screen | Title | Used for |
+|---|---|---|
+| `RPL00` | **Replenish — Next** | Ask for or resume a replenishment task. |
+| `RPL01` | **Replenish — Take** | Confirm the source location and stock. |
+| `RPL02` | **Replenish — How Much** | Confirm the quantity taken. |
+| `RPL02R` | **Replenish — Why Less** | Record why the quantity is short. |
+| `RPL03` | **Replenish — Bring** | Scan the destination pick location. |
+| `RPL_DONE` | **Replenished** | Review the completed or short result. |
+
 ## If something goes wrong
 
 | Message | What it means | What to do |

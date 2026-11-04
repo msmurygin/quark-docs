@@ -308,6 +308,59 @@ Use **Supervisor > Count Excess Now** when reported excess must be checked befor
 - Reported excess creates count work; it does not silently increase stock.
 - The wave completes only after its picking work is finished and all station positions are free.
 
+## RF screen map
+
+### Station route
+
+| Screen | Title | Used for |
+|---|---|---|
+| `SPR00` | **Start Station Route** | Take or resume a route portion. |
+| `SPR01` | **Scan Shared Tote** | Bind an empty shared tote. |
+| `SPR02` | **Station Stop** | Collect goods at a source. |
+| `SPR03` | **Deliver Tote** | Deliver a tote to its station. |
+| `SPR04` | **Release Empty Tote** | Release an unused empty tote. |
+| `SPR05` | **Station Route** | Review live route progress. |
+| `SPR06` | **Short Stop** | Record a route shortage. |
+| `SPR07` | **Reject Stop** | Reject a stop for another decision. |
+| `SPRZ` | **Location Empty?** | Confirm whether the source is physically empty. |
+
+### Distribution station
+
+| Screen | Title | Used for |
+|---|---|---|
+| `STNM` | **Distribution Station** | Choose station work. |
+| `STN01` | **Station** | Select the distribution station. |
+| `STN02` | **Box on Position** | Bind a box to a numbered position. |
+| `STN03` | **Close Box** | Close a completed station box. |
+| `STN04` | **Box Full** | Replace a full box. |
+| `STN05` | **Box to Pack Station** | Deliver a closed box to packing. |
+| `STN10` | **Place: Scan Tote and Item** | Identify goods to distribute. |
+| `STN11` | **Place: Scan Lot** | Identify the lot when more than one is present. |
+| `STN12` | **Place: Bind Empty Box** | Supply the suggested position with a box. |
+| `STN13` | **Place: Confirm Box and Quantity** | Confirm the destination box and placed quantity. |
+| `STN20` | **Item Missing** | Identify missing station goods. |
+| `STN21` | **Confirm Missing or Damaged Item** | Confirm the whole remaining item declaration. |
+| `STN22` | **Damaged Item** | Identify damaged station goods. |
+
+### Supervisor recovery
+
+| Screen | Title | Used for |
+|---|---|---|
+| `STNSM` | **Station: Supervisor** | Choose a supervisor action. |
+| `STN30` | **Withdraw: Read Order** | Identify an order for whole-order withdrawal. |
+| `STN31` | **Withdraw: Reason** | Record the reason. |
+| `STN32` | **Confirm Whole Order Withdrawal** | Review the irreversible scope. |
+| `STN33` | **Order Withdrawn** | Review the withdrawal result. |
+| `STN40` | **Report Excess: Read Codes** | Identify reported excess. |
+| `STN41` | **Confirm Excess Report** | Review the evidence before recording it. |
+| `STN42` | **Excess Reported** | Review the report result. |
+| `STN50` | **Tote Lost: Scan** | Identify a completely missing tote. |
+| `STN51` | **Confirm Whole Tote Lost** | Confirm the whole-tote write-off. |
+| `STN52` | **Tote Loss Recorded** | Review the recorded loss. |
+| `STN60` | **Count Excess: Read Station** | Select a station for an immediate count. |
+| `STN61` | **Confirm Count Now** | Review and request the count. |
+| `STN62` | **Count Request Result** | Review whether count work was created. |
+
 ## If something goes wrong
 
 | What you see | Meaning | What to do |

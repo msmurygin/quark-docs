@@ -95,6 +95,18 @@ Change **Control Station** only when no order or container is waiting there. A c
 
 The scan history is kept on the server. A lost connection, `Esc`, or another operator taking over does not erase the containers already scanned.
 
+### RF screen map
+
+| Screen | Title | Used for |
+|---|---|---|
+| `CTL00` | **Order Control** | Scan the control station. |
+| `CTL01` | **Control Station** | Scan a container or enter the order. |
+| `CTL02` | **Order Control** | Review progress and scan remaining containers. |
+| `CTL02C` | **Complete Control** | Submit completion after the operator presses `F2` **Complete**. |
+| `CTL03` | **What Is Missing?** | Select the missing container. |
+| `CTL04` | **Report Missing** | Review and report the missing container. |
+| `CTL05` | **Order Checked** | Review the completed result and next step. |
+
 ### Report a missing container
 
 Use this for a container under **Still waiting** that should be at the station but cannot be found, including one last seen at packing or consolidation but already directed to control. A row under **Not arrived** still has an earlier step to finish and cannot be reported missing yet.
