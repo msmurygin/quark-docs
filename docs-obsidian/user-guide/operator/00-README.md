@@ -21,16 +21,13 @@ Use this page to find the right guide, learn the RF keys, and look up a term.
 | 08 | [Inventory count](08-inventory-count.md) | Count a location, or only an item in it |
 | 09 | [Picking](09-picking.md) | Pick orders onto a pallet, into order boxes on a cart, or from a paper list |
 | 10 | [Packing, verify and repack](10-packing-verify.md) | Check and close boxes at a pack station, or repack a pallet into cartons |
+| 10A | [Consolidation](/docs/operator/consolidation/) | Place packed boxes onto outbound pallets, close them, or reopen them under supervision |
 | 11 | [Order control after picking](11-order-control-after-picking.md) | Check that every container of an order reached the control station |
 | 12 | [Troubleshooting and messages](12-troubleshooting-and-messages.md) | Understand a message |
 | 13 | [Replenish](13-replenish.md) | Bring stock from storage to a pick location that is running low |
 | 14 | [Batch picking and distribution station](14-batch-picking-and-distribution-station.md) | Collect a wave into shared totes, then sort it into order or store boxes |
 | 15 | [Staging outbound units](15-staging.md) | Choose and confirm the Stage location for a picked unit |
 | 16 | [Loading and shipment](16-loading-and-shipment.md) | Confirm the truck, load units, complete loading and ship |
-
-## Process without a guide yet
-
-The terminal also contains **Consolidation**. Its step-by-step operator guide is still to be written. Follow your site's work instructions for that menu entry.
 
 The terminal screen families around outbound work are:
 
@@ -39,10 +36,10 @@ The terminal screen families around outbound work are:
 | Discrete pallet picking | `PICK01`–`PICK15` |
 | Cart picking into order boxes | `PKA00`–`PKA31`; box exceptions use `PKA50`–`PKA52` |
 | Summary step on a cart | `PKAA` and its related cart-route screens |
-| Batch picking and station sorting | `SPR00`–`SPR07`, then `STN01`–`STN62` |
+| Batch picking and station sorting | `SPR00`–`SPR07` and `SPRZ`; station work uses the `STN` screens listed in the process guide. |
 | Paper picking | Web workplace; no terminal screens by design |
 | Packing | `PACK` |
-| Consolidation | `CON` |
+| Consolidation | `CONM`, `CON01`–`CON05`, `CONR01`–`CONR02` |
 | Order control | `CTL` |
 | Staging | `STG` |
 | Loading | `LOD` |
@@ -81,7 +78,7 @@ The status line says **Select function — Esc to change warehouse**.
 | `2` | **Inventory** | 05, 06, 07, 08, 13 |
 | `3` | **Picking** | 09 |
 | `4` | **Packing** | 10 |
-| `5` | **Consolidation** | Not documented yet |
+| `5` | **Consolidation** | [10A](/docs/operator/consolidation/) |
 | `6` | **Order Control** | 11 |
 | `7` | **Distribution Station** | 14 |
 | `8` | **Stage** | [15](15-staging.md) |
