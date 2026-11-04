@@ -54,7 +54,7 @@ During putaway destination selection, weight and volume include stock already in
 
 When the move is executed, the system checks physical occupancy again. This execution check does not add reservations. A move within the same zone skips the zone-level weight, volume and case-count checks; location-level limits still apply.
 
-Enter weight and volume in the units configured for the warehouse. The zone form stores the values as entered and does not convert them for display. Use the same units when comparing a zone limit with a product, pack or location limit.
+Enter weight and volume in the units configured for the warehouse. The form converts these physical values between warehouse display units and storage units. Use the same displayed units when comparing a zone limit with a product, pack or location limit.
 
 Location limits still apply. A destination must pass both its own capacity rules and the zone rules.
 
