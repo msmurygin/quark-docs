@@ -16,11 +16,14 @@ The standard forms are operational templates, not tax invoices or legal advice. 
 
 | Document | Start from | What must exist before issue |
 |---|---|---|
-| `Packing list / Опаковъчен лист` | Shipment Orders | At least one closed package. |
-| `Pick list / Лист за подбор` | Shipment Orders | At least one pick for the order. |
-| `Goods issue note / Разходна стокова разписка` | Shipment Orders | Shipped quantity, priced order lines and one currency. |
-| `CMR` | Shipment Orders | Something to carry, a carrier and gross weight. |
-| `Goods receipt note / Приходна стокова разписка` | Receipts | A supplier, received quantity, priced receipt lines and one currency. |
+| Packing list | Shipment Orders | At least one closed package. |
+| Pick list | Shipment Orders | At least one pick for the order. |
+| Goods issue note | Shipment Orders | Shipped quantity, priced order lines and one currency. |
+| CMR | Shipment Orders | Something to carry, a carrier and gross weight. |
+| Goods receipt note | Receipts | A supplier, received quantity, priced receipt lines and one currency. |
+
+These are English descriptions of the supplied document types. The document
+picker shows the label for the selected language.
 
 `Print Documents` is available on the Shipment Orders and Receipts lists. It is not available on a dispatch or trip card.
 
@@ -74,7 +77,8 @@ Issue a document and save its PDF without requiring a configured printer.
 1. Open `Sidebar > Management & Control > Orders & Waves > Orders`.
 2. Tick exactly one order.
 3. Click `Print Documents`.
-4. Choose the document and `Language`: `English` or `Български`.
+4. Choose the document and set **Language** to English or Bulgarian. The
+   language name itself can be displayed in that language.
 5. Click `Download PDF`.
 6. Open the downloaded file and verify the company, counterparty, lines, quantities, currency and number.
 

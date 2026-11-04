@@ -38,6 +38,17 @@ The terminal says that the Stage was chosen and that stock was not moved. This i
 
 The terminal confirms that the unit is staged. The Dispatch now shows the unit at the Stage location.
 
+## RF screen map
+
+| Screen | Title | Used for |
+|---|---|---|
+| `STGM` | **Stage** | Choose the staging action. |
+| `STG01` | **Stage Unit** | Scan the root pallet or container. |
+| `STG02` | **Confirm Stage** | Confirm the physical move to Stage. |
+| `STG03` | **Stage Choice Required** | Stop when no Stage has been selected. |
+| `STGA01` | **Choose Stage (Supervisor)** | Scan the unit that needs a Stage choice. |
+| `STGA02` | **Choose Stage (Supervisor)** | Select and confirm the Stage location. |
+
 ## What you should see
 
 - The same root LPN remains with the unit throughout staging.

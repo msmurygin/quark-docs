@@ -1028,7 +1028,7 @@
    {
     "text": "Scan the next unit. Repeat for all",
     "keys": [],
-    "note": "**Progress** shows 1 из 5. из means of."
+    "note": "**Progress** shows the completed and total counts."
    },
    {
     "text": "Last serial: **Serial Capture Complete**",

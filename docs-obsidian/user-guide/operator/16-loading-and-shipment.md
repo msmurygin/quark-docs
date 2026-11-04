@@ -55,6 +55,23 @@ Shipment writes off the loaded stock, records one shipment receipt per order, cl
 
 *The shipment review is a separate screen. Check the transport and complete counts before the irreversible action.*
 
+## RF screen map
+
+| Screen | Title | Used for |
+|---|---|---|
+| `LODM` | **Loading** | Choose loading, recovery or shipment work. |
+| `LOD01` | **Scan Load** | Scan or enter the Load. |
+| `LOD02` | **Confirm Transport** | Confirm the registered transport. |
+| `LOD03` | **Scan Unit** | Scan the next root pallet or container. |
+| `LOD04` | **Confirm Unit Loading** | Confirm that the unit is physically in the trailer. |
+| `LOD05` | **Complete Loading** | Review and complete physical loading. |
+| `LOD06` | **Load Status** | Review counts and open shipment confirmation. |
+| `LODR01` | **Supervisor: Scan Load** | Open recovery for a Load. |
+| `LODR02` | **Supervisor Recovery** | Choose the recovery action. |
+| `LODR03` | **Supervisor: Unload Unit** | Record a unit removed from the trailer. |
+| `LODR04` | **Supervisor: Cancel Empty Load** | Cancel a Load only after every unit is removed. |
+| `LODS01` | **Confirm Shipment** | Review and perform irreversible Goods Issue. |
+
 ## If a unit must leave the trailer
 
 Do this before shipment.

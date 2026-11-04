@@ -51,7 +51,8 @@ Continuously serial-tracked SKUs are not included in min/max planning.
 
 ## Configure the replenishment policy
 
-Open **Policy > Replenishment Policy**, then open a policy from the list.
+Open **Warehouse Configuration > Policies > Replenishment Policy**, then open
+a policy from the list.
 
 The policy controls task priority:
 
@@ -83,7 +84,7 @@ the zone threshold.
 
 ## Plan and monitor work
 
-Open **Inventory > Replenishment**.
+Open **Management & Control > Inventory > Replenishment**.
 
 The list shows the destination pick location, SKU, lot, source location,
 quantity, UOM, priority, status, short reason, and planning time.
@@ -145,15 +146,9 @@ Check these conditions:
 - Eligible reserve stock is free and available.
 - The SKU is not continuously serial tracked.
 
-## Production rollout check
+## Before production rollout
 
-The min/max engine and its service-level database scenarios cover planning,
-duplicate prevention, zone eligibility, full and short confirmation, policy
-priority, and cancellation. A complete clean-database General Distribution
-journey from configuration through RF confirmation has not yet been verified
-as one end-to-end scenario.
-
-Before production rollout, run one isolated warehouse pilot with your real
+Run one isolated warehouse pilot with your real
 location UOMs, work-area permissions, source location types, and operator RF
 profile. Confirm one full task, one partial task with a reason, and one
 supervisor cancellation.

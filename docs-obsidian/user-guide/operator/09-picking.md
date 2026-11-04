@@ -17,7 +17,7 @@ Across these patterns, the same warehouse rules can require source confirmation 
 | Discrete pick onto a pallet | RF terminal | `PICK01`–`PICK15` |
 | Cart picking into order boxes | RF terminal | `PKA00`–`PKA31`; box exceptions use `PKA50`–`PKA52` |
 | Summary step on a cart | RF terminal, inside the cart route | `PKAA` and the related cart-route screens |
-| Batch picking for a distribution station | RF terminal: route, then station | `SPR00`–`SPR07`, then `STN01`–`STN62` |
+| Batch picking for a distribution station | RF terminal: route, then station | `SPR00`–`SPR07` and `SPRZ`; `STN01`–`STN05`, `STN10`–`STN13`, `STN20`–`STN22`, `STN30`–`STN33`, `STN40`–`STN42`, `STN50`–`STN52`, `STN60`–`STN62` |
 | Paper picking | Web workplace | No terminal screens by design |
 
 Packing, consolidation, order control, staging and loading continue in their own terminal menus after picking when the outbound route requires them.
