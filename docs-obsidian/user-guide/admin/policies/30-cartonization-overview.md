@@ -241,8 +241,8 @@ Two ways out:
   Manager, Supervisor). Picks still on a cart are handed over first. Then
   the same exception is repaired again. Success gives `Resolved`.
 
-Screen: Task Manager, "Pick Target Exceptions" (Russian: «Исключения отбора
-по таре»). Tick one `PlannedCarton` row in `RecoveryRequired` and press
+Screen: Task Manager, **Pick Target Exceptions**. Tick one `PlannedCarton` row
+in `RecoveryRequired` and press
 **Retry**. The button is grey on any other row. The
 read RPC is `cartonization_exception_list`.
 

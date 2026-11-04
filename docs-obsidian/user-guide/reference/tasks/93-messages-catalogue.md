@@ -3,7 +3,10 @@
 This page lists the messages that the Task Manager screens show, grouped by the page that explains them.
 A part in `{braces}` is replaced by a value. The page linked in the heading says when the message appears and what to do.
 
-Messages are reproduced exactly as they appear in the application. A message may begin with a lower-case letter.
+Messages are reproduced exactly as they appear in the application unless an
+entry is marked **English meaning**. Those entries explain a refusal that the
+current application can show in another language. A message may begin with a
+lower-case letter.
 
 ## [Task Board](10-task-board.md) buttons (grey text)
 
@@ -41,12 +44,12 @@ Messages are reproduced exactly as they appear in the application. A message may
 - `{orders} has nothing left in work — press Release to dispatch again` and the form with `have`
 - `{n} not deleted: {reason}; {reason}`
 - `Tasks could not be deleted: {message}`
-- `task {id} is {status} — удалить можно только задачу, которую ещё никто не взял`
+- **English meaning:** `Task {id} can be deleted only before an operator takes it; current status is {status}.`
 - `task {id} is a {type} task over '{source}' — it holds no reservation in an order`
 - `task {id} is a {type} task over '{source}' — it belongs to no order`
 - `task {id} belongs to order {a}, not order {b}`
 - `pick_detail {id} points at task {x}, not {y} — the link has already diverged`
-- `pick_detail {id} is {status}, not Released — нечего возвращать в резерв`
+- **English meaning:** `Pick {id} is no longer Released (current status {status}); nothing can be returned to the reservation pool.`
 - `{entity} id={id} not found`
 
 ## [Pick Assignments](20-pick-assignments-list.md) and [Dissolving a pick assignment](63-dissolving-a-pick-assignment.md)

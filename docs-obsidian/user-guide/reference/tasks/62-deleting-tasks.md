@@ -40,16 +40,18 @@ For each deleted task:
 
 ## If a task is refused
 
-The reason of each refused task is the text of its refusal. These are the ones you can meet:
+The reason of each refused task normally contains the text of its refusal. Rows
+marked **English meaning** explain a refusal that the current application can
+show in another language.
 
 | Reason | Why |
 |---|---|
-| `task {id} is {status} — удалить можно только задачу, которую ещё никто не взял` | The task is not `Created`. Somebody took it. |
+| **English meaning:** `Task {id} can be deleted only before an operator takes it; current status is {status}.` | The task is not `Created`. Somebody took it. |
 | `task {id} is a {type} task over '{source}' — it holds no reservation in an order` | The task is not a pick task. |
 | `task {id} is a {type} task over '{source}' — it belongs to no order` | Same, found while looking for the order. |
 | `task {id} belongs to order {a}, not order {b}` | The link from the task to its order does not match. |
 | `pick_detail {id} points at task {x}, not {y} — the link has already diverged` | The pick and the task no longer point at each other. |
-| `pick_detail {id} is {status}, not Released — нечего возвращать в резерв` | The pick is not in the state `Released`. |
+| **English meaning:** `Pick {id} is no longer Released (current status {status}); nothing can be returned to the reservation pool.` | The pick is not in the state `Released`. |
 | `{entity} id={id} not found` | Somebody deleted it first. The `{entity}` is the name of the missing row (`task`, `pick_detail`). |
 
 If the whole call fails, the toast reads `Tasks could not be deleted: {message}`.

@@ -35,7 +35,7 @@ In this order:
 1. The order status is one of the four above. Else `cannot delete a reservation from an order in status {status}`.
 2. The pick belongs to this order. Else `pick_detail {id} belongs to order {a}, not order {b}`.
 3. Nothing is picked: `pick_detail {id} already has {qty} picked — a started pick cannot be deleted; short it or cancel the pick itself (picking-phase operations)`.
-4. The task is not in work. A task that nobody has claimed (`Created`) does not protect the pick: it is deleted together with the pick. A task that is `Assigned` or later refuses. The text is `pick_detail {id} взята в работу (task {id} is in work) — снять её может только фаза отбора`. Part of this message is in Russian in the code. It means: the pick is taken into work, only the picking phase can release it.
+4. The task is not in work. A task that nobody has claimed (`Created`) does not protect the pick: it is deleted together with the pick. A task that is `Assigned` or later refuses because only the picking flow can release an in-progress pick.
 
 ## What changes
 
