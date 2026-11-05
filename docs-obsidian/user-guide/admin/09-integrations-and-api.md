@@ -14,7 +14,7 @@ This chapter lists only what exists today. It is short on purpose.
 
 | Part | What it does | Where |
 |---|---|---|
-| JSON-RPC API | Every business action as a method call. | Path `/rpc` on `app-server`. |
+| JSON-RPC API | Every business action as a method call. | `POST /api/rpc` on the Quark API base URL. |
 | API keys | Let another system call the API as a user. | `02-users-roles-permissions.md`, section 7. |
 | RPC documentation | Browsable list of methods. | `Enterprise > Platform Tools > RPC Documentation`. |
 | Business events | Events such as `process.receipt.closed`. | `Enterprise > Integrations > Events`. |

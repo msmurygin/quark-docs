@@ -12,7 +12,7 @@ sequenceDiagram
     autonumber
     actor Op as Operator
     participant RF as RF screens
-    participant API as app-server RPC
+    participant API as Quark API
     participant PE as Putaway engine
     participant DB as Database
 
@@ -53,7 +53,7 @@ sequenceDiagram
     autonumber
     actor Op as Operator
     participant RF as RF screen PUTW03
-    participant API as app-server RPC
+    participant API as Quark API
     participant MV as MovementService
     participant DB as Database
 
@@ -83,23 +83,17 @@ sequenceDiagram
 
 Reading notes:
 
-- A soft rule is one of: `capacity`, `loc_type`, `sku_mixing`, `lot_mixing`, `multi_lot_on_lpn`, `attribute_mixing`. The operator may confirm past them only for the location the engine chose. If the operator scans a different location, the ordinary rules apply in full and the move is refused.
-- A redirect is raised only when the destination is the reserved location and it is blocked by an inventory hold, does not exist, or is inactive. The replacement is the nearest usable location (`NearestTo`) and it is reserved in a second transaction after the move has rolled back.
+- A soft rule is one of: capacity, location type, SKU mixing, lot mixing,
+  several lots on one LPN, or attribute mixing. The operator may confirm past
+  it only for the suggested location. Scanning another location runs the
+  ordinary checks in full.
+- If the reserved destination becomes unavailable, Quark can redirect the
+  pallet to the nearest usable location and reserve the replacement.
 - When the pallet lands in a location other than the reserved one, the reservation is set to `Cancelled`. When it lands in the reserved one, it is set to `Consumed`.
 - If the system setting `COUNT_ON_PUTAWAY_DEVIATION` is `1` and the move landed through an acknowledged deviation, the destination is queued for a count (event `process.inventory.count_requested`).
-- `PUTW03` asks for a suggestion every time it becomes the top screen, also when `PUTW_OVR` returns to it. Each ask cancels the pallet's earlier live reservation and may insert a new one. The grant stays in `globals.grant_id`.
-- The full order of checks inside the move is on [25-move-execute.md](25-move-execute.md).
-## Tables written
-
-| Table or stream | When | Source |
-|---|---|---|
-| `idempotency_store` | both calls | `crates/libs/wms-shared/src/pipeline_runner.rs:267-323` |
-| `inventory_pending_move_in` | the suggestion inserts `Active`; the move, the release call and the sweeper change the status | `crates/libs/wms-inventory/src/putaway/reserve.rs:185-215`, `crates/libs/wms-lib-core/src/model/inventory/pending_move_in.rs:589-700` |
-| `container` and `inventory_balances` (new location) | the move | `crates/libs/wms-inventory/src/adapters/postgres/for_moving_container.rs:53-150` |
-| `transaction_log` | the move, one row per line | `crates/libs/wms-inventory/src/movement/side_effects.rs:290-352` |
-| `enterprise.integration_event` | the move (`process.inventory.moved`) | `crates/libs/wms-inventory/src/adapters/postgres/for_publishing_domain_events.rs:29-41` |
-| location holds `LocBlocked` | the move, only for oversize goods (`positions_required` above 1) | `crates/libs/wms-inventory/src/putaway/section_holds.rs:101-150` |
-| `inventory_override_grant` | after a supervisor approval | `crates/libs/wms-inventory/src/movement/override_grant.rs:37` |
+- `PUTW03` requests a fresh suggestion whenever the operator returns to it.
+  The previous live reservation is cancelled before a replacement is made.
+- See [Move execution checks](25-move-execute.md) for the order of validations.
 ## Related pages
 
 - [Operator guide: Putaway](../../operator/05-putaway.md)

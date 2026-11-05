@@ -4,7 +4,7 @@ In this guide you log in, make your first calls with `curl`, and create an API k
 
 You need:
 
-- a running `app-server` (local development uses `http://localhost:8081`),
+- the Quark API base URL (local development commonly uses `http://localhost:8081`),
 - `curl`,
 - a user name and password issued by your Quark administrator.
 
@@ -36,7 +36,7 @@ content-type: application/json
 
 - `-c cookies.txt` saves the cookie in a file. The cookie is named `auth-token`.
 - Use `-b cookies.txt` on the next calls to send it back.
-- The token lasts for `SERVICE_TOKEN_DURATION_SEC` seconds (1800 in the development config). Every call you make with the cookie renews it.
+- The deployment controls the session duration. Every authenticated call renews it.
 
 If the user name or password is wrong, you get HTTP 403 and this body. The body is the same for an unknown user and for a wrong password, on purpose.
 
@@ -50,7 +50,7 @@ If the user name or password is wrong, you get HTTP 403 and this body. The body 
 }
 ```
 
-After 10 failed logins in 60 seconds for the same user name, the server refuses further tries with the same `LOGIN_FAIL` answer until the window passes. See [06-rate-limits-and-limits.md](06-rate-limits-and-limits.md).
+After 10 failed logins in 60 seconds for the same user name, the server refuses further tries with the same `LOGIN_FAIL` answer until the window passes. See [Rate limits and limits](06-rate-limits-and-limits.md).
 
 ## Step 3. Ask who you are
 
@@ -85,7 +85,7 @@ Expected shape (values will differ):
 }
 ```
 
-The real answer has more fields. See [reference/enterprise.md](reference/enterprise.md#me).
+The real answer has more fields. See the [`me` method](reference/enterprise.md#me).
 
 ## Step 4. Find your warehouses
 
@@ -203,7 +203,7 @@ Expected shape:
 
 Note the difference from step 5. A command answers with `meta` and `data`. `meta.idempotency_replayed` tells you if the answer is a stored copy of an earlier call.
 
-Most commands need an idempotency key, so you can repeat them safely. `generate_lpn` does not. For a command that does, see [04-command-types-and-concurrency.md](04-command-types-and-concurrency.md) and [08-workflows-by-example.md](08-workflows-by-example.md).
+Most commands need an idempotency key, so you can repeat them safely. `generate_lpn` does not. For a command that does, see [Command types and concurrency](04-command-types-and-concurrency.md) and [Workflows by example](08-workflows-by-example.md).
 
 ## Step 7. Make an API key
 
@@ -305,11 +305,11 @@ Second, call a method your role may not call (or a method that does not exist). 
 
 `id` is `null` here because the server refused the call before it ran the method. Only a superuser (`typ` of `Admin` or `Sys`) skips the permission check. For a superuser, an unknown method gives HTTP 400 and `RPC_REQUEST_METHOD_UNKNOWN`.
 
-Error answers are not standard JSON-RPC. There is no `jsonrpc` key and no numeric `code`. Read `error.message` and `error.data.detail`. Save `error.data.req_uuid`: it is the id to give to support, because it is in the server log. See [05-errors.md](05-errors.md).
+Error answers are not standard JSON-RPC. There is no `jsonrpc` key and no numeric `code`. Read `error.message` and `error.data.detail`. Save `error.data.req_uuid`: it is the id to give to support, because it is in the server log. See [Errors](05-errors.md).
 
 ## Where to go next
 
-- How login, keys and permissions work: [02-authentication.md](02-authentication.md).
-- The request and response shape in detail: [03-request-and-response-format.md](03-request-and-response-format.md).
-- Safe repeats and version checks: [04-command-types-and-concurrency.md](04-command-types-and-concurrency.md).
-- Full call sequences: [08-workflows-by-example.md](08-workflows-by-example.md).
+- How login, keys and permissions work: [Authentication and permissions](02-authentication.md).
+- The request and response shape in detail: [Request and response format](03-request-and-response-format.md).
+- Safe repeats and version checks: [Command types and concurrency](04-command-types-and-concurrency.md).
+- Full call sequences: [Workflows by example](08-workflows-by-example.md).
