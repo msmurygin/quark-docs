@@ -665,12 +665,14 @@ flowchart TD
 
 When there is no work, the line above **Current loc** says **No eligible Pick work**. On **Get Area Work** it says **No eligible Pick work in the area**. A refusal from the server shows in the same place.
 
-The short-reason codes depend on the warehouse setup. A new warehouse has no
-business-specific reasons. A General Distribution warehouse commonly uses
-`SHORT` (the stock is below the system quantity), `WRONG_LOCATION` (the stock is
-not where the system says) and `LPN_NOT_FOUND` (the pallet is not in the
-location). `LPN_NOT_FOUND` takes no partial quantity: the pallet is there or it
-is not. Ask your supervisor which published codes your warehouse uses.
+The short-reason codes depend on the warehouse setup. The General Distribution
+reference configuration includes `SHORT` (the stock is below the system
+quantity), `WRONG_LOCATION` (the stock is not where the system says) and
+`LPN_NOT_FOUND` (the pallet is not in the location). The warehouse team must
+explicitly apply that configuration after selecting the profile; warehouse
+Bootstrap does not create these reasons. `LPN_NOT_FOUND` takes no partial
+quantity: the pallet is there or it is not. Ask your supervisor which published
+codes your warehouse uses.
 
 The server decides in this order. First, if you already hold a live carrier job, or a carrier that was dissolved with goods and not delivered, that job opens again. Next, if you did not name an area (**Discrete Pick**), you get a single pick. If you named an area, the picking policy for that area and your equipment decides. If the policy needs no carrier, you get a single pick. If it needs a carrier, you get a task you already hold, or else **Scan Carrier**.
 
