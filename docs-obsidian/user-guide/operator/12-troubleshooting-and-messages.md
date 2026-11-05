@@ -133,8 +133,10 @@ On a phone, the keys of the footer are buttons, for example **Esc Back**. A tap 
 
 Failed actions are written to the server log. Supervisors and support can find them with the time and your user name.
 
-The server writes one line for every call, with the command name, the user, the warehouse, the duration and the outcome. By default these lines go to the file `logs/app-server.log.YYYY-MM-DD` in the folder where the server runs (one file per day, JSON lines). The terminal program has its own file, `rf-terminal.YYYY-MM-DD.log`, in its log folder (default `logs`). Ask support for the exact folders of your installation.
+Quark records the command, user, warehouse, duration and outcome for each call.
+Give support your user name, warehouse and the approximate time of the action.
+Include the request identifier if the terminal shows one.
 
 ## Related guides
 
-- [00 README](00-README.md)
+- [Operator guide overview](00-README.md)

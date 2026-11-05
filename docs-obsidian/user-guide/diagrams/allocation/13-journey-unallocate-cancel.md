@@ -18,7 +18,7 @@ Stock that an order has reserved comes back in four ways: the `Unallocate` butto
 sequenceDiagram
     actor Op as Operator
     participant UI as Order screen
-    participant API as app-server RPC
+    participant API as Quark API
     participant CMD as CancelOrderAllocation
     participant REL as release_allocation_for_order
     participant DB as Database

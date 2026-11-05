@@ -24,22 +24,23 @@ If none of them is valid, you get HTTP 401 and `NO_AUTH`.
 2. The server sets the cookie `auth-token` (`HttpOnly`, path `/`).
 3. Send the cookie on every later call.
 
-Facts from the code:
+Session behavior:
 
-- The token is signed with `SERVICE_TOKEN_KEY`. It lasts `SERVICE_TOKEN_DURATION_SEC` seconds (1800 in the development config).
+- The deployment controls the session duration.
 - Each authenticated request with a cookie sets a fresh cookie. The session slides while you are active.
 - The token is tied to the user's `token_salt`. When the salt changes, old tokens stop working.
 - If the server finds a bad cookie (wrong format, unknown user, bad signature), it removes the cookie from your browser.
 - `POST /api/logoff` with `{"logoff": true}` removes the cookie. The answer is `{"result":{"logged_off":true}}`.
 - A user with `rf_login = false` cannot log in from a handheld client. A client that sends the header `X-Rf-Client: rf-go` or `X-Rf-Client: rf-web` is treated as a handheld client. The refusal looks exactly like a wrong password.
-- A login that fails, or is throttled, gets HTTP 403 and `LOGIN_FAIL`. See [05-errors.md](05-errors.md).
+- A login that fails, or is throttled, gets HTTP 403 and `LOGIN_FAIL`. See [Errors](05-errors.md).
 
-The `status` column of a user (`Active`, `Invited`, `Locked`, `Disabled`) decides whether the user may be authenticated (`UserStatus::may_sign_in`, `wms-lib-auth/src/user_status.rs`). `Active` and `Invited` are let in. `Locked` and `Disabled` are refused on every door:
+A user's status controls authentication. `Active` and `Invited` users may sign
+in. `Locked` and `Disabled` users are refused through every credential type:
 
 - Password login (web, RF, supervisor override): checked after the password matched. The answer is the same as for a wrong password: HTTP 403 `LOGIN_FAIL`.
 - A cookie that was issued before the lock: refused on the next request with HTTP 401 `NO_AUTH`, and the cookie is removed.
 - A service token for the user: refused the same way.
-- An API key of the user: refused with the same generic failure as a revoked key. The key is not revoked and works again when the status goes back to `Active`. The key check is cached, so a key that was accepted a moment ago can work for up to `WMS_API_KEY_TTL_SECS` seconds (default 30).
+- An API key of the user: refused with the same generic failure as a revoked key. The key is not revoked and works again when the status goes back to `Active`. A previously accepted key can remain cached for up to 30 seconds by default.
 
 ### API key
 
@@ -73,19 +74,21 @@ To use a key, send it as a bearer token:
 
 To stop a key, call `revoke_user_api_key` with `{"data": {"id": <key id>, "user_id": <key owner user id>}}`. A retry is a successful no-op and keeps the original revoke time. To see keys, call `list_user_api_key` (the list never holds the secret).
 
-Facts from the code:
+API-key behavior:
 
 - A key works only if it is known, not revoked, not expired, and its user has `api_access = true`. All four failures give the same answer (`NO_AUTH`). The server hides which one it was.
-- The server remembers a key check for `WMS_API_KEY_TTL_SECS` seconds (30 by default). After you revoke a key or switch off `api_access`, the key can still work for up to that long on a server that has already checked it.
+- The server remembers a key check for up to 30 seconds by default. After you revoke a key or switch off `api_access`, a running server can accept the cached result until that period ends.
 - A key does not carry its own permissions. It acts with the role of its user in the warehouse you select.
 - Making and revoking a key is written to the audit log. The plaintext key and the hash are not.
-- Administrative HTTP routes, such as `POST /api/admin/rbac/reseed`, accept **only** an API key. A cookie gets `ADMIN_BEARER_REQUIRED`.
 
-The `api_access` column of a new user is `true` by default. So every new user can use an API key from the start. To stop this for one user, set `data.api_access` to `false` with `update_user`, and check with `get_user`.
+The `api_access` field of a new user is `true` by default. To stop API-key
+access for one user, set `data.api_access` to `false` with `update_user`, then
+check the result with `get_user`.
 
 ### Service token
 
-`X-Service-Auth` is used when `web-ui-server` calls `app-server` for a signed-in person. It is signed with `SERVICE_INTERNAL_AUTH_KEY`. It names a service and one user. It cannot be used to act as another user. Outside callers should not use it.
+`X-Service-Auth` is reserved for calls between Quark services. Outside callers
+must use a session cookie or a managed API key.
 
 ## Choose the warehouse
 
@@ -108,19 +111,22 @@ Your warehouses and your role in each one come from `list_user_warehouses`. An a
 
 `X-Data-Scope: enterprise` asks for the enterprise scope instead of a warehouse. Do not send it together with `X-Warehouse-Id` (HTTP 400, `WAREHOUSE_SELECTOR_CONFLICT`). The scope needs an enterprise role (HTTP 403, `ENTERPRISE_SCOPE_NOT_AVAILABLE` without one). `X-Data-Scope: warehouse` is the same as leaving it out. Any other value gives `WAREHOUSE_SELECTOR_INVALID`.
 
-In the enterprise scope the database search path holds only the shared `enterprise` schema. So only methods that use enterprise tables work there (the "Enterprise" group in the reference: users, roles, API keys, and so on). A method that reads warehouse tables (receipts, stock, orders) fails in this scope. Use `X-Warehouse-Id` for warehouse data. A call with a warehouse header can also use the enterprise tables.
+Enterprise scope supports the methods in the **Enterprise** reference group,
+such as users, roles and API keys. Receipt, stock and order methods require
+`X-Warehouse-Id` instead.
 
 Two methods work before you have a default warehouse: `me` and `list_user_warehouses`.
 
 ## Tenant
 
-One `app-server` process serves **one tenant**. The tenant id is part of the server's own configuration (set when the tenant manager provisions the process). It is never read from a request header or from `params`.
+Each Quark API base URL belongs to one tenant. The tenant is selected by the
+address, not by a request header or `params`.
 
 - Do not send a tenant id. There is no request field for it.
-- The `tenant_id` shown in ADR-058 examples (`meta.tenant_id`) is not read by the code. Unknown keys in `meta` are ignored.
-- To work in another tenant, call that tenant's server.
+- Do not send `meta.tenant_id`; it does not select a tenant.
+- To work in another tenant, use that tenant's API base URL.
 
-When the tenant manager provisions a tenant on Kubernetes, the tenant's server gets the address `https://<tenant_name>.<base_domain>`. The base domain is a setting of the tenant manager. For other kinds of deployment, ask your administrator for the base URL.
+Ask your administrator for each tenant's base URL.
 
 ## Permissions (RBAC)
 
@@ -128,19 +134,19 @@ When the tenant manager provisions a tenant on Kubernetes, the tenant's server g
 
 For each call to `POST /api/rpc` the server does this:
 
-1. It finds your role in the selected warehouse (`enterprise.user_warehouse`). No role means HTTP 403, `RBAC_NO_ROLE`.
+1. It finds your role in the selected warehouse. No role means HTTP 403, `RBAC_NO_ROLE`.
 2. If your user `typ` is `Admin` or `Sys`, the check passes. These are superusers.
-3. Otherwise it looks for a row in `enterprise.role_permission` with your role, resource type `api` and resource code equal to the **method name**. No row means no access (deny by default). A row gives access when `can_execute` is true.
+3. Otherwise it checks whether the role may execute the requested method. A
+   missing permission denies access by default.
 4. If access is denied, you get HTTP 403, `RBAC_FORBIDDEN`. The body names the method. The denial is written to the audit log.
-5. If the permission lookup itself fails (database error), you get HTTP 503, `SERVICE_ERROR`. The server fails closed.
+5. If the permission check itself fails, you get HTTP 503, `SERVICE_ERROR`. The server fails closed.
 
-The server keeps role and permission lookups in memory for 60 seconds (`WMS_RBAC_API_TTL_SECS`). The server copy that handles your change clears its memory at once. Other server copies learn about the change through the `enterprise.rbac_cache_epoch` table (a shared poller, see `docs-obsidian/architecture/rbac-cache-invalidation.md`). If that poller is slow, a copy can use the old answer until its 60 seconds end.
-
-`RBAC_ENFORCEMENT_MODE=log_only` is a rollout switch for the whole server. In that mode, denials are logged but not blocked. The default is to enforce.
+Permission changes normally take effect immediately, but another running server
+instance can use its previous result for up to 60 seconds.
 
 ### Methods that skip the check
 
-These are read from `routes_rpc.rs`:
+These methods bypass the ordinary method-permission check:
 
 | Methods | Login | Permission check |
 |---|---|---|
@@ -152,7 +158,7 @@ These are read from `routes_rpc.rs`:
 
 The built-in roles are `ADMIN`, `MANAGER`, `SUPERVISOR`, `OPERATOR` and `VIEWER`. You can add custom roles. A custom role starts with **no** permissions.
 
-The first time the server sees a method, it adds default permission rows for the built-in roles. Each method lists its default roles in the reference (`Roles that have it by default`) and in the OpenRPC key `x-quark-default-roles`. The seeding never overwrites an administrator's edit.
+The first time the server sees a method, it adds default permission entries for the built-in roles. Each method lists its default roles in the reference (`Roles that have it by default`) and in the OpenRPC key `x-quark-default-roles`. This setup does not overwrite an administrator's edit.
 
 ### Change permissions
 
@@ -167,8 +173,6 @@ The first time the server sees a method, it adds default permission rows for the
 Only `ADMIN` may change the permission matrix or individual role-permission rows. `MANAGER` retains read-only access to the matrix.
 
 A permission row has `role_id`, `resource_type`, `resource_code` and the bits `can_read`, `can_write`, `can_delete`, `can_execute`. For an API method, set `resource_type` to `api`, `resource_code` to the method name, and `can_execute` to `true`.
-
-There is also an HTTP route that rebuilds the default rows from the method catalog: `POST /api/admin/rbac/reseed` (add `?force=true` to overwrite). It needs an **API key** (not a cookie) whose user holds the capability `admin.rbac.reseed`. Every use is written to the audit log.
 
 ### Supervisor overrides (two-person rule)
 
@@ -190,11 +194,14 @@ Who may authorise a pair:
 | Pick pallet code 121 | Capability `pick_drop.close_foreign` |
 | Pick code 120, packing code 122 | A role in `SUPERVISOR`, `MANAGER` or `ADMIN` |
 
-The three `receipt.*` capabilities are given to `SUPERVISOR` only. `ADMIN` and `MANAGER` cannot authorise a receipt override. The person who receives cannot approve their own discrepancy. See [05-errors.md](05-errors.md) and [04-command-types-and-concurrency.md](04-command-types-and-concurrency.md).
+The three `receipt.*` capabilities are given to `SUPERVISOR` only. `ADMIN` and `MANAGER` cannot authorise a receipt override. The person who receives cannot approve their own discrepancy. See [Errors](05-errors.md) and [Command types and concurrency](04-command-types-and-concurrency.md).
 
 ## Browser calls (CORS)
 
-The server allows `GET` and `POST`, the headers `Content-Type`, `Authorization`, `Referer`, `X-Warehouse-Id` and `X-Data-Scope`, and credentials (cookies). It allows only the origins listed in `SERVICE_CORS_ALLOWED_ORIGINS`.
+The server allows `GET` and `POST`, credentials (cookies), and the headers
+`Content-Type`, `Authorization`, `Referer`, `X-Warehouse-Id` and
+`X-Data-Scope`. Browser requests are accepted only from origins configured by
+the deployment administrator.
 
 ## Quick reference
 

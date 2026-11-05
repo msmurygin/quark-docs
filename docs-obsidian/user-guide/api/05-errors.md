@@ -1,6 +1,6 @@
 # Errors
 
-This page lists every error shape and code that the code base can send to an API caller.
+This page explains the error shapes and codes an API client must handle.
 
 ## The error answer
 
@@ -32,11 +32,13 @@ Things to know:
 - A failed answer has no `result`.
 - Do not parse sentences. Some texts are written in the language of the user (`locale`). Switch on `error.message`, `detail.return_code`, `detail.class`, `detail.context.code` and `detail.error_code`.
 - One case returns **HTTP 200 with an error body**: `APPLICATION_RETURN`. Always check for `error` in the body, not only the HTTP status.
-- The server never puts SQL, table names or stack traces in the answer. The exceptions are database `CHECK` violations, which name the rule (see `INVALID_DATA`).
+- The server does not return stack traces. Some validation refusals can include
+  a constraint identifier; treat it as diagnostic text and switch on the error
+  name instead.
 
 ## HTTP status and error names
 
-These names are in `error.message`. The mapping is in `crates/libs/wms-lib-web/src/error.rs`.
+These names appear in `error.message`.
 
 ### Login and scope
 
@@ -49,13 +51,12 @@ These names are in `error.message`. The mapping is in `crates/libs/wms-lib-web/s
 | 400 | `WAREHOUSE_REQUIRED` | null | No `X-Warehouse-Id`, and you do not have exactly one default warehouse. | Send `X-Warehouse-Id`. |
 | 403 | `WAREHOUSE_NOT_AVAILABLE` | null | You may not use this warehouse, or it is not active. | Pick a warehouse from `list_user_warehouses`. |
 | 403 | `ENTERPRISE_SCOPE_NOT_AVAILABLE` | null | You asked for the enterprise scope and have no enterprise role. | Use a warehouse scope. |
-| 403 | `SERVICE_DELEGATION_DENIED` | null | A service token tried to act as a user other than the one it names. | Internal. Not for outside callers. |
 
 ### Permission (RBAC)
 
 | HTTP | Name | `detail` | Meaning | What to do |
 |---|---|---|---|---|
-| 403 | `RBAC_FORBIDDEN` | The method name | Your role has no execute permission on this method. | Ask an administrator. See [02-authentication.md](02-authentication.md). |
+| 403 | `RBAC_FORBIDDEN` | The method name | Your role has no execute permission on this method. | Ask an administrator. See [Authentication and permissions](02-authentication.md). |
 | 403 | `RBAC_NO_ROLE` | Your user id | You have no role in this warehouse. | Ask an administrator to assign a role. |
 
 If the permission lookup itself fails, you get HTTP 503 with `SERVICE_ERROR`. The server fails closed: it does not let the call through.
@@ -65,7 +66,7 @@ If the permission lookup itself fails, you get HTTP 503 with `SERVICE_ERROR`. Th
 | HTTP | Name | `detail` | Meaning |
 |---|---|---|---|
 | 400 | `RPC_REQUEST_INVALID` | Text | The body is not a valid request: `jsonrpc` is missing or not `"2.0"`, `id` is missing, `method` is missing or not a string. |
-| 400, 413, 415 | `RPC_REQUEST_INVALID` | Text from the web framework | The HTTP body could not be read as JSON: it is not JSON (400), it is larger than 2 MB (413), or `Content-Type` is not `application/json` (415). The HTTP status keeps the kind of refusal; the body is the error shape above (F-16 — it used to be plain text). |
+| 400, 413, 415 | `RPC_REQUEST_INVALID` | Request error text | The HTTP body could not be read as JSON: it is not JSON (400), it is larger than 2 MB (413), or `Content-Type` is not `application/json` (415). The HTTP status keeps the kind of refusal; the body uses the error shape above. |
 | 400 | `RPC_REQUEST_METHOD_UNKNOWN` | `rpc method '<name>' unknown` | No such method. |
 | 400 | `RPC_PARAMS_INVALID` | Text from the JSON parser | A parameter is missing or has the wrong type, or the method needs params and you sent none. |
 
@@ -73,17 +74,17 @@ If the permission lookup itself fails, you get HTTP 503 with `SERVICE_ERROR`. Th
 
 | HTTP | Name | `detail` | Meaning |
 |---|---|---|---|
-| 400 | `ENTITY_NOT_FOUND` | `{ "entity": "<table>", "id": <n> }` | No row has this id. |
+| 400 | `ENTITY_NOT_FOUND` | `{ "entity": "<entity>", "id": <n> }` | No record has this id. |
 | 400 | `CODE_LIST_VALUE_NOT_FOUND` | The code | A value is not in its code list. |
 | 400 | `LOCATION_NOT_FOUND` | The location code | No such location. |
 | 400 | `UNIQUE_VIOLATION` | null | A row with this unique value already exists. |
-| 400 | `DEPENDENT_DATA_EXIST` | `{ "entity": "<table>", "id": [<ids>] }` | You cannot delete the row: other rows still refer to it. |
-| 400 | `INVALID_DATA` | Text | A value breaks a rule. The text says which. Covers: validation errors, hierarchy errors, a business-logic refusal, a refused user type, and database refusals (`CHECK` violation: the text names the rule and table, for example `chk_step_criterion_values_nonempty`; duplicate row: `Record already exists`; foreign key: `Cannot delete: record is in use` or `Referenced record does not exist`). |
+| 400 | `DEPENDENT_DATA_EXIST` | `{ "entity": "<entity>", "id": [<ids>] }` | You cannot delete the record because other records still refer to it. |
+| 400 | `INVALID_DATA` | Text | A value breaks a validation or business rule. Correct the value named in the detail. |
 | 400 | `MODEL_ERROR` | Text | A model-layer error that no other name covers. |
 | 400 | `INTERNAL_SYSTEM_ERROR` | Text | A business-logic system error with a message. |
 | 400 | `RF_ERROR` | Object | A structured domain refusal. See the next section. |
-| 200 | `APPLICATION_RETURN` | `{ "message": "<text>", "return_code": <n> }` | A legacy "return code" answer. The HTTP status is 200 but the body has `error`. The comment in the code says it is a UI direction, not a failure. |
-| 500 | `SERVICE_ERROR` | null | Something failed on the server that the caller cannot fix. Includes a `list_options.limit` above 5000 (as the code reads). |
+| 200 | `APPLICATION_RETURN` | `{ "message": "<text>", "return_code": <n> }` | A UI instruction carried in the `error` field. Handle the instruction even though the HTTP status is 200. |
+| 500 | `SERVICE_ERROR` | null | Something failed on the server that the caller cannot fix. A `list_options.limit` above 5000 is one example. |
 | 503 | `SERVICE_ERROR` | null | The permission lookup or the warehouse lookup failed. Try again. |
 
 A `SERVICE_ERROR` carries no detail on purpose. Use `req_uuid` to find the cause in the log.
@@ -119,7 +120,7 @@ Business commands report their refusals as `RF_ERROR` with HTTP 400. `detail` is
 | `UserInput` | The user can fix the input. | Show the message. Let the user correct it. |
 | `SupervisorOverride` | A supervisor may allow it. | Use the override flow (below). |
 | `HardFail` | Not allowed. | Show the message. Do not retry unchanged. |
-| `Anomaly` | A serial-number anomaly guard fired. | Blocked by default. An owner policy may allow an override. |
+| `Anomaly` | A serial-number anomaly guard fired. | Follow `is_overridable`: use the override flow when it is `true`; otherwise stop. |
 | `StateMachine` | The object is in the wrong state for this action. | Read the state. |
 
 ### Return codes that every domain shares
@@ -128,7 +129,7 @@ Business commands report their refusals as `RF_ERROR` with HTTP 400. `detail` is
 |---|---|---|---|
 | 0 | HardFail (or UserInput) | A plain business refusal. The message says why. | Show the message. |
 | 9 | HardFail | A document was not found (`context: {entity, doc_number}`). | Check the number. |
-| 40 | Retry | **Version conflict.** `context.current_state` holds the row's current `version` (and often `status`). | Read the state. Decide again. Send with the new version. See [04-command-types-and-concurrency.md](04-command-types-and-concurrency.md). |
+| 40 | Retry | **Version conflict.** `context.current_state` holds the row's current `version` (and often `status`). | Read the state. Decide again. Send with the new version. See [Command types and concurrency](04-command-types-and-concurrency.md). |
 | 41 | Retry | A row lock timed out, or contended stock could not be taken. | Wait and send the same call again. |
 | 42 | HardFail | The idempotency key was already used for different data or another command. | Make a new key. |
 | 44 | Retry | The first call with this key is still running. | Send the same call again with the same key. |
@@ -136,7 +137,7 @@ Business commands report their refusals as `RF_ERROR` with HTTP 400. `detail` is
 
 ### Receipt return codes (inbound)
 
-Receipt, serial and case-level commands use this table. Source: `crates/libs/wms-shared/src/validation_codes.rs`.
+Receipt, serial and case-level commands use this table.
 
 | Code | Name | Class | Overridable | Meaning |
 |---|---|---|---|---|
@@ -189,20 +190,22 @@ Receipt, serial and case-level commands use this table. Source: `crates/libs/wms
 | 85 | SerialOwnerMismatch | UserInput | no | The serial belongs to another owner. |
 | 86 | SerialNotInContainer | UserInput | no | The serial is not in the container. |
 | 87 | SerialCheckDigitFailed | UserInput | no | The check digit is wrong. |
-| 88 | SerialReturnWithoutShip | Anomaly | yes (flag set in the code) | `serial_return` on a serial that is not `Shipped`. |
-| 89 | SerialAtTwoLocations | Anomaly | no | The serial is seen at two locations. Not sent by any method today. A background scan only writes a warning to the server log. |
-| 90 | SerialVelocityAnomaly | Anomaly | no | A serial shipped too soon after it was received (the SKU's `Velocity Threshold (min)`, default 30). Never an error: `serial_ship` ships, records an `AnomalyFlagged` row in the serial's history and publishes `process.serial.flagged_anomaly` with `anomaly_code` 90. |
+| 88 | SerialReturnWithoutShip | Anomaly | yes | `serial_return` on a serial that is not `Shipped`. |
+| 89 | SerialAtTwoLocations | Anomaly | no | The serial is detected at two locations by an integrity check. It is reported in operational logs rather than returned by a customer API method. |
+| 90 | SerialVelocityAnomaly | Anomaly | no | A serial shipped too soon after it was received (the SKU's `Velocity Threshold (min)`, default 30). Never an error: `serial_ship` ships, records `AnomalyFlagged` in the serial's history and publishes `process.serial.flagged_anomaly` with `anomaly_code` 90. |
 | 91 | SerialMassAnomaly | Anomaly | yes | A receive would put more active serials in one container than the SKU limit (`max_per_lpn`). |
 | 92 | SerialReusedAfterDisposed | Anomaly | no | A receive registers a serial that was disposed before. |
-| 93 | SerialPatternAnomaly | Anomaly | no | Not sent by any method today. A background scan only writes a warning to the server log. |
-| 94 | SerialLotMismatch | UserInput | no | The serial belongs to another lot. Not sent by any method today. |
+| 93 | SerialPatternAnomaly | Anomaly | no | A serial-pattern issue detected by an integrity check. It is reported in operational logs rather than returned by a customer API method. |
+| 94 | SerialLotMismatch | UserInput | no | The serial belongs to another lot. This response is reserved for serial and lot validation. |
 | 95 | SerialAsnNotAdvised | UserInput | no | The serial was not advised on the ASN. |
 
 Code 75 was removed on purpose and is never sent. Codes 55 to 60 are container codes.
 
-The meaning of codes 88 to 93 above comes from the places in the code that send them. The code has no "owner policy" that changes whether a serial code is overridable. The `is_overridable` flag is fixed where the code is raised. No serial code names an override capability.
+Serial response codes have a fixed `is_overridable` value. Owner settings do
+not change that value, and no separate override permission is associated with
+these serial codes.
 
-The serial codes reach you the same way from every method: during a receipt (for example `receipt_receive_against_asn`) and from the `serial_*` methods (`serial_return`, `serial_pick`, `serial_move`, `capture_serial`, `cancel_episode`, and so on). The answer is `RF_ERROR` with the `return_code` (80 to 95, or a receipt code such as 74), `class`, `is_overridable` and `context`. A serial that does not exist is 80; an action the serial's state does not allow is 81 (`StateMachine`). A wrong scan the operator must fix has `return_code` 0 and class `UserInput`. (Until F-14 the `serial_*` methods answered HTTP 400 `INVALID_DATA` with the code name in the text.)
+The serial codes reach you the same way from every method: during a receipt (for example `receipt_receive_against_asn`) and from the `serial_*` methods (`serial_return`, `serial_pick`, `serial_move`, `capture_serial`, `cancel_episode`, and so on). The answer is `RF_ERROR` with the `return_code` (80 to 95, or a receipt code such as 74), `class`, `is_overridable` and `context`. A serial that does not exist is 80; an action the serial's state does not allow is 81 (`StateMachine`). A wrong scan the operator must fix has `return_code` 0 and class `UserInput`.
 
 ### Move return codes
 
@@ -239,7 +242,7 @@ Pick pallets (`pick_drop_open`, `pick_drop_close`, `pick_dispatch_next`):
 
 Pick source confirmation (`pick_confirm_*`): `SOURCE_CONFIRMATION_REQUIRED`, `CONFIRMATION_SOURCE_CHANGED`, `WRONG_LOT_ATTRIBUTES`, `LOT_SOURCE_AMBIGUOUS`, `WRONG_SOURCE_LPN`, `WRONG_INTERNAL_LOT`, `SOURCE_NOT_PHYSICALLY_IDENTIFIABLE`, `MANUAL_ENTRY_NOT_ALLOWED`, `EVIDENCE_NOT_IN_PLAN`, `SOURCE_EXPIRED`, `SOURCE_ON_HOLD`, `BARCODE_UNREADABLE`, `NO_LOT_IN_SCOPE`, `NO_VERIFIABLE_ATTRIBUTES`, `ATTRIBUTES_DO_NOT_SEPARATE_LOTS`, `LOCATION_ALLOWS_MIXING`, `SEVERAL_LOTS_IN_SCOPE`.
 
-Pick dispatch and assignment: `IN_PICK_ASSIGNMENT`, `UNKNOWN_WORK_AREA`, `UNKNOWN_EQUIPMENT_PROFILE`, `EQUIPMENT_PROFILE_INACTIVE`, `PICK_ASSIGNMENT_CHANGED`. The pick-assignment rules (start, bind, route, complete, carton-full, replace) add more codes. They are defined in `crates/libs/wms-outbound/src/domain/pick_assignment/`.
+Pick dispatch and assignment: `IN_PICK_ASSIGNMENT`, `UNKNOWN_WORK_AREA`, `UNKNOWN_EQUIPMENT_PROFILE`, `EQUIPMENT_PROFILE_INACTIVE`, `PICK_ASSIGNMENT_CHANGED`. Start, bind, route, completion, carton-full and replacement rules can add more codes.
 
 Packing (`packing_*`): `PACK_UNIT_UNKNOWN`, `PACK_CONTAINER_UNKNOWN`, `PACK_CARTON_UNKNOWN`, `PACK_UNIT_NOT_NAMED`, `PACK_CONTAINER_NOT_WAITING_HERE`, `PACK_PRINTER_UNKNOWN`, `PACK_JOB_PACKED`, `PACK_NOT_A_VERIFIED_PACKAGE`, `PACK_VERSION_CONFLICT` (this one comes with return code 40), `SUPERVISOR_CONFIRMATION_REQUIRED` (overridable), `OVERRIDE_GRANT_REFUSED`, `OVERRIDE_GRANT_NOT_FOR_THIS_CARTON`, `PACK_REOPEN_REASON_REQUIRED`.
 
@@ -249,7 +252,9 @@ Moves and containers: `CONTAINER_STANDS_ELSEWHERE` (with `stands_at`), `CONTAINE
 
 When a command claims or releases several tasks together, the refusal lists each task in `context.refusals` with a reason such as `CONTENDED`, `NOT_FOUND`, `NOT_IN_POOL` or `TOO_HEAVY`.
 
-These lists are **not complete**. Each rule defines its own codes next to the code that raises them. More codes exist in `crates/libs/wms-outbound/src/domain/pick_assignment/` (aggregate, route, delivery, tare), in `picking/infrastructure/holder_change.rs` (`SERIAL_EPISODE_OPEN`, `SERIAL_EPISODE_ABANDONED`, `PICK_ASSIGNMENT_LIVE`) and in `cartonization/repair.rs` (`CARTON_REPLAN_*`, `SOLVER_BUDGET_EXCEEDED`). Putaway adds no `context.code` strings. A client must handle an unknown `context.code` by its `return_code` and `class`.
+These lists are **not complete**. A client must handle an unknown
+`context.code` by its `return_code` and `class` rather than failing on an
+unrecognized text code.
 
 ### Wave errors
 
@@ -277,7 +282,7 @@ When `is_overridable` is `true` (or the class is `SupervisorOverride`):
 3. If a supervisor must accept it, call `supervisor_override_grant` with the `pairs` (and the supervisor's `username` and `password` if you are not the supervisor). Then repeat the command with the returned `grant_id` as `override_grant_id` (in `data`, or in `ctx` for `move_execute`).
 4. For a receipt command, a refusal of the grant itself comes back as `RF_ERROR` with `class: "UserInput"`, `return_code: 0` and `context.grant_refusal` (a text reason). Pick pallets and packing cartons use `OVERRIDE_GRANT_REFUSED` and the `NOT_FOR_THIS_...` codes listed above.
 
-See [02-authentication.md](02-authentication.md) for who may approve which code.
+See [Authentication and permissions](02-authentication.md) for who may approve which code.
 
 ## Errors from routes outside `/api/rpc`
 
@@ -291,32 +296,15 @@ See [02-authentication.md](02-authentication.md) for who may approve which code.
 | 415 | `Content-Type` is not `application/json`. |
 | 422 | The JSON is valid, but `username` or `pwd` is missing or is not a string. |
 
-For these three, the web framework (Axum) answers, not the application code. The body is plain text, not the JSON error shape above. (`/api/rpc` answers the same three in the error shape: see Request format.)
-
-### `GET /api/auth-bridge`
-
-HTTP 401 with `NO_AUTH` when the token is bad or the user is unknown.
-
-### `POST /api/admin/rbac/reseed`
-
-This route has its own, smaller error shape:
-
-```json
-{ "success": false, "error": { "code": "ADMIN_BEARER_REQUIRED", "correlation_id": "<uuid>" } }
-```
-
-| HTTP | `error.code` | Meaning |
-|---|---|---|
-| 403 | `ADMIN_BEARER_REQUIRED` | You used a cookie. Use an API key. |
-| 403 | `FORBIDDEN` | The key's user lacks the capability `admin.rbac.reseed`. |
-| 503 | `RBAC_RESEED_FAILED` | The audit write or the authorisation lookup failed. Nothing changed. |
-| 500 | `RBAC_RESEED_FAILED` | The reseed failed. |
-
-A success is `{"success": true, "forced": <bool>, "api_methods_considered": <n>, "administrative_capabilities_considered": <n>, "api_resources_considered": <n>, "api_seeded": <n>, "server_action_seeded": <n>, "roles_considered": <n>, "duration_ms": <n>, "correlation_id": "<uuid>"}`.
+For these three, the body is plain text rather than the JSON error shape above.
+`/api/rpc` returns the same request problems in the standard error shape.
 
 ### `GET /health`
 
-HTTP 200 and `{"result":{"success":true}}` when the server can get a database connection. When it cannot, the handler returns the `DbUnavailable` error. The error table has no entry for it, so it falls to the general case: HTTP 500 and `SERVICE_ERROR`.
+HTTP 200 and `{"result":{"success":true}}` means the API and its required
+data service are available. An unavailable dependency returns HTTP 500 and
+`SERVICE_ERROR`. If tenant access and readiness cannot be verified, the route
+returns HTTP 503 with `TENANT_ACCESS_UNAVAILABLE`.
 
 ## Quick guide: what should my program do?
 
@@ -325,7 +313,7 @@ HTTP 200 and `{"result":{"success":true}}` when the server can get a database co
 | HTTP 401 | Log in again. |
 | HTTP 403 `RBAC_*` | Stop. Ask an administrator. |
 | HTTP 400 `RPC_*`, `INVALID_DATA`, `ENTITY_NOT_FOUND` | Fix the request. Do not retry unchanged. |
-| `RF_ERROR` class `Retry` (40, 41, 44) | Retry as described in [04-command-types-and-concurrency.md](04-command-types-and-concurrency.md). |
+| `RF_ERROR` class `Retry` (40, 41, 44) | Retry as described in [Command types and concurrency](04-command-types-and-concurrency.md). |
 | `RF_ERROR` with `is_overridable` | Use the override flow. |
 | `RF_ERROR` class `HardFail` or `UserInput` | Show `detail.message`. |
 | HTTP 500 or 503 | Retry later with the same idempotency key. Give `req_uuid` to support if it keeps happening. |

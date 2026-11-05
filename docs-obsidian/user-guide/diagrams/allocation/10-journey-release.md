@@ -18,7 +18,7 @@ Two buttons on the order screen reserve stock: `Release` and `Allocate`. This pa
 sequenceDiagram
     actor Op as Operator
     participant UI as Order screen
-    participant API as app-server RPC
+    participant API as Quark API
     participant REL as ReleaseShipmentOrder
     participant ALL as Allocation pass
     participant DB as Database
@@ -55,7 +55,7 @@ Reading notes.
 sequenceDiagram
     actor Op as Operator
     participant UI as Order screen
-    participant API as app-server RPC
+    participant API as Quark API
     participant CMD as AllocateShipmentOrder
     participant ALL as Allocation pass
     participant DB as Database
