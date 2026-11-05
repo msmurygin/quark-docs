@@ -18,15 +18,12 @@ The default roles Operator and Supervisor may run **Move Stock**. If you see **N
 1. On **Main Menu**, press `2` (**Inventory**).
 2. On **Inventory**, press `2` (**Move Stock**).
 
-![RF screen Move - Find Stock with empty search fields](../assets/screens/rf-move-stock.png)
-*Screen INVMOV01: the search fields. Focus: Fill at least one field (Lot, Location, LPN, Serial, SKU or Owner), then press Enter. The teal number 1 marks the LPN field.*
-
-3. On **Move — Find Stock**, read the status line: **Fill at least one field, then Enter**.
+3. On **Move — Find Stock**, read the status line: **Fill at least one field, then Enter (Lot: F2 finds it)**.
 4. Fill in at least one field:
 
 | Field | What to enter |
 |-------|---------------|
-| **Lot** | A lot code (up to 40 characters) |
+| **Lot** | A lot code (up to 40 characters), or press `F2` after identifying the source stock. |
 | **Location** | A location code (up to 30) |
 | **LPN** | A pallet label (up to 40). A label with several data fields can be scanned here. |
 | **Serial** | A serial number (up to 60) |
@@ -34,6 +31,29 @@ The default roles Operator and Supervisor may run **Move Stock**. If you see **N
 | **Owner** | An owner (up to 50) |
 
 5. Press `Enter`.
+
+### Find the lot in the source stock
+
+Use `F2` when the goods show a lot but you do not know its code. The lookup only
+lists lots that are physically in the source you identify; it does not search
+the whole warehouse.
+
+1. Identify the source in one of these ways:
+   - scan or enter **LPN**; or
+   - enter both **SKU** and **Location** for loose stock.
+2. Check the other search fields before opening the lookup. Any entered **SKU**,
+   **Location** or **Owner** also narrows the result, including when **LPN** is
+   present. Clear a value that does not describe the source you are holding.
+3. Move the cursor to **Lot** and press `F2`.
+4. On **Pick Lot**, review the lot, SKU and quantity in the source. A row marked
+   **HOLD** identifies held stock; selecting it does not override the hold.
+5. Select the required lot with `Enter`. The terminal returns to **Move — Find
+   Stock** and fills **Lot**. The other search fields stay in place.
+6. Press `Enter` to find the matching stock position.
+
+If you have not entered an LPN or the pair **SKU** and **Location**, the terminal
+says **Enter the SKU first, with its location (or the LPN): F2 finds the lot in
+that stock**. Identify the source, then press `F2` again.
 
 ![INVMOV02 - Move — Pick Position](../assets/screens/INVMOV02.png)
 *Screen INVMOV02: the list titled Pick the position to move.*
@@ -110,6 +130,8 @@ Your answer never changes the stock. It is kept on the location card, tab **Chec
 | Message | What it means | What to do |
 |---------|---------------|------------|
 | **Nothing found — Esc to change the filter** / **No stock matches the filter. Esc to change it.** | No stock matches your search. | Press `Esc`. Change the fields. |
+| **Enter the SKU first, with its location (or the LPN): F2 finds the lot in that stock** | The lot lookup has no source to search. | Enter **LPN**, or enter both **SKU** and **Location**, then press `F2` on **Lot** again. |
+| **No lot lies in this stock — Esc to go back** | No lot matches all entered source fields, or the source contains no lot-controlled stock. | Press `Esc`. Check **LPN**, **SKU**, **Location** and **Owner**; clear any field that does not describe the source. Continue without a lot filter only when appropriate. |
 | **source not found: {id}** | The stock to move no longer exists. | Search again. |
 | **source {id} is inactive (status={status})** | The source is not active. | Tell your supervisor. |
 | **source location blocked: {reason}** | The source location is blocked. | Tell your supervisor. |
