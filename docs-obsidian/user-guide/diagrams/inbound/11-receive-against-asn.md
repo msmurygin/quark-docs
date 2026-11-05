@@ -30,7 +30,7 @@ Reading notes:
 - `get_asn_by_number` returns the receipt header, the totals, the receipt `version`, and the first open serial episode. The screen keeps the version and sends it as `expected_receipt_version` when the operator closes (F8).
 - `RCASN01SUM` goes straight to `RCASN01SKU` when it opens. The summary with the F8 (close) key shows when the operator comes back to it.
 - The ASN flow sends only business data: receipt, SKU, quantity, unit, locations, LPN, lot attributes. It does not send a line id. The server finds the line (Diagram 2, step 7).
-- `RCASN01RSN` repeats the same call with `shortage_reason` and `acknowledged_overrides = [28]`. Code 28 needs a supervisor capability (see [13-receive-checks-and-policy.md](13-receive-checks-and-policy.md)).
+- `RCASN01RSN` repeats the same call with `shortage_reason` and `acknowledged_overrides = [28]`. Code 28 needs a supervisor capability (see [Receive checks and receipt policy](13-receive-checks-and-policy.md)).
 - F4 on the summary opens the damaged-line screens (page 15). F6 on the close screen opens the adjust screens (page 16).
 ## Diagram 2. Inside `receipt_receive_against_asn`
 
@@ -40,7 +40,7 @@ Reading notes:
 sequenceDiagram
     autonumber
     participant RF as RF screen RCASN01LINE
-    participant API as app-server RPC
+    participant API as Quark API
     participant RN as Pipeline runner
     participant CM as ReceiveAgainstAsn
     participant VL as Validation rules
@@ -73,29 +73,25 @@ Reading notes:
 
 - Steps 3 to 5: the claim of the idempotency key is outside the transaction. A repeated key returns the stored result and writes nothing. The receipt row is locked `FOR UPDATE`, so commands on one receipt wait for each other. `receipt_receive_against_asn` carries no version, because two operators may receive on the same receipt at the same time.
 - Step 5: only `Open` and `InProgress` allow a receive. A receipt that is `OnHold`, `Closed` or `Cancelled` refuses it.
-- Step 9: the line is found by a 4-tier lookup on SKU, lot attributes, LPN and external lot. If no line matches, the owner's receipt policy `no_sku_on_asn` decides. `Allow` makes a synthetic line (expected 0). `HardError` refuses. `Warning` refuses with code 24 and the text "Receive it anyway?", but this check does not read the acknowledged codes, so a second try gets the same answer (see the findings file). A line that needs an exact lot-attribute match but expects none refuses with code 34.
-- Step 10: the 12 rules and their codes are on [13-receive-checks-and-policy.md](13-receive-checks-and-policy.md).
-- Step 12: `qty_received` goes up by the received quantity in base units, and the line becomes `InProgress`.
-- Steps 13 and 14: `DepositService` locks the location, checks the LPN is not in use by another owner or SKU, resolves the lot by the SKU's lot policy, writes the stock and the `transaction_log` row, and publishes a deposited event. Lots are on [14-serials-lots-lpn.md](14-serials-lots-lpn.md).
-- Step 16: if the receipt is `Open`, it becomes `InProgress` here, together with the version bump.
-- Step 17: if the receive carries `damage_info`, a damage report for the whole received quantity is made in the same transaction (page 15).
-- `holds_applied` in the answer lists auto holds placed by the SKU and the owner settings (page 13). They do not block the receive.
+- Step 9: the line is found by SKU, lot attributes, LPN and external lot. If
+  no line matches, the owner's **No SKU on ASN** rule decides. `Allow` creates
+  an unexpected line with expected quantity 0. `Warning` asks the operator to
+  acknowledge the unexpected SKU before continuing. `HardError` refuses the
+  receive. A line that requires an exact lot-attribute match but expects none
+  is refused with code 34.
+- Step 10: see [Receive checks and receipt policy](13-receive-checks-and-policy.md) for the 12 rules and their codes.
+- Step 12: the received quantity increases in base units, and the line becomes
+  `InProgress`.
+- Steps 13 and 14: Quark checks the destination and LPN, resolves the lot from
+  the SKU policy, writes the stock movement and publishes the deposited event.
+  See [Serial numbers, lots and LPNs](14-serials-lots-lpn.md).
+- Step 16: an `Open` receipt becomes `InProgress` and receives a new version.
+- Step 17: when the receive includes damage information, Quark creates a damage
+  report for the received quantity in the same transaction.
+- The response lists any automatic holds applied by SKU or owner settings. They
+  do not block this receive.
 - The label print after the commit is best effort. A print failure does not fail the receive.
-## Tables written by one receive
 
-| Table or stream | Written by |
-|---|---|
-| `idempotency_store` | pipeline runner |
-| `receipt_detail` (`qty_received`, `status`, `to_loc`, `to_lot`, `to_container_id`, `completion`) | command and finalizer |
-| `receipt` (`status`, `completion`, `version`, `effective_date`) | finalizer |
-| `receipt_receive_event` (one row for each receive) | finalizer |
-| `inventory_balances_lot`, `lot_attributes` (when a new lot is made) | `DepositService` |
-| `inventory_balances`, `container` | `DepositService` |
-| `transaction_log` | `DepositService` |
-| `inventory_hold` (auto holds) | finalizer |
-| `inventory_balances_serial`, `serial_capture_episode` | serial registration and the deferred capture |
-| `receipt_detail_damage` | only when the receive carries `damage_info` |
-| `enterprise.integration_event`: `process.receipt.line_received`, and `line_short` or `line_over`, `override_applied`, deposited event | command, finalizer, validation |
 ## Related pages
 
 - [Operator guide: receiving against an ASN](../../operator/02-receiving-against-asn.md)

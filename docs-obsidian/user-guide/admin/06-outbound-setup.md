@@ -418,11 +418,13 @@ Define what happens when a picker cannot find the full quantity.
 
 ### Before you start
 
-- Role: `ADMIN`, `MANAGER`, `SUPERVISOR` (write).
-- A new warehouse has no business-specific short reasons. For a General
-  Distribution warehouse, create, review and publish `SHORT`, `LPN_NOT_FOUND`
-  and `WRONG_LOCATION` as described below. Another warehouse may use different
-  approved codes.
+- Roles: **Admin** and **Manager** can change reasons. **Supervisor** can review
+  them.
+- The General Distribution reference configuration includes `SHORT`,
+  `LPN_NOT_FOUND` and `WRONG_LOCATION`, but warehouse Bootstrap does not create
+  them. After selecting the profile, explicitly apply its reviewed
+  configuration and confirm the reasons are published. Another warehouse may
+  use different approved codes.
 
 ### Steps
 

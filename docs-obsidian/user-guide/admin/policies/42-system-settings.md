@@ -1,371 +1,198 @@
 ---
-title: "Policy Reference - System Settings"
+title: "System Settings"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-11-05
 ---
 
 # System Settings
 
-This page lists every key of the table `system_settings`, the dashboard settings
-(`dashboard_setting`, `dashboard_metric_threshold`), and the printing and label
-settings that change behaviour.
+System settings control warehouse-wide behavior that is not owned by a receipt,
+putaway, allocation or picking policy. Each warehouse has its own values.
 
-Read the legend in [00-README.md](./00-README.md) first.
-Paths are relative to `crates/libs/` unless they start with `crates/`.
+Change a setting only after reviewing the workflows listed on this page. Most
+changes apply to the next command or newly created work; they do not rewrite
+open documents or history.
 
-## 1. How system settings work
+## Open the settings
 
-| Item | Value |
-|---|---|
-| Table | `system_settings`, **one table per warehouse** (it lives in the warehouse schema, for example `wh1`). Each warehouse has its own values. |
-| Menu path | `Sidebar > Warehouse Configuration > Settings & Reference Data > System Settings` |
-| Screen fields | `Config Key`, `Value`, `Default Value`, `Description`, `Editable` |
-| What you can change | Only `Value` (`config_value`). Key, default, description and the editable flag are read-only on the screen and in `update_system_settings`. |
-| Refusal when not editable | `system setting <KEY> is read-only` |
-| API | `list_system_settings`, `get_system_settings`, `update_system_settings` (roles `Admin`, `Manager`), `create_system_settings`, `delete_system_settings` (roles `Admin`, `Manager`) |
-| Column sizes | `config_key` up to 30 characters, `config_value` and `default_value` up to 50, `description` up to 120. A longer value is refused by the database. |
-| Reading rules | The server reads `config_value`. Some readers fall back to `default_value` when `config_value` is empty (marked "value, else default" below). |
+1. Open `Sidebar > Warehouse Configuration > Settings & Reference Data > System
+   Settings`.
+2. Find the required **Config Key**.
+3. Review **Description** and **Default Value**.
+4. Change **Value** and save.
+5. Test the affected workflow in the same warehouse.
 
-### 1.1 How the server reads a value
+**Admin** and **Manager** maintain system settings. **Config Key**, **Default
+Value**, **Description** and **Editable** are read-only on this screen. A row
+whose **Editable** value is off cannot be changed here.
 
-| Reader | What it does | Used for |
+Use the format shown in the table below. An empty, invalid or out-of-range value
+may cause the product to use its default instead.
+
+## Current settings
+
+### Receiving, audit and command safety
+
+| Config Key | Normal value | What it controls |
 |---|---|---|
-| `get_int` | Reads `config_value`. Whole numbers and the words `true/yes/on` (= 1) and `false/no/off` (= 0), in any case, spaces ignored. Anything else, or empty, counts as "not set" and the caller uses its built-in default. | most keys |
-| `get_int_effective` | Reads `config_value`; if it is empty, reads `default_value`. | `TASK_*` |
-| `lock_timeout_ms` | The one reader of every `*_LOCK_TIMEOUT_MS` key. It reads like `get_int_effective`, and answers 5000 for anything that is not a number above 0: no row, empty, text, `0`, a negative number. | `RECEIPT_LOCK_TIMEOUT_MS`, `ORDER_LOCK_TIMEOUT_MS`, `PUTAWAY_LOCK_TIMEOUT_MS` |
-| `setting_is_on` | `get_int` result is not 0. A value that cannot be read means **off**. | audit keys, `CHECK_DIGIT_ENABLED` |
-| text reader | Returns `config_value` as is. | `LOC_GEN_PATTERN`, `MOVE_HOLD_POLICY`, `LABEL_RENDERER_URL` |
+| `ALLOW_CLOSE_WITH_DISCREPANCY` | `1` | Allows an authorised discrepancy override when closing a planned receipt that is partial, over its plan, or still pending with a nonzero expected quantity. It does not bypass unresolved serial or damage work. |
+| `ENABLE_RECEIPT_AUDIT` | `1` | Records new field-level changes to receipt headers. Turning it off does not remove existing audit history. |
+| `ENABLE_SKU_AUDIT` | `false` | Records new changes to SKU records. Turning it on does not create history for earlier changes. |
+| `RECEIPT_LOCK_TIMEOUT_MS` | `5000` | How long a receipt operation waits when another operation is changing the same receipt. Use a positive whole number of milliseconds. |
+| `ORDER_LOCK_TIMEOUT_MS` | `5000` | How long an order operation waits when another operation is changing the same order. Use a positive whole number of milliseconds. |
+| `IDEMPOTENCY_TTL_DAYS` | `7` | How long a replay-safe command keeps its stored result for the same idempotency key and payload. |
 
-A key that has **no row** counts as "not set". Because the baseline seeds the rows
-listed in section 2, a row is missing only for the key in section 3.
+When `ALLOW_CLOSE_WITH_DISCREPANCY` is on, the user still needs the required
+authority to confirm the discrepancy. When it is off, correct the receipt or
+resolve the planned quantity before closing it.
 
-A value of `0` or less for a `*_LOCK_TIMEOUT_MS` key is never used. In PostgreSQL
-`lock_timeout = '0ms'` would mean "wait for ever", so the server uses 5000 instead
-(fixed in P-13, commit `420b6746a`). The other time keys also reject `0` and use
-their built-in default.
+### Moves, putaway and counts
 
-## 2. Keys seeded by the migrations (20)
+| Config Key | Normal value | What it controls |
+|---|---|---|
+| `MOVE_HOLD_POLICY` | `warn` | `warn` applies the hold code's interactive warning or block when moving held source stock. `silent` skips the source LPN/lot hold check. Location hold checks still apply. |
+| `MOVE_REQUIRE_LPN` | `0` | When on, prevents a stock move from leaving loose stock at an ordinary destination. Whole-LPN relocation and receipt rules are separate. |
+| `PUTAWAY_RESERVATION_TTL_MIN` | `15` | Lifetime, in positive whole minutes, of a new directed-putaway location reservation when no owner-specific value takes precedence. |
+| `PUTAWAY_LOCK_TIMEOUT_MS` | `5000` | How long putaway waits for a destination that another operation is reserving. Use a positive whole number of milliseconds. |
+| `COUNT_ON_PUTAWAY_DEVIATION` | `0` | When on, requests a count of the destination after an operator confirms a directed-putaway deviation. |
+| `COUNT_ON_PICK_CANCELLED` | `0` | When on, requests a source-location count when an order cancellation removes a pick whose source was already confirmed. |
 
-The seed is in `wms-app/migrations/001_baseline.sql:9945-9962`, migration
-`wms-app/migrations/071_count_on_scan_and_putaway_exceptions.sql:57-62` and migration
-`wms-app/migrations/091_every_lock_timeout_is_a_setting.sql` (the two lock time-outs).
-All rows are `editable = true`.
+`MOVE_HOLD_POLICY = silent` is a broad operational choice. Test it with LPN,
+lot and location holds before using it. It does not make held stock available to
+allocation and does not disable location-level move checks.
 
-| Key | Seed `Value` | `Default Value` | Type |
-|---|---|---|---|
-| `ENABLE_SKU_AUDIT` | `false` | `false` | on/off |
-| `CHECK_DIGIT_ENABLED` | `true` | `true` | on/off |
-| `LOC_GEN_PATTERN` | `<AISLE_PREFIX><AISLE>-<LEVEL>-<LOC>` | same | text |
-| `IDEMPOTENCY_TTL_DAYS` | `7` | `7` | days |
-| `RECEIPT_LOCK_TIMEOUT_MS` | `5000` | `5000` | milliseconds |
-| `ORDER_LOCK_TIMEOUT_MS` | `5000` | `5000` | milliseconds |
-| `PUTAWAY_LOCK_TIMEOUT_MS` | `5000` | `5000` | milliseconds |
-| `ENABLE_RECEIPT_AUDIT` | `1` | `1` | on/off |
-| `ALLOW_CLOSE_WITH_DISCREPANCY` | `1` | `1` | on/off |
-| `MOVE_HOLD_POLICY` | `warn` | `warn` | `warn` or `silent` |
-| `MOVE_REQUIRE_LPN` | `0` | `0` | `0` or `1` |
-| `PUTAWAY_RESERVATION_TTL_MIN` | `15` | `15` | minutes |
-| `LABEL_RENDERER_URL` | `http://localhost:8086` | same | URL |
-| `TASK_LEASE_TTL_MIN` | `15` | `15` | minutes |
-| `TASK_SKIP_COOLDOWN_MIN` | `10` | `10` | minutes |
-| `TASK_SKIP_ESCALATE_AFTER` | `3` | `3` | count |
-| `TASK_MAX_CONCURRENT_DEFAULT` | `1` | `1` | count |
-| `TASK_ALLOW_RELEASE_DEFAULT` | `1` | `1` | `0` or `1` |
-| `COUNT_ON_PUTAWAY_DEVIATION` | `0` | `0` | `0` or `1` |
-| `COUNT_ON_PICK_CANCELLED` | `0` | `0` | `0` or `1` |
-| `WAREHOUSE_TIMEZONE` | `UTC` | `UTC` | IANA time zone name |
+### Locations
 
-Note: `ENABLE_RECEIPT_AUDIT` and `ALLOW_CLOSE_WITH_DISCREPANCY` are seeded **on**
-(`Value` = 1), and since wms-app 109 their `Default Value` is `1` too. Before
-that it said `false`, so the screen showed "off by default" for features a
-fresh install runs.
+| Config Key | Normal value | What it controls |
+|---|---|---|
+| `CHECK_DIGIT_ENABLED` | `true` | Generates a check digit for newly created locations, including locations created by the bulk generator. Existing locations do not change. |
+| `LOC_GEN_PATTERN` | `<AISLE_PREFIX><AISLE>-<LEVEL>-<LOC>` | Pattern used by the location generator for new location codes. |
 
-### 2.1 Receiving and documents
+The location pattern can use the aisle, level and location prefix, number and
+suffix placeholders shown by the generator. Test one small range before
+creating a large location set.
 
-#### `ALLOW_CLOSE_WITH_DISCREPANCY`
-- **UI**: `System Settings`, row `ALLOW_CLOSE_WITH_DISCREPANCY`, column `Value`.
-- **Type and range**: on/off (`1/0`, `true/false`). Not set or unreadable = off.
-- **Default**: seed `1`, `Default Value` `1` (wms-app 109; it was `false` before P-24).
-- **Meaning**: may a receipt be closed when its completion is `Partial`, or `Over`/`Pending` against a plan?
-- **Affects**: `receipt_close`.
-  Description: `Per D-21. Permit close with completion=Partial|Over via supervisor override (code 71).`
-  - Off: the close is refused for good. Message: `Cannot close receipt <number>: completion is <Partial|Over|Pending> and ALLOW_CLOSE_WITH_DISCREPANCY is off` (code 71, not overridable).
-  - On: the close needs code 71 confirmed by a person with the right `receipt.override_close_discrepancy`, or a supervisor grant for `receipt:<id>`. Before approval, the message is `Receipt <number> is <completion> — supervisor override required to close`.
-- **Example**: ASN expects 150, 149 received. On: a supervisor confirms, the receipt closes with `close_summary.discrepancy_override` naming the supervisor. Off: nobody can close it. Fix the quantity or cancel the missing line first.
-- **Interactions**: a blind or return receipt (expected 0) is never a discrepancy and closes without this setting. Serial episodes (code 73) and pending damage (code 77) block the close whatever this says. See [40-receipt-policy-settings.md](./40-receipt-policy-settings.md) section 7.1.
-- **When you change it**: affects the next close command only. Closed receipts stay closed.
+### Task assignment
 
-#### `RECEIPT_LOCK_TIMEOUT_MS`
-- **Type and range**: whole milliseconds above 0. Not set, empty, `0` or less = 5000 (section 1.1). Reads `Value`, then `Default Value`.
-- **Default**: seed `5000`.
-- **Meaning**: how long a receipt command waits for the receipt row that another command holds.
-- **Affects**: every receipt command and receipt line planning.
-- **Message when it runs out**: `receipt is locked, please retry (timeout <ms>ms)` (code 41, retry).
-- **Example**: two operators receive onto the same receipt. The second waits up to 5 seconds, then gets code 41 and presses again.
-- **When you change it**: takes effect on the next command.
+| Config Key | Normal value | What it controls |
+|---|---|---|
+| `TASK_LEASE_TTL_MIN` | `15` | How long newly claimed work stays assigned before it may return to the pool after the operator stops responding. |
+| `TASK_SKIP_COOLDOWN_MIN` | `10` | How long skipped work stays out of the shared pool before it may be offered again. |
+| `TASK_SKIP_ESCALATE_AFTER` | `3` | Number of skips after which work waits for supervisor attention. |
+| `TASK_MAX_CONCURRENT_DEFAULT` | `1` | Default number of tasks an operator may hold when no work area supplies its own limit. |
+| `TASK_ALLOW_RELEASE_DEFAULT` | `1` | Default permission to release or skip work when no work area supplies its own rule. |
 
-#### `ORDER_LOCK_TIMEOUT_MS`
-- **Seeded** `5000` (wms-app 091). Before that migration no row existed and the key did not show on the screen.
-- **Type and range**: whole milliseconds above 0. Not set, empty, `0` or less = 5000 (section 1.1). Reads `Value`, then `Default Value`.
-- **Affects**: order commands (allocate, release, cancel) wait for the order lock.
-- **Message**: `order is locked by another operation (waited <ms>ms)` (code 41, retry).
+Work-area settings take precedence when the terminal requests work for a named
+area. A change does not rewrite an existing task's current lease end
+immediately. The next claim, heartbeat, progress update or other lease renewal
+uses the new value.
 
-#### `IDEMPOTENCY_TTL_DAYS`
-- **Type and range**: whole days. Not set = 7.
-- **Meaning**: how long a stored answer for an idempotency key is kept. A repeated request with the same key and payload inside this time returns the first answer instead of running again.
-- **Affects**: every stateless or stateful command through the pipeline. The cleaner removes older keys.
-- **When you change it**: new keys use the new time. Keys already stored keep their own expiry.
+### Manual picking and consolidation
 
-#### `ENABLE_RECEIPT_AUDIT`
-- **Type and range**: on/off. Not set or unreadable = off.
-- **Default**: seed `1`, `Default Value` `1` (wms-app 109; it was `false` before P-24).
-- **Meaning**: write a field-level history of every change to a receipt header.
-- **Affects**: table `receipt_audit` (screen tab `Audit` of the receipt) through `ReceiptBmc::audit_setting_key`. A daily sweeper deletes audit rows older than **365 days**. That limit is a constant (`RECEIPT_AUDIT_RETENTION_DAYS`), not a setting.
-- **When you change it**: off stops new rows. Old rows stay until the sweeper removes them.
+| Config Key | Normal value | What it controls |
+|---|---|---|
+| `MANUAL_PICK_REQUIRE_TO_LPN` | `false` | When on, a manual workstation pick requires an explicit destination LPN. When off, the workflow may use the whole source, a planned carton or a generated Case as applicable. |
+| `CONSOLIDATION_UNROUTED_BOXES` | `Refuse` | `Refuse` keeps a box waiting until its order has a Dispatch route. `OneOrder` allows an unrouted box to open a pallet for its own owner and order. |
+| `CONSOLIDATION_AUTO_CLOSE` | `Off` | `On` closes a consolidation pallet automatically when all expected boxes are present or its gross-weight limit is reached. `Off` requires an explicit close. |
 
-#### `ENABLE_SKU_AUDIT`
-- **Type and range**: on/off. Seed `false`.
-- **Affects**: table `sku_audit` (tab `Audit` of the SKU). Not swept.
-- **When you change it**: no past history is created when you switch it on.
+See [Consolidation Stations](../06a-consolidation-board.md) for station setup,
+weight requirements and the operator flow.
 
-### 2.2 Moves and putaway
+### Printing and warehouse time
 
-#### `MOVE_HOLD_POLICY`
-- **Type and range**: text, `warn` or `silent` (any case). Any other word means `warn`. Not set = `warn`.
-- **Default**: seed `warn`.
-- **Meaning**: what a move does when the **stock it takes** (an LPN or a lot) carries an active hold.
-  - `warn`: each hold is judged by its hold code (file 43). Hard codes stop the move. Confirmable codes ask for a confirmation (code 80).
-  - `silent`: holds on the source stock are ignored. The move runs.
-- **Affects**: `wms-inventory/src/movement/validation.rs:332-400`, read at `movement/service.rs:367`. It does **not** switch off the location checks (source location hold, code 83; destination location hold, code 84). Moves of type "progressive" (QC release, move to QC, move to damage and similar) ignore holds whatever this says.
-- **Messages (warn)**: hard: `hold #<id> ("<code>") blocks this move (policy: not overridable)`; confirmable: `move requires an acknowledged override of: <code 80 (<hold code>)>`.
-- **When you change it**: next move only.
+| Config Key | Normal value | What it controls |
+|---|---|---|
+| `LABEL_RENDERER_URL` | deployment value | Optional warehouse override for the label-rendering service. A non-empty **Value** overrides deployment configuration only when it differs from **Default Value**. |
+| `WAREHOUSE_TIMEZONE` | `UTC` | IANA time-zone name used to determine the warehouse's local day. |
 
-#### `MOVE_REQUIRE_LPN`
-- **Type and range**: `1` = on. Any other value, or not set = off. (`true` also counts as 1.)
-- **Meaning**: a move may not leave stock loose.
-- **Affects**: `movement/service.rs:515-531`. When the stock would land without an LPN and the destination is not a discard-LPN location, the move is refused: `MOVE_REQUIRE_LPN=1: this move would leave stock loose — name or generate a destination LPN`. Moving a whole container (relocate) is never affected.
-- **Interactions**: receipts are not affected; use the receipt policy `receipt_without_lpn` for those.
+Use an IANA name such as `Europe/Sofia`. The warehouse day affects daily
+processes such as inventory-count policy scheduling and follows daylight-saving
+changes for that zone.
 
-#### `COUNT_ON_PUTAWAY_DEVIATION`
-- **Type and range**: `1` = on. Anything else = off. Seed `0`.
-- **Description**: `Directed putaway with an acknowledged deviation (code 85): 0=nothing, 1=count the destination location`.
-- **Affects**: after a directed putaway move that the operator pushed through with an acknowledged deviation, the server asks for a count of the destination location. It only writes an outbox event; the count starts after the move commits.
-- **When you change it**: next deviating move.
+Printing also requires a label definition, template, printer configuration and
+an active assignment. See [Printing and Labels](../07-printing-and-labels.md).
 
-#### `COUNT_ON_PICK_CANCELLED`
-- **Type and range**: `1` = on. Anything else = off. Seed `0` (wms-app 119).
-- **Description**: `Order cancelled while its pick's source was already confirmed: 0=nothing, 1=count the source location`.
-- **Affects**: an order cancel asks for a count of the source location of every pick it removes whose source an operator had already confirmed. It only writes an outbox event; the count starts after the cancel commits. Count spec Appendix N.
-- **When you change it**: next order cancel.
+When `LABEL_RENDERER_URL` is absent, empty, or equal to **Default Value**, the
+deployment `RENDERER_URL` is authoritative. Web-side label or report previews
+without warehouse context always use the deployment address, not the warehouse
+override.
 
-#### `PUTAWAY_RESERVATION_TTL_MIN`
-- **Type and range**: whole minutes above 0. Seed `15`.
-- **Meaning**: how long a directed-putaway reservation of a location is held.
-- **Affects**: the hold time of every directed-putaway reservation. Order: the owner's `Putaway Reservation TTL (min)` → this setting (`Value`, else `Default Value`) → the constant 15 (file 41, A.3). A value that is not whole digits does **not** fall back to `Default Value`; the built-in 15 is used.
-- **When you change it**: new reservations only.
+### Implementation-managed setting
 
-#### `PUTAWAY_LOCK_TIMEOUT_MS`
-- **Seeded** `5000` (wms-app 091).
-- **Type and range**: whole milliseconds above 0. Not set, empty, or 0 or less = 5000 (`DEFAULT_LOCK_TIMEOUT_MS`). Reads `Value`, then `Default Value`.
-- **Meaning**: how long a putaway suggestion waits for a location that another operator is reserving.
-- **Affects**: `wms-inventory/src/putaway/reserve.rs:362-366` (`lock_timeout_ms`); the value goes to `LocBmc::lock_all_by_code`.
+`OVERRIDE_GRANT_TTL_SECONDS` controls how long a newly issued supervisor
+override remains valid. When it is not configured, the product uses five
+minutes. This key is not part of the baseline System Settings list; change it
+only through the approved deployment or administration workflow.
 
-#### `OVERRIDE_GRANT_TTL_SECONDS`
-- **Not seeded.**
-- **Type and range**: whole seconds above 0. Not set, or 0 or less = **300**.
-- **Meaning**: how long a supervisor override grant stays valid (moves and receipts).
-- **Affects**: `wms-inventory/src/movement/override_grant.rs:96-99`, `:417-424`. An expired grant is refused as expired.
-- **When you change it**: new grants. Grants already minted keep their own expiry.
+## Dashboard settings
 
-### 2.3 Locations
+Dashboard configuration has its own screens:
 
-#### `CHECK_DIGIT_ENABLED`
-- **Type and range**: on/off. Seed `true`. Not set = off.
-- **Description**: `Enable automatic check digit generation for new locations`.
-- **Affects**: a new location gets its check digit computed from the code when on — one location (`New`, `create_loc`) and every location of the bulk generator `gen_locs` alike (`LocBmc::create`, `LocBmc::create_many_with_loc_generator`).
-- **When you change it**: new locations only. Existing check digits stay.
+- `Sidebar > Warehouse Configuration > Dashboards > Board Settings`
+- `Sidebar > Warehouse Configuration > Dashboards > Metric Thresholds`
 
-#### `LOC_GEN_PATTERN`
-- **Type and range**: text up to 50 characters. Empty or not set = `<AISLE_PREFIX><AISLE>-<LEVEL>-<LOC>`.
-- **Description**: `location code generation pattern`.
-- **Meaning**: the shape of the codes made by the bulk generator. Placeholders: `<AISLE_PREFIX>`, `<AISLE>`, `<AISLE_SUFFIX>`, `<LEVEL_PREFIX>`, `<LEVEL>`, `<LEVEL_SUFFIX>`, `<LOC_PREFIX>`, `<LOC>`, `<LOC_SUFFIX>`.
-- **Affects**: `gen_locs` only.
-- **Example**: aisle prefix `A`, aisle `01`, level `02`, loc `03` with the default gives `A01-02-03`.
-- **When you change it**: only locations generated afterwards.
+Only **Admin** and **Manager** can read or change **Board Settings** and **Metric
+Thresholds**. Other authorised roles may view the dashboard and metric
+catalogue, but not these configuration records.
 
-### 2.4 Tasks (picking and counting work)
+### Board Settings
 
-All five read `Value`, then `Default Value`. A value of 0 or less is replaced by the built-in default, except where noted.
-
-#### `TASK_LEASE_TTL_MIN`
-- **Default**: seed 15, built-in 15.
-- **Meaning**: minutes a claimed task is held for the operator before the reaper gives it back to the pool.
-- **Example**: an operator claims a task and the radio dies. After 15 minutes another operator can get it.
-- **When you change it**: leases created later. A lease already running keeps its end time.
-
-#### `TASK_SKIP_COOLDOWN_MIN`
-- **Default**: seed 10, built-in 10.
-- **Meaning**: minutes a refused (skipped) task is invisible to everyone before it returns to the pool. The supervisor board view uses the same number.
-
-#### `TASK_SKIP_ESCALATE_AFTER`
-- **Default**: seed 3, built-in 3.
-- **Meaning**: after this many refusals, the task leaves the pool and waits for a supervisor.
-
-#### `TASK_MAX_CONCURRENT_DEFAULT`
-- **Default**: seed 1, built-in 1.
-- **Meaning**: how many tasks one operator may hold at once **when the terminal names no work area**. When a work area is named, that work area's `max_concurrent_tasks` applies and this setting is ignored.
-
-#### `TASK_ALLOW_RELEASE_DEFAULT`
-- **Default**: seed 1, built-in on.
-- **Meaning**: may an operator hand back or refuse a task when the terminal names no work area. `0` is a real "no" here (not replaced). With a named work area, its `allow_task_release` applies.
-
-### 2.5 Printing
-
-#### `LABEL_RENDERER_URL`
-- **Type and range**: URL, text up to 50 characters. Seed `http://localhost:8086`.
-- **Description**: `Per D-16, D-22. External Typst/label renderer service URL. Used by LabelPrintService::print_label.`
-- **Meaning and order**: the address of the label renderer. The setting wins **only if its `Value` differs from its own `Default Value`**. Otherwise the environment variable `RENDERER_URL` is used. If that is empty too, `http://localhost:8086`. An empty `Value` means "use the environment".
-- **Affects**: all label printing from the warehouse. When the setting overrides the environment with a different address, the server logs one warning per schema and address.
-- **Example**: seed row. `Value` = `Default Value` = `http://localhost:8086`, so the environment wins. Set `Value` = `http://render.internal:8086`: it differs from the default, so it wins.
-- **When you change it**: the next print.
-
-### 2.6 Warehouse day
-
-#### `WAREHOUSE_TIMEZONE`
-- **Type and range**: an IANA time zone name, such as `Europe/Moscow` or `Asia/Novosibirsk`. Seed `UTC`. Empty = `Default Value`. No row = `UTC`.
-- **Description**: `Time zone of this warehouse (IANA name, e.g. Europe/Moscow). Its date is the warehouse day`.
-- **Meaning**: the time zone of this physical warehouse. Its local date is the **warehouse day**. It is a setting of each warehouse, not of the enterprise. IANA daylight-saving transitions are applied automatically; the day still changes at the warehouse's local midnight when its UTC offset changes.
-- **Affects**: cycle-count policies run once per warehouse day — the scheduler and `Run Now` both write that date to `Last Run` (`SystemSettingsBmc::warehouse_today`; see `24-inventory-count-policy.md`).
-- **Example**: `Europe/Moscow` (UTC+3). A policy that ran at 23:30 local time runs again after 00:00 local time, not after 03:00.
-- **Wrong value**: an unknown name is refused when you save it: `unknown time zone 'Europe/Moskow': use an IANA name such as Europe/Moscow`.
-- **When you change it**: the next scheduler pass (at most one hour). A policy that already ran on the new local date does not run again that day.
-
-## 3. Keys read by the code but not seeded (1)
-
-| Key | If no row | Meaning | Section |
-|---|---|---|---|
-| `OVERRIDE_GRANT_TTL_SECONDS` | 300 | supervisor grant life | 2.2 |
-
-To use one, create the row with `create_system_settings`
-(`config_key`, `config_value`, `default_value`, `description`, `editable`).
-
-## 4. Constants that look like settings but are not
-
-These are hard-coded. There is no screen and no key.
-
-| Constant | Value | Where | What it does |
-|---|---|---|---|
-| `RECEIPT_AUDIT_RETENTION_DAYS` | 365 | `app-server/src/services/cleanup_tasks.rs:121` | age at which receipt audit rows are deleted |
-| `DEFAULT_TTL_MINUTES` | 15 | `wms-inventory/src/putaway/reserve.rs:22` | last-resort reservation time |
-| `LONG_REDIRECT_DISTANCE` | 30 | `wms-inventory/src/putaway/mod.rs:293` | a putaway redirect longer than this is marked long in the trace |
-| `ABANDONED_PER_TICK_ALERT` | 20 | `wms-inventory/src/putaway/sweeper.rs:91` | the sweeper warns when it frees this many abandoned reservations in one 5-minute pass |
-| `SWEEP_INTERVAL` | 5 minutes | `sweeper.rs:57` | how often the sweeper runs |
-| `DEFAULT_EPISODE_TTL` | 8 hours | `wms-serial/src/service/serial/episode_lifecycle.rs:57` | life of a serial-capture episode before it is marked abandoned |
-| `MAX_REGISTRATION_BATCH` | 500 | `wms-inventory/src/domain/handling_unit/aggregate.rs:5` | handling units registered at once |
-
-## 5. Dashboard settings
-
-### 5.1 Where
-
-| Item | Value |
+| Field | Meaning |
 |---|---|
-| Menu path | `Sidebar > Warehouse Configuration > Dashboards > Board Settings` and `Sidebar > Warehouse Configuration > Dashboards > Metric Thresholds` |
-| Screens | `Dashboard Settings` (list and card), `Metric Thresholds` (list and card), `Dashboard Metrics` (read-only catalogue) |
-| Roles | change: `Admin`, `Manager`. Read the settings: `Admin`, `Manager`. Read the catalogue: every role. |
-| API | `dashboard_setting_get`, `dashboard_setting_list`, `update_dashboard_setting`, `dashboard_metric_threshold_*` (`create`, `update`, `delete`, `get`, `list`), `dashboard_metric_catalogue` |
-| Scope | one `dashboard_setting` row per warehouse (`id = 1`), plus one threshold row per metric |
-| Versioning | both are versioned. A save sends the version it read. Stale: optimistic-lock conflict with the current version. |
+| **Rail slot 1** to **Rail slot 6** | Selects the six metrics displayed in the Control Center rail. Use six different catalogue metrics. |
+| **Show demo figures** | Allows design sample values where a metric has no live source. It does not change measured values. |
+| **Throughput plan (units/hour)** | Adds a positive hourly plan line to the throughput chart. Leave empty for no plan line. |
+| **Expiring within (days)** | Sets the horizon for the lots-expiring exception. Enter 1 to 365 days. |
 
-If the settings cannot be read, the board is drawn with the defaults and shows
-`board settings unavailable — showing the defaults`.
+Available rail metrics include released orders, picked lines, pending
+shipments, inventory accuracy, labour on floor, open receipts, received lines,
+pending putaway, stock on hold and executed moves. **Dock utilisation** is a
+demo-only metric because dock-door utilisation is not currently measured.
 
-### 5.2 `dashboard_setting` (the board settings card)
+### Metric Thresholds
 
-Seed: one row made by migration 080 (`INSERT … (id) VALUES (1)`), so a save is always an update.
+Use a threshold to color a measured rail metric without changing stock or
+documents.
 
-#### Rail (`rail`) - `Rail slot 1` ... `Rail slot 6`
-- **Column and type**: `rail` text array, either empty (NULL) or **exactly 6** metric keys. On the screen the card shows six slots, each a picker of a metric key.
-- **Default**: NULL = the design rail: `orders_released`, `lines_picked`, `shipments_pending`, `dock_utilisation`, `inventory_accuracy`, `labour_on_floor`. Saving the design rail again stores NULL, so a later change of the design still reaches this warehouse.
-- **Meaning**: which six measures show in the top rail of the Control Center.
-- **Refusals**: `the rail holds exactly 6 metrics, not <n>`, `no metric '<key>' in the catalogue`, `metric '<key>' is on the rail twice` (an emptied slot is an empty key and is refused by name).
-- **Affects**: `wms-dashboard/src/service/snapshot.rs:132-170`. A user can also keep a personal rail. A key that was removed from the catalogue, or repeated, takes the warehouse's metric at that position; the rail never shrinks.
-- **Metrics** you can choose (11):
+1. Select a **Metric**.
+2. Set **Bad when** to **Above — high is bad** or **Below — low is bad**.
+3. Enter **Alert at**, **Critical at**, or both.
+4. Save and check the Control Center.
 
-| Key | Label | Unit | Source |
-|---|---|---|---|
-| `orders_released` | Orders released | `ord` | live, counted in the board window |
-| `lines_picked` | Lines picked | `ln` | live, window |
-| `shipments_pending` | Shipments pending | `shp` | live |
-| `dock_utilisation` | Dock utilisation | `%` | **demo only** (dock doors are not modelled). Sample 78%. |
-| `inventory_accuracy` | Inventory accuracy | `%` | live: matched first looks out of all first looks in the window, one decimal. No count = no number (shown as a dash). |
-| `labour_on_floor` | Labour on floor | `ppl` | live |
-| `receipts_open` | Receipts open | `rcp` | live |
-| `lines_received` | Lines received | `ln` | live, window |
-| `putaway_pending` | Putaway pending | `ln` | live |
-| `stock_on_hold` | Stock on hold | `hld` | live |
-| `moves_executed` | Moves executed | `mv` | live, window |
+For **Above**, the critical value must be at least as high as the alert value.
+For **Below**, the critical value must be at least as low. A value exactly at a
+threshold reaches that level. Demo figures are not assigned alert levels.
 
-#### `show_demo` - `Show demo figures`
-- **Column and type**: boolean, not null, default `true`.
-- **Meaning**: whether demo numbers may appear.
-- **Affects**: a slot with a demo-only source (`dock_utilisation`, and the exception `below_reorder_point`) shows the sample figure when on. When off it shows `no source`. Real measured numbers are never changed by this.
-- **Helper text on the screen**: `Off: a slot, row or panel with no module behind it says so instead of drawing the design's figure.`
+## Change control
 
-#### `throughput_plan_per_hour` - `Throughput plan (units/hour)`
-- **Column and type**: double precision, empty allowed, must be above 0 and finite. Default empty.
-- **Meaning**: the plan line on the throughput chart. The chart has 12 buckets over the board window, so the plan for one bucket is the hourly plan × the bucket's hours.
-- **Refusal**: `the throughput plan must be a positive number per hour`.
-- **Empty**: no plan line.
+Before changing a production setting:
 
-#### `expiring_within_days` - `Expiring within (days)`
-- **Column and type**: integer 1 to 365, not null, default **30**. Required on the card (the six rail slots are required too).
-- **Meaning**: how far ahead the exception `Lots expiring` looks. Its subtitle reads `<n> days`.
-- **Refusal**: `the expiry horizon is 1 to 365 days, not <n>`.
-- **Affects**: `wms-dashboard/src/domain/metric/postgres_repository.rs:156-164`.
-- **When you change it**: the next board refresh. No stock or document changes.
+1. Record the current value and the reason for the change.
+2. Identify the next command, job or scheduler pass that will read it.
+3. Make the change during an agreed operating window.
+4. Run one controlled happy path and one relevant refusal or recovery path.
+5. Confirm the result in the user interface and operational logs available to
+   the administrator.
+6. Restore the previous value if the expected behavior is not observed.
 
-#### `version` - hidden. Optimistic lock. Bumped on each save.
+## If something goes wrong
 
-### 5.3 `dashboard_metric_threshold`
+| Symptom | Likely cause | What to do |
+|---|---|---|
+| A setting cannot be saved | The row is read-only, the value is too long, or its format is invalid. | Use the documented format and check **Editable**. Do not create a replacement key with a similar spelling. |
+| The previous behavior continues | The setting applies only to newly created work, or a work-area/owner value takes precedence. | Review the precedence described above and repeat the test with new work. |
+| A lock timeout appears repeatedly | Concurrent users or automation are changing the same receipt, order or destination. | Let the current operation finish and retry. Increase a timeout only after confirming the contention is expected. |
+| Labels do not print after changing the renderer address | The renderer, template, printer or assignment is unavailable. | Check the complete print setup; do not assume the renderer address alone selects a printer. |
+| Daily count scheduling uses the wrong date | The warehouse time zone is wrong or invalid. | Save the correct IANA time-zone name and check the next scheduler pass. |
+| A dashboard rail value shows no source | The selected metric has no live data source and demo figures are off. | Select a live metric or enable demo figures only for a demonstration environment. |
 
-One row per metric (unique on `metric_key`). Without a row the metric has no alert level and always shows normal.
+## Related guides
 
-| UI label | Column | Type | Rule |
-|---|---|---|---|
-| `Metric` (required) | `metric_key` | text, a key from the catalogue | cannot be changed after creation: `a threshold's metric does not change — add a threshold for the other metric` |
-| `Bad when` (required) | `bad_when` | `Above` or `Below` (labels `Above — high is bad`, `Below — low is bad`) | empty on create = `Above`. Anything else: `bad_when <x> is not Above or Below` |
-| `Alert at` | `alert_at` | number | at least one of the two levels is required |
-| `Critical at` | `critical_at` | number | must be finite |
-| (hidden) `Version` | `version` | integer | optimistic lock |
-
-- **Order rule**: `Above`: alert ≤ critical. `Below`: alert ≥ critical.
-  Messages: `a threshold needs an alert level, a critical level, or both`,
-  `the critical level must be at least as bad as the alert level`,
-  `a threshold level must be a finite number`.
-- **How a value is judged**: a level is reached **at** its value. `Above`: `value >= critical` is Critical, `value >= alert` is Alert. `Below`: `value <= …`. A value that is not a number is normal. Only measured values are judged; demo values and failed reads are always normal.
-- **Example**: metric `shipments_pending`, `Above`, alert 40, critical 60. A value of 40 is Alert, 60 is Critical, 39 is normal. For `inventory_accuracy`, `Below`, alert 98, critical 95: 98 is Alert, 95 is Critical.
-- **Affects**: only the colour/level of the rail slot. No document or stock changes.
-
-## 6. Printing and label settings that act like policy
-
-| Setting | Where | What it controls | Used? |
-|---|---|---|---|
-| `LABEL_RENDERER_URL` | system setting | label renderer address (section 2.5) | yes |
-| `Auto-Print LPN` (`owner_config.auto_print_lpn_on_receive`) | owner, tab `Receiving` | print the LPN label after a receive (file 41, B.8) | yes |
-| Printer assignment | table `printer_assignments`, API only | which printer a print goes to. Fields: `scope_type` (`User`, `Zone`, `Owner`, `Warehouse`), `scope_id` (the user id, zone id or owner id; empty for the warehouse), `printer_id`, `priority` (default 100, lower wins inside a scope), `is_active` (default true). Order: **Zone → User → Owner → Warehouse**. A print with no location has no zone, so the order is User → Owner → Warehouse. | yes |
-| Printer configuration | table `printer_configurations`, API only | `code`, `name`, `description`, `printer_host`, `printer_port` (default 9100), `printer_model`, `zone_code`, `is_default`, `label_definition_id`, `is_active` (default true) | only `code`, `printer_host`, `printer_port` are used. **`is_active`, `zone_code`, `is_default`, `label_definition_id`, `printer_model` are stored only**: a printer with `is_active = false` still prints if an active assignment points to it. |
-| Label definitions and templates | tables `label_definitions`, `label_templates`; designer in `Sidebar > Overview > Reports` | the label layout. The code looks a label up by its exact code: `lpn_id_label` (receive), `handling_unit_label` (handling unit registry), `shipping_label` (carton close) | yes |
-| Zone printer fields | `Warehouse Configuration > Topology > Putaway Zones > Printer Settings`: `Default Label Printer`, `Auto Print Addr Label`, `Auto Print Carton Label`, `Default Report Printer` | meant to set default printers | **Stored only. They have no effect today.** The model reads and writes them; no print path reads them. Use a printer assignment with scope `Zone`. |
-
-Print results never fail the business command. A missing printer, a missing
-template or an unreachable device is logged and the receive or the carton close still
-succeeds.
-
-See also the guide `../07-printing-and-labels.md`.
-
-## 7. Count of keys
-
-- System settings: 19 seeded + 1 read but not seeded = **20 keys**. All 20 are read by code.
-- Dashboard: 4 board settings (`rail` as one field of six slots, `show_demo`, `throughput_plan_per_hour`, `expiring_within_days`) plus the hidden `version`, and 4 threshold fields (`metric_key`, `bad_when`, `alert_at`, `critical_at`).
+- [Go-Live Checklist for a New Tenant](../10-checklist-go-live.md)
+- [Warehouse Structure](../03-warehouse-structure.md)
+- [Reason Codes, Holds and Handling Unit Types](43-reason-codes-and-holds.md)
+- [Inventory Count Policy and Count Settings](24-inventory-count-policy.md)
+- [Printing and Labels](../07-printing-and-labels.md)
+- [Reports and Dashboards](../08-reports-and-dashboards.md)

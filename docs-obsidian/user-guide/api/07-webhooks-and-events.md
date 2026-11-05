@@ -1,16 +1,17 @@
 # Webhooks and events
 
-The WMS tells other systems about business changes through **integration events**. This page explains what exists in the code today and what does not.
+The WMS tells other systems about business changes through **integration events**.
 
 ## The short version
 
-- When a business action commits, the server writes an **integration event** row in the same database transaction. This is an **outbox**. A rolled-back action leaves no event.
-- A background **delivery worker** inside `app-server` reads new events and sends them to **subscribers**.
+- When a business action commits, the WMS records an **integration event** in
+  the same transaction. A rolled-back action leaves no event.
+- A background delivery worker sends new events to **subscribers**.
 - A subscriber has a delivery method: `webhook` (the server sends an HTTP POST), `poll` (you read the events yourself), or `internal` (handled inside the WMS).
-- You read events, deliveries and subscribers with normal JSON-RPC methods. There is no separate "events" REST route in `app-server`.
+- You read events, deliveries and subscribers with normal JSON-RPC methods.
 
 ```text
-business command  --(same transaction)-->  enterprise.integration_event   (outbox)
+    business command  --(same transaction)-->  integration event
                                                    |
                          delivery worker (polls every 5 s)
                                                    |
@@ -24,7 +25,7 @@ business command  --(same transaction)-->  enterprise.integration_event   (outbo
 
 ### Event shape
 
-An event row has these fields (read them with `list_integration_event` and `get_integration_event`):
+An event has these fields (read them with `list_integration_event` and `get_integration_event`):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -34,7 +35,7 @@ An event row has these fields (read them with `list_integration_event` and `get_
 | `entity_name` | text | The kind of thing it is about, for example `receipt`. |
 | `key1`, `key2`, `key3` | text | Identifiers. For a receipt, `key1` is the receipt number. For a receipt line, `key1` is the receipt number and `key2` the line number. |
 | `payload` | object or null | The details of the event (different for each code). |
-| `warehouse` | text or null | The warehouse schema name, such as `wh1`. |
+| `warehouse` | text or null | The warehouse identifier carried by the event, such as `wh1`. |
 | `tenant_id` | integer or null | The tenant. |
 | `event_status` | text | `new`, `partial`, `sent`, `failed` or `skipped`. See below. |
 | `internal_status` | text | `new`, `processing`, `done`, `error` or `skipped`. For processing inside the WMS. |
@@ -84,7 +85,7 @@ curl -s -X POST "$BASE_URL/api/rpc" \
   }'
 ```
 
-Methods: `get_integration_event`, `list_integration_event`, `count_integration_event`. The default roles are ADMIN, MANAGER, OPERATOR and VIEWER. See [reference/integration.md](reference/integration.md).
+Methods: `get_integration_event`, `list_integration_event`, `count_integration_event`. The default roles are ADMIN, MANAGER, OPERATOR and VIEWER. See the [Integration method reference](reference/integration.md).
 
 ## Subscribers
 
@@ -104,13 +105,13 @@ Fields you can set through the API:
 | `code` | A stable name. Required when you create. You cannot change it later. |
 | `name` | A label. |
 | `description` | An optional explanation of the subscriber. |
-| `delivery` | `webhook`, `poll` or `internal`. |
+| `delivery` | `webhook` or `poll`. `internal` is reserved for Quark-managed subscribers. |
 | `webhook_url` | The URL to POST to. In an update you can clear it with an explicit `null`. |
 | `webhook_headers` | Extra string-valued HTTP headers. This field is write-only because it may contain a secret. |
 | `event_filter` | Event-code patterns such as `process.*`. |
-| `warehouse_filter` | Optional warehouse schema names. |
-| `max_retries` | How many delivery attempts before the delivery is marked `failed`. Database default: 3. |
-| `retry_delay_sec` | The base delay between attempts. Database default: 60. |
+| `warehouse_filter` | Optional warehouse identifiers. |
+| `max_retries` | How many delivery attempts before the delivery is marked `failed`. Default: 3. |
+| `retry_delay_sec` | The base delay between attempts. Default: 60. |
 | `is_active` | Only active subscribers receive events (update only). |
 
 Example:
@@ -139,7 +140,7 @@ The built-in Integration Platform subscriber starts inactive. In the Integration
 How the filters work in the delivery worker:
 
 - `event_filter.event_codes` is a list. An item can be `*` (all), `prefix.*` (the codes under the prefix: `process.order.*` takes `process.order.created`, never `process.order_x.created` or `process.order` itself), or an exact code.
-- `warehouse_filter.warehouses` is a list of warehouse schema names. An empty or missing list means all warehouses.
+- `warehouse_filter.warehouses` is a list of warehouse identifiers. An empty or missing list means all warehouses.
 
 ## Delivery
 
@@ -170,16 +171,18 @@ Content-Type: application/json
 - The worker accepts only `http` and `https` URLs and does not follow redirects. Give the final URL in `webhook_url`.
 - DNS is resolved before every request. If any returned address is loopback, private, link-local (including `169.254.169.254`), multicast, unspecified, or in a blocked special-purpose range, the delivery fails with `blocked webhook destination`. The request connects only to the address set that passed this check.
 - Delivery connects directly and ignores process-level HTTP proxy variables, because proxy-side DNS resolution cannot be pinned by the worker.
-- For an on-premises receiver on a private network, set `DELIVERY_WEBHOOK_PRIVATE_ALLOWLIST` to a comma-separated list such as `1000@erp.internal:8443,2000@10.20.30.40:8080`. Each entry is limited to that event tenant and exact authority. Use `system@host:port` only for a deliberately shared endpoint. The exception does not enable redirects or other URL schemes.
+- For an on-premises receiver on a private network, ask the deployment
+  administrator to allow the exact tenant, host and port. This exception does
+  not enable redirects or other URL schemes.
 
-### Delivery rows
+### Delivery records
 
-For each event and matching subscriber, the worker keeps one **delivery** row. Read them with `list_integration_event_delivery`, `get_integration_event_delivery` and `count_integration_event_delivery`.
+For each event and matching subscriber, the worker keeps one **delivery** record. Read it with `list_integration_event_delivery`, `get_integration_event_delivery` and `count_integration_event_delivery`.
 
 | `transmit_status` | Meaning |
 |---|---|
 | `pending` | Waiting for the first or the next attempt. |
-| `processing` | The worker has claimed it. A claim lasts 60 seconds. If the worker dies, another poll takes the row after the claim runs out. |
+| `processing` | The worker has claimed it. A claim lasts 60 seconds. If the worker stops, another poll takes the delivery after the claim runs out. |
 | `sent` | A 2xx answer arrived. |
 | `failed` | Attempts reached `max_retries`. |
 | `skipped` | The subscriber was inactive or filtered out. |
@@ -188,9 +191,11 @@ Other delivery fields: `attempts`, `last_attempt`, `next_attempt`, `response_cod
 
 ### Order, retries and duplicates
 
-- The worker reads up to 100 events with status `new` or `partial` in each poll, in id order. It polls every 5 seconds by default (`DELIVERY_WORKER_POLL_SEC`).
+- The worker reads up to 100 events with status `new` or `partial` in each poll,
+  in id order. The default poll interval is 5 seconds.
 - A failed attempt is retried after `retry_delay_sec × 2^(attempts so far)` seconds. With `retry_delay_sec = 15`: 15 s, 30 s, 60 s, and so on. The exponent stops growing at 20.
-- After `max_retries` attempts the delivery is `failed`. The code has no automatic restart and no replay method for a failed delivery.
+- After `max_retries` attempts the delivery is `failed`. Failed deliveries are
+  not restarted automatically.
 - Delivery is **at least once**. If the worker sends a request and dies before it records the result, it can send it again. A receiver should deduplicate on the stable source identity and still tolerate a repeated request. The body has no `key2`.
 - Order is by event id within one poll, but a retry of an old event can arrive after newer events. Do not rely on strict order.
 
@@ -198,11 +203,14 @@ For a custom receiver, use `source_event_id` together with the identity of the W
 
 ### `poll` subscribers
 
-A `poll` subscriber gets a delivery row that stays `pending`. The worker does nothing else for it.
+A `poll` subscriber gets a delivery record that stays `pending`. The worker does nothing else for it.
 
-There is no API to mark a poll delivery as read. The delivery methods are read-only (`list_`, `get_`, `count_`). The comment in the SQL mentions `GET /api/integration/events?subscriber=X&status=pending`, but that route does not exist in `app-server`. Read events with `list_integration_event` and keep your own position (the last `id` you handled).
+There is no API to mark a poll delivery as read. The delivery methods are
+read-only (`list_`, `get_`, `count_`). Read events with
+`list_integration_event` and keep your own position, such as the last `id` you
+handled.
 
-A poll delivery does not hold back the event. If an event has only poll subscribers, its `event_status` becomes `sent` while the poll delivery row stays `pending`.
+A poll delivery does not hold back the event. If an event has only poll subscribers, its `event_status` becomes `sent` while the poll delivery stays `pending`.
 
 ### `internal` subscribers
 
@@ -225,6 +233,5 @@ See [Triggers, schedules and webhooks](../integration-platform/04-triggers-sched
 
 ## Other push mechanisms
 
-- **Live updates (SSE)** for the web UI are described in ADR-086. They belong to the web UI, not to the JSON-RPC API, and the ADR says the feature ships switched off.
-- **Metrics:** `GET /metrics` on `app-server` returns JSON counters: `poll_cycles`, `poll_errors`, `events_polled`, `events_delivered`, `events_skipped`, `deliveries_sent`, `deliveries_failed`, `webhook_calls`, `webhook_latency_sum_ms`, and some authentication counters.
-- There is no WebSocket API, and no outbound message queue (the `queue` delivery value is only a comment in the SQL).
+The public JSON-RPC interface does not provide a WebSocket feed. Use webhook
+delivery or event polling for customer integrations.
