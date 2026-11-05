@@ -4,8 +4,9 @@
 
 The General Distribution profile is a reviewed standard setup for an inactive
 warehouse. Assisted onboarding can turn confirmed customer requirements and
-that standard into an explainable plan. It does **not** apply the plan or change
-the warehouse automatically.
+that standard into an explainable plan. It can inspect the current setup and
+check selected policy behaviour without changing warehouse data. It does
+**not** apply the plan or change the warehouse automatically.
 
 An administrator remains responsible for reviewing every planned change,
 approving it and carrying it out through the supported administrator workflows.
@@ -24,6 +25,21 @@ The core checklist covers:
 
 The plan adds cartonization, integrations, reports and labels only when the
 confirmed requirements say they are needed.
+
+## What the assistant can do
+
+The assistant separates preparation from execution:
+
+- **Inspect and validate:** read the current setup, preview generated locations
+  and run supported policy checks without saving changes.
+- **Prepare for approval:** describe proposed warehouse records and policy
+  changes for an administrator to review.
+- **Plan only:** prepare cartonization, report and label drafts that still need
+  their normal editor, preview and validation workflow.
+
+The assistant cannot publish policies, activate reports, render or print
+documents, or make configuration changes by itself. Normal role permissions
+still apply when an administrator carries out an approved change.
 
 ## Information to confirm first
 
@@ -63,18 +79,23 @@ different UI language or a country-specific document set.
 
 1. Confirm that the target warehouse is still inactive.
 2. Review the customer facts and every planned configuration area.
-3. Approve and apply changes through the normal administrator workflow.
-4. Run one controlled scenario through **Receive**, **Putaway**, **Allocate**,
+3. Review previews and validation results. Resolve every warning before
+   approving a change.
+4. Apply approved changes through the normal administrator workflow.
+5. Run one controlled scenario through **Receive**, **Putaway**, **Allocate**,
    **Replenish**, **Pick**, **Pack**, **Load** and **Goods Issue**.
-5. Check required reports and labels against the approved samples.
-6. Activate the warehouse only after the full scenario passes.
+6. Open every required report and label in its editor. Validate and preview it,
+   then compare the output with the approved sample.
+7. Activate the warehouse only after the full scenario passes.
 
 ## Current limitation
 
 There is no customer UI that applies a warehouse profile in one step. Assisted
 onboarding currently prepares a deterministic plan and validates its scope; it
 does not create or publish business-specific reason codes, policies or other
-warehouse records by itself.
+warehouse records by itself. Report and label drafts remain plan items until an
+administrator creates, validates and activates them through the supported
+editors.
 
 ## Related guides
 
