@@ -60,7 +60,7 @@ For the RF entry `Pick by Area` the system looks for the policy in this order:
 2. The area default (`work_area.picking_policy_code`).
 3. `DISCRETE`.
 
-The code must have a `Published` revision. If it has none, the lookup fails with `picking policy {code} has no published revision`. The service stops this from happening (see `22-work-areas-equipment-and-permissions.md`).
+The selected code must have a `Published` revision. The work-area screen prevents a policy without one from being assigned. The reserved `DISCRETE` policy is also required for direct discrete picking and as the final fallback for `Pick by Area`.
 
 The old RF entry `Discrete Pick` (`PICK01`, title `Get Pick Work`) names no area, so it always works as `DISCRETE`. When a pallet is opened for work taken through `Pick by Area`, the terminal sends the area code (`pick_drop_open`, field `work_area_code`, `PICK03` revision 4). The pallet then opens under the policy of (area, equipment), else the area default, when the pick location is in a zone of the area (`WorkAreaBmc::covers_location`). If the pick stands outside the area, `DISCRETE` is used. An unknown area code is refused: `UNKNOWN_WORK_AREA`.
 
@@ -418,6 +418,25 @@ An episode is the stored proof of one source. It lives while the same operator h
 ### In the area assignment
 
 `Policy {code} has no published revision: it cannot be assigned to a work area`, `Work area {id} not found`. See `22-work-areas-equipment-and-permissions.md`.
+
+### At the terminal when DISCRETE is not published
+
+The terminal shows:
+
+`the picking policy DISCRETE is not published: a supervisor must publish it (Outbound setup > Picking policies)`
+
+This is a configuration refusal, not a temporary terminal failure. Retrying the refused terminal step cannot help until `DISCRETE` is published. The Pick task may already exist or be held by the operator.
+
+An `Administrator` or `Manager` should:
+
+1. Open `Sidebar > Warehouse Configuration > Policies > Picking Policies`.
+2. If an editable `DISCRETE` draft already exists, open it. Otherwise click `New Draft`, enter `DISCRETE` in `Code`, enter a `Description`, and click `Create Draft`.
+3. If you created a new draft, open it from the list.
+4. Review the pallet, emptied-location, order-control and source-confirmation settings.
+5. Click `Save`, then `Publish`.
+6. Ask the operator to retry the refused terminal step. If the task has already returned to the pool, request work again instead.
+
+Publishing `DISCRETE` restores the fallback; it does not bypass the other eligibility checks for the order, task, operator, equipment or stock.
 
 ## 10. Unfinished or inconsistent points an administrator should know
 
