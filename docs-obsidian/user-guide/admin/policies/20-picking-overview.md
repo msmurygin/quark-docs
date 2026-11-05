@@ -12,7 +12,7 @@ Picking turns released order demand into directed warehouse work. Quark chooses 
 
 This page helps an administrator choose a picking pattern and understand which settings control it. For terminal instructions, see [Picking](../../operator/09-picking.md) and [Batch picking and distribution station](../../operator/14-batch-picking-and-distribution-station.md).
 
-## Choose a picking pattern
+## The five warehouse work patterns
 
 Quark supports five warehouse work patterns.
 
