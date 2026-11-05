@@ -13,9 +13,12 @@ rule, the supervisor screen, and the operator flow.
 flowchart LR
     A[Check eligible pick locations] --> B{Stock plus stock on the way<br/>at or below minimum?}
     B -- No --> A
-    B -- Yes --> C{Eligible reserve stock available?}
+    B -- Yes --> C{More reserve stock to check?}
     C -- No --> D[Report no source]
-    C -- Yes --> E[Create replenishment work]
+    C -- Yes --> X{Source lot expired?}
+    X -- Yes --> Y[Skip it and check the next source]
+    Y --> C
+    X -- No --> E[Create replenishment work]
     E --> F[Operator takes the next task]
     F --> G[Scan source and enter quantity]
     G --> H[Scan destination]
@@ -106,6 +109,16 @@ planner can create work from more than one source. If no eligible source has
 at least one whole location UOM, the pick location is reported without a
 source and no task is created for that pass.
 
+An expired lot is not an eligible replenishment source. A lot is expired when
+its expiration date is today or earlier in the warehouse's local day. The
+planner skips it and tries another source; if no usable source is available, it
+reports the pick location without a source and creates no task. A lot without
+an expiration date remains eligible.
+
+This source check excludes expired lots from source selection only. The SKU's minimum remaining
+shelf-life settings are applied later when stock is allocated and picked; they
+do not reserve extra shelf life during replenishment planning.
+
 ## Complete replenishment on the RF terminal
 
 1. Open **Inventory > Replenish**. The terminal assigns the next eligible
@@ -144,6 +157,8 @@ Check these conditions:
 - The location UOM belongs to the SKU's active pack.
 - The SKU has a replenishment policy.
 - Eligible reserve stock is free and available.
+- At least one source lot is not expired. A date of today already counts as
+  expired; a lot without an expiration date can still be used.
 - The SKU is not continuously serial tracked.
 
 ## Before production rollout
