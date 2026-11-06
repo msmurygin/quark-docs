@@ -3,7 +3,7 @@ title: "Administrator Guide - Reports and Dashboards"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-10
+updated: 2026-11-06
 ---
 
 # Reports and Dashboards
@@ -33,42 +33,42 @@ Reports are produced by **Quark Reports** and shown inside the web UI. The repor
 5. Click run. The browser downloads the file (PDF, XLSX).
 6. Click the star to mark a favorite.
 
-### Field reference
+### Standard reports
 
-Seeded report catalogue (16 reports). Names are the English labels.
+#### General Distribution reports
 
-| Code | English name | Category |
+The report catalogue depends on how the site was deployed. The General Distribution report set is deployment-managed: warehouse Bootstrap does not add it, and it cannot be installed from the Reports screen. If these reports are missing, ask the deployment owner whether the General Distribution report set was installed for this warehouse.
+
+The current General Distribution package contains nine English reports:
+
+| Report | Category | Main use and parameters |
 |---|---|---|
-| `ru_inv_3` | Inventory Count Sheet (INV-3) | audit |
-| `kz_esf_print` | Electronic Invoice (ESF) | finance |
-| `grouped_receipt_by_supplier` | Receipts by Supplier | inbound |
-| `kz_act_priemki` | Inventory Acceptance Certificate | inbound |
-| `kz_z_1` | Goods Receipt Order (Z-1) | inbound |
-| `ru_mh_1` | Goods Receipt Order (M-4) | inbound |
-| `ru_torg_2` | Discrepancy Report (TORG-2) | inbound |
-| `ru_m_11` | Materials Requisition Note (M-11) | inventory |
-| `ru_mh_3` | Materials Record Card (M-17) | inventory |
-| `cortive_pick_list` | Pick List | outbound |
-| `kz_snt_print` | Accompanying Waybill for Goods (SNT) | outbound |
-| `kz_z_2` | Stock Release Note (Z-2) | outbound |
-| `pivot_sku_by_month` | SKU by Month (Pivot) | outbound |
-| `ru_torg_12` | Goods Consignment Note (TORG-12) | outbound |
-| `ru_ttn_1t` | Consignment and Waybill (1-T) | outbound |
-| `ru_upd_503` | Universal Transfer Document (UPD) | outbound |
+| `Inventory Count Sheet` | inventory | Print the locations, SKU and lot for one count. Enter `Count number`. A blind count does not print the expected quantity. |
+| `Inventory Holds` | inventory | Review active location, LPN and lot holds, their direction, reason, the user who placed them and covered stock. Filter by reason, scope, target and placed dates; enable `Include released holds` when required. Quantities under overlapping holds are not a warehouse total. |
+| `Expiring and Expired Stock` | inventory | Find lots already expired or expiring within a chosen number of days. Filter by SKU, lot, owner and `Only expired`. A lot dated today is expired. |
+| `Putaway List` | inbound | Print the goods on one receipt and the latest active destination recommendation for each container. Enter `Receipt number`. If no recommendation exists, the report shows the receiving location. |
+| `Receipt Variances` | inbound | Review short, over, unexpected, damaged and rejected quantities. Enter `Received from` and `Received to`; optionally filter by receipt, supplier, owner or SKU. Closed receipts are included by default. |
+| `Receipts by Supplier` | inbound | Compare expected, received, damaged, rejected, short, over and unexpected quantities by supplier and unit of measure. Enter `Received from` and `Received to`; optionally filter by supplier or owner. |
+| `Stock Adjustment Report` | inventory | Review posted quantity changes, reasons and users for a period. Enter `Date from` and `Date to`; optionally filter by SKU, location, owner or reason. |
+| `Stock Movement` | inventory | Review receipts, moves, picks, adjustments and shipments with signed quantities and source/destination details. Enter `Date from` and `Date to`; optionally filter by SKU, location, owner or movement type. |
+| `Stock on Hand` | inventory | Review on-hand, reserved, picked, held and available quantities by SKU, location, lot and owner. Optionally filter those fields or enable `Only with stock`. |
 
-Inventory count reports (category `inventory`). Each asks for a period, `date_from` and `date_to`:
+Where totals are shown, they stay within a unit of measure; the catalogue never adds unlike units together. Reports that show a `Time zone` parameter accept an IANA time zone and use UTC when it is empty.
 
-| Code | English name | What it shows |
-|---|---|---|
-| `inventory_count_accuracy` | Inventory Accuracy | Share of locations and lines that matched on the first count, and the difference in units and value. By zone, by SKU ABC class and by counter. |
-| `inventory_count_variance_by_sku` | Count Variance by SKU | The 100 SKUs with the largest first-count difference, by value and then by units. |
-| `count_variance_causes` | Count Variance Causes | Accepted differences by cause. Then each cause by zone, by counter and by SKU. Per row: how many, their share, the difference in units, in value and its net value. |
-| `location_empty_confirmations` | Empty Confirmations | Locations confirmed empty by operators. |
+Reapplying the unchanged profile package does not create duplicate reports. If the warehouse already contains one of these standard reports with different content, profile application stops instead of overwriting it. Review the existing report with the installer before deciding whether to keep the customization or restore the profile version.
 
-- Value is the difference × the SKU's `cost` attribute. A SKU without a cost adds no value.
-- `Count Variance Causes` counts what the board panel `Variance causes` counts: tasks accepted with an adjustment, by the time of the decision. Run it for today and it agrees with the panel on `Today`.
-- `Count Variance Causes` names a seeded cause by the description of the cause list, which is English (`Mix-up with another item`). The board names it in the reader's language. Your own causes appear as you named them. A difference accepted before causes existed appears as not recorded.
-- `Inventory Accuracy` and the board's `Inventory accuracy` use one definition: a location's **first** count matched when every line matched.
+```mermaid
+flowchart LR
+    W["Warehouse Bootstrap"] --> D{"General Distribution reports<br/>installed during deployment?"}
+    D -->|"No"| M["The nine reports are not in the catalogue"]
+    D -->|"Yes"| C["Nine standard reports appear in the catalogue"]
+    C -->|"Same set installed again"| N["No duplicates"]
+    C -->|"An existing report has different content"| R["Installation stops for review"]
+```
+
+Site-specific or statutory forms may also appear in the catalogue when they were added separately for that deployment. They are not part of the English General Distribution report set. Confirm that each such form is approved for the site's country and operating procedure before use.
+
+Additional custom reports can appear in the same catalogue. Treat them as site configuration: check their parameter descriptions and ownership before relying on them in an operating procedure.
 
 All standard warehouse roles can run the reports currently offered by the catalogue. **Report designer** is shown only to users with designer access.
 
@@ -194,7 +194,7 @@ Rules (`dashboard_metric_threshold` checks):
 
 ### Inventory accuracy and variance causes
 
-- **Inventory accuracy** (rail metric `inventory_accuracy`): the share of locations counted in the scope (`Shift`, `Today`, `7 days`) that matched on the **first** count. A location matched when every line of that count matched. A recount does not improve the figure. This is the definition of the report `Inventory Accuracy`.
+- **Inventory accuracy** (rail metric `inventory_accuracy`): the share of locations counted in the scope (`Shift`, `Today`, `7 days`) that matched on the **first** count. A location matched when every line of that count matched. A recount does not improve the figure.
 - The sparkline under the figure has 12 bars, one per twelfth of the scope. A full bar is 100 %. A stretch with no counts repeats the last measured value; it is not 0 %.
 - **Variance causes** (panel `Variance causes`, after count progress, full width): the differences accepted in the scope, one row per cause. Each row shows the cause, a bar and `count · share %`. The most frequent cause is on top. `Not established`, `Within tolerance` and `no cause recorded` are grey. They say nothing about where stock goes wrong.
 - With no difference accepted in the scope, the panel says `no variance accepted in this period`.
