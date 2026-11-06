@@ -202,6 +202,8 @@ The template catalogue contains ready-made manual flows for shipment labels and 
 | **Econt: Create Shipment & Label** | Creates one Econt shipment and returns its shipment number and waybill PDF URL. |
 | **DHL Express: Create Shipment & Label** | Creates one DHL Express shipment and returns its tracking number and PDF or ZPL label. |
 | **FedEx: Create Shipment & Label** | Creates one FedEx shipment and returns its tracking number and PDF or ZPL label. |
+| **Speedy: Reprint Existing Label** | Returns a PDF or ZPL label for an existing Speedy parcel without creating another shipment. |
+| **Econt: Retrieve Existing Label** | Returns the PDF URL for an existing Econt shipment without creating another label. |
 | **Speedy: Cancel Shipment** | Cancels a prepared Speedy shipment before pickup is ordered. A cancellation reason is required. |
 | **Econt: Cancel Shipment** | Deletes a prepared Econt shipping label before courier acceptance. |
 | **FedEx: Cancel Shipment** | Cancels a complete FedEx shipment by its master tracking number, including every package in a multi-piece shipment. |
@@ -233,6 +235,36 @@ flowchart LR
 The shipment reference is the repeat-protection key. Reusing a reference after a successful run returns that existing run instead of creating another carrier shipment. A carrier rejection fails the run and remains visible in **Monitor**. Shipment creation is not retried automatically because repeating a remote write could create a duplicate.
 
 Do not immediately repeat a failed create run. A timeout or lost response can leave the run failed even though the carrier accepted the shipment. First check the run steps and search the carrier account by **Shipment reference**. If the run is **outcome_unknown**, follow [the reconciliation procedure](05-monitoring-and-notifications.md#if-the-status-is-outcome_unknown) and do not retry until the external result is known.
+
+### Retrieve an existing Speedy or Econt label
+
+Use the retrieval template when the carrier shipment already exists but its label was not downloaded, was lost or must be printed again. Do not run **Create Shipment & Label** again merely to recover the label.
+
+1. Create, validate and activate a separate flow from the matching retrieval template.
+2. For Speedy, choose **Speedy: Reprint Existing Label**. Select **Run**, enter **Parcel number**, choose **Label format** (`PDF` or `ZPL`) and **Paper size** (`A6`, `A4` or `A4 (4 × A6)`).
+3. For Econt, choose **Econt: Retrieve Existing Label**. Select **Run** and enter **Shipment number**.
+4. Open the run in **Monitor**. A successful Speedy run contains the label data. A successful Econt run contains the existing label's PDF URL.
+5. Download or print the result through the approved process for your site.
+
+These flows call only the carrier's label-retrieval operation; they do not call its shipment-creation operation. The retrieval step is safe to retry. If the carrier response is missing the label value or returns it empty, the run fails instead of reporting a false success. Confirm that the parcel or shipment number belongs to the account connected to this flow, then retry the retrieval flow rather than the creation flow.
+
+```mermaid
+flowchart LR
+    A["Shipment already exists"] --> B{"Label available?"}
+    B -->|"Yes"| C["Use the saved label"]
+    B -->|"No"| D{"Carrier"}
+    D -->|"Speedy"| E["Run Reprint Existing Label<br/>with Parcel number"]
+    D -->|"Econt"| F["Run Retrieve Existing Label<br/>with Shipment number"]
+    E --> G{"Non-empty label data returned?"}
+    F --> H{"Non-empty PDF URL returned?"}
+    G -->|"Yes"| I["Download or print"]
+    H -->|"Yes"| I
+    G -->|"No"| J["Check the number and carrier account"]
+    H -->|"No"| J
+    J --> D
+```
+
+The current Speedy and Econt retrieval templates are verified against the platform's carrier emulator. Before production use, run a controlled retrieval in the carrier environment approved for your account and confirm that the returned label opens and prints correctly.
 
 ### Cancel a prepared shipment
 
