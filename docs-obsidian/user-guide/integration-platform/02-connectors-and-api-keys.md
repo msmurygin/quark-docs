@@ -79,6 +79,50 @@ The key list shows metadata such as provider, type, environment, status and vers
 
 The connector test checks connection and authentication. It does not prove that every operation in every flow is permitted. Run a controlled flow after the connector test passes.
 
+### Recover when an OAuth access token is rejected
+
+An OAuth provider can reject an access token before its recorded expiry. When
+an **OAuth2** or **OAuth2 Refresh Token** connector receives HTTP 401, the
+platform discards that rejected access token but keeps the connector's stored
+OAuth credential. The next token request can therefore obtain a replacement
+without an administrator rotating the connector credential.
+
+What happens next depends on the request:
+
+- A retry-safe operation can obtain a replacement token and try again in the
+  same run when HTTP 401 is included in its retryable statuses and another
+  attempt remains.
+- An unsafe operation is not repeated automatically. Its configured **On
+  Error** action handles the known 401 response. The next request can obtain a
+  replacement token.
+- A connector **Test** that receives 401 reports the failed test and discards
+  the rejected access token. Select **Test** again; the new test requests a
+  replacement token before checking the provider. If token acquisition fails,
+  the test reports the authentication failure.
+
+Do not rotate a client secret or refresh token merely because one access token
+was rejected. Retry the connector test first. Replace the stored OAuth
+credential only if the platform cannot obtain a replacement token or the
+provider reports that the underlying authorization was revoked.
+
+```mermaid
+flowchart TD
+    A[OAuth request uses an access token] --> B{Provider returns HTTP 401?}
+    B -- No --> C[Continue with the provider response]
+    B -- Yes --> D[Discard the rejected access token]
+    D --> E{Retry-safe, 401 is retryable and attempts remain?}
+    E -- Yes --> F[Request a replacement access token]
+    E -- No --> H[Do not repeat this request automatically]
+    H --> I[Apply On Error or report a failed connector test]
+    I --> J[The next request asks for a replacement access token]
+    F --> K{Token acquired for this run?}
+    K -- Yes --> G[Retry the original retry-safe request]
+    K -- No --> L[Report token acquisition failure]
+    J --> M{Token acquired for the new request?}
+    M -- Yes --> N[Continue the new request or test]
+    M -- No --> L
+```
+
 ## Set up Speedy or Econt for Bulgarian shipments
 
 Use the system connector template that matches the carrier:
@@ -175,6 +219,7 @@ The platform refuses a revocation that would leave an active flow without a usab
 | Selecting **Use** on **Generic HTTP API** does not create a connector or show an error | The template does not have the service-specific Base URL needed for an HTTP connector | Do not select **Use** repeatedly. Select **+ New Connector**, choose **HTTP**, enter the provider's **Base URL** and authentication method, then save and test it. |
 | Connection test cannot reach the service | Wrong URL, DNS, firewall or remote outage | Confirm the environment URL and network route; retry only after reachability is restored. |
 | Authentication is rejected | Wrong auth type, expired secret or mismatched account fields | Compare the connector fields with the provider's credential type; save and test the replacement. |
+| An OAuth connector test returns HTTP 401 once | The provider rejected the cached access token | Select **Test** again. The rejected access token has been discarded, so the new test requests a replacement. Rotate the stored OAuth credential only if replacement-token acquisition also fails. |
 | A carrier setup field disappeared after an upgrade | The refreshed template no longer exposes a generic setting that its shipment flow does not consume | Review the supported carrier fields above, save and test the existing connector, then run one controlled shipment. Do not recreate the connector merely to restore the unused field. |
 | **Connection test failed: ... Previous credentials were kept.** | The replacement credentials could not authenticate or reach the provider | Leave the previous key active, correct the replacement values and select **Save credentials & test** again. |
 | API key shows **expired** | Its configured validity period ended | Create and bind a replacement, test the connector, then revoke the old key if it is still active in storage. |
