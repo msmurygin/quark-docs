@@ -23,8 +23,9 @@ The core checklist covers:
 - packing and shipping configuration;
 - work areas, equipment, users and permissions.
 
-The plan adds cartonization, integrations, reports and labels only when the
-confirmed requirements say they are needed.
+The plan always includes the standard report and label requirements as
+plan-only items. It adds other optional areas, such as customer-defined
+cartons, only when the confirmed requirements call for them.
 
 ## What the assistant can do
 
@@ -56,31 +57,82 @@ Road transport requires the reporting scope because the standard output includes
 CMR consignment note. Report samples cannot be supplied when reports are out of
 scope.
 
+If an earlier answer changes, review every dependent answer again. The planning
+assessment treats the updated answers as a new revision and does not silently
+reuse dependent decisions from the previous revision.
+
+## Profile suggestion and approval
+
+Assisted onboarding can compare the confirmed facts with reviewed warehouse
+profiles. A profile with a conflicting mandatory requirement is not eligible.
+Other matches are ranked. A unique best match can be selected for the plan; a
+tie remains unresolved. This selection is a suggestion only: it is not an
+approval, is not saved as warehouse configuration and still requires
+administrator review.
+
+Defaults follow the same review boundary:
+
+- eligible low-risk defaults for master data, processes, strategies, roles,
+  reports and labels may be reviewed as one bundle;
+- high-risk choices must be approved individually;
+- integration and RF interface defaults always require explicit approval;
+- compliance-sensitive defaults are not proposed by assisted onboarding.
+
+An accepted default becomes part of the reviewed plan. It is not written to the
+warehouse automatically.
+
 ## Reference catalogues
 
-When labels are in scope, the European English label catalogue contains pallet,
-SKU, location, LPN, handling-unit and shipping labels.
+The assisted plan carries European English requirements for pallet, SKU,
+location, LPN, handling-unit and shipping labels. Its plan-only report
+requirements are Goods Receipt Note, Putaway List, Picking List, Packing List,
+Delivery Note, Inventory Count Sheet and Stock Adjustment Report. Road
+transport adds a CMR consignment note requirement.
 
-When reports are in scope, the report catalogue contains:
+These plan items are not the same thing as the deployable
+[General Distribution report set](08-reports-and-dashboards.md#general-distribution-reports).
+That current nine-report package is deployment-managed and is not installed by
+warehouse Bootstrap or from the **Reports** screen. The assisted plan does not
+create or activate either catalogue. An administrator must review each required
+output in the supported editor and deployment workflow.
 
-- Goods Receipt Note;
-- Putaway List;
-- Picking List;
-- Packing List;
-- Delivery Note;
-- Inventory Count Sheet;
-- Stock Adjustment Report;
-- CMR Consignment Note when road transport is required.
+The assisted plan does not select a different UI language or a country-specific
+document set.
 
-The assisted plan uses the European English catalogue. It does not select a
-different UI language or a country-specific document set.
+## Read the readiness result
+
+The planning assessment has three results:
+
+| Result | Meaning | What to do |
+|---|---|---|
+| **Blocked** | The plan cannot be approved yet. Its structure, validation, traceability, revision or coverage is not current and complete; a confirmation, blocking answer or approval is missing; evidence conflicts; a required component is unavailable or still needs a target-system check; or a required validation scenario has not passed. | Resolve every blocking item, refresh changed answers and run the required scenarios again. |
+| **Partial** | All blocking gates and required scenarios passed, but a non-blocking limitation remains. This includes unknown, plan-only, target-check or unsupported items that do not block the plan. | Decide whether to resolve, defer or remove each non-blocking item before approval. |
+| **Ready** | The reviewed facts are current, required coverage is available and all required scenarios passed, with no unresolved non-blocking limitation. | Continue with administrator review and controlled application. |
+
+**Ready** describes the plan, not the warehouse. It never authorizes execution,
+activates the warehouse or replaces the controlled go-live scenario.
+
+```mermaid
+flowchart TD
+    F["Confirm current warehouse facts"] --> P["Review the suggested profile and defaults"]
+    P --> V{"Plan valid, current, traceable<br/>and complete?"}
+    V -->|"No"| B["Blocked — resolve and reassess"]
+    V -->|"Yes"| Q{"Blocking answer, conflict or approval missing?"}
+    Q -->|"Yes"| B
+    Q -->|"No"| C{"Required component unavailable or<br/>target check pending, or scenario not passed?"}
+    C -->|"Yes"| B
+    C -->|"No"| O{"Non-blocking limitation remains?"}
+    O -->|"Yes"| A["Partial — review the remaining gap"]
+    O -->|"No"| R["Ready for administrator review"]
+    R --> X["Apply through supported workflows"]
+```
 
 ## Review and validate the setup
 
 1. Confirm that the target warehouse is still inactive.
 2. Review the customer facts and every planned configuration area.
-3. Review previews and validation results. Resolve every warning before
-   approving a change.
+3. Review previews and the readiness result. A **Blocked** plan cannot be
+   approved. Resolve every blocking item and review every **Partial** item.
 4. Apply approved changes through the normal administrator workflow.
 5. Run one controlled scenario through **Receive**, **Putaway**, **Allocate**,
    **Replenish**, **Pick**, **Pack**, **Load** and **Goods Issue**.
