@@ -116,9 +116,44 @@ Choose one **On Error** action for the result after any request-level attempts a
 | **Skip (continue)** | Record the step outcome and continue. Use only when the step is optional. |
 | **Fallback (jump to fallback step)** | Continue at a later fallback step. |
 
-**Request Retry Override** can change maximum attempts, backoff and retryable status codes. It runs before **On Error** and applies only when the step's **Operation** contains `"retry_safe": true`. An unsafe operation is attempted once. **Timeout (seconds)** limits the time spent on the step. A fallback must point forward to a later step so that the graph remains executable.
+**Request Retry Override** can change maximum attempts, backoff and retryable status codes. It runs before **On Error**. `GET`, `HEAD` and `OPTIONS` operations are retry-safe unless **Operation** explicitly sets `"retry_safe": false`; another operation must explicitly set `"retry_safe": true`. An unsafe operation is attempted once. **Timeout (seconds)** limits the time spent on the step. A fallback must point forward to a later step so that the graph remains executable.
 
-After an upgrade that removes the old step-level **Retry** action, existing steps that used it are changed to **Fail (stop flow)**. Revalidate those flows. Add **Request Retry Override** only when the remote operation is safe to repeat; otherwise keep the single attempt and handle the failure through **On Error**.
+### When the provider asks you to wait
+
+For a retry-safe request, a provider can return a retryable status together
+with `Retry-After`. The platform accepts either a number of seconds or an HTTP
+date. Before the next attempt, it waits for whichever is longer: the delay in
+`Retry-After` or the backoff configured on the connector or step. A shorter
+provider delay never shortens your configured backoff.
+
+The platform waits inside the current run only when the provider delay is at
+most five minutes. If the provider asks for more than five minutes, it does not
+make another request in that run; the provider response continues to **On
+Error**. A missing or invalid `Retry-After` uses the configured backoff. This
+does not make an unsafe operation retryable and does not schedule a background
+retry after the run has ended.
+
+```mermaid
+flowchart TD
+    A[Configured retryable status or connection failure] --> B{Operation is retry-safe?}
+    B -- No --> U{Connection failed, timed out, or status is 408 or 5xx?}
+    U -- Yes --> J[Stop the run and reconcile the unknown outcome]
+    U -- No --> G[Apply On Error]
+    B -- Yes --> K{Attempts remain?}
+    K -- No --> G
+    K -- Yes --> C{Valid Retry-After on the response?}
+    C -- No --> D[Wait for configured backoff]
+    C -- Yes, up to five minutes --> E[Wait for the longer provider or configured delay]
+    C -- Yes, over five minutes --> G
+    D --> F[Try the request again]
+    E --> F
+    F --> H{Result}
+    H -- Success --> I[Continue the flow]
+    H -- Retryable status or connection failure --> A
+    H -- Other failure --> G
+```
+
+After an upgrade that removes the old step-level **Retry** action, existing steps that used it are changed to **Fail (stop flow)**. Revalidate those flows. Add **Request Retry Override** only when the remote operation is safe to repeat; otherwise keep the single attempt. A known provider refusal then follows **On Error**. If an unsafe request times out, loses its connection, or returns HTTP 408 or 5xx, the run stops with an unknown outcome instead: check the provider before deciding whether to submit the operation again.
 
 ## Validate, save and activate
 
