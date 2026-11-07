@@ -192,6 +192,61 @@ Use **Undo** and **Redo** while the builder is open. Before a larger change, sel
 
 If a run fails because of a credential or remote outage, fix and test the connector instead of changing an unchanged flow.
 
+## Import and confirm Amazon merchant-fulfilled orders
+
+Use the Amazon templates as a pair:
+
+| Template | What it does |
+| --- | --- |
+| **Amazon SP-API: Import Unshipped Orders** | Checks the preceding 24 hours every five minutes for unshipped or partially shipped merchant-fulfilled orders and creates their remaining lines as WMS shipment orders. |
+| **Amazon SP-API: Confirm WMS Shipments** | Listens for Goods Issue and confirms each closed physical packing carton as a separate Amazon package. |
+
+The shipment-confirmation flow is package based. For every closed carton, it sends that carton's package reference, carrier, shipping method, tracking number and shipped line quantities. It does not turn the complete order or load into one package.
+
+### Set up the two flows
+
+1. Create and test an **Amazon Selling Partner API** connector. Enter the regional SP-API endpoint, LWA client ID, LWA client secret, LWA refresh token and Marketplace ID supplied for the Amazon account.
+2. Open **Templates**, select **Use Template** on **Amazon SP-API: Import Unshipped Orders**, and choose that Amazon connector.
+3. Choose the WMS connection, **WMS goods owner ID** and **Marketplace ship-to ID** for imported orders. Create the draft, review it, validate it and activate it.
+4. Use **Amazon SP-API: Confirm WMS Shipments** to create a second draft. Map it to the same Amazon connector and WMS connection, then validate and activate it.
+5. Keep both flows together when changing the connector. The confirmation flow accepts only orders imported through its mapped Amazon connector.
+
+Before enabling a production schedule, import a controlled order in an approved Amazon test environment and verify its owner, destination, SKU mapping and quantities in WMS. The current templates have been exercised with the integration emulator; production Amazon access is not established by that test.
+
+The import template is not an unlimited backlog scan. After an outage lasting more than 24 hours, reconcile older unshipped Amazon orders before restarting the schedule. Use an approved manual or custom import for those orders; do not assume that the standard schedule will find them.
+
+### Complete and confirm an order
+
+1. Let the import flow create the WMS shipment order.
+2. Pick and pack the order through the normal warehouse process.
+3. Close every physical packing carton. Make sure each carton has its own carrier code, carrier name and tracking number before Goods Issue. If a shipping method is not recorded, the confirmation uses the carrier name.
+4. Complete Goods Issue. The confirmation flow validates the packages and sends one Amazon shipment package for each carton.
+5. Open **Monitor** and verify that **Amazon SP-API: Confirm WMS Shipments** succeeded. Check the run for every expected carton, not only the order-level result.
+
+```mermaid
+flowchart LR
+    A[Import unshipped Amazon order] --> B[Create WMS shipment order]
+    B --> C[Pick and pack]
+    C --> D[Close each physical carton]
+    D --> E[Record carrier and tracking per carton]
+    E --> F[Complete Goods Issue]
+    F --> G{Each carton valid?}
+    G -->|No| H[Failed run in Monitor]
+    G -->|Yes| I[Confirm one Amazon package per carton]
+    I --> J[Record confirmation on each carton]
+```
+
+### Recover an uncertain Amazon confirmation
+
+Amazon confirmation is a remote write, so the flow does not automatically repeat it after an uncertain response. Check Amazon first:
+
+- If Amazon did **not** apply the package confirmation, run **Amazon: Release Verified Unapplied Confirmation** with the WMS packing carton and pending confirmation reference. Then allow a new delivery attempt.
+- If Amazon **did** apply it, run **Amazon: Mark Verified Package Confirmation Applied** with the same two values. This records the verified result without sending the shipment confirmation again.
+
+Use these recovery templates only after checking the package in Amazon. A carton already recorded as confirmed is not submitted again. A known provider refusal remains a failed run in **Monitor**; correct the rejected data before a new attempt.
+
+If validation fails before Amazon is called, check that there is at least one package, each package reference is a unique positive number, every package has carrier and tracking details, and the quantities across all packages exactly match the Goods Issue quantities.
+
 ## Carrier shipment labels and cancellation
 
 The template catalogue contains ready-made manual flows for shipment labels and carrier cancellation:
