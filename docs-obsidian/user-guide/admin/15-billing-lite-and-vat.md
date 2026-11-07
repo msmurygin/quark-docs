@@ -3,7 +3,7 @@ title: "Administrator Guide - Billing Lite and VAT"
 type: user-guide
 audience: customer administrator, billing manager, implementer
 status: draft
-updated: 2026-11-07
+updated: 2026-11-08
 ---
 
 # Billing Lite and VAT
@@ -22,9 +22,10 @@ before adopting it for a legal or customer-facing process.
 1. Create a billing account and connect the correct owner in each warehouse.
 2. Define effective-dated rates and VAT rules.
 3. Review captured usage and resolve anything that could not be rated.
-4. Preview and finalize an activity report for a period.
-5. Prepare, validate and issue a fiscal document.
-6. Download PDF or UBL, record delivery and reconcile payments.
+4. Preview and finalize an activity statement for a period.
+5. Download its summarized PDF Activity Report or detailed CSV ledger.
+6. Prepare, validate and issue a fiscal document when required.
+7. Download the fiscal PDF or UBL, record delivery and reconcile payments.
 
 ```mermaid
 flowchart TB
@@ -34,8 +35,9 @@ flowchart TB
     X -->|"Correct setup and Rate unrated"| R
     R -->|"Yes"| C["Charge ledger"]
     C --> P["Preview period"]
-    P --> F["Finalize activity report"]
-    F --> D["Prepare and validate draft"]
+    P --> F["Finalize activity statement"]
+    F --> AR["PDF Activity Report or detailed CSV"]
+    F --> D["Prepare and validate fiscal draft"]
     D --> I["Issue fiscal document"]
     I --> O["PDF or UBL"]
     I --> S["Mark sent"]
@@ -47,7 +49,8 @@ flowchart TB
 - Work in **Enterprise** mode. Billing Lite is not a warehouse-local menu.
 - Use `ADMIN` or `MANAGER` to configure billing and perform billing actions.
   `SUPERVISOR` can read the billing registers, preview periods and download
-  exports. It cannot change setup or finalize a period.
+  exports. `VIEWER` can download the verified PDF Activity Report and fiscal
+  PDF or UBL, but cannot browse the billing registers or close a period.
 - Create all warehouses and owners first. Complete the legal and billing
   requisites on the relevant owner cards.
 - Choose one warehouse as the issuer. Exactly one owner at that warehouse must
@@ -63,8 +66,8 @@ flowchart TB
 | Role | What it can do |
 |---|---|
 | `ADMIN`, `MANAGER` | Create and change accounts, owner bindings, rates, VAT rules and fiscal sequences; rate usage; finalize periods; prepare, validate, issue and update fiscal documents; record and reverse payments. |
-| `SUPERVISOR` | Read accounts, setup and ledgers; preview periods; export activity reports; download invoice PDF and UBL. |
-| `VIEWER` | Read storage reconciliation only. |
+| `SUPERVISOR` | Read accounts, setup and ledgers; preview periods; export the detailed activity CSV; download the PDF Activity Report and fiscal PDF or UBL. |
+| `VIEWER` | Download a PDF Activity Report or fiscal PDF/UBL when the document identifier is supplied through an authorized workflow; read storage reconciliation. It cannot close periods or export the detailed activity CSV. |
 
 ## 1. Prepare issuer and buyer requisites
 
@@ -72,13 +75,23 @@ Billing takes legal names and identifiers from owner master data. Complete the
 owner cards before preparing the first invoice.
 
 For the issuer owner, provide the legal company name, country and postal
-address, VAT or company identifier as applicable, default currency and bank
-details used on the fiscal document. Complete the same buyer identity fields
-for the owner that will be marked **Billing identity**.
+address, VAT or company identifier as applicable, default currency, locale,
+timezone and bank details used on the fiscal document. Complete the same buyer
+identity fields for the owner that will be marked **Billing identity**.
 
-Finalizing the activity report freezes the seller and buyer details. Changing
-an owner card later does not rewrite that report or any fiscal document prepared
-from it.
+The buyer's frozen locale also selects the Activity Report language when no
+language override is supplied. A Bulgarian locale selects Bulgarian; every
+other or unknown locale safely falls back to English. A missing billing
+identity or currency blocks rating or finalization. A missing party name,
+address record, two-letter country code or category-specific VAT identifier
+blocks the applicable fiscal step rather than producing a document with guessed
+values. Street, city and postal fields are optional. Bank details are also
+optional; when no eligible default bank account exists, the fiscal output omits
+payment means.
+
+Finalizing the activity statement freezes the seller and buyer details.
+Changing an owner card later does not rewrite that statement, its Activity
+Report or any fiscal document prepared from it.
 
 ## 2. Create the billing account
 
@@ -98,8 +111,8 @@ from it.
 
 An account may consolidate several warehouses, but it does not erase their
 boundaries in the ledgers. Usage and charges retain both **Warehouse** and
-**Owner** attribution. The consolidated PDF activity annex summarizes activity
-by warehouse.
+**Owner** attribution. The consolidated PDF Activity Report summarizes activity
+by warehouse and owner.
 
 ## 3. Connect owners by warehouse
 
@@ -126,13 +139,21 @@ Fictional account `NORTHSTAR` contains:
 | `WH-NORTH` | `NORTHSTAR-MARKETPLACE` | No | Marketplace stock activity, still attributed separately. |
 | `WH-SOUTH` | `NORTHSTAR-RETAIL` | No | South-site activity under the same consolidated account. |
 
-The final activity report has one account total, but its underlying charges
-still show the warehouse and owner that produced them.
+The final activity statement has one account total, but its underlying charges
+and Activity Report breakdown still show the warehouse and owner that produced
+them.
 
 ## 4. Create rates
 
 Open `Sidebar > Billing Lite > Rates` and create an effective-dated rate for
 each billable activity and unit.
+
+Billing Lite uses the same list, card, picker and code-list controls as the
+rest of Quark. Configure accounts in **Accounts**, owner connections in
+**Owners by warehouse**, prices in **Rates**, tax treatment in **VAT rules**
+and numbering in **Fiscal sequences**. Adding an item to a dropdown does not
+create a new billing calculation; only the activities in the supported catalog
+below generate usage.
 
 | Field | Meaning |
 |---|---|
@@ -164,9 +185,10 @@ overlapping dates at the same account, warehouse, activity and unit scope.
 | Outbound unit | `BASE_UNIT` | Shipped base units are counted. |
 | Storage pallet-day | `PALLET_DAY` | The daily storage snapshot counts eligible pallets. |
 
-The system deduplicates repeated delivery of the same source fact. Planned
-receipts and load-planning events are not billable activity. Storage currently
-supports pallet-day, not cell-day.
+The system deduplicates repeated delivery of the same source fact. The current
+catalog does not create separate receipt-level, inbound-pallet or sorting
+charges. Planned receipts and load-planning events are not billable activity.
+Storage currently supports pallet-day, not cell-day.
 
 ## 5. Review usage and charges
 
@@ -188,7 +210,7 @@ shows the runs but does not expose the reconciliation operation. Ask an
 implementer or support user to run the storage reconciliation API when a
 pallet-day count is missing or unexpected.
 
-## 6. Preview and finalize an activity report
+## 6. Preview and finalize an activity statement
 
 1. Open `Sidebar > Billing Lite > Accounts`.
 2. Tick one account and click **Close period**.
@@ -200,12 +222,47 @@ pallet-day count is missing or unexpected.
 7. Click **Finalize** only after the result is complete.
 
 Finalization allows only one close for the same account and period. It freezes
-the selected charges, currency, total, seller and buyer details, and integrity
-hash. A closed report cannot be changed by later rate or owner-card edits.
+the selected charges, currency, total, seller and buyer snapshots, rate
+calculation version and integrity hash. A closed statement cannot be changed by
+later rate or owner-card edits.
 
-Open `Sidebar > Billing Lite > Activity reports` to review the closed report.
-Tick one closed row and click **Export CSV** for a UTF-8 activity export. The
-activity report does not currently have a PDF export.
+### Download the Activity Report
+
+1. Open `Sidebar > Billing Lite > Activity reports`.
+2. Tick one closed statement.
+3. Click **Download PDF**.
+
+The customer-facing PDF contains:
+
+- the frozen provider and client identities;
+- statement number, period and status;
+- **Summary of charges** with activity, quantity, unit, unit price, amount and
+  total;
+- **Warehouse and owner breakdown**, preserving the source of consolidated
+  charges;
+- the frozen rate version, close time, ledger entry count and ledger
+  verification hash.
+
+The standard button uses the client locale frozen at finalization. An API
+consumer can explicitly request `en` or `bg`; any other explicit language is
+rejected. When no override is supplied, a frozen Bulgarian locale selects
+Bulgarian and every other or unrecognized locale falls back to English.
+
+Click **Export CSV** when the recipient needs the detailed immutable rows:
+operation references, warehouse, owner, activity, quantity, unit, price,
+amount and currency. The PDF is a readable summary; the CSV is the detailed
+reconciliation export. Both are built from the closed ledger, not recalculated
+from current warehouse balances or current rates. Download is rejected if the
+statement is not closed or if its hash, total or currency no longer agrees with
+the frozen charge ledger.
+
+### Activity Report versus fiscal document
+
+The Activity Report is operational evidence of the warehouse services charged
+for a period. It is not a tax invoice and it is not EN 16931 UBL. Prepare and
+issue a fiscal document separately when the customer requires an invoice,
+credit note or debit note. The fiscal workflow adds legal numbering, tax rules,
+VAT totals, payment details and its own PDF/UBL outputs.
 
 ## 7. Configure VAT rules
 
@@ -247,7 +304,7 @@ not consume a committed number, and an issued number is never reused.
 ## 9. Prepare, validate and issue an invoice
 
 1. Open `Sidebar > Billing Lite > Activity reports`.
-2. Tick one closed report and click **Prepare invoice**.
+2. Tick one closed statement and click **Prepare invoice**.
 3. Choose **Tax jurisdiction** and **Tax point date**. Add **Due date** when
    required, then click **Prepare**.
 4. Open `Sidebar > Billing Lite > Fiscal invoices`.
@@ -373,15 +430,20 @@ Use fictional data in a non-production tenant.
    attribution. Confirm the override price in **Charge ledger**.
 7. Preview the period. Expected: two warehouses, no unrated usage and the sum
    of the visible charges.
-8. Finalize, open **Activity reports** and download **Export CSV**. Compare its
-   rows and total with the charge ledger.
-9. Prepare and **Validate** an invoice. Review seller, buyer, dates, currency,
+8. Finalize, open **Activity reports**, click **Download PDF**, then **Export
+   CSV**. Compare the PDF total and warehouse/owner breakdown with the detailed
+   CSV rows and the charge ledger. Confirm that the PDF shows the frozen rate
+   version and ledger verification value.
+9. Download the PDF again without a language override and confirm it follows
+   the buyer locale. Through the API, request `en` and `bg` explicitly and
+   confirm both versions render from the same closed statement.
+10. Prepare and **Validate** an invoice. Review seller, buyer, dates, currency,
    VAT groups and totals before **Issue**.
-10. Download PDF and UBL. If external UBL validation is configured, confirm a
+11. Download PDF and UBL. If external UBL validation is configured, confirm a
     successful validation result.
-11. Click **Mark sent**, record a partial payment and confirm `Partially paid`.
+12. Click **Mark sent**, record a partial payment and confirm `Partially paid`.
     Record the remainder and confirm `Paid`.
-12. Reverse the last payment and confirm that the payment remains visible and
+13. Reverse the last payment and confirm that the payment remains visible and
     the invoice returns to the calculated earlier settlement state.
 
 Do not treat this walkthrough as tax certification, printer certification,
@@ -407,7 +469,14 @@ configured.
 | Unrated usage remains | No unambiguous effective rate matches the account, warehouse, activity, unit and occurrence date. | Correct the binding or rate, then use **Rate unrated** and preview again. |
 | The billing period cannot be previewed | Dates, account setup or captured facts are inconsistent. | Check the selected account and inclusive dates, then review the usage ledger. |
 | The billing period was not closed | Unrated usage, concurrent close or changed ledger content blocked finalization. | Refresh, resolve unrated rows and preview again before **Finalize**. |
-| The fiscal invoice was not prepared | Seller/buyer identity, tax rule, dates or closed report is incomplete. | Complete requisites and VAT setup, then prepare again. |
+| **Download PDF** says the statement is not closed | The selected statement is not a frozen closed statement. | Select a closed statement. If a nonclosed legacy row is visible in **Activity reports**, contact support. |
+| The Activity Report has no verified ledger | The closed statement has no usable frozen ledger hash. | Do not recreate the value manually. Treat it as an integrity problem and contact support. |
+| The Activity Report reports a ledger, total or currency mismatch | The frozen statement no longer agrees with its immutable charge rows. | Stop using the report and escalate the integrity incident. Do not change rates or balances to hide it. |
+| The Activity Report identity is incomplete | Required owner requisites were absent when the statement was finalized. | Correct the owner setup for future periods. Contact support before deciding how to replace an already closed statement. |
+| An explicit Activity Report language is rejected | The PDF accepts only English or Bulgarian overrides. | Request `en` or `bg`, or omit the override to use the frozen client locale with English fallback. |
+| **Download PDF** is unavailable | The role cannot export that document, no closed row is selected, or the page did not refresh correctly after an upgrade. | Use an authorized export role, tick one closed statement, refresh the page and sign in again. Contact an administrator or support if the button remains unavailable. |
+| The Activity Report renderer is unreachable or rendering fails | The PDF rendering service is stopped, unreachable or cannot compile the report. | Restore the report renderer, check its service logs and retry the same closed statement. The ledger does not need to be finalized again. |
+| The fiscal invoice was not prepared | Seller/buyer identity, tax rule, dates or closed statement is incomplete. | Complete requisites and VAT setup, then prepare again. |
 | The fiscal invoice is not ready | Deterministic validation found a missing or inconsistent fiscal field. | Follow the returned message; do not issue until validation passes. |
 | The invoice UBL was not generated | Fiscal prerequisites or external validation failed. | Correct the draft setup, or restore the configured validation service. |
 | The payment was not recorded | Status, amount, method or external reference is invalid. | Use an `Issued`, `Sent` or `Partially paid` invoice or debit note and enter no more than the remaining amount. |
@@ -420,7 +489,10 @@ configured.
   prices, recurring subscription fees or full 3PL billing.
 - No foreign-exchange conversion is performed. Keep one approved document
   currency and matching rates for a billing period.
-- Activity report export is CSV only; there is no activity-report PDF.
+- The PDF Activity Report is a summary. Use the CSV export for individual
+  immutable charge rows and source references.
+- Billing activities do not currently include a separate whole-receipt,
+  inbound-pallet or sorting charge.
 - Storage billing supports pallet-day only. Cell-day is not implemented.
 - Credit notes reverse the full original document; partial credit notes are not
   implemented.
