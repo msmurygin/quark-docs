@@ -3,7 +3,7 @@ title: "Administrator Guide - Start Here"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-02
+updated: 2026-11-07
 ---
 
 # Administrator Guide - Start Here
@@ -66,6 +66,7 @@ Do the steps in this order. Each step needs the data from the step before.
 | 12 | [FAQ](11-faq.md) | Answers to common questions. |
 | 13 | [Build a Custom Report](12-build-custom-reports.md) | Create a report with parameters, read-only SQL datasets and a Typst template. |
 | 14 | [Warehouse Documents](14-warehouse-documents.md) | Issue, download and print warehouse documents; configure legal identifiers, document printers and SSCC. |
+| 15 | [Billing Lite and VAT](15-billing-lite-and-vat.md) | Consolidate rated activity across warehouses, close a period, issue VAT documents and reconcile payments. |
 
 ## Important facts to know before you start
 
@@ -90,5 +91,6 @@ Do the steps in this order. Each step needs the data from the step before.
 | Manual wave planning | Available | `Management & Control > Orders & Waves > Waves` provides reviewed add, remove, station and release actions with per-order results. |
 | Wave strategies | Available | Configure filters, grouping, size limits, station, schedule and release mode; preview before creating waves. |
 | Warehouse documents | Available | Issue English or Bulgarian PDFs from one selected order or receipt; print through an assigned document printer. |
+| Billing Lite | Available in Enterprise mode | Rate implemented warehouse activities, consolidate several warehouses, close activity reports, issue VAT documents and reconcile manually entered payments. See [Billing Lite and VAT](15-billing-lite-and-vat.md). |
 
 Replenishment quantity still comes from each pick location's **Min** and **Max**. The SKU's replenishment policy sets task urgency; it does not replace the min/max trigger. See [Replenishment](06-outbound-setup.md#11-replenishment-of-pick-locations-minmax).
