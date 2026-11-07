@@ -50,6 +50,7 @@ Record explicit answers for:
 - whether reports are required;
 - whether labels are required;
 - whether customer-defined cartons are required;
+- whether RF terminal screens need customer-specific adaptation;
 - whether road transport is required;
 - which approved customer report samples define the expected output.
 
@@ -80,6 +81,55 @@ Defaults follow the same review boundary:
 
 An accepted default becomes part of the reviewed plan. It is not written to the
 warehouse automatically.
+
+## Review and release an RF screen adaptation
+
+When the confirmed requirements call for an RF terminal adaptation, treat the
+screen definition and its release as separate approvals. Assisted onboarding
+can validate and plan these steps, but it does not save or activate an RF
+screen. An Administrator or Manager performs the approved release manually.
+
+RF screen revisions and the active selection are shared by all warehouses in
+the same tenant and environment. They are not isolated per warehouse. Activating
+a revision can therefore affect every terminal in that tenant and environment;
+schedule it as a controlled tenant-wide release.
+
+1. Validate the complete screen definition before saving it. This check covers
+   the current screen format, screen identity, widget identities and rules
+   inside that one screen. It does not read or change the saved terminal setup.
+2. Resolve every invalid field or screen rule. If the check reports an unknown
+   field, remove or correct it: the terminal would ignore that field.
+3. Check every navigation path and referenced target screen separately. The
+   definition check does not prove that another screen or route exists.
+4. Retain the exact validated definition for the release record, then save it.
+   Saving creates a new, inactive revision and returns its revision number; the
+   terminals continue using the current active revision.
+5. Record the returned revision number and the revision currently active in the
+   target environment. Test the navigation and targets in a controlled
+   environment before production activation.
+6. Activate the reviewed revision as a separate controlled step. Plan how
+   terminals will reload: a terminal with a cached flow can keep the old screen
+   until that flow is reloaded.
+
+Activation is refused if another administrator changed the active revision
+after your review. Reload the current revision, compare the changes and approve
+again. Do not retry an old approval against the new state.
+
+```mermaid
+flowchart TD
+    R["Confirm tenant-wide scope and target environment"] --> V["Validate the complete screen definition"]
+    V --> Q{"Format, identities and screen rules valid?"}
+    Q -->|"No"| F["Correct the definition and validate again"]
+    F --> V
+    Q -->|"Yes"| N["Test navigation and referenced targets separately"]
+    N --> S["Retain the definition; save an inactive revision"]
+    S --> A["Record the new and current active revision numbers"]
+    A --> C{"Active revision unchanged since review?"}
+    C -->|"No"| L["Reload, compare and approve again"]
+    L --> A
+    C -->|"Yes"| P["Activate the reviewed revision"]
+    P --> T["Reload terminal flows in the controlled rollout"]
+```
 
 ## Reference catalogues
 
