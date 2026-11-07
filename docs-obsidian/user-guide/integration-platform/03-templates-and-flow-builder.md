@@ -211,6 +211,39 @@ The shipment-confirmation flow is package based. For every closed carton, it sen
 4. Use **Amazon SP-API: Confirm WMS Shipments** to create a second draft. Map it to the same Amazon connector and WMS connection, then validate and activate it.
 5. Keep both flows together when changing the connector. The confirmation flow accepts only orders imported through its mapped Amazon connector.
 
+### Verify regional Orders access without creating WMS data
+
+Before testing an import, use the official static sandbox for the same Amazon region as the account. The catalogue provides a matched connector and diagnostic flow for each region:
+
+| Region | Connector template | Diagnostic flow template |
+| --- | --- | --- |
+| Europe (EU) | **Amazon SP-API Static Sandbox (EU)** | **Amazon SP-API Sandbox (EU): Verify Orders v2026 Access** |
+| North America (NA) | **Amazon SP-API Static Sandbox (NA)** | **Amazon SP-API Sandbox (NA): Verify Orders v2026 Access** |
+| Far East (FE) | **Amazon SP-API Static Sandbox (FE)** | **Amazon SP-API Sandbox (FE): Verify Orders v2026 Access** |
+
+1. Create the regional sandbox connector and complete its **LWA client ID**, **LWA client secret**, **LWA refresh token** and **Marketplace ID**.
+2. Select **Save credentials & test**.
+3. On **Templates**, select **Use Template** on the diagnostic flow for the same region and map it to that sandbox connector.
+4. Validate and activate the flow, then select **Run**.
+5. Open the run in **Monitor**. A successful run returns the region's fixed Orders v2026 sandbox response and does not create or change WMS orders.
+
+Do not mix a regional flow with another region's connector or replace a sandbox endpoint with the production endpoint. A successful diagnostic proves access to that region's static Orders v2026 sandbox case only. It does not prove access to production orders, the scheduled import, package confirmation or any WMS write.
+
+```mermaid
+flowchart TD
+    A[Choose the Amazon account region] --> B{Region}
+    B -->|Europe| C[Use EU sandbox connector and EU diagnostic]
+    B -->|North America| D[Use NA sandbox connector and NA diagnostic]
+    B -->|Far East| E[Use FE sandbox connector and FE diagnostic]
+    C --> F[Save credentials and test]
+    D --> F
+    E --> F
+    F --> G[Run the matched Orders v2026 diagnostic]
+    G --> H{Run succeeds?}
+    H -->|No| I[Check region, endpoint and credentials]
+    H -->|Yes| J[Sandbox access verified; WMS data unchanged]
+```
+
 Before enabling a production schedule, import a controlled order in an approved Amazon test environment and verify its owner, destination, SKU mapping and quantities in WMS. The current templates have been exercised with the integration emulator; production Amazon access is not established by that test.
 
 The import template is not an unlimited backlog scan. After an outage lasting more than 24 hours, reconcile older unshipped Amazon orders before restarting the schedule. Use an approved manual or custom import for those orders; do not assume that the standard schedule will find them.
