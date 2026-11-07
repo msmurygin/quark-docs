@@ -177,6 +177,70 @@ flowchart TD
     R --> X["Apply through supported workflows"]
 ```
 
+## Refresh a reviewed plan after a change
+
+A General Distribution plan is tied to the confirmed requirements, the
+reviewed profile and the product contract available when the plan was
+prepared. Regenerate the plan when:
+
+- a confirmed requirement or dependent answer changes;
+- the reviewed profile changes;
+- a product update changes a supported operation or one of its required
+  fields.
+
+Regeneration is required even when the displayed profile version is unchanged.
+The current product contract must still match the one used to prepare the
+reviewed plan.
+
+Coverage and readiness belong to one exact plan. Re-run those checks, without
+necessarily regenerating an otherwise current plan, when target capability
+availability changes or when the available coverage was produced for another
+plan.
+
+1. Confirm the latest requirements and review every dependent answer.
+2. Preview the current profile. Stop if a blocking gap cannot be resolved by
+   supplying complete inputs for the planned changes. Required custom
+   integrations, custom report outputs, missing product capabilities and
+   required target gates remain blocking until a supported approach is
+   available or the customer confirms that the requirement no longer applies.
+   No refreshed plan exists while one of these gaps remains.
+3. For the remaining planned changes, supply exactly one complete input that
+   matches the current required fields. Missing, duplicate, unexpected or
+   invalid inputs prevent plan generation.
+4. Generate the new plan from the current profile and product contract.
+5. Run coverage and readiness checks for this exact plan. A changed target
+   capability requires fresh coverage even when the plan itself remains
+   current.
+6. Resolve every readiness blocker, including stale confirmations, missing
+   approvals or answers, conflicting evidence, target checks and required
+   scenarios that have not passed.
+7. Compare a regenerated plan with the previously reviewed plan and obtain fresh
+   approvals before any controlled application.
+
+Generating and checking the refreshed plan does not change warehouse data.
+
+```mermaid
+flowchart TD
+    C{"What changed?"}
+    C -->|"Requirement, profile or product contract"| F["Confirm current facts and dependent answers"]
+    C -->|"Target availability or coverage source"| V["Re-run coverage and readiness for the exact current plan"]
+    F --> PR["Preview the current profile"]
+    PR --> Q{"Blocking gap that complete inputs cannot resolve?"}
+    Q -->|"Yes"| B["No refreshed plan — resolve the capability or requirement"]
+    B --> F
+    Q -->|"No"| E["Collect one complete current input for every planned change"]
+    E --> I{"Every input complete, valid and unique?"}
+    I -->|"No"| X["Resolve missing, duplicate or unexpected inputs"]
+    X --> E
+    I -->|"Yes"| G["Generate a new plan from the current product contract"]
+    G --> V
+    V --> R{"Readiness has no blocking reason?"}
+    R -->|"No"| D["Keep the plan Blocked and resolve the reason"]
+    D --> V
+    R -->|"Yes"| A["Compare changes and obtain fresh approvals"]
+    A --> CA["Continue with controlled application"]
+```
+
 ## Review and validate the setup
 
 1. Confirm that the target warehouse is still inactive.
