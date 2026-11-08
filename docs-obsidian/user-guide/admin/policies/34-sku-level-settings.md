@@ -21,13 +21,13 @@ Main menu **SKU**. Open a SKU. Tabs:
 
 | Tab label | Form | What is on it |
 |---|---|---|
-| **Basic** | `sku_basic_form` | Owner, SKU Code, External ID, Pack, ABC Class, Class, SKU Group, Description, Active, Pick Instruction |
+| **Basic** | `sku_basic_form` | Owner, SKU Code, External ID, Pack, ABC Class, Class, SKU Group, Description, Active, Pick Instruction, active typed custom fields |
 | **Weight** | `sku_weight_form` | Gross Weight, Net Weight, Tare Weight, Cube, Stack limit, Positions required |
 | **Policies** | `sku_policies_form` | Allocation, Replenishment, Putaway, Cartonization, Receipt and Lot policies; Putaway Location, Putaway Zone, Putaway Class |
 | **Shelf Life** | `sku_shelf_life_form` | Min. shelf life at shipping (days), Min Shelf Life on Pick, Min Shelf Life on Receive, Rotation, Rotate By, Expire Days |
 | **Temperature & Aging** | `sku_temperature_form` | Requires Temperature Capture, Min and Max Temperature, Warning Temp Min and Max, Max Age on Receive (days) |
 | **Serial Tracking** | `sku_serial_config_form` | See page 33 |
-| **Attributes**, **Audit**, **Barcodes** | other | Free attributes, audit trail, barcode list |
+| **Audit**, **Barcodes** | other | Audit trail and barcode list |
 
 Labels come from `wms-lib-sql/sql/wms-meta-ui/migrations/001_baseline.sql`
 (form detail rows, forms 14, 15, 16, 17, 182, 200) and `082_pick_instruction_fields.sql`.
@@ -617,11 +617,11 @@ Both are API only, default `false`. Read at `inventory_service.rs:1195-1260`.
 
 ## Part 8: Things people look for that are not SKU columns
 
-- **Hazmat or dangerous goods.** The `sku` table has no such column. Keep it
-  as a custom attribute: SKU > tab **Attributes** (tables `attribute_def` and
-  `attribute_value`, entity type `sku`). A putaway step can then match on it
-  with the criterion "SKU attribute". No other
-  process reads these attributes.
+- **Hazmat or dangerous goods.** There is no built-in SKU field for this.
+  If a customer uses a custom classification, define an active SKU attribute,
+  then fill it under **Custom fields** on the SKU Basic card. Putaway and
+  allocation policy steps can use that value as a condition. A custom field
+  does not by itself implement dangerous-goods segregation or compliance.
 - **A "lot tracked" or "expiry tracked" switch.** None exists. Lot behaviour
   comes from the Lot Policy (page 32). Expiry behaviour comes from the Lot
   Policy dates, the SKU's day counts (Expire Days, Best By Days, Deliver By

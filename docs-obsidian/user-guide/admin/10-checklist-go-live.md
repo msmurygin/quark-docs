@@ -3,7 +3,7 @@ title: "Administrator Guide - Go-Live Checklist"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-11-08
 ---
 
 # Go-Live Checklist for a New Tenant
@@ -64,7 +64,7 @@ data that is not part of a new customer warehouse. **N/A** = not available.
 | 19 | SKU barcodes. | Create | SKU barcode list | RF scanning needs them. |
 | 20 | Lot policy. | Create | `Warehouse Configuration > Policies > Lot Policy` | Create the policies required by the customer's lot, date and attribute rules. `STD` and `NOLOT` are not included automatically. |
 | 21 | Serial config for serial SKUs. | Create | SKU tab `Serial Tracking` | Only when needed. |
-| 22 | Custom attributes. | Optional | `Attributes` | |
+| 22 | Custom attributes. | Optional | Define fields in `Product Data > Attributes`, then fill `Custom fields` on SKU and location cards. | Use active SKU or location definitions when putaway or allocation policies depend on them. |
 
 ### 3.4 Inbound
 
