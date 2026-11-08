@@ -226,6 +226,13 @@ Use this when you found less than the required quantity.
 5. On **Confirm Short**, read: `Pick {a}, short {b}, reason {code}`. Press `F4` (**Commit Short**).
 6. **Pick Result** appears.
 
+The published reason decides what happens next. It may block the whole source
+location, move the free remainder of the shorted SKU to a missing-stock
+location, request a count and try allocation again. In a mixed location, other
+SKUs stay where they are. Stock already assigned to work in progress is not
+taken from another operator. Follow the supervisor's direction if the location
+becomes unavailable after the short.
+
 ### A9. Reject a pick
 
 ![PICK11 - Reject Pick](../assets/screens/PICK11.png)
