@@ -3,7 +3,7 @@ title: "Allocation Policy: Steps and Criteria"
 type: user-guide
 audience: customer administrator
 status: verified
-updated: 2026-11-05
+updated: 2026-11-08
 ---
 
 # Allocation Policy: Steps and Criteria
@@ -19,6 +19,7 @@ Prepare these records before you build the policy:
 - the units of measure in each SKU's pack;
 - any putaway zones, location categories, and location ABC classes that the policy will use;
 - each SKU's lot rotation and shelf-life settings;
+- any active SKU or location custom attributes that the policy will use;
 - the owner and SKU that will use the policy.
 
 Users who maintain allocation policies normally have the `Administrator`, `Manager`, or `Supervisor` role.
@@ -131,6 +132,29 @@ Operational destinations such as quality control, damage, returns, staging, pack
 If the SKU's pack has no active rung above the base unit, `EqPackPallet` finds nothing and `NePackPallet` behaves like `Any`.
 
 This setting filters the source position; it does not force Quark to take the complete position. A step may take part of a qualifying full-pallet position when the remaining demand is smaller.
+
+#### Custom attributes
+
+Use `Custom attributes` to narrow a step by values saved on the SKU or candidate location.
+
+1. Click `Add attribute`.
+2. Choose an active SKU or location attribute.
+3. Choose an `Operator` and enter the typed `Value`.
+4. Add another row when every selected condition must also match. Use `Remove` to delete a row.
+
+The value editor follows the attribute type: number fields for integers, a True/False control for Boolean values, a date picker for dates, and text input for text or decimals. For `in` and `not in`, enter a comma-separated list.
+
+| Operator | Meaning |
+| :--- | :--- |
+| `=` / `≠` | Equal to / not equal to the value. |
+| `<` / `≤` / `>` / `≥` | Compare ordered numbers, dates, or text supported by the selected type. |
+| `in` / `not in` | Match or exclude one of the comma-separated values. |
+| `contains` | The text contains the value. |
+| `starts with` / `ends with` | The text starts or ends with the value. |
+
+A SKU condition is checked once for the order line. If it fails, that step provides no stock for the line. A location condition filters individual candidate locations. A record with no value does not qualify. If the policy refers to a definition that is inactive or no longer applies to the SKU owner, allocation stops with an error instead of silently ignoring the condition. Attribute conditions work together with the step's zone, location type, category, ABC, and LPN quantity settings.
+
+Define and fill the fields first; see [Custom attributes](../04-owners-sku-uom-pack-hierarchy.md#8-custom-attributes). Before deactivating, deleting, or changing the owner scope of a referenced definition, remove or replace that condition in every allocation policy that uses it.
 
 ### Selection
 

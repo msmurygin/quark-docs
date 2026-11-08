@@ -3,7 +3,7 @@ title: "Administrator Guide - Owners, SKU, UOM, Pack Hierarchy, Lot and Serial R
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-02
+updated: 2026-11-08
 ---
 
 # Owners, SKU, UOM, Pack Hierarchy, Lot and Serial Rules
@@ -274,7 +274,7 @@ Create an item master record.
 3. Tab `Basic`: fill `Owner`, `SKU Code`, `Pack`, `Description`, `Active`.
 4. Tab `Weight`: fill `Gross Weight`, `Net Weight`, `Tare Weight`, `Cube`.
 5. Tab `Policies`: pick the five required policies.
-6. Optional tabs: `Shelf Life`, `Temperature & Aging`, `Serial Tracking`, `Attributes`.
+6. Optional tabs: `Shelf Life`, `Temperature & Aging`, and `Serial Tracking`. Active custom fields appear on `Basic` after the new SKU is saved once.
 7. Click `Save`.
 8. Barcodes: open the barcode list of the SKU, click `New`, fill the form, click `Save`.
 9. Optional: tab `Pick Locations` — the locations the SKU is picked from. On a saved SKU click `New` on the tab, choose the `Location` in the picker, pick `Pick Type` and `Unit`, enter `Min` and `Max`, click `Save`. To change one, open it with the arrow at the start of its row; to remove one, tick it and click `Delete`.
@@ -601,92 +601,83 @@ Packing a serial-tracked SKU is refused today.
 
 ### What you will do
 
-Define a reusable field, then give one SKU a value for it. This is a two-part setup:
+Define a reusable field, then fill it directly on a SKU or location card. This is a two-part setup:
 
 - the **attribute definition** says which records can use the field and what kind of value it accepts;
-- the **attribute value** is the answer stored on one SKU or location.
+- the **custom field** on the record stores the value for one SKU or location.
 
 For example, define the text attribute `COLOR` once, then set `COLOR = Blue` on SKU `WIDGET-1`.
 
 ```mermaid
 flowchart LR
-    D["Define COLOR<br/>Entity Type = sku"] --> S["Open WIDGET-1<br/>Attributes tab"]
-    S --> V["Add COLOR = Blue"]
-    V --> P["SKU attribute condition<br/>can read Blue"]
+    D["Define active field<br/>COLOR for SKU"] --> S["Open saved SKU<br/>Basic tab"]
+    S --> V["Enter Color = Blue<br/>under Custom fields"]
+    V --> P["Save the SKU card"]
+    P --> A["Putaway or allocation<br/>can use the value"]
 ```
 
 ### Before you start
 
 - `ADMIN` or `MANAGER` creates and changes attribute definitions.
-- `ADMIN`, `MANAGER` or `OPERATOR` adds and changes values on a SKU or location.
-- Create and save the SKU or location before adding a value.
-- Use `Entity Type = sku` for this example. The value picker only shows definitions for the record type you opened.
+- A user who can edit a SKU or location can also fill its visible custom fields.
+- Custom fields are currently supported on SKU and location cards.
+- For a new SKU, save the required Basic data first. Owner-dependent custom fields appear after that first save.
 
 ### Steps
 
 1. Open `Sidebar > Warehouse Configuration > Product Data > Attributes`.
 2. Click `New`.
 3. Set `Entity Type` to `sku`, enter `Code = COLOR`, `Label = Color`, and choose `Data Type = Text`.
-4. If the definition is intended for one owner, choose that `Owner`. Leave it blank for a system-wide definition. Click `Save`.
-5. Open `Sidebar > Warehouse Configuration > Product Data > SKUs`, open the SKU, and select the `Attributes` tab.
-6. Click `New`. In `Attribute`, choose `COLOR`.
-7. Enter `Blue` in `Text Value`. The form shows the one value field that matches the definition's data type.
-8. Click the `Save` button in the attribute card. The tab returns to the values list; `COLOR` is now a row.
+4. Leave `Active` on. If the field is intended for one owner, choose that `Owner`; leave it blank for a definition shared by all owners. Click `Save`.
+5. Open `Sidebar > Warehouse Configuration > Product Data > SKUs` and open a saved SKU.
+6. On the `Basic` tab, find `Color` under `Custom fields`.
+7. Enter `Blue` and click the SKU card's `Save` button. The SKU data and changed custom fields are saved together.
+8. Reopen the SKU and confirm that `Color` still shows `Blue`.
+
+For a location field, use `Entity Type = location` and leave `Owner` blank, then open the saved location. The field appears under `Custom fields` on the location edit card. Locations do not have owner-specific custom fields.
 
 ![Attribute Definitions list with COLOR selected](../assets/screens/attribute-definitions-list-form.png)
 
 *Attribute Definitions list. Focus: verify the entity type, data type, Required and Active settings for `COLOR`.*
 
-![SKU attribute value card for COLOR](../assets/screens/sku-attribute-value-edit-form.png)
-
-*Saved SKU attribute value. Focus: confirm `COLOR` and its text value before saving another change.*
-
 ### Field reference
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
-| `Entity Type` (required) | Where the attribute appears. | `sku`, `receipt`, `location` (code list `ENTITY_TYPE`). | `sku` |
+| `Entity Type` (required) | Which card shows the custom field. | `sku` or `location`. | `sku` |
 | `Code` (required) | Key. Unique per entity type and owner. | Text. | `COLOR` |
 | `Label` (required) | Shown name. | Text. | `Color` |
 | `Data Type` (required) | Type of value. | `Text`, `Integer`, `Decimal`, `Boolean`, `Date`. | `Text` |
-| `Owner` | Stored scope for the definition. Blank means system-wide. The current SKU and location value pickers do not enforce this scope, so select the definition carefully. | An owner. | |
-| `Display Order` | Order. | Whole number. | 10 |
-| `Required` | Stored metadata. The SKU and location value cards do not enforce it today. | On or off. | off |
-| `Active` | When off, putaway matching ignores the definition. Current SKU and location lists, pickers and cards may still show it and allow its value to be saved or edited. | On or off. | on |
-| `Default Value` | Stored metadata. The SKU and location value cards do not copy it into a new value today. | Text. | |
+| `Owner` | Optional owner-specific version of a SKU field. Blank means the definition is shared. An owner-specific definition with the same code takes priority for that owner's SKU. Always leave this blank for a location field. | An owner or blank. | |
+| `Display Order` | Position among the custom fields. Lower numbers appear first. | Whole number. | 10 |
+| `Required` | Marks the field and prevents a saved value from being cleared. | On or off. | off |
+| `Active` | Controls whether the field is offered on cards and in policy conditions. | On or off. | on |
+| `Default Value` | Reference value on the definition. It is not automatically copied into a new SKU or location. | Text. | |
 
-The value card depends on `Data Type`:
-
-| Data Type | Field shown on the value card | Example |
-|---|---|---|
-| `Text` | `Text Value` | `Blue` |
-| `Integer` | `Integer Value` | `24` |
-| `Decimal` | `Decimal Value` | `12.50` |
-| `Boolean` | `Boolean Value` | on |
-| `Date` | `Date Value` | `2026-10-27` |
-
-The definition list offers `receipt`, but the current web UI has value tabs only for SKUs and locations. Receipt line lot attributes are configured through lot policies; do not use this screen as their setup path.
+The card chooses the control from `Data Type`: text box, whole-number box, decimal box, checkbox, or date picker. Enter a value in that control; there is no separate attribute-value card.
 
 ### What you should see
 
 - The definition appears in `Attribute Definitions`.
-- The SKU's `Attributes` tab shows one row for `COLOR` and its text value.
-- Open the row to change its value. Use `Delete` on the value card to remove the value from this SKU without deleting the shared definition.
+- The label appears under `Custom fields` on the matching SKU or location card.
+- The current value appears when you reopen the record.
+- Optional values can be cleared from the record. This does not delete the shared definition.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Duplicate key `uq_attr_def_owner` or `uq_attr_def_system` | The code is used for that entity type and owner. | Use another code. |
-| Duplicate key `uq_attr_value` | That SKU or location already has a value for this definition. | Open the existing row instead of clicking `New`. |
-| The definition is missing from `Attribute` | Its entity type does not match this tab. | Check `Entity Type` on the definition. The picker filters SKU and location definitions separately. |
-| An inactive or other-owner definition is still listed | The value picker filters only by entity type today; it does not enforce `Active` or `Owner`. | Do not select it. Reopen the definition and check `Active` and `Owner`. |
-| All five value fields appear | No definition has been chosen yet. | Choose `Attribute`; the form then keeps only its matching value field visible. |
+| The field is not shown on a new SKU | The owner-dependent fields are loaded after the SKU exists. | Save the required Basic data, then fill the custom fields that appear. |
+| The field is not shown on an existing record | The definition is inactive, belongs to another entity type, or does not apply to this owner. | Check `Active`, `Entity Type`, and `Owner` on the definition, then reopen the record. |
+| `Attribute ... is required and cannot be cleared` | A required saved value was removed. | Enter a valid value and save again. The refused save leaves the other changes unapplied. |
+| `Attribute ... expects ...` | The value does not match the definition's data type. | Use the field's number, checkbox, or date control and enter the expected type. |
+| The code is already used | Another definition has the same code for this entity type and owner. | Open the existing definition or use a different code. |
 
 ### What this affects later
 
 - Values are stored per record. Changing `COLOR` on one SKU does not change another SKU.
-- Text values from active SKU and location definitions feed putaway conditions (`SKU attribute`, `Location attribute`). Inactive definitions and other data types are stored, but those conditions ignore them today.
+- Putaway conditions can use active `Text` definitions for SKUs and locations.
+- Allocation policy steps can filter by active typed SKU and location attributes; see [Allocation Policy: Steps and Criteria](policies/11-allocation-policy-steps-and-criteria.md#custom-attributes).
 
 ## 9. Handling unit types (containers you own)
 

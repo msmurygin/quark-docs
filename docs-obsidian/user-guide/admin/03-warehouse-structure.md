@@ -3,7 +3,7 @@ title: "Administrator Guide - Warehouse Structure"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-11-08
 ---
 
 # Warehouse Structure
@@ -201,7 +201,7 @@ All numbers must be zero or more. **Zero means "unlimited"** for capacity.
 
 Tab `Position`: `X Coord`, `Y Coord`, `Z Coord`, `Aisle`, `Bay`. All must be zero or more.
 
-Tab `Attributes`: custom attributes. See [Owners, SKUs, units and packs](04-owners-sku-uom-pack-hierarchy.md#8-custom-attributes).
+Section `Custom fields`: typed custom attributes configured for locations. They are edited and saved with the location card; there is no separate Attributes tab. See [Owners, SKUs, units and packs](04-owners-sku-uom-pack-hierarchy.md#8-custom-attributes).
 
 ### What you should see
 
