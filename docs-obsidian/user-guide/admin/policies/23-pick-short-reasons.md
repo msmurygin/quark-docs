@@ -3,7 +3,7 @@ title: "Administrator Guide - Pick Short Reasons"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-05
+updated: 2026-11-08
 ---
 
 # Pick Short Reasons
@@ -101,10 +101,10 @@ The current workflow uses these actions:
 | Action | What it does |
 |---|---|
 | **ReleaseCurrentRemainder** | Releases the part of the current pick that was not found. |
-| **BlockSourceLocation** | Stops new allocation and new pick work from the source location until the discrepancy is resolved. |
-| **ReleaseRelatedReservations** | Releases eligible, not-yet-started reservations at the affected source location. |
-| **RelocateResidualToMissing** | Moves eligible unreserved stock remaining at the source to the zone's **Missing To Location** or to a configured fixed location. |
-| **CreateInventoryCount** | Requests a count of the affected location. |
+| **BlockSourceLocation** | Stops new allocation and new pick work for the whole source location until the discrepancy is resolved. This also affects other SKUs stored there. |
+| **ReleaseRelatedReservations** | Releases eligible, not-yet-started reservations for the shorted SKU at the source location. |
+| **RelocateResidualToMissing** | Moves all movable free stock of the shorted SKU at the source location to the zone's **Missing To Location** or to a configured fixed location. Other SKUs stay in place. |
+| **CreateInventoryCount** | Requests a count of the matching SKU code at this location, the matching SKU code across countable locations, or the entire source location. |
 | **ReallocateReleasedDemand** | Tries allocation again for the selected orders, excluding blocked stock. |
 
 Leave compatibility choices that are not part of the current warehouse design
@@ -121,13 +121,46 @@ For the three reference reasons, review a sequence that:
 5. requests an inventory count; and
 6. allocates the current and affected orders again.
 
-For residual relocation, select the entire location and use either the zone's
-**Missing To Location** or an approved fixed location. Related-reservation
-release must cover the same location. Reallocation may cover the current order,
-orders whose reservations were released, or both.
+For residual relocation, set both **RelocateResidualToMissing** and
+**ReleaseRelatedReservations** to **CurrentSkuAtLocation**. Use either the
+zone's **Missing To Location** or an approved fixed location. The relocation
+moves all movable free stock of the shorted SKU at the source, across its lots.
+It does not move another SKU from a mixed location, and it does not take stock
+already reserved for work in progress. A serial-tracked balance that still has
+an active reservation cannot be split, so its free remainder stays with the
+reserved quantity at the source.
+
+Choose the count scope separately:
+
+| Count scope | What the warehouse counts |
+|---|---|
+| **CurrentSkuAtLocation** | The matching SKU code at the source location. |
+| **CurrentSkuEverywhere** | The matching SKU code at the source, plus that code at each other countable location where it is held. Locations already blocked or being counted are skipped. |
+| **EntireLocation** | Every SKU at the source location. Use this only when the discrepancy calls the whole location into question. |
+
+**CurrentSkuEverywhere** does not create a second count when the SKU is held
+nowhere else. Count requests match the SKU code, not the owner. If different
+owners reuse the same SKU code, their matching stock can enter the same count.
+Reallocation may cover the current order, orders whose
+reservations were released, or both.
 
 Do not publish the revision until the destination, scope and order coverage have
 been reviewed together.
+
+```mermaid
+flowchart TD
+    S[Short SKU reported] --> R[Release the missing quantity]
+    R --> A{Configured follow-up actions}
+    A --> B[Block the whole source location]
+    A --> U[Release unstarted reservations<br/>for the shorted SKU]
+    U --> M[Move all movable free stock of that SKU<br/>to the missing-stock location]
+    M --> K[Keep other SKUs and work-in-progress stock]
+    A --> C{Count scope}
+    C --> CL[Matching SKU code at this location]
+    C --> CE[Matching SKU code at countable locations]
+    C --> CA[Every SKU at this location]
+    A --> RA[Allocate affected demand again]
+```
 
 ## What happens after a short pick
 
@@ -137,11 +170,17 @@ been reviewed together.
 3. The pick and task record the shortage, reason and note.
 4. If configured, the source location is blocked from new allocation and new
    work.
-5. If configured, eligible related reservations are released. Work already
-   started by another operator is not taken away from them.
-6. If configured, eligible unreserved residual stock is moved to the configured
-   missing-stock location.
-7. If configured, a location count is requested.
+5. If configured, eligible related reservations for the shorted SKU are
+   released. Work already started by another operator is not taken away from
+   them.
+6. If configured, all movable free stock of the shorted SKU at that location is
+   moved to the configured missing-stock location. Other SKUs stay. If the
+   shorted SKU was in a mixed box, the box stays and the free quantity may move
+   without that box. A serial-tracked balance with an active reservation stays
+   together at the source.
+7. If configured, a count is requested with the selected scope. A
+   **CurrentSkuEverywhere** request skips another location that is already
+   blocked or being counted.
 8. If configured, allocation runs again for the selected orders.
 
 The system keeps the published reason revision and its enabled actions with the
@@ -170,8 +209,9 @@ After a test shortage, confirm that:
 - the source location is blocked when the reason requires it;
 - work already started by another operator remains assigned to them;
 - eligible unstarted reservations were released when the reason requires it;
-- residual stock moved to the intended missing-stock location when relocation
-  is configured;
+- all movable free stock of the shorted SKU moved to the intended missing-stock
+  location when relocation is configured, while other SKUs stayed at the
+  source;
 - a count request is visible to the responsible team when the reason requests
   one; and
 - the affected demand was considered for allocation again when reallocation is
@@ -186,9 +226,11 @@ of pick locations.
 | Symptom | Meaning | What to do |
 |---|---|---|
 | The terminal does not accept a reason code | The code has no published revision, or it does not allow the entered quantity. | Check the published revision and its **Allow Partial** and **Allow Zero** settings. Give the operator an approved code. |
-| The revision cannot be published | A required release action is missing, or the relocation, count or reallocation settings are incompatible. | Review all enabled actions together. Confirm the relocation destination and make the reservation-release scope cover the relocation scope. |
+| The revision cannot be published | A required release action is missing, or the relocation, count or reallocation settings are incompatible. | Enable **ReleaseCurrentRemainder**. If residual relocation is enabled, add **ReleaseRelatedReservations**, confirm the destination and set both actions to **CurrentSkuAtLocation**. Review the count and reallocation scopes separately. |
 | Allocation continues to avoid the source | The location is still blocked while the discrepancy is unresolved. | Complete or resolve the requested count, then confirm that the location is available again. |
-| Residual stock did not move | No valid missing-stock destination was available, or the stock was still reserved for work already in progress. | Check the zone's **Missing To Location**, the configured fixed destination and the work still active at the source. |
+| Other SKUs at the source did not move | This is expected. Residual relocation covers only the shorted SKU. | Leave the other SKUs in place. Investigate them separately only when there is evidence of another discrepancy. |
+| Residual stock of the shorted SKU did not move | No valid missing-stock destination was available, or the stock was still reserved for work already in progress. | Check the zone's **Missing To Location**, the configured fixed destination and the work still active at the source. |
+| A **CurrentSkuEverywhere** count did not include another location | That location was already blocked or being counted when the request ran. | Resolve the existing block or count, then request a controlled follow-up count if it is still needed. |
 | Demand was not allocated again | No eligible stock was available, or the reallocation order coverage did not include the order. | Review available stock and the **Order Scope** of the reallocation action. |
 
 ## Related guides
