@@ -3,7 +3,7 @@ title: "Administrator Guide - Warehouse Structure"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Warehouse Structure
@@ -112,7 +112,16 @@ The code also uses these location codes by name:
 - `DAMAGE` (returns booked as damaged),
 - `INTRANSIT` and `LOST` (stock adjustments).
 
-The initial warehouse includes them. **Do not delete or rename them.**
+**Do not delete or rename these system locations.**
+
+Warehouse Bootstrap creates `INTRANSIT` only during the warehouse's first
+initialization. It does not add a missing location later. Before using discrete
+picking, confirm that exactly one location has type **In transit (open pick
+pallets)**. If it is missing, create location `INTRANSIT` with that type and
+putaway zone `DOCK`, then confirm that its displayed status is **Ok**. Some
+picking paths also require the canonical code `INTRANSIT`. If the type already
+exists under another code, do not create a second one; have an administrator or
+support restore the canonical system location before picking.
 
 The baseline also seeds the locations `UNKNOWN`, `DOCK`, `QC`, `RETURN`, `RTV`, `STAGE` and `PICKTO`. What depends on them:
 
@@ -139,7 +148,7 @@ See the table above.
 |---|---|---|
 | `owners.picking_toloc X is a Y location, not Pickto/Stage/Door` | The owner's `Pick drop location` must be `Pickto`, `Stage` or `Door`. | Pick a location of one of those types. |
 | Work area pack station is refused | Only a `Pack` location can be the station of a work area. | Change the location type to `Pack`, or pick another location. |
-| Second `InTransit` location refused | Only one exists. | Use the existing one. |
+| Second `InTransit` location refused | A location of that type already exists. | Use it only when its code is `INTRANSIT`. If it has another code, have an administrator or support restore the canonical system location. |
 
 ### What this affects later
 
