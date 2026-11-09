@@ -3,7 +3,7 @@ title: "Administrator Guide - Go-Live Checklist"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Go-Live Checklist for a New Tenant
@@ -44,7 +44,7 @@ data that is not part of a new customer warehouse. **N/A** = not available.
 | # | Item | Status | Where | Notes |
 |---|---|---|---|---|
 | 6 | Putaway zones. | Included: `DOCK` | `Warehouse Configuration > Topology > Putaway Zones` | Create the customer's storage zones. `RACK` is not included automatically. |
-| 7 | Special locations. | Included: `DAMAGE`, `DOCK`, `LOST`, `PICKTO`, `QC`, `RETURN`, `RTV`, `STAGE`, `UNKNOWN` | `Warehouse Configuration > Topology > Locations` | Review these locations before activation. Discrete picking also needs exactly one location of type `InTransit`; it is not included automatically. |
+| 7 | Special locations. | Included: `DAMAGE`, `DOCK`, `INTRANSIT`, `LOST`, `PICKTO`, `QC`, `RETURN`, `RTV`, `STAGE`, `UNKNOWN` | `Warehouse Configuration > Topology > Locations` | Review these locations before activation. Warehouse Bootstrap creates `INTRANSIT` with type **In transit (open pick pallets)** only during the warehouse's first initialization. It does not add a missing location later. Exactly one location of this type must exist. |
 | 8 | Storage locations. | Create | `Warehouse Configuration > Topology > Locations` | Generate or import the approved warehouse map. The sample `A-01-0` to `D-06-3` map is demo data only. |
 | 9 | A `Door` location (dock door). | Included: `DOCK` | `Locations` | Create additional doors when the physical warehouse needs them. |
 | 10 | A `Pack` location for each pack station. | Create | `Locations` | Bootstrap does not create pack stations. |
@@ -152,5 +152,6 @@ Before go-live, verify one complete departure in the path you will operate: dire
 | Allocation reserves nothing. | No stock, or the policy steps do not match, or stock is held. | Check stock, steps and holds. |
 | Cartonization exceptions on the order. | SKU has no weight or size. | Fill weight and cube. |
 | "you have no right to take Pick tasks". | No task permission. | Item 13. |
+| The terminal says that the warehouse has no location of type `InTransit`. | The warehouse was initialized without the system location used by open pick pallets. | In **Locations**, first confirm that no **In transit (open pick pallets)** location exists. If it is absent, create `INTRANSIT` with that type and putaway zone `DOCK`, then confirm that its displayed status is **Ok**. If the type already exists under another code, do not create a second one; have an administrator or support restore the canonical `INTRANSIT` location before picking. |
 | No label. | No printer assignment or renderer. | Items 36 and 37. |
 | `Ship order` is refused. | Picking or packing is incomplete, the physical content changed, or the order belongs to a Load. | Finish the required work, refresh, or ship through the Load. |
