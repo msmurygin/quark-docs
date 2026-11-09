@@ -82,6 +82,32 @@ Defaults follow the same review boundary:
 An accepted default becomes part of the reviewed plan. It is not written to the
 warehouse automatically.
 
+## Plan more than one object of a kind
+
+One assisted plan can include several customer objects of the same kind. For
+example, it can plan several zones, location ranges, policies, SKUs, work
+areas or users instead of reducing each area to one generic record.
+
+Give every planned object a short, stable key:
+
+- use 1–64 English letters (`A-Z`, `a-z`), digits, dots, underscores or
+  hyphens;
+- do not use spaces or slashes;
+- keep the same key through every step for that object. For example, the
+  create, rules, validation and publication steps for one policy must all name
+  the same policy key; previewing and generating one location range must use
+  the same range key.
+
+The General Distribution profile still represents one warehouse and one
+owner. It does not support a second warehouse or owner in the same plan. Each
+required report or label item is also planned once. Every repeatable area must
+contain at least one complete object.
+
+The same step for the same object can be requested by more than one part of the
+onboarding questionnaire. Matching copies are combined. Different values for
+that same step and object key are a conflict: correct the customer data and
+obtain the required review again before generating the plan.
+
 ## Review and release an RF screen adaptation
 
 When the confirmed requirements call for an RF terminal adaptation, treat the
@@ -204,9 +230,10 @@ plan.
    required target gates remain blocking until a supported approach is
    available or the customer confirms that the requirement no longer applies.
    No refreshed plan exists while one of these gaps remains.
-3. For the remaining planned changes, supply exactly one complete input that
-   matches the current required fields. Missing, duplicate, unexpected or
-   invalid inputs prevent plan generation.
+3. For the remaining planned changes, supply complete current data for every
+   planned object. Use a distinct stable key for each repeated object and the
+   same key for every step that belongs to it. Missing, duplicated,
+   conflicting, unexpected or invalid data prevents plan generation.
 4. Generate the new plan from the current profile and product contract.
 5. Run coverage and readiness checks for this exact plan. A changed target
    capability requires fresh coverage even when the plan itself remains
@@ -228,9 +255,9 @@ flowchart TD
     PR --> Q{"Blocking gap that complete inputs cannot resolve?"}
     Q -->|"Yes"| B["No refreshed plan — resolve the capability or requirement"]
     B --> F
-    Q -->|"No"| E["Collect one complete current input for every planned change"]
-    E --> I{"Every input complete, valid and unique?"}
-    I -->|"No"| X["Resolve missing, duplicate or unexpected inputs"]
+    Q -->|"No"| E["Collect complete current data for every planned object"]
+    E --> I{"Every object complete, valid and consistently keyed?"}
+    I -->|"No"| X["Resolve missing, duplicate, conflicting or unexpected data"]
     X --> E
     I -->|"Yes"| G["Generate a new plan from the current product contract"]
     G --> V
