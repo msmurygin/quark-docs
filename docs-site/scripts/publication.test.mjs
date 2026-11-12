@@ -59,6 +59,7 @@ test('web screenshots fill the article while RF screenshots stay compact',()=>{
  const webRule=/\.doc-figure img\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
  assert.match(webRule,/width:\s*100%/);
  assert.match(css,/\.doc-figure img\[width='780'\]/);
+ assert.match(css,/\.doc-figure img\[width='390'\]/);
  assert.match(css,/\.doc-figure img\[width='240'\]/);
  assert.match(css,/max-width:\s*min\(100%,\s*300px\)/);
  assert.doesNotMatch(css,/:not\(\[width='1280'\]\)/);

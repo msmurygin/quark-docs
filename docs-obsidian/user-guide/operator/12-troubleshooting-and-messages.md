@@ -114,7 +114,12 @@ The tables in each guide list the messages for that process:
 | Inventory count | [08](08-inventory-count.md) |
 | Picking | [09](09-picking.md) |
 | Packing | [10](10-packing-verify.md) |
+| Consolidation | [10A](10a-consolidation.md) |
 | Order control | [11](11-order-control-after-picking.md) |
+| Replenishment | [13](13-replenish.md) |
+| Batch picking and distribution station | [14](14-batch-picking-and-distribution-station.md) |
+| Staging | [15](15-staging.md) |
+| Loading and shipment | [16](16-loading-and-shipment.md) |
 
 ## Common situations
 
@@ -124,7 +129,7 @@ The tables in each guide list the messages for that process:
 | You must stop in the middle of serial capture | Press `Esc`, answer `Y` (**Exit**). Later use **Resume Serial Capture**. |
 | A list is empty | Read the status line. Press `Esc`. Change the filter. |
 | You do not see a function you need | Ask your supervisor for the right user or role. |
-| You need stage, load, ship or replenishment | These processes have no RF screens yet. Ask your supervisor. |
+| You need replenishment, staging, loading or shipment | Open the corresponding guide above. If its menu item is unavailable, ask your supervisor to check your role and the warehouse setup. |
 | You use the browser version (WebRF) | The screens and keys are the same. The footer shows the keys as buttons. |
 
 On a phone, the keys of the footer are buttons, for example **Esc Back**. A tap on a button sends the same key as the keyboard. The tap does not close the on-screen keyboard. A button that is not allowed on the screen is grey. Menu rows and list rows can be tapped too. With a hardware keyboard or a scanner, the keys `F1` to `F12`, `Enter`, `Esc`, `Tab`, the arrow keys and `Page Up` / `Page Down` work as in the terminal. `Left` and `Right` work only on a field where you choose a value from a short list. `Ctrl` + `]` types the group separator of a scanned label; the field shows it as ␝.
