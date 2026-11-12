@@ -13,6 +13,10 @@ Move a picked pallet or container to the Stage location selected for its deliver
 
 The preferred Stage selected when the order is added to a Dispatch is a route preference. A newly completed physical unit can still show **Stage Choice Required** and need the supervisor step below.
 
+![RF Stage menu in the dark handheld layout](../assets/screens/rf-stage-menu.jpg)
+
+*Open **Stage**, then choose the operator confirmation or the supervisor route-assignment action.*
+
 ## Choose the Stage — supervisor
 
 Use these steps only when the operator sees **Stage Choice Required**.
@@ -35,6 +39,10 @@ The terminal says that the Stage was chosen and that stock was not moved. This i
 4. Review **From** and **Go to**. Move the unit to the location shown under **Go to**.
 5. Scan the destination Stage location.
 6. Confirm when the terminal asks for confirmation.
+
+![RF Stage Unit screen waiting for the root LPN](../assets/screens/rf-stage-unit.jpg)
+
+*Stage Unit. Scan the root pallet or container; do not scan an inner box.*
 
 The terminal confirms that the unit is staged. The Dispatch now shows the unit at the Stage location.
 

@@ -211,6 +211,7 @@ a{text-underline-offset:3px}
 .doc-figure img { margin-inline: auto; cursor: zoom-in; width: 100%; height: auto; max-width: 100%; }
 /* Landscape web captures use the full article width. Portrait RF captures stay compact. */
 .doc-figure img[width='780'],
+.doc-figure img[width='390'],
 .doc-figure img[width='240'] { width: auto; max-width: min(100%, 300px); }
 .doc-figure figcaption { margin: 12px auto 0; max-width: 72ch; font-size: 13px; line-height: 1.6; color: var(--qd-mute); }
 .doc-figure figcaption strong { color: var(--qd-ink); }
