@@ -24,7 +24,7 @@ There is no separate ASN screen in the menu.
 
 ### Before you start
 
-- Role: `ADMIN`, `MANAGER`, `SUPERVISOR` or `OPERATOR` (receiving API methods are granted to all four).
+- Role: `ADMIN`, `MANAGER`, `SUPERVISOR` or `OPERATOR`.
 - The owner, the SKUs and the supplier exist.
 - The owner's `WH Settings` are filled (`04-owners-sku-uom-pack-hierarchy.md`, section 2).
 
@@ -47,17 +47,17 @@ There is no separate ASN screen in the menu.
 
 *Caption: the Header tab of a receipt. Focus: 1 Completion shows Partially received while Status shows InProgress. 2 The Damage Records tab. The lines are in the list below.*
 
-![receipt_detail_edit_form - Receipt Line](../assets/screens/receipt-detail-edit-form.png)
+![Receipt line card](../assets/screens/receipt-detail-edit-form.png)
 
 *Caption: the card of a receipt line, tab Detail. Focus: 1 the Report Damage button, 2 Qty Received.*
 
 ### Field reference
 
-Tab `Header` (`receipt_header_form`):
+Tab `Header`:
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
-| `Receipt Number` (required) | Document number. Unique (`receipt_receipt_number_key`). | Text. | `ASN-1001` |
+| `Receipt Number` (required) | Document number. Unique in the warehouse. | Text. | `ASN-1001` |
 | `Owner` (required) | Owner of the goods. | An owner. | `OWNER001` |
 | `Status` | State. | `Open`, `InProgress`, `OnHold`, `Closed`, `Cancelled`. Default `Open`. | `Open` |
 | `Receipt Type` | Kind of receipt. | `Normal`, `CustomerReturn`, `InterFacilityTransfer`, `Sscc`, `CaseLevel`. Default `Normal`. | `Normal` |
@@ -97,7 +97,7 @@ temperature.
 These settings are storage and receiving checks. They do not collect live
 sensor readings or provide continuous temperature monitoring.
 
-Receipt line, tab `Detail` (`receipt_detail_fields_form`):
+Receipt line, tab `Detail`:
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
@@ -124,26 +124,26 @@ Buttons on the receipt list and their windows:
 | `Close Receipt` | `Close Receipt` | Closing is final. A shortage or excess goes into the close summary. If a discrepancy needs a supervisor, `Supervisor username` and `Supervisor password` appear. |
 | `Adjust Qty` (line) | `Adjust Received Qty` | `Correct Qty` (required), `Reason` (required), `Comment`. |
 
-Receiving codes you will meet (`ReceiptValidationReturnCode`):
+Receiving refusal codes you may see:
 
-| Code | Name | Meaning |
-|---|---|---|
-| 22 | ReceiptWithoutAsnDoc | Receiving with no ASN is not allowed by the policy. |
-| 24 | NoSkuOnAsn | The SKU is not on the ASN. |
-| 25 | ReceiptWithoutLpn | An LPN is required. |
-| 27 / 29 | QtyExcess / PoQtyExcess | More than expected (ASN / PO). |
-| 28 | QtyShortage | Less than expected at close. |
-| 30 | QtyNotPackMultiple | Quantity is not a multiple of the pack. |
-| 35 to 37 | LotAttributeMissing / Mismatch / FormatInvalid | Lot attribute problem. |
-| 45 to 49 | Date codes | Expiration too soon or passed, manufactured too old, delivery-by passed, best-by passed, expiration missing. |
-| 50 / 51 | TemperatureOutOfRange / TemperatureRequired | Temperature rules. |
-| 55 to 60 | Container codes | Mixing, hierarchy or SSCC problems. |
-| 70 | InvalidStateForOperation | The receipt state does not allow the action. |
-| 71 | CannotCloseWithExceptions | Close needs a supervisor override. |
-| 72 | CannotCancelWithInventory | Cancel is refused because stock was received. |
-| 73 | CannotCloseWithOpenSerialEpisode | An open serial capture blocks close. |
-| 76 | DestinationLocationHeld | The destination location has an enforcing hold. |
-| 77 | CannotCloseWithPendingDamage | A damage record has no disposition yet. |
+| Code | Meaning |
+|---|---|
+| 22 | The policy requires a decision for receiving without an ASN. `Warning` lets the operator confirm and continue; `HardError` refuses the receipt. |
+| 24 | The SKU is not on the ASN. |
+| 25 | An LPN is required. |
+| 27 / 29 | The received quantity is greater than the ASN or PO quantity. |
+| 28 | The proposed receive would leave the applicable SKU, lot or case below its expected quantity. |
+| 30 | The quantity is not a multiple of the pack. |
+| 35 to 37 | A required lot attribute is missing, different or in the wrong format. |
+| 45 to 49 | A required date is missing or outside the SKU's date rules. |
+| 50 / 51 | The temperature is missing or outside the accepted range. |
+| 55 to 60 | The container hierarchy, mixing rule or SSCC is not valid. |
+| 70 | The receipt state does not allow the action. |
+| 71 | The receipt has a discrepancy at close. If discrepancy approval is enabled, a supervisor can approve it; otherwise closing is refused. |
+| 72 | The receipt cannot be cancelled because stock was already received. |
+| 73 | An unfinished serial capture blocks closing. |
+| 76 | An enforcing hold blocks the destination location. |
+| 77 | A damage record still needs an outcome. |
 
 ### What you should see
 
@@ -154,11 +154,11 @@ Receiving codes you will meet (`ReceiptValidationReturnCode`):
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Duplicate key `receipt_receipt_number_key` | The number exists. | Use another number. |
-| Code 71 | Close needs a supervisor. | Enter supervisor credentials in the window. The supervisor needs the right `receipt.override_close_discrepancy`. |
+| The receipt number already exists | Another receipt uses the number. | Use another number. |
+| Code 71 | The receipt has a discrepancy. | If discrepancy approval is enabled, enter the supervisor's credentials in the confirmation window. Otherwise correct the discrepancy before closing. |
 | Code 72 | Stock was already received. | Adjust or close instead of cancelling. |
-| Code 77 | Damage has no disposition. | Decide the disposition (section 3). |
-| `cannot {to} an order in status {from}` style messages | The action does not fit the status. | Check the `Status`. |
+| Code 77 | A damage record has no outcome. | Record the outcome (section 3). |
+| The action is not allowed in the current status | The receipt must move through another step first. | Check the `Status` and complete or reverse the preceding step as appropriate. |
 
 ### What this affects later
 
@@ -187,7 +187,7 @@ Set how strict receiving is about missing documents, quantity, pack multiples an
 5. Click `Save`.
 6. Assign the policy to SKUs (SKU tab `Policies`, field `Receipt Policy`).
 
-![receipt_policy_general_form - Receipt Policy General](../assets/screens/receipt-policy-general-form.png)
+![Receipt Policy General tab](../assets/screens/receipt-policy-general-form.png)
 
 *Caption: the General tab of a receipt policy. Focus: 1 Receipt Without PO, 2 ASN/PO Qty Discrepancy.*
 
@@ -214,7 +214,7 @@ Tabs `Qty validation against ASN (RF)` (form title `ASN Qty Validation`) and `Qt
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
-| `Execute Qty validation` | Level of the check. | `None`, `Sku`, `Lot` (code list `RECQTYVAL`). Seed `None`. | `Sku` |
+| `Execute Qty validation` | Level of the check. | `None`, `Sku`, `Lot`. Default `None`. | `Sku` |
 | `Excess Message` | Show a message on excess. | On or off. | on |
 | `Excess Override` | Excess above the limit needs an override. | On or off. | on |
 | `Excess Override %` | The limit for the soft check. | Whole number. | 5 |
@@ -224,7 +224,7 @@ Tabs `Qty validation against ASN (RF)` (form title `ASN Qty Validation`) and `Qt
 | `Shortage Override` | Shortage needs an override. | On or off. | on |
 | `Shortage Override %` | The limit. | Whole number. | 5 |
 
-How the excess check works (`ExcessLimits` in `wms-inbound`):
+How the excess check works:
 
 - Percent = (received + new − expected) × 100 ÷ expected.
 - If percent is above `Excess Error %` and `Excess Error` is on: **refused**.
@@ -240,16 +240,16 @@ How the excess check works (`ExcessLimits` in `wms-inbound`):
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Code 27 / 29 with an override request | Excess is above the soft limit. | A supervisor with `receipt.override_qty_excess` approves. |
+| Code 27 / 29 with an override request | Excess is above the soft limit. | Ask a supervisor to approve it. |
 | Code 27 / 29 as a refusal | Excess is above the hard limit. | Receive less, or raise the limit. |
-| Code 28 | Shortage at close. | A supervisor with `receipt.override_qty_shortage` approves. |
+| Code 28 with an override request | The proposed receive leaves the applicable SKU, lot or case below its expected quantity. | Ask a supervisor to approve it, or receive the remaining quantity. |
 | Delete refused | SKUs use the policy. | Change the SKUs first. |
 
 ### What this affects later
 
 - Receiving on RF and web reads the policy of the SKU.
-- The system setting `ALLOW_CLOSE_WITH_DISCREPANCY` (seed `1`) lets a supervisor close a receipt that is `Partial` or `Over`.
-- The tab titles say `(RF)`, but the quantity checks are not RF only. The web `Receive` window and RF call the same method (`receipt_receive_against_asn`), so the same checks run. When the server asks about an excess or a shortage, the web window shows the question and, for a supervisor, the approval.
+- The system setting `ALLOW_CLOSE_WITH_DISCREPANCY` (default `1`) lets a supervisor close a receipt that is `Partial`, `Over`, or still `Pending` with an expected quantity greater than zero. When the setting is off, the discrepancy must be corrected before closing.
+- The tab titles say `(RF)`, but the quantity checks are not RF only. The web `Receive` window and the terminal apply the same checks. When the system asks about an excess or a shortage, the web window shows the question and, for a supervisor, the approval.
 
 ## 3. Damage handling and dispositions
 
@@ -268,15 +268,15 @@ Set what happens to damaged goods found at receiving, and know how a damage case
 2. Set `Damage Action: Minor`, `Damage Action: Major`, `Damage Action: Total`.
 3. Set reasons: open `Sidebar > Warehouse Configuration > Settings & Reference Data > Code List` and edit the lists `damage_reason`, `damage_severity` and `damage_action` if you need other words.
 4. The operator reports damage on a line: `Report Damage`.
-5. Close each damage case with a disposition (API or RF; see below).
+5. Close each damage case with an outcome through the approved integration described below.
 
-![report_damage_cmp - Report Damage](../assets/screens/report-damage-cmp.png)
+![Report Damage window](../assets/screens/report-damage-cmp.png)
 
 *Caption: the Report Damage window on a receipt line.*
 
 ### Field reference
 
-Window `Report Damage` (`report_damage_cmp`):
+Window `Report Damage`:
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
@@ -287,20 +287,20 @@ Window `Report Damage` (`report_damage_cmp`):
 | `The vendor is answerable` | Sent to the ERP as the basis for a claim. | On or off. | on |
 | `What happened` (required) | Free text. | Text. | |
 
-Owner actions (code list `damage_action`): `None` (no action), `Hold` (place inventory hold), `Reject` (reject damaged units). Seed: Minor `None`, Major `Hold`, Total `Reject`.
+Owner actions: `None` (no action), `Hold` (place inventory hold), `Reject` (reject damaged units). Defaults: Minor `None`, Major `Hold`, Total `Reject`.
 
-Dispositions of a damage record (`receipt_detail_damage.disposition`; empty = still pending):
+Outcomes of a damage record (an empty outcome means that the decision is still pending):
 
-| Disposition | Set by | Effect |
-|---|---|---|
-| `Repurpose` | `receipt_set_damage_disposition` (stateful, per damage record) | Marker only. |
-| `Destroyed` | `receipt_set_damage_disposition` | Marker only. |
-| `WrittenOff` | `receipt_write_off_damage` | Writes the stock off. |
-| `RTV` | `receipt_move_damage_to_rtv` | Moves the stock to a return-to-vendor location. |
+| Outcome | Effect |
+|---|---|
+| `Repurpose` | Records the decision. It does not move or change stock. |
+| `Destroyed` | Records the decision. It does not move or change stock. |
+| `WrittenOff` | Writes the damaged stock off. |
+| `RTV` | Moves the damaged stock to a return-to-vendor location. |
 
 The tab `Damage Records` (columns `ID`, `Line`, `Qty`, `Reason`, `Description`, `Reported At`, `Reported By`, `Severity`) is read-only.
 
-There is no web button and no RF screen for the dispositions. Nothing in the web metadata or in the RF client calls them. They are JSON-RPC methods only. Use the API (see `09-integrations-and-api.md`).
+There is currently no web or RF action for these outcomes. Record them through an approved integration using the [API guide](09-integrations-and-api.md).
 
 ### What you should see
 
@@ -311,7 +311,7 @@ There is no web button and no RF screen for the dispositions. Nothing in the web
 
 | Message | Meaning | Fix |
 |---|---|---|
-| Code 77 on close | A damage record has no disposition. | Set the disposition through the API or RF. |
+| Code 77 on close | A damage record has no outcome. | Record the outcome through the approved integration, then close the receipt again. |
 | Destination refused: a hold forbids it | A location hold blocks the move. | Release the hold, or use the supervisor override. |
 
 ### What this affects later
@@ -373,13 +373,13 @@ The first step that finds a suitable location wins. If no step finds one, there 
 
 *Caption: the putaway policy list. Focus: Open the row to edit the steps.*
 
-![putaway_step_component - Putaway Step Editor](../assets/screens/putaway-step-component.png)
+![Putaway Step Editor](../assets/screens/putaway-step-component.png)
 
 *Caption: the step editor with the three bands. Focus: 1 Destination, 2 Conditions, 3 Placement.*
 
 ### Field reference
 
-Policy header (`putaway_policy_normal_form`): `Code` (required), `Description`.
+Policy header: `Code` (required), `Description`.
 
 Step fields, from the step editor:
 
@@ -429,11 +429,9 @@ Rules the step editor checks before `Save`:
 
 ### What this affects later
 
-- The suggested location is reserved for `PUTAWAY_RESERVATION_TTL_MIN` minutes (seed 15) or the owner's own `Putaway Reservation TTL (min)`.
+- The suggested location is reserved for `PUTAWAY_RESERVATION_TTL_MIN` minutes (default 15) or the owner's own `Putaway Reservation TTL (min)`.
 - A deviation from the suggestion needs an acknowledgement. If `COUNT_ON_PUTAWAY_DEVIATION` is `1`, the destination location is counted.
 - Without a working policy, received stock waits and no location is suggested.
-
-The editor texts come from the English translation rows `putaway_step.*` in the web metadata. The server errors come from `crates/libs/wms-inventory/src/putaway/policy.rs`.
 
 ## 6. Minimal inbound setup
 
