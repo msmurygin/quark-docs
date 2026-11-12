@@ -3,7 +3,7 @@ title: "Administrator Guide - Go-Live Checklist"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-09
+updated: 2026-11-12
 ---
 
 # Go-Live Checklist for a New Tenant
@@ -21,6 +21,13 @@ Check that a new tenant has the minimum data to run the full path:
 - You know which inbound, picking, packing and shipping paths the site will use.
 
 ## 3. Configuration and data checklist
+
+Before configuring the warehouse, create it through the path shown on the
+Enterprise home. A subscription-backed installation uses **Add warehouse** or
+**Change capacity** on the **Limits** card. An installation without those links
+uses `Warehouses > Add warehouse`. Wait for **Preparation status** to become
+**Ready**, then activate the warehouse and assign its users. See [Warehouse
+Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 
 Legend: **Included** = supplied by the standard installation or warehouse
 bootstrap. **Create** = you must create or assign it for the customer.

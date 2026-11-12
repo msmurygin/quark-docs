@@ -227,6 +227,7 @@ The dashboard is the home page, so it opens right after sign-in. The breadcrumb 
 
 ```
 Enterprise Overview
+Terminals & devices
 Warehouses
 Owners
 Users & Roles
@@ -251,12 +252,16 @@ Platform Tools
 Notes:
 
 - `Enterprise Overview` opens the Enterprise landing page.
+- `Terminals & devices` shows the web-terminal address and the SSH host, port
+  and host-key fingerprint for handheld setup.
 - `Users & Roles`, `Integrations` and `Platform Tools` start collapsed, just like groups in the warehouse sidebar.
 - `IPaaS` is available under `Integrations`; it is no longer shown in a warehouse sidebar.
 - `Metadata Studio`, `RF UI Designer` and `RPC Documentation` are grouped under `Platform Tools`.
 
 | Menu path | What it is for |
 |---|---|
+| `Enterprise Overview` | Review subscription limits and open **Change capacity** or **Add warehouse** when online capacity management is available. |
+| `Terminals & devices` | Copy the web-terminal and SSH connection details for handhelds. |
 | `Warehouses` | Create and monitor warehouses. |
 | `Users & Roles > Users` | Create users, assign warehouses and manage user access. |
 | `Users & Roles > Roles` | Review roles and the permissions assigned to them. |

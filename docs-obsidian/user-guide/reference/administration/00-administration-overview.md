@@ -20,6 +20,7 @@ A role named `MANAGER` or `SUPERVISOR` does not open Enterprise, even if an API 
 
 | Sidebar path | Page |
 |---|---|
+| `Terminals & devices` | Web-terminal and SSH connection details for handhelds |
 | `Warehouses` | Warehouse administration |
 | `Owners` | Owner administration |
 | `Users & Roles > Users` | [Users list](10-users-list.md) |
@@ -39,10 +40,17 @@ A role named `MANAGER` or `SUPERVISOR` does not open Enterprise, even if an API 
 
 ### Warehouse definitions and owners
 
-`Warehouses` opens the Enterprise warehouse administration form. Registration
-creates an inactive warehouse definition; it does not provision a PostgreSQL
-schema. The list reports whether the schema is ready, and activation is refused
-until deployment preparation is complete.
+`Terminals & devices` shows the connection details for browser and SSH
+handhelds. See [Enterprise Console, Capacity and
+Terminals](../../admin/03a-enterprise-console-capacity-and-terminals.md).
+
+`Warehouses` opens the Enterprise warehouse administration form. On a
+subscription-backed installation, warehouse creation starts on the capacity
+page linked from the Enterprise home; the **Add warehouse** action in this list
+is disabled. On an installation without subscription capacity, registration
+starts here. Both paths provision the warehouse schema, leave the warehouse
+inactive, and report preparation status in this list. Activation is refused
+until preparation is complete.
 
 Owners are available directly from the Enterprise sidebar. Product owners used
 by warehouse operations are also available under

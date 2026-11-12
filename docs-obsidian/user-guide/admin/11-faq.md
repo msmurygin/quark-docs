@@ -3,7 +3,7 @@ title: "Administrator Guide - FAQ"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-10-27
+updated: 2026-11-12
 ---
 
 # FAQ
@@ -36,7 +36,10 @@ No. The role code is stable identity. Change `Name` or `Description`.
 ## Warehouse and master data
 
 **How do I add a second warehouse?**
-There is no screen. The installer must create the schema, run the migrations and insert the row. See `03-warehouse-structure.md`, section 1.
+Switch to **Enterprise** and use **Add warehouse** on the **Limits** card. If
+all licensed warehouses are in use, open **Change capacity** first and raise
+**Licensed warehouses**. Installations without subscription capacity use
+`Warehouses > Add warehouse` instead. See [Warehouse Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 
 **What does location status `Hold` mean? Can I set it?**
 It is calculated from active holds. Place or release a hold instead. See `05-inbound-setup.md`, section 4.
