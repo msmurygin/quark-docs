@@ -154,4 +154,3 @@ or contact the installation administrator.
   added.
 - Terminal connection details belong to this customer installation. Recheck
   the host-key fingerprint if a device reports that it changed.
-
