@@ -45,9 +45,9 @@ handhelds. See [Enterprise Console, Capacity and
 Terminals](../../admin/03a-enterprise-console-capacity-and-terminals.md).
 
 `Warehouses` opens the Enterprise warehouse administration form. On a
-subscription-backed installation, warehouse creation starts on the capacity
-page linked from the Enterprise home; the **Add warehouse** action in this list
-is disabled. On an installation without subscription capacity, registration
+subscription-backed installation, warehouse creation starts by opening
+**Change capacity** on the Enterprise home; the **Add warehouse** action in this
+list is disabled. On an installation without subscription capacity, registration
 starts here. Both paths provision the warehouse schema, leave the warehouse
 inactive, and report preparation status in this list. Activation is refused
 until preparation is complete.

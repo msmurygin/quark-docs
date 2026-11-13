@@ -36,9 +36,9 @@ No. The role code is stable identity. Change `Name` or `Description`.
 ## Warehouse and master data
 
 **How do I add a second warehouse?**
-Switch to **Enterprise** and use **Add warehouse** on the **Limits** card. If
-all licensed warehouses are in use, open **Change capacity** first and raise
-**Licensed warehouses**. Installations without subscription capacity use
+Switch to **Enterprise**, open **Change capacity** on the **Limits** card and
+use **Add a warehouse** on the capacity page. If all licensed warehouses are in
+use, raise **Licensed warehouses** first. Installations without subscription capacity use
 `Warehouses > Add warehouse` instead. See [Warehouse Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 
 **What does location status `Hold` mean? Can I set it?**

@@ -32,12 +32,10 @@ preparation is ready, and activate it for operations.
 1. Switch to **Enterprise**. The **Limits** card shows the number of warehouses
    in use and either the licensed limit or **unlimited**.
 2. Follow the path offered on that card:
-   - If **Add warehouse** is shown, open it.
-   - If **Change capacity** is shown but **Add warehouse** is not, every
-     licensed warehouse is in use. Open **Change capacity**, raise **Licensed
-     warehouses**, complete the capacity change, and reopen the capacity page
-     from the Enterprise home.
-   - If neither capacity link is shown, open `Sidebar > Warehouses` and click
+   - If **Change capacity** is shown, open it. The capacity page contains **Add
+     a warehouse**. If every licensed warehouse is in use, raise **Licensed
+     warehouses** and complete the capacity change before adding one.
+   - If the capacity link is not shown, open `Sidebar > Warehouses` and click
      **Add warehouse**. This is the path for an installation that does not sell
      warehouses as subscription capacity.
 3. On the capacity page, under **Add a warehouse**, fill **Code** and **Name**,
@@ -91,9 +89,9 @@ The two creation paths use these fields:
 
 | Message | Meaning | Fix |
 |---|---|---|
-| **Add warehouse** is disabled in the **Warehouses** list | This subscription adds warehouses on its capacity page. | Open the capacity page from the Enterprise home. |
-| **Change capacity** is shown but **Add warehouse** is not | Every licensed warehouse is already in use. | Open **Change capacity**, raise **Licensed warehouses**, wait for the new limit, then reopen the page from the Enterprise home. |
-| `The capacity session has ended` | The capacity page was left open too long, or its one-time link was already used. | Close it and open **Change capacity** or **Add warehouse** again from the Enterprise home. |
+| **Add warehouse** is disabled in the **Warehouses** list | This subscription adds warehouses on its capacity page. | Open **Change capacity** from the Enterprise home. |
+| The capacity page says that all licensed warehouses are in use | No licensed place remains for another warehouse. | Raise **Licensed warehouses**, wait for the new limit, then reopen **Change capacity** from the Enterprise home. |
+| `The capacity session has ended` | The capacity page was left open too long, or its one-time link was already used. | Close it and open **Change capacity** again from the Enterprise home. |
 | `Warehouse ... is not finished yet` | The warehouse setup stopped before all preparation steps completed. | Keep the same values and press **Add warehouse** again to resume it. |
 | The warehouse cannot be activated | Its preparation status is not ready. | Read **Preparation details**, correct the cause, refresh, and activate only when it is ready. |
 | A user sees no warehouse after sign-in | The user is not assigned to it, or the warehouse is inactive. | Activate the warehouse and assign the user's warehouse role. |

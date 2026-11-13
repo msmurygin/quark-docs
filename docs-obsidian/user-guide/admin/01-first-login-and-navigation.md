@@ -260,7 +260,7 @@ Notes:
 
 | Menu path | What it is for |
 |---|---|
-| `Enterprise Overview` | Review subscription limits and open **Change capacity** or **Add warehouse** when online capacity management is available. |
+| `Enterprise Overview` | Review subscription limits and open **Change capacity** when online capacity management is available. The capacity page also creates licensed warehouses. |
 | `Terminals & devices` | Copy the web-terminal and SSH connection details for handhelds. |
 | `Warehouses` | Create and monitor warehouses. |
 | `Users & Roles > Users` | Create users, assign warehouses and manage user access. |

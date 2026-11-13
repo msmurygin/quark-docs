@@ -72,9 +72,9 @@ Do the steps in this order. Each step needs the data from the step before.
 ## Important facts to know before you start
 
 1. **Start warehouse creation from the Enterprise home.** When the **Limits**
-   card shows **Add warehouse** or **Change capacity**, use that subscription
-   page; it assigns the schema name. If the installation has no capacity link,
-   use `Warehouses > Add warehouse` and enter the schema name there. In both
+   card shows **Change capacity**, open it and use **Add a warehouse** on the
+   capacity page; it assigns the schema name. If the installation has no
+   capacity link, use `Warehouses > Add warehouse` and enter the schema name there. In both
    cases, wait for **Ready** before activating the warehouse. See [Warehouse
    Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 2. **User status `Locked` and `Disabled` block every way in.**
