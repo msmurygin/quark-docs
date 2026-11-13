@@ -341,7 +341,7 @@ The template catalogue contains ready-made manual flows for shipment labels and 
 | --- | --- |
 | **Speedy: Create Shipment & Label** | Creates one Speedy shipment, then requests its PDF or ZPL label. |
 | **Econt: Create Shipment & Label** | Creates one Econt shipment and returns its shipment number and waybill PDF URL. |
-| **DHL Express: Create Shipment & Label** | Creates one DHL Express shipment and returns its tracking number and PDF or ZPL label. |
+| **DHL Express: Create Shipment & Label** | Validates the delivery country, postal code and city, then creates one DHL Express shipment and returns its tracking number and PDF or ZPL label. |
 | **FedEx: Create Shipment & Label** | Creates one FedEx shipment and returns its tracking number and PDF or ZPL label. |
 | **Speedy: Reprint Existing Label** | Returns a PDF or ZPL label for an existing Speedy parcel without creating another shipment. |
 | **Econt: Retrieve Existing Label** | Returns the PDF URL for an existing Econt shipment without creating another label. |
@@ -361,6 +361,21 @@ The template catalogue contains ready-made manual flows for shipment labels and 
 8. Open the run in **Monitor**. Confirm that the run succeeded, record the returned tracking or shipment number and label result, and verify the expected pickup arrangement with the carrier.
 
 Speedy returns label data in the run result. The template calls Speedy's label operation; it does not send the result to a local warehouse printer. Econt returns a waybill PDF URL. DHL Express and FedEx return the carrier response that contains the tracking and label result. Download or print the returned label through the approved process for your site.
+
+The DHL Express template runs **Validate Recipient Address** before it reserves the WMS packing carton or asks DHL to create the shipment. DHL checks the recipient country, postal code and city as a delivery address. If the address is refused, the run fails at that step in **Monitor**; correct those three recipient fields and run the controlled shipment again. The refused run does not reserve the carton and does not create a DHL shipment. This check is part of the DHL Express template only; do not assume that another carrier template performs the same validation.
+
+```mermaid
+flowchart TD
+    A[Run DHL Express Create Shipment and Label] --> B[Validate recipient country, postal code and city]
+    B --> C{DHL accepts the delivery address?}
+    C -->|No| D[Run fails in Monitor]
+    D --> E[Correct recipient address fields]
+    C -->|Yes| F[Reserve the WMS packing carton]
+    F --> G[Create the DHL shipment and label]
+    G --> H[Record tracking and label result]
+```
+
+The validation path has been exercised with the carrier emulator. Before production use, run a controlled shipment in the DHL environment approved for your account; an emulator result does not certify a live DHL account, service area or address database.
 
 ```mermaid
 flowchart LR
