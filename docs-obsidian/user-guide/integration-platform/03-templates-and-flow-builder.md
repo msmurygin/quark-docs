@@ -280,6 +280,59 @@ Use these recovery templates only after checking the package in Amazon. A carton
 
 If validation fails before Amazon is called, check that there is at least one package, each package reference is a unique positive number, every package has carrier and tracking details, and the quantities across all packages exactly match the Goods Issue quantities.
 
+## Import and ship PrestaShop orders
+
+Use these templates as a pair:
+
+| Template | What it does |
+| --- | --- |
+| **PrestaShop: Import Paid Orders** | Checks every five minutes for orders that PrestaShop marks as valid and creates their lines as WMS shipment orders. |
+| **PrestaShop: Ship WMS Orders** | When WMS posts a Goods Issue, adds the configured shipped state to the matching PrestaShop order and reads the order back to verify the result. |
+
+### Set up the connector and flows
+
+1. Create a **PrestaShop Webservice** connector. Enter the store's **Webservice URL** and **Webservice key**, then select **Save credentials & test**.
+2. On **Templates**, select **Use Template** on **PrestaShop: Import Paid Orders**. Choose the PrestaShop connector and WMS connection, then enter **WMS goods owner ID** and **Marketplace ship-to ID**.
+3. Review the import flow and its paused schedule, then activate the flow.
+4. Select **Run**, confirm the controlled import succeeded in **Monitor**, then enable the schedule.
+5. Select **Use Template** on **PrestaShop: Ship WMS Orders**. Choose the same PrestaShop connector and WMS connection.
+6. Enter **PrestaShop shipped order state ID**. Use the state configured as shipped in this store; state IDs are store-specific.
+7. Review, validate and activate the shipment-status flow only if each imported order is completed by one Goods Issue.
+
+The import records which connector supplied each order. The status flow updates only orders imported through that same connector, so use one matched pair of flows for each PrestaShop store.
+
+```mermaid
+flowchart TD
+    A{Each order completes in one Goods Issue?} -->|No| K[Keep the status flow inactive]
+    A -->|Yes| B[PrestaShop order is marked valid]
+    B --> C[Import Paid Orders]
+    C --> D[Create WMS shipment order]
+    D --> E[Pick, pack and complete Goods Issue]
+    E --> F[Ship WMS Orders]
+    F --> G[Add the configured shipped state]
+    G --> H[Read the PrestaShop order back]
+    H --> I{State matches?}
+    I -->|Yes| J[Run succeeds]
+    I -->|No| L[Run fails in Monitor]
+```
+
+The status update adds an order-history entry and asks PrestaShop to send the email configured for that state. It does not create a carrier shipment or send tracking details.
+
+WMS publishes the event after every Goods Issue, and the current template does not check whether more Goods Issues remain for the order. Do not activate this status flow for an operation that can ship one order in several parts: the first Goods Issue could mark the PrestaShop order as shipped too early.
+
+### Verify and recover
+
+1. Import one controlled paid order and confirm the owner, destination, SKU and quantity in WMS.
+2. Complete the order through its single Goods Issue.
+3. In **Monitor**, confirm that **PrestaShop: Ship WMS Orders** succeeded.
+4. In PrestaShop, confirm that the exact order has the configured shipped state and one corresponding history entry.
+
+If the run rejects the order identity, confirm that the order came from the same PrestaShop connector selected by the status flow. If PrestaShop refuses the state, check **PrestaShop shipped order state ID** and the Webservice key's permissions.
+
+The state change is a remote write and is not automatically repeated after an uncertain response. A timeout, lost connection, HTTP 408 or server error can leave the run as `outcome_unknown`, and normal **Retry** is then blocked. Inspect the order history in PrestaShop first, then follow the [outcome-unknown reconciliation procedure](05-monitoring-and-notifications.md#if-the-status-is-outcome_unknown). If the state is already present, do not submit it again; if it is absent, reconcile the result before allowing another attempt.
+
+These templates have been exercised with the integration emulator. A successful emulator run does not certify a real PrestaShop version, Webservice permissions, outbound email setup or production store.
+
 ## Carrier shipment labels and cancellation
 
 The template catalogue contains ready-made manual flows for shipment labels and carrier cancellation:
