@@ -3,7 +3,7 @@ title: "Administrator Guide - Warehouse Structure"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-09
+updated: 2026-11-12
 ---
 
 # Warehouse Structure
@@ -15,26 +15,45 @@ the warehouse itself, putaway zones, locations, work areas, equipment and operat
 
 ### What you will do
 
-Create a warehouse from the Enterprise workspace, check that its schema is ready, and activate it for operations.
+Add a warehouse through the path shown on the Enterprise home, check that its
+preparation is ready, and activate it for operations.
 
 ### Before you start
 
 - Sign in with an Enterprise administrator account.
 - Choose the permanent storage units for weight, length and volume. They cannot be changed later.
-- Choose a unique warehouse code and schema name. The schema name starts with a lowercase letter and then uses only lowercase letters, digits or underscores.
+- Choose a unique warehouse code and name.
+- If your installation lets you create the warehouse from the **Warehouses**
+  list, also choose a schema name. It starts with a lowercase letter and then
+  uses only lowercase letters, digits or underscores.
 
 ### Steps
 
-1. Switch to **Enterprise**.
-2. Open `Sidebar > Warehouses`.
-3. Click **Add warehouse**.
-4. On **Create warehouse**, fill in **Code**, **Name** and **Schema name**.
-5. Choose **Storage weight unit**, **Storage length unit** and **Storage volume unit**.
-6. Click **Create**. The system creates the warehouse with a complete schema and leaves it inactive.
-7. In the list, wait for **Preparation status** to show **Ready**.
-8. Select the warehouse and click **Edit**.
-9. Review the name and preparation details, turn on **Active**, and click **Save**.
-10. Assign users and roles as described in [Users, roles and permissions](02-users-roles-permissions.md#4-assign-a-warehouse-and-a-role).
+1. Switch to **Enterprise**. The **Limits** card shows the number of warehouses
+   in use and either the licensed limit or **unlimited**.
+2. Follow the path offered on that card:
+   - If **Change capacity** is shown, open it. The capacity page contains **Add
+     a warehouse**. If every licensed warehouse is in use, raise **Licensed
+     warehouses** and complete the capacity change before adding one.
+   - If the capacity link is not shown, open `Sidebar > Warehouses` and click
+     **Add warehouse**. This is the path for an installation that does not sell
+     warehouses as subscription capacity.
+3. On the capacity page, under **Add a warehouse**, fill **Code** and **Name**,
+   then choose the weight, length and volume units. Click **Add warehouse**.
+   The schema name is assigned automatically.
+4. On **Create warehouse** in the WMS, fill **Code**, **Name** and **Schema
+   name**, choose the three storage units, and click **Create**.
+   Skip this step when you used the capacity page.
+5. Return to `Sidebar > Warehouses`. A warehouse added from the capacity page
+   normally appears within a minute. It is inactive until you finish its setup.
+6. Wait for **Preparation status** to show **Ready**.
+7. Select the warehouse and click **Edit**.
+8. Review its name and preparation details, turn on **Active**, and click
+   **Save**.
+9. Assign the other users and roles as described in [Users, roles and
+   permissions](02-users-roles-permissions.md#4-assign-a-warehouse-and-a-role).
+   The administrator who added a subscription warehouse is already assigned
+   to it with the **ADMIN** role.
 
 ![Enterprise warehouse list with preparation status](../assets/screens/warehouse-admin-list.png)
 
@@ -42,17 +61,18 @@ Create a warehouse from the Enterprise workspace, check that its schema is ready
 
 ![Create warehouse window](../assets/screens/warehouse-admin-create.png)
 
-*Create warehouse. Focus: storage units and schema identity are permanent after creation.*
+*Create warehouse on an installation without subscription capacity. Focus:
+storage units and schema identity are permanent after creation.*
 
 ### Field reference
 
-The creation window uses these fields:
+The two creation paths use these fields:
 
 | Field | Meaning | Allowed values | Example |
 |---|---|---|---|
 | `code` | Short code. | Text up to 20 characters. | `WH1` |
 | `name` | Display name. | Text up to 200 characters. | `Main Warehouse` |
-| `schema_name` | Internal schema identity created for this warehouse. | Up to 50 lowercase letters, digits or underscores; starts with a letter. | `wh1` |
+| `schema_name` | Internal schema identity created for this warehouse. The capacity page assigns it automatically. | On **Create warehouse**: up to 50 lowercase letters, digits or underscores; starts with a letter. | `wh1` |
 | `is_active` | Whether users may operate in the warehouse. | On or off; set in **Edit** after readiness is **Ready**. | On |
 | `weight_uom` | Unit in which weights are stored. | Choose from the list. | `G` |
 | `length_uom` | Unit in which lengths are stored. | Choose from the list. | `MM` |
@@ -61,12 +81,18 @@ The creation window uses these fields:
 ### What you should see
 
 - **Preparation status** becomes **Ready** after creation.
+- A warehouse added from the capacity page appears inactive, with an
+  automatically assigned schema name.
 - After activation and user assignment, the warehouse appears in the warehouse switcher for those users.
 
 ### If something goes wrong
 
 | Message | Meaning | Fix |
 |---|---|---|
+| **Add warehouse** is disabled in the **Warehouses** list | This subscription adds warehouses on its capacity page. | Open **Change capacity** from the Enterprise home. |
+| The capacity page says that all licensed warehouses are in use | No licensed place remains for another warehouse. | Raise **Licensed warehouses**, wait for the new limit, then reopen **Change capacity** from the Enterprise home. |
+| `The capacity session has ended` | The capacity page was left open too long, or its one-time link was already used. | Close it and open **Change capacity** again from the Enterprise home. |
+| `Warehouse ... is not finished yet` | The warehouse setup stopped before all preparation steps completed. | Keep the same values and press **Add warehouse** again to resume it. |
 | The warehouse cannot be activated | Its preparation status is not ready. | Read **Preparation details**, correct the cause, refresh, and activate only when it is ready. |
 | A user sees no warehouse after sign-in | The user is not assigned to it, or the warehouse is inactive. | Activate the warehouse and assign the user's warehouse role. |
 | A stored unit cannot be changed | Storage units are permanent after creation. | Create the warehouse with the correct units before loading data. |

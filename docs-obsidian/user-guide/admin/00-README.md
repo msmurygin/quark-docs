@@ -3,7 +3,7 @@ title: "Administrator Guide - Start Here"
 type: user-guide
 audience: customer administrator
 status: draft
-updated: 2026-11-07
+updated: 2026-11-12
 ---
 
 # Administrator Guide - Start Here
@@ -53,6 +53,7 @@ Do the steps in this order. Each step needs the data from the step before.
 | 1 | [First Login and Navigation](01-first-login-and-navigation.md) | You can sign in and find every screen. |
 | 2 | [Users, Roles and Permissions](02-users-roles-permissions.md) | Users exist. Each user has a warehouse and a role. |
 | 3 | [Warehouse Structure](03-warehouse-structure.md) | Zones, locations (including Stage, Door, Pack, Pick-to) and work areas exist. |
+| 3A | [Enterprise Console, Capacity and Terminals](03a-enterprise-console-capacity-and-terminals.md) | Review subscription limits, change licensed capacity and configure handheld connections. |
 | 4 | [Owners, SKUs, Units and Packs](04-owners-sku-uom-pack-hierarchy.md) | Owners, pack hierarchies and SKUs exist. Lot and serial rules are set. |
 | 5 | [Inbound Setup](05-inbound-setup.md) | Receipts can be received. Putaway policy sends stock to locations. |
 | 6 | [Outbound Setup](06-outbound-setup.md) | Orders can be allocated, picked, packed, loaded and shipped; pick locations can be replenished. |
@@ -70,7 +71,12 @@ Do the steps in this order. Each step needs the data from the step before.
 
 ## Important facts to know before you start
 
-1. **Create warehouses from Enterprise mode.** Switch to **Enterprise**, select `Warehouses`, click **Add warehouse**, fill the code, name, schema and storage units, then click **Create warehouse**. Wait for **Ready** before assigning users or activating the warehouse. See [Warehouse Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
+1. **Start warehouse creation from the Enterprise home.** When the **Limits**
+   card shows **Change capacity**, open it and use **Add a warehouse** on the
+   capacity page; it assigns the schema name. If the installation has no
+   capacity link, use `Warehouses > Add warehouse` and enter the schema name there. In both
+   cases, wait for **Ready** before activating the warehouse. See [Warehouse
+   Structure](03-warehouse-structure.md#1-create-and-activate-a-warehouse).
 2. **User status `Locked` and `Disabled` block every way in.**
    Such a user cannot sign in, open sessions end on the next request, and the user's API keys are refused. `Active` and `Invited` are let in.
 3. **Loading and Goods Issue are separate decisions.** A `Loaded` Load has not deducted stock. Shipment is an explicit, irreversible Goods Issue. See [Dispatch, loading and Goods Issue](06-outbound-setup.md#10-dispatch-loading-and-goods-issue).
