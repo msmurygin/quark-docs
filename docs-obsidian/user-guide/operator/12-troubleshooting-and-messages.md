@@ -37,33 +37,31 @@ Some actions need a supervisor. The terminal opens a screen with **Supervisor** 
 4. The supervisor presses `Enter`.
 5. The terminal returns to the previous screen. Repeat your action.
 
-The screens are:
+The approval screen and reason depend on the action:
 
-| Screen | Where | Reason shown |
-|--------|-------|--------------|
-| **Supervisor Override** (`RCCLOSE_OVR`) | Receipt close | **Received differs from expected — a supervisor must authorize the close** |
-| **Supervisor Override** (`INVMOV_OVR`) | Move | **Held or restricted stock — a supervisor must authorize** |
-| **Supervisor Override** (`PUTW_OVR`) | Putaway | **The location breaks a putaway rule — a supervisor must authorize** |
-| **Supervisor Confirmation** (`PICK13_OVR`) | Close pallet | **This pallet belongs to another operator - a supervisor must confirm the close** |
-| **Supervisor Confirmation** (`PKA_OVR`) | Dissolve | **Goods are already on the carrier - a supervisor must confirm the dissolve** |
+| Action | Approval screen | Reason shown |
+|--------|-----------------|--------------|
+| Close a receipt | **Supervisor Override** | **Received differs from expected — a supervisor must authorize the close** |
+| Move held or restricted stock | **Supervisor Override** | **Held or restricted stock — a supervisor must authorize** |
+| Put away to a location outside the directed rule | **Supervisor Override** | **The location breaks a putaway rule — a supervisor must authorize** |
+| Close another operator's pallet | **Supervisor Confirmation** | **This pallet belongs to another operator - a supervisor must confirm the close** |
+| Dissolve a carrier after goods were added | **Supervisor Confirmation** | **Goods are already on the carrier - a supervisor must confirm the dissolve** |
 
 If the supervisor approval does not work, you may see a message that the grant cannot be used. The supervisor must approve again.
 
-## Messages that can appear on any screen
+## Situations that can occur on any screen
 
-| Message | What it means | What to do |
-|---------|---------------|------------|
+| What you see | What it means | What to do |
+|--------------|---------------|------------|
 | **No permission: {screen}** or **No permission** | Your user may not use this function. | Tell your supervisor which screen you were using and what you tried to do. |
-| **receipt was modified concurrently, please retry** | Someone changed the same record at the same time. | Send the form again. Some screens try again by themselves. |
-| **receipt is locked, please retry (timeout {ms}ms)** | Someone else is using the record. | Wait a moment. Send again. |
-| **order is locked by another operation (waited {ms}ms)** | Same, for an order. | Wait. Send again. |
-| **idempotency key conflict — generate new UUID for retry** | The terminal sent a request again with changed data. | Start the action again from the first screen. |
-| **version conflict on {thing}** | Someone changed the record you work on. | Open the record again. |
-| **Cancelled** | You said no to a question. | Nothing was done. |
+| A message says that the record changed | Someone saved a change after you opened the screen. | Open the record again, review the current values and repeat the action. |
+| A message says that the record is locked or busy | Another operation is using the same record. | Wait a moment, then repeat the action. |
+| A message says that the action cannot be safely repeated | The repeated request no longer matches the original action. | Return to the first screen and start the action again. |
+| **Cancelled** | You answered no to a question or left the confirmation. | Nothing was done. |
 
 ### When RF says No permission
 
-The terminal shows the screen title when it has one. It does not show the internal server command name; support can still find that name in the RF log.
+The terminal shows the screen title when it has one. Note that title and the action you attempted.
 
 ```mermaid
 flowchart LR
@@ -73,7 +71,7 @@ flowchart LR
     P --> R["Retry after access is corrected"]
 ```
 
-If the terminal cannot reach the server, the status line turns red. It shows the technical error text of the failed call, for example `jrpc transport: ...` followed by the network reason (such as "connection refused"). The terminal waits at most 10 seconds for an answer. You stay on the same screen. The error is also written to the terminal log. Wait a moment and send again. If it repeats, tell your supervisor.
+If the terminal cannot reach the server, the status line turns red and you stay on the same screen. Wait a moment and send again. If the problem repeats, tell your supervisor which screen you were using and when it happened.
 
 If your session has ended, the status line says **Session expired. Please sign in again.** Sign in again.
 
@@ -114,7 +112,12 @@ The tables in each guide list the messages for that process:
 | Inventory count | [08](08-inventory-count.md) |
 | Picking | [09](09-picking.md) |
 | Packing | [10](10-packing-verify.md) |
+| Consolidation | [10A](10a-consolidation.md) |
 | Order control | [11](11-order-control-after-picking.md) |
+| Replenishment | [13](13-replenish.md) |
+| Batch picking and distribution station | [14](14-batch-picking-and-distribution-station.md) |
+| Staging | [15](15-staging.md) |
+| Loading and shipment | [16](16-loading-and-shipment.md) |
 
 ## Common situations
 
@@ -124,18 +127,14 @@ The tables in each guide list the messages for that process:
 | You must stop in the middle of serial capture | Press `Esc`, answer `Y` (**Exit**). Later use **Resume Serial Capture**. |
 | A list is empty | Read the status line. Press `Esc`. Change the filter. |
 | You do not see a function you need | Ask your supervisor for the right user or role. |
-| You need stage, load, ship or replenishment | These processes have no RF screens yet. Ask your supervisor. |
+| You need replenishment, staging, loading or shipment | Open the corresponding guide above. If its menu item is unavailable, ask your supervisor to check your role and the warehouse setup. |
 | You use the browser version (WebRF) | The screens and keys are the same. The footer shows the keys as buttons. |
 
 On a phone, the keys of the footer are buttons, for example **Esc Back**. A tap on a button sends the same key as the keyboard. The tap does not close the on-screen keyboard. A button that is not allowed on the screen is grey. Menu rows and list rows can be tapped too. With a hardware keyboard or a scanner, the keys `F1` to `F12`, `Enter`, `Esc`, `Tab`, the arrow keys and `Page Up` / `Page Down` work as in the terminal. `Left` and `Right` work only on a field where you choose a value from a short list. `Ctrl` + `]` types the group separator of a scanned label; the field shows it as ␝.
 
-## What the supervisor sees
+## What to give support
 
-Failed actions are written to the server log. Supervisors and support can find them with the time and your user name.
-
-Quark records the command, user, warehouse, duration and outcome for each call.
-Give support your user name, warehouse and the approximate time of the action.
-Include the request identifier if the terminal shows one.
+Give support the screen title, your user name, the warehouse and the approximate time of the action. Include the request identifier if the terminal shows one. Do not send a password.
 
 ## Related guides
 
