@@ -1,6 +1,6 @@
 # Resetting a password
 
-Use this page to give a user a new password. This is the only way to change a password in the product: no screen lets a user change their own.
+Use this page when an administrator must give a user a new password. A user who can receive account email can instead select **Forgot?** on the sign-in page and choose their own password from a one-time link.
 
 ## Before you start
 
@@ -16,6 +16,8 @@ Use this page to give a user a new password. This is the only way to change a pa
 4. On the `General` tab, type the new password in `Password`. The field is empty when the card opens; the old password is never shown.
 5. Click `Save`.
 6. Tell the user the new password in a safe way. The system does not ask the user to change it at first sign-in.
+
+For self-service recovery, do not set or send a password yourself. Ask the user to select **Forgot?** on the sign-in page. The link works once for 30 minutes. When the system issues a new link for the same account, the previous link becomes unusable. Completing the reset ends every open session for that account. See [Sign-in, passwords and sessions](92-sign-in-passwords-and-sessions.md#reset-a-forgotten-password).
 
 ## What changes
 
@@ -33,6 +35,7 @@ Use this page to give a user a new password. This is the only way to change a pa
 | `Only a superuser can change or delete the superuser account {id}` | The account is `Admin` or `Sys`, and you are not a super-user. | Ask a super-user. |
 | The user still cannot sign in | The status is `Locked` or `Disabled`, `RF device login` is off for the handheld, or the password is shorter than 8 characters. | Check the card. The sign-in always answers `Invalid username or password`. |
 | `Password must have at least 8 characters.` | The password is too short. | Set a password of 8 or more characters. |
+| The user cannot receive a reset email | Email recovery is unavailable, the account is not eligible, or the address cannot receive the message. The recovery page does not reveal which case applies. | Check the account status and email. If necessary, set a new password here and send it through an approved secure channel. |
 
 ## Related pages
 

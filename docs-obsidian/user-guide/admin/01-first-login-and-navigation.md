@@ -30,6 +30,10 @@ Sign in to the web UI and reach the main screen.
 4. Click `Sign in`.
 5. Optional: use the `RU` / `EN` button on the sign-in page to change the language of the sign-in page. Use the moon/sun button to change the theme.
 
+If you have forgotten the password, click `Forgot?`. Enter your user name or account email and click `Send a reset link`. The confirmation does not reveal whether an account exists. A link sent to an eligible account works once for 30 minutes. When the system issues a new link for the same account, the previous link becomes unusable. After you choose the new password, all open sessions for the account end.
+
+If the recovery page says that this installation does not send reset emails, contact your administrator. See [Sign-in, passwords and sessions](../reference/administration/92-sign-in-passwords-and-sessions.md#reset-a-forgotten-password) for the complete workflow.
+
 ![Web sign-in page](../assets/screens/login.png)
 
 *Caption: the sign-in page with the fields Username and Password. Focus: Sign in form on the right: Username, Password and the Sign in button. The teal numbers on the picture mark: 1 Username, 2 Password, 3 Sign in button.*
@@ -54,6 +58,8 @@ The sign-in form and user administration use the same eight-character minimum. P
 |---|---|---|
 | A password length message | The password field failed the form check. | Type a longer password. |
 | `Login failed.` | The server did not accept the credentials. | Check the user name and the password. |
+| No reset email arrives | The page always gives the same confirmation, including for an unknown or ineligible account. | Check spam and the entered user name or email, then ask an administrator if the message still does not arrive. |
+| `This link has expired or was already used` | The link is older than 30 minutes, was already used, or was replaced when the system issued a newer link for the same account. | Click `Ask for a new link`. |
 | Login is refused for an RF terminal only | The user has **RF device login** turned off. The refusal looks the same as a wrong password. | Turn on **RF device login** for the user; see [Users, Roles and Permissions](02-users-roles-permissions.md). |
 | Sign-in returns an error with no detail after a database reset | The session data was reset. | Ask the system administrator to restart the web service, then sign in again. |
 
